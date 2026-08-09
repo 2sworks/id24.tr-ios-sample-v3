@@ -86,11 +86,29 @@ Görüşme sırasında agent'ın gönderebildiği tüm komutlar için
 
 ## Kopma Durumunda WebRTC
 
-Görüşme sırasında ICE bağlantısı `.disconnected` **veya** `.failed` duruma düşerse SDK
-`terminateCall("TURN_DISCONNECTED")` yayınlar ve LostConnection/reconnect akışı devreye
-girer; `.closed` ise yalnızca loglanır. Üç durum da birleşik kapanma kodlarıyla
-etiketlenir: 4140 `turnDisconnected` · 4141 `turnFailed` · 4142 `turnClosed`
+Görüşme sırasında ICE bağlantısı `.disconnected` veya `.failed` duruma düşerse SDK
+görüşmeyi **hemen sonlandırmaz**: bir toparlanma penceresi açar (varsayılan 8 sn ·
+`.failed` için 12 sn). Pencere içinde `connected`/`completed` gelirse görüşme kesintisiz
+sürer ve hiçbir kod raporlanmaz. Pencere dolarsa `terminateCall("TURN_DISCONNECTED")`
+yayınlanır ve LostConnection/reconnect akışı devreye girer; `.closed` ise yalnızca
+loglanır. Üç durum da birleşik kapanma kodlarıyla etiketlenir:
+4140 `turnDisconnected` · 4141 `turnFailed` · 4142 `turnClosed`
 ([WebSocket → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100)).
+
+**Neden pencere var?** WiFi ↔ hücresel geçişi, asansöre girmek, hücre değişimi ICE'ı
+rutin olarak `disconnected`'a düşürür ve çoğu kez saniyeler içinde düzelir. Anında
+sonlandırmak sağlıklı görüşmeleri gereksiz yere kesiyordu. Pencere açıkken durum daha da
+kötüleşirse (disconnected → failed) pencere **uzatılmaz**, yalnızca raporlanacak kod güncellenir.
+
+```swift
+IdentifyManager.shared.iceDisconnectGraceSeconds = 8    // ICE .disconnected
+IdentifyManager.shared.iceFailedGraceSeconds     = 12   // ICE .failed
+```
+
+Sinyal (WebSocket) koptuğunda ise medya oturumu **tamamen** kapatılır: peer connection
+kapanır, kamera capture durur, mikrofon susar. Peer connection kendi taşıma hattı üzerinden
+ayakta kalabildiği için yalnızca susturmak yetmiyordu — kullanıcı "bağlantı koptu" ekranını
+görürken mikrofon panele açık kalabiliyordu.
 
 Bağlantı kopup kullanıcı yeniden bağlandığında (`reconnectToSocket`), WebRTC oturumu
 **yalnızca kullanıcı görüşme ekranındaysa** yeniden kurulur (video+audio+data channel) ve

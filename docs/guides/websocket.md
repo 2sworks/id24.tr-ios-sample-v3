@@ -159,36 +159,59 @@ SDK'nın kendisi kapatır; kod **close frame ile sunucuya da gider**.
 | 4103 | `forceQuit` | `forceQuitSDK()` |
 | 4104 | `reconnectCycle` | Reconnect öncesi eski bağlantının kapatılması |
 | 4105 | `backgroundTimeout` | Uygulama arka planda limit süreyi aştı (aşağıya bakın) |
+| 4106 | `callCompleted` | Görüşme tamamlandı; sonraki modüle geçiliyor (`disconnectSocket(reason:)`) |
+| 4107 | `pingTimeout` | *Rezerve* — ölü bağlantı tespiti bu sürümde 4109 ile yapılır |
+| 4108 | `ringingTimeout` | Çağrı çaldı ama `ringingTimeout` (varsayılan 300 sn) boyunca yanıtlanmadı |
+| 4109 | `heartbeatTimeout` | Ardışık 3 PING'e PONG gelmedi — bağlantı ölü kabul edildi |
 
-### 4110–4118 · Sunucu/protokol kaynaklı (gelen standart kodun etiketi)
+> ⚠️ **Sürüm notu:** `4106` daha önce `heartbeatTimeout` idi. Heartbeat zaman aşımı
+> **4109**'a taşındı, 4106 artık `callCompleted`. Sunucu tarafındaki eşlemeyi güncelleyin.
+
+### 4110–4119 · Sunucu/protokol kaynaklı (gelen standart kodun etiketi)
 
 | Kod | Case | Kaynak | Davranış |
 |---|---|---|---|
 | 4110 | `serverNormal` | 1000 | sadece log |
 | 4111 | `serverGoingAway` | 1001 | sadece log |
 | 4112 | `noStatusReceived` | 1005 | sadece log |
-| 4113 | `protocolError` | 1002 | listener'a `.wrongSocketActionErr` |
-| 4114 | `unsupportedFrame` | 1003 | listener'a `.wrongSocketActionErr` |
-| 4115 | `encodingError` | 1007 | listener'a `.wrongSocketActionErr` |
-| 4116 | `policyViolated` | 1008 | listener'a `.wrongSocketActionErr` |
-| 4117 | `messageTooBig` | 1009 | listener'a `.wrongSocketActionErr` |
-| 4118 | `unknownWsError` | diğer | listener'a `.wrongSocketActionErr` (tip detayı reason'da) |
+| 4113 | `protocolError` | 1002 | listener'a **`.connectionErr`** |
+| 4114 | `unsupportedFrame` | 1003 | listener'a **`.connectionErr`** |
+| 4115 | `encodingError` | 1007 | listener'a **`.connectionErr`** |
+| 4116 | `policyViolated` | 1008 | listener'a **`.connectionErr`** |
+| 4117 | `messageTooBig` | 1009 | listener'a **`.connectionErr`** |
+| 4118 | `unknownWsError` | diğer | listener'a **`.connectionErr`** (tip detayı reason'da) |
+| 4119 | `authRejected` | — | WS anahtarı/oturum doğrulaması reddedildi; bağlantı hiç kurulamadı |
 
-### 4130–4132 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler
+> Hata kodlarında eskiden son `sdkSocketActions` yeniden yayınlanıyordu; kopma anındaki
+> değer alakasız olduğu için reconnect ekranı açılmıyordu. Artık her beklenmedik kopmada
+> `.connectionErr` gider ve arkada canlı kalan WebSocket/WebRTC bağlantıları elle kapatılır.
+
+### 4130–4133 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler
 
 | Kod | Case | Kaynak |
 |---|---|---|
 | 4130 | `networkUnreachable` | Reachability: internet erişimi yok |
 | 4131 | `transportError` | SSL / proxy / firewall hatası |
 | 4132 | `unexpectedDrop` | Hatasız kopma — sunucu sessiz kapattı |
+| 4133 | `connectTimeout` | Verilen sürede bağlantı hiç kurulamadı (ilk 30 sn · reconnect 10 sn) |
 
 ### 4140–4142 · TURN / ICE (WebRTC)
 
 | Kod | Case | Kaynak | Davranış |
 |---|---|---|---|
-| 4140 | `turnDisconnected` | ICE `.disconnected` | `terminateCall("TURN_DISCONNECTED")` → LostConnection |
-| 4141 | `turnFailed` | ICE `.failed` | `terminateCall("TURN_DISCONNECTED")` → LostConnection |
+| 4140 | `turnDisconnected` | ICE `.disconnected` | **8 sn** toparlanma penceresi; dolarsa `terminateCall("TURN_DISCONNECTED")` |
+| 4141 | `turnFailed` | ICE `.failed` | **12 sn** toparlanma penceresi; dolarsa `terminateCall("TURN_DISCONNECTED")` |
 | 4142 | `turnClosed` | ICE `.closed` | log + event |
+
+> **Toparlanma penceresi:** ICE koptuğunda görüşme HEMEN sonlandırılmaz. WiFi ↔ hücresel
+> geçişi, asansör, hücre değişimi bu durumu rutin üretir ve çoğu kez saniyeler içinde
+> düzelir. Pencere içinde `connected`/`completed` gelirse görüşme kesintisiz sürer ve
+> kod hiç raporlanmaz. Süreler host tarafından ayarlanabilir:
+>
+> ```swift
+> IdentifyManager.shared.iceDisconnectGraceSeconds = 8    // ICE .disconnected
+> IdentifyManager.shared.iceFailedGraceSeconds     = 12   // ICE .failed
+> ```
 
 ### Arka Plan Zaman Aşımı (4105)
 

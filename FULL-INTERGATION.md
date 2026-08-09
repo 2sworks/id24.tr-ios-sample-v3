@@ -886,6 +886,41 @@ Kutudan çıktığı gibi çalışır — kurulum gerekmez:
 - Davranış: `coordinator.dismissLostConnection()` (restart etmeden kapatma),
   `moduleRestartToken` gözlemi.
 
+### Dayanıklılık ayarları
+
+Varsayılanlar sahada denenmiştir; değiştirmeniz **gerekmez**. Hepsi `setupSDK`'dan önce
+ya da sonra ayarlanabilir.
+
+```swift
+let m = IdentifyManager.shared
+
+// ICE toparlanma penceresi — WiFi↔hücresel geçişinde görüşmeyi kesmemek için
+m.iceDisconnectGraceSeconds = 8     // ICE .disconnected
+m.iceFailedGraceSeconds     = 12    // ICE .failed
+
+// Yeniden bağlanma denemesinin vazgeçme süresi (ilk bağlantı sabit 30 sn)
+m.reconnectTimeoutSeconds   = 10
+
+// Çift yönlü PING/PONG heartbeat — ölü bağlantı tespiti
+m.isHeartbeatEnabled        = true
+m.heartbeatIntervalSeconds  = 10
+
+// Arka planda kalma limiti (çalan çağrı / süren görüşme varken uygulanmaz)
+m.backgroundTimeoutSeconds  = 30
+m.isBackgroundTimeoutEnabled = true
+
+// Yanıtlanmayan çağrının üst sınırı
+m.ringingTimeout            = 300
+```
+
+Bağlantının neden koptuğunu okumak için `m.lastSocketCloseCode`, görüşmenin sağlık
+özeti için `m.lastCallHealthReport` — ayrıntı:
+[WebSocket → Birleşik Kapanma Kodları](docs/guides/websocket.md) ve
+[CallScreen → Görüşme Sağlık Raporu](NewTest/Modules/CallScreen/CallScreen.md).
+
+> ⚠️ **Sunucu koordinasyonu:** Bu sürümde `4106` artık `callCompleted`; heartbeat zaman
+> aşımı **4109**'a taşındı. Sunucu tarafındaki kod eşlemesini güncelleyin.
+
 ---
 
 ## 14) "Bypass Yok" Kuralı

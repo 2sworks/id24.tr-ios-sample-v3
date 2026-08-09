@@ -135,7 +135,7 @@ public enum SDKCallNetworkQuality { case none, /* ... */ good, poor }
 |---|---|
 | `checkSignLangIfNeeded()` | `connectToSignLang` ise işaret dili kapısını açar |
 | `signLangCompleted()` | İşaret dili adımını tamamlar |
-| `acceptCall()` | Çağrıyı kabul eder (`manager.acceptCall`) — TURN kimliği + SDP offer |
+| `acceptCall()` | Çağrıyı kabul eder (`manager.acceptCall`) — TURN kimliği + SDP offer. Çalan çağrı yoksa ya da bağlantı kapanıyorsa **başarısız döner** ve `errorMessage` dolar |
 | `terminateCall(coordinator:)` | Görüşmeyi bitirir + dinleyiciyi geri verir + ThankYou'ya geçer |
 | `verifySMS()` | SMS kodunu doğrular (`manager.smsVerification`) |
 | `startRemoteNFC(birthDate:validDate:docNo:)` | Uzaktan NFC okumayı başlatır |
@@ -149,6 +149,54 @@ nonisolated public func listenSocketMessage(message: SDKCallActions)
 ```
 CallScreen aktifken soket mesajlarını **doğrudan bu VM** işler (coordinator yerine).
 Aksiyonların tam listesi: [WebSocket → Aksiyon Kataloğu](../../../docs/guides/websocket.md#aksiyon-kataloğu--sdkcallactions).
+
+## Gelen Arama Zili ve Çalma Penceresi
+
+Zil (sistem sesi + titreşim) tamamen SDK'nın sorumluluğundadır — kendi çağrı ekranınızı
+yazsanız bile zili siz başlatmaz/durdurmazsınız. Çalma durumunun sahibi
+`IdentifyManager.isRinging`'dir; çalma hangi yoldan biterse bitsin (yanıtlama, endCall,
+terminateCall, imOffline, çalma zaman aşımı, kopma, SDK kapanışı) zil de susar.
+
+```swift
+let m = IdentifyManager.shared
+m.incomingCallRingtoneEnabled  = true   // sistem sesi (sessiz modda iOS çalmaz)
+m.incomingCallVibrationEnabled = true   // CoreHaptics — sessiz modda da hissedilir
+m.incomingCallRingtoneInterval = 2.5    // iki zil arası (sn)
+m.ringingTimeout               = 300    // yanıtlanmazsa sonlandırma süresi (sn)
+```
+
+- **Sessiz mod:** Sistem sesi iOS kısıtı gereği çalmaz; titreşim CoreHaptics üzerinden
+  verildiği için sessiz anahtarından etkilenmez. Dokunsallık donanımı olmayan cihazlarda
+  (iPhone 7 ve öncesi) eski `AudioServicesPlaySystemSound` yoluna düşülür.
+- **`hideCallAnswerScreen` açıkken zil hiç çalmaz** — host çağrıyı çalma ekranı
+  göstermeden anında yanıtladığı için zil tek bir gereksiz darbe olurdu.
+- **Çalma zaman aşımı (4108):** Temsilci tarafı çağrıyı iptal edemediğinden yanıtlanmayan
+  çağrının bir üst sınırı vardır. Süre duvar saatiyle `initCall` anından ölçülür; dolduğunda
+  `terminateCall("RINGING_TIMEOUT")` yayınlanır.
+- **Yinelenen `initCall`** yok sayılır: görüşme sürerken ikinci bir çalma ekranı açılmaz.
+
+### Çağrı durumu (salt-okunur)
+
+```swift
+IdentifyManager.shared.isRinging     // temsilci aradı, henüz yanıtlanmadı
+IdentifyManager.shared.isCallActive  // görüşme sürüyor
+```
+
+## Görüşme Sağlık Raporu
+
+Görüşme bittiğinde SDK tek satırlık bir sağlık özeti üretir; sunucuya `call_health`
+tipiyle gider ve host'a da açıktır:
+
+```swift
+if let r = IdentifyManager.shared.lastCallHealthReport {
+    print(r.durationText, r.isHealthy, r.socketDropCount, r.iceDisconnectCount)
+}
+```
+
+Rapor; socket kopma sayısı ve çevrimdışı süre, ICE kesinti/başarısızlık/toparlanma
+sayıları ve kesintili süre, cihazın internet kaybı ile WiFi↔hücresel geçiş sayısı, en uzun
+sunucu sessizliği ve bitişteki ICE durumunu içerir. Saha sorunlarını ("görüşme koptu")
+tek kayıttan teşhis etmek içindir.
 
 ## Sinyal Zinciri — Perde Arkası
 
@@ -208,4 +256,11 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .callScreenTts, language: 
   [LostConnection rehberi](../LostConnection/LostConnection.md).
 - **Görüşme kurulamıyor / tek yönlü medya:** Neredeyse her zaman TURN kimlik sorunudur —
   [TURN & WebRTC → Sorun Giderme](../../../docs/guides/turn-webrtc.md#sorun-giderme).
-- **Simülatör:** Kamera yok — görüşme yalnızca gerçek cihazda test edilir.
+- **Simülatör:** Kamera yok — görüşme yalnızca gerçek cihazda test edilir. Zil titreşimi
+  ve ICE toparlanma penceresi de yalnızca cihazda doğrulanabilir.
+- **`acceptCall()` başarısız dönebilir:** Yeniden bağlanma sonrası ekranda asılı kalmış eski
+  bir çalma ekranından "yanıtla"ya basılırsa SDK `startCall` göndermez ve hata döner. Kendi
+  ekranınızı yazıyorsanız bu yolu mutlaka ele alın — aksi halde kullanıcı sonsuz "bağlanıyor"
+  durumunda kalır.
+- **Zili siz yönetmeyin:** `SDKRingtonePlayer` SDK'ya özeldir; çalma/susturma `isRinging`
+  üzerinden tek noktadan yapılır. Kendi çağrı ekranınızda zil başlatmaya çalışmayın.
