@@ -140,6 +140,10 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .videoRecorderTts, languag
 - **Sesli doğrulama nasıl açılır?** Sunucu tarafından (`video_record_speech` bayrağı) —
   okunacak metin, eşleşme eşiği ve süre de sunucudan gelir
   ([Sunucu & API](../../../docs/guides/server-api.md#roomresponse--akışı-şekillendiren-alanlar)).
+  Bayrak yanıtta hiç yoksa okunacak metnin dolu olması doğrulamayı açmaya yeter; bayrak
+  açıkça `0` gönderildiğinde metin dolu olsa da doğrulama kapalı kalır.
+- **Kayıt süresi birimi:** `video_record_duration` sunucudan **milisaniye** gelir
+  (6000 → 6 sn). SDK saniyeye çevirir ve 3–120 sn aralığına sıkıştırır.
 - **Video reddediliyor:** Boyut `manager.requestMaxBodySize`'ı aşıyorsa `videoSelected`
   kabul etmez; süreyi ve çözünürlüğü düşürün.
 - **`speechSuccess` ne zaman anlamlı?** Yalnızca okuma-metni senaryosunda; doğrulama
