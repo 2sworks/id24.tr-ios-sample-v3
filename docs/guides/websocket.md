@@ -215,6 +215,11 @@ Aktif oturum sırasında uygulama arka plana geçerse SDK süre sayar; limit aş
 soket **4105** ile kapatılır ve kullanıcı döndüğünde LostConnection/reconnect ekranı
 hazırdır. Sistem uygulamayı erken dondurursa süre, ön plana dönüşte telafi edilir.
 
+Kural **istisnasız** işler: çalan çağrı ya da süren görüşme de muaf değildir. Süre dolunca
+görüşme biter, kullanıcı yeniden bağlanma ekranına alınır ve oradan tam prosedürle bekleme
+odasına döner (temsilci yeniden arayabilir). Eskiden canlı çağrı muaf tutuluyordu; sonuç,
+limitin görüşmede hiç işlememesi ve mobil ile panelin farklı durumda kalması oldu.
+
 ```swift
 IdentifyManager.shared.backgroundTimeoutSeconds = 30   // varsayılan 30 sn
 IdentifyManager.shared.isBackgroundTimeoutEnabled = true // kapatmak için false

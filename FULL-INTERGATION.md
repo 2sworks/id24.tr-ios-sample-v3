@@ -901,7 +901,7 @@ m.reconnectTimeoutSeconds   = 10
 m.isHeartbeatEnabled        = true
 m.heartbeatIntervalSeconds  = 10
 
-// Arka planda kalma limiti (çalan çağrı / süren görüşme varken uygulanmaz)
+// Arka planda kalma limiti — istisnasız, görüşme sürerken de uygulanır
 m.backgroundTimeoutSeconds  = 30
 m.isBackgroundTimeoutEnabled = true
 
