@@ -102,7 +102,7 @@ IdentifyManager.shared.setupSDK(
 | `active_comparison_result_skip_module` | Aktif karşılaştırma sonucuna göre modül atlama |
 | `encrypted_turn_credential`, `short_term_usage` | TURN kimlik modu → [TURN & WebRTC](turn-webrtc.md) |
 | `liveness`, `liveness_recording`, `liveness_report*` | Canlılık adım sırası ve kayıt/rapor ayarları |
-| `video_record_speech*`, `speech_expected_sentence`, `video_record_duration` | Kısa videoda sesli okuma doğrulaması. `video_record_duration` **milisaniyedir** (6000 → 6 sn); `video_record_speech` gelmezse metnin dolu olması doğrulamayı açar |
+| `video_record_speech*`, `speech_expected_sentence`, `video_record_duration` | Kısa videoda sesli okuma doğrulaması. `video_record_duration` **milisaniyedir** (6000 → 6 sn). Doğrulamayı **metin** açar: `video_record_read_text` (yoksa `speech_expected_sentence`) doluysa açık, boşsa kapalı — `video_record_speech` bayrağı belirleyici değildir |
 | `agent_view_scale` | Görüşmede agent görüntü oranı |
 | `hide_call_answer_screen` | Çağrı cevaplama ekranını gizle |
 | `request_max_body_size` | Upload boyut sınırı (sunucudan gelir) |

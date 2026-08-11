@@ -69,14 +69,39 @@ arka plana attı" gibi durumları yakalamak için birebirdir.)
 
 ## Silent Bayrağı — 🔕
 
-Bazı loglar konsolu kirletmesin ama online'a yine de gitsin istersiniz (ör. saniyede
-birkaç kez üretilen ölçümler). Bunun için satır bazında `silent`:
+Bazı satırlar geliştirirken görülmeli ama sunucuya taşınmamalıdır (ör. giden istek
+gövdeleri, saniyede birkaç kez üretilen ölçümler). Bunun için satır bazında `silent`:
 
 ```swift
 SDKLog.debug("liveness skoru: \(score)", .liveness, silent: true)
 ```
 
-`silent: true` satırı konsola basılmaz; online kanal davranışı değişmez.
+`silent: true` = **konsolda görünür, online kuyruğa girmez.** `.online` seviyesinde satır
+`🔕` ekiyle basılır ve orada durur; `.onlineSilent` seviyesinde konsol zaten kapalı olduğu
+için satır tamamen düşer.
+
+Yani iki eksen birbirinden bağımsızdır: `SDKLogLevel` hangi kanalların açık olduğunu
+oturum boyunca belirler, `silent` ise tek bir satırın online kuyruğa girme hakkını alır.
+
+**Online kanalı sessizce kapatan diğer durumlar** — seviye `.online` olsa bile satır
+kuyruğa girmez:
+
+| Durum | Sonuç |
+|---|---|
+| `logOnlineSecretKey` boş | Konsola "Online log devre dışı: secKey boş" uyarısı basılır |
+| Oturum kapandı (`closeSDK` sonrası artçı loglar) | Konsola basılır, kuyruk kapalı olduğu için sessizce atlanır |
+| `SDKLog.console(...)` ile yazılan satırlar | Taşıma katmanına hiç girmez — aşağıya bakın |
+
+### `SDKLog.console` — yalnızca konsol
+
+Log gönderiminin **kendi** hata satırı online kuyruğa girerse yeni bir gönderim hatası
+doğurur ve sonsuz döngü kurar. Bu satırlar `SDKLog.console(severity, category, mesaj)`
+ile yazılır: biçim diğer tüm loglarla birebir aynıdır (redaksiyon dahil), tek farkı
+kuyruğa hiç uğramamasıdır.
+
+```
+[identify] ⚠️ WARN  · NETWORK  · 2026-08-11 02:49:41 › Log gönderimi tamamlanamadı. Sunucuya ulaşılamadı. Neden: …
+```
 
 ---
 

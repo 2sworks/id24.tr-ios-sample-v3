@@ -86,58 +86,36 @@ Görüşme sırasında agent'ın gönderebildiği tüm komutlar için
 
 ## Kopma Durumunda WebRTC
 
-Görüşme sırasında ICE bağlantısı `.disconnected` veya `.failed` duruma düşerse SDK
-görüşmeyi **hemen sonlandırmaz**: bir toparlanma penceresi açar (varsayılan 8 sn ·
-`.failed` için 12 sn). Pencere içinde `connected`/`completed` gelirse görüşme kesintisiz
-sürer ve hiçbir kod raporlanmaz. Pencere dolarsa `terminateCall("TURN_DISCONNECTED")`
-yayınlanır ve LostConnection/reconnect akışı devreye girer; `.closed` ise yalnızca
-loglanır. Üç durum da birleşik kapanma kodlarıyla etiketlenir:
-4140 `turnDisconnected` · 4141 `turnFailed` · 4142 `turnClosed`
+Görüşme sırasında ICE bağlantısı `.disconnected` veya `.failed` duruma düşerse görüşme
+**anında sonlandırılır**: `terminateCall("TURN_DISCONNECTED")` yayınlanır ve
+LostConnection/reconnect akışı devreye girer. `.closed` yalnızca loglanır. Üç durum da
+birleşik kapanma kodlarıyla etiketlenir: 4140 `turnDisconnected` · 4141 `turnFailed` ·
+4142 `turnClosed`
 ([WebSocket → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100)).
-
-**Neden pencere var?** WiFi ↔ hücresel geçişi, asansöre girmek, hücre değişimi ICE'ı
-rutin olarak `disconnected`'a düşürür ve çoğu kez saniyeler içinde düzelir. Anında
-sonlandırmak sağlıklı görüşmeleri gereksiz yere kesiyordu. Pencere açıkken durum daha da
-kötüleşirse (disconnected → failed) pencere **uzatılmaz**, yalnızca raporlanacak kod güncellenir.
-
-```swift
-IdentifyManager.shared.iceDisconnectGraceSeconds = 8    // ICE .disconnected
-IdentifyManager.shared.iceFailedGraceSeconds     = 12   // ICE .failed
-```
 
 ### Sinyal (WebSocket) koptuğunda
 
-Davranış, görüşmenin o an sürüp sürmediğine göre ayrışır.
+Görüşme sürsün sürmesin davranış aynıdır: medya oturumu **tamamen** kapatılır (peer
+connection kapanır, kamera capture durur, mikrofon susar), socket kapatılır ve kullanıcıya
+"Bağlantı Koptu" ekranı gösterilir.
 
-**Görüşme sürerken** kopma olursa görüşme sonlandırılmaz, **askıya alınır**:
+### Neden toparlanma penceresi YOK?
 
-- Medya **susturulur** (sinyal yokken panele ses/görüntü gitmemeli) ama peer connection
-  ayakta bırakılır — kapatılsaydı görüşme geri gelemez, panelin yeni bir `initCall` atması
-  gerekirdi.
-- Kullanıcıya "bağlantı koptu" ekranı **gösterilmez**.
-- SDK pencere boyunca `socketRecoveryRetryInterval` aralıklarla kendi sessiz yeniden
-  bağlanma denemesini yapar (yeniden bağlanma normalde kullanıcı tetiklidir).
-  Varsayılan 3 sn / 1 sn ≈ 3 deneme. Pencere bilinçli olarak KISA tutulmuştur: kurtarılamayacak
-  bir görüşme için kullanıcıyı donmuş ekranda bekletmek, kopma ekranını hemen göstermekten kötüdür.
-- Sinyal geri gelirse medya yeniden açılır, görüşme kaldığı yerden sürer.
-- Pencere dolarsa tam sonlandırma yapılır: peer connection kapatılır, 4132 raporlanır,
-  sağlık raporu kapanır ve LostConnection ekranı açılır.
+Bir dönem hem ICE hem WebSocket için "toparlanma penceresi" (askı + sessiz yeniden
+bağlanma) vardı: kopma anında görüşme askıya alınıyor, medya susturuluyor ama peer
+connection ayakta bırakılıyor, SDK arka planda sessizce yeniden bağlanmayı deniyordu.
+**Bu yapı kaldırıldı** — sunucu ve panel tarafında karşılığı yoktu:
 
-```swift
-IdentifyManager.shared.socketDropGraceSeconds      = 3   // 0 → özellik kapalı
-IdentifyManager.shared.socketRecoveryRetryInterval = 1
-IdentifyManager.shared.isCallSuspended                  // salt-okunur durum
-```
+- Sunucu askıdaki oturumu hâlâ canlı saydığı için sessiz yeniden abonelik `subRejected`
+  ("Oda dolu") ile reddediliyordu.
+- Panel çağrı oturumunu kapatmıyor, sayaç işlemeye devam ediyordu.
+- Cihaz testinde ident statüsü bu yolla `Reddedildi`ye düştü.
 
-Olaylar: askıya alınırken `call.suspended`, toparlandığında `call.resumed`.
-
-> ⚠️ **Sunucu bağımlılığı:** Pencerenin görüşmeyi gerçekten kurtarması, sunucunun da
-> müşteriyi o saniyelerde odada tutmasına bağlıdır. Sunucu oturumu anında düşürüyorsa
-> pencere görüşmeyi kurtaramaz; yalnızca "bağlantı koptu" ekranı `socketDropGraceSeconds`
-> kadar gecikir. Bu yüzden süre kısa tutulmuştur.
-
-**Görüşme yokken** (ya da özellik kapalıyken) kopma olursa medya oturumu **tamamen**
-kapatılır: peer connection kapanır, kamera capture durur, mikrofon susar.
+Artık tek bir davranış var: **bağlantı koptu → her şey yıkılır → "Bağlantı Koptu" ekranı →
+kullanıcı yeniden bağlanır → tam prosedür.** Yeniden bağlanma `imOnline` +
+`getIdentStatus` + `subscribe` + `stepChanged` gönderir. Panel bir karar vermemişse
+(statü id `< 0`) müşteri **bekleme odasına** döner ve temsilci yeniden arayabilir; karar
+vermişse başarılı/başarısız ThankYou ekranı açılır.
 
 Bağlantı kopup kullanıcı yeniden bağlandığında (`reconnectToSocket`), WebRTC oturumu
 **yalnızca kullanıcı görüşme ekranındaysa** yeniden kurulur (video+audio+data channel) ve

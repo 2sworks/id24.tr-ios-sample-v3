@@ -894,14 +894,6 @@ ya da sonra ayarlanabilir.
 ```swift
 let m = IdentifyManager.shared
 
-// ICE toparlanma penceresi — WiFi↔hücresel geçişinde görüşmeyi kesmemek için
-m.iceDisconnectGraceSeconds = 8     // ICE .disconnected
-m.iceFailedGraceSeconds     = 12    // ICE .failed
-
-// Sinyal (WebSocket) toparlanma penceresi — görüşme sırasında kısa TCP kopmaları
-m.socketDropGraceSeconds      = 3   // 0 → kapalı (kopma anında anında sonlandır)
-m.socketRecoveryRetryInterval = 1   // pencere içindeki sessiz deneme aralığı
-
 // Yeniden bağlanma denemesinin vazgeçme süresi (ilk bağlantı sabit 30 sn)
 m.reconnectTimeoutSeconds   = 10
 
@@ -917,11 +909,11 @@ m.isBackgroundTimeoutEnabled = true
 m.ringingTimeout            = 300
 ```
 
-Görüşme sırasında sinyal koparsa görüşme hemen bitmez, `socketDropGraceSeconds` boyunca
-askıya alınır (medya susturulur, WebRTC oturumu ayakta kalır, SDK sessizce yeniden bağlanmayı
-dener). Durumu `m.isCallSuspended` ile okuyabilir, `call.suspended` / `call.resumed`
-olaylarını dinleyebilirsiniz. Ayrıntı ve sunucu bağımlılığı:
-[TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).
+Görüşme sırasında sinyal ya da ICE koparsa **toparlanma beklenmez**: görüşme biter, tüm
+bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir. Yeniden bağlanma
+kullanıcı tetiklidir ve tam prosedürle çalışır (imOnline + getIdentStatus + subscribe +
+stepChanged); panel bir karar vermemişse müşteri bekleme odasına döner, vermişse ThankYou
+ekranı açılır. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).
 
 Bağlantının neden koptuğunu okumak için `m.lastSocketCloseCode`, görüşmenin sağlık
 özeti için `m.lastCallHealthReport` — ayrıntı:

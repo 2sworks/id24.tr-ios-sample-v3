@@ -257,7 +257,7 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .callScreenTts, language: 
 - **Görüşme kurulamıyor / tek yönlü medya:** Neredeyse her zaman TURN kimlik sorunudur —
   [TURN & WebRTC → Sorun Giderme](../../../docs/guides/turn-webrtc.md#sorun-giderme).
 - **Simülatör:** Kamera yok — görüşme yalnızca gerçek cihazda test edilir. Zil titreşimi
-  ve ICE toparlanma penceresi de yalnızca cihazda doğrulanabilir.
+  ve ICE kopma davranışı da yalnızca cihazda doğrulanabilir.
 - **`acceptCall()` başarısız dönebilir:** Yeniden bağlanma sonrası ekranda asılı kalmış eski
   bir çalma ekranından "yanıtla"ya basılırsa SDK `startCall` göndermez ve hata döner. Kendi
   ekranınızı yazıyorsanız bu yolu mutlaka ele alın — aksi halde kullanıcı sonsuz "bağlanıyor"

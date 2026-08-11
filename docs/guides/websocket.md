@@ -199,19 +199,15 @@ SDK'nın kendisi kapatır; kod **close frame ile sunucuya da gider**.
 
 | Kod | Case | Kaynak | Davranış |
 |---|---|---|---|
-| 4140 | `turnDisconnected` | ICE `.disconnected` | **8 sn** toparlanma penceresi; dolarsa `terminateCall("TURN_DISCONNECTED")` |
-| 4141 | `turnFailed` | ICE `.failed` | **12 sn** toparlanma penceresi; dolarsa `terminateCall("TURN_DISCONNECTED")` |
+| 4140 | `turnDisconnected` | ICE `.disconnected` | anında `terminateCall("TURN_DISCONNECTED")` |
+| 4141 | `turnFailed` | ICE `.failed` | anında `terminateCall("TURN_DISCONNECTED")` |
 | 4142 | `turnClosed` | ICE `.closed` | log + event |
 
-> **Toparlanma penceresi:** ICE koptuğunda görüşme HEMEN sonlandırılmaz. WiFi ↔ hücresel
-> geçişi, asansör, hücre değişimi bu durumu rutin üretir ve çoğu kez saniyeler içinde
-> düzelir. Pencere içinde `connected`/`completed` gelirse görüşme kesintisiz sürer ve
-> kod hiç raporlanmaz. Süreler host tarafından ayarlanabilir:
->
-> ```swift
-> IdentifyManager.shared.iceDisconnectGraceSeconds = 8    // ICE .disconnected
-> IdentifyManager.shared.iceFailedGraceSeconds     = 12   // ICE .failed
-> ```
+> **Toparlanma penceresi YOK.** ICE ya da WebSocket koptuğu anda görüşme biter, tüm
+> bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir. Bekleme/askı
+> yapısı denendi ve geri alındı: sunucu askıdaki oturumu canlı saydığı için yeniden
+> abonelik `subRejected` ("Oda dolu") ile reddediliyor, panel çağrı oturumunu kapatmıyordu.
+> Ayrıntı: [TURN & WebRTC → Neden toparlanma penceresi YOK?](turn-webrtc.md).
 
 ### Arka Plan Zaman Aşımı (4105)
 
