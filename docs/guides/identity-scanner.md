@@ -202,11 +202,47 @@ sabit çerçevede kurtarılacak tespit yok ama kadrajın kayma bedeli aynen sür
 görüntüden en keskini teslim edilir.
 
 **Teslim edilen görüntü çerçeveye değil, belgeye kırpılır.** Sabit çerçeve kullanıcı
-yönlendirmesi ve OCR bölgesidir; çekim anında kart profillerinde (`.visionText`,
-`.mrzTurkishID`) çerçevenin içinde kartın gerçek kenarları aranır ve kırpma ona göre
-yapılır — dinamik moddaki davranışın aynısı. Kenar bulunamazsa çerçeveye kırpılır.
-Pasaport ve tanınmayan belge profillerinde çerçeve kırpması kullanılır: pasaport kitapçık
-olduğu ve her açıda tutulabildiği için düzeltmesi çekim sonrası MRZ turunda yapılır.
+yönlendirmesi ve OCR bölgesidir; çekim anında çerçevenin içinde belgenin gerçek kenarları
+aranır ve kırpma ona göre yapılır — dinamik moddaki davranışın aynısı. Bulunamazsa ya da
+bulunan şey belgeye benzemiyorsa çerçeve kırpması teslim edilir; yani deneme hiçbir şeyi
+kötüleştiremez.
+
+### Mesafe kapısı — "çerçeveye oturmadan çekmez"
+
+Sabit modda çekim, belge çerçeveye oturana kadar onaylanmaz; bu sırada ne yapılması
+gerektiği HUD'da yazar:
+
+| Durum | Yönerge |
+|---|---|
+| Belge çerçeveyi taşıyor | "Kimliği biraz uzaklaştırın" |
+| Belge çerçevenin epey içinde (uzaktan çekim) | "Kimliği biraz yaklaştırın" |
+| Boyut doğru ama bir yana kaymış | "Kimliği çerçeveye ortalayın" |
+
+Ölçü `ScannerFixedFrame` üzerinden ayarlanır:
+
+```swift
+ScannerFixedFrame(aspect: 1.585,
+                  captureFitTolerance: 30,   // pt — kenar başına izin verilen boşluk
+                  overflowTolerance: 4)      // pt — çerçeveyi taşma payı
+```
+
+`captureFitTolerance` varsayılan 30pt: 360pt genişliğindeki bir çerçevede belgenin en az
+~%83'ünü doldurması gerekir. 10'a çekmek neredeyse tam oturma ister; yükseltmek gevşetir.
+
+Boyut ve konum **ayrı** ölçülür: boyut, karşılıklı kenarların toplam boşluğuna bakar
+(belgenin nerede durduğu bunu değiştirmez), kaymışlık ise bu boşluğun iki yana ne kadar
+dengesiz dağıldığına. Aksi hâlde doğru boyutta ama sola kaymış bir kimliğe "yaklaştırın"
+denirdi.
+
+> Kapı yalnız **kanıt varken** kısıtlar: belgenin kenarları bulunamıyorsa (koyu kart +
+> koyu zemin, düşük ışık) karar üretilmez ve çekim eskisi gibi serbest kalır. Aksi hâlde
+> tarayıcı hiç tetiklenmeyen bir ekrana dönüşebilirdi. Elle çekim düğmesi her hâlükârda
+> kapıdan muaftır.
+
+Tüm profiller dener, ama başarı oranı profile göre değişir: dikdörtgen tespitinin en-boy
+ve güven eşikleri profile özeldir. Kimlik/ehliyet en çok kazanan taraftır — alan ROI'leri
+karta göre tanımlı olduğundan kırpmanın kayması bölgesel OCR'ı da kaydırır. Tanınmayan
+belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşendir.
 
 ### Akıllı Davranışlar (kutudan çıkar)
 
