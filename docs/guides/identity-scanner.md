@@ -130,7 +130,8 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 |---|---|
 | `profile` | Hangi belge, nasıl taranır (yukarıda) |
 | `style: QuadrilateralStyle` | Dörtgen overlay'in görünümü (köşe stili, renkler) |
-| `configuration: ScannerConfiguration` | HUD metinleri + zamanlama (aşağıda) |
+| `configuration: ScannerConfiguration` | HUD metinleri + zamanlama + çerçeve modu (aşağıda) |
+| `frameMode: ScannerFrameMode?` | Çerçeve modunu tek çağrı için ezer (`nil` → configuration'ınki) |
 | `debugROI` | Alan bölgelerini ekranda çizer (geliştirme) |
 | `externalTorchOn` | El feneri kontrolünü dışarıdan bağlama (`Binding<Bool>`) |
 | `onTorchAvailability` | Cihazda fener var/yok bildirimi |
@@ -157,9 +158,59 @@ ScannerConfiguration.overrideDefault = cfg
 `timing` tarafında yakalama hızı, odak davranışı ve manuel yakalama gecikmesi ayarlanır
 (`ScannerTimingConfig`).
 
+### Çerçeve Modu — `ScannerFrameMode`
+
+Tarayıcı, belgenin karede nerede olduğuna iki yoldan birinden karar verir:
+
+| Mod | Nasıl çalışır |
+|---|---|
+| `.fixedFrame(ScannerFixedFrame)` | Ekranda **sabit** bir çerçeve çizilir; kullanıcı belgeyi ona hizalar. OCR yalnız çerçevenin içini okur. **Varsayılan.** |
+| `.dynamicQuad` | Belge canlı dikdörtgen tespitiyle **takip edilir**, perspektifi düzeltilir. |
+
+Seçim belge türü başına yapılır — `ScannerConfiguration` presetleri zaten türe göre ayrık:
+
+```swift
+// Varsayılanlar — üçü de sabit çerçeve
+ScannerFrameMode.idCardDefault   = .fixedFrame(.idCard)     // kimlik
+ScannerFrameMode.passportDefault = .fixedFrame(.passport)   // pasaport
+ScannerFrameMode.documentDefault = .fixedFrame(.document)   // serbest belge
+
+// Takip moduna dönmek: tek satır
+ScannerFrameMode.idCardDefault = .dynamicQuad
+
+// Çerçevenin ölçüsü de ayarlanabilir — ölçüler EKRAN NOKTASI cinsinden
+ScannerFrameMode.idCardDefault = .fixedFrame(
+    ScannerFixedFrame(aspect: 1.585,          // belgenin en/boy oranı
+                      horizontalPadding: 15,  // iki yandan boşluk (pt)
+                      verticalOffset: -24,    // merkezden kaydırma (pt, negatif = yukarı)
+                      cornerRadius: 16)       // köşe yarıçapı (pt)
+)
+```
+
+Hazır geometriler: `.idCard` (ID-1, 1.585), `.passport` (TD3 veri sayfası, 1.42),
+`.document` (A4 dikey, 0.707) — üçü de 15pt yan boşluk + 16pt köşe yarıçapı.
+
+> Çerçeve **ekran noktasında** ölçülür, sonra kamera koordinatına çevrilir. Tersi
+> (kamera tamponuna göre ölçmek) sezgisel ama yanlıştır: önizleme tamponu kırparak
+> ekranı doldurur, dolayısıyla tampon genişliğinin %90'ı görünür genişliğin %90'ı
+> **değildir** — çerçeve ekran dışına taşar ve kırpılan bölge belgeden çok daha geniş
+> kalır. Ekranda ölçmek, gördüğünüz çerçeve ile kırpılan bölgeyi tanım gereği eşitler.
+
+Sabit modda **lens/kamera geçişi kapalıdır** — geçişin tek amacı tespiti kurtarmaktı,
+sabit çerçevede kurtarılacak tespit yok ama kadrajın kayma bedeli aynen sürüyor. Otomatik
+çekim mekanizması iki modda da aynıdır: alanlar eşleşince tarama çizgisi başlar, iki aday
+görüntüden en keskini teslim edilir.
+
+**Teslim edilen görüntü çerçeveye değil, belgeye kırpılır.** Sabit çerçeve kullanıcı
+yönlendirmesi ve OCR bölgesidir; çekim anında kart profillerinde (`.visionText`,
+`.mrzTurkishID`) çerçevenin içinde kartın gerçek kenarları aranır ve kırpma ona göre
+yapılır — dinamik moddaki davranışın aynısı. Kenar bulunamazsa çerçeveye kırpılır.
+Pasaport ve tanınmayan belge profillerinde çerçeve kırpması kullanılır: pasaport kitapçık
+olduğu ve her açıda tutulabildiği için düzeltmesi çekim sonrası MRZ turunda yapılır.
+
 ### Akıllı Davranışlar (kutudan çıkar)
 
-- Belge sensöre çok yaklaşınca **ultra-geniş lense otomatik geçiş** (+ "uzaklaştırın" metni)
+- Belge sensöre çok yaklaşınca **ultra-geniş lense otomatik geçiş** (+ "uzaklaştırın" metni) — yalnız `.dynamicQuad` modunda
 - Dokunarak odaklama (sarı odak göstergesi)
 - Otomatik yakalama üst üste başarısız olursa **manuel yakalama** teklifi
 - Pasaport dik tutulursa **"yana çevirin"** yönlendirmesi
