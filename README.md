@@ -7,7 +7,7 @@ tek bir akış içinde, sunucu tarafından yönetilen modül sırasıyla çalı�
 
 Bu depo, SDK'yı edinen bir geliştiricinin **ilk bakacağı yer** olarak tasarlandı:
 
-- **Çalışan bir örnek uygulama** (`NewTest/`) — her modülün hazır ekranı ve host-tarafı örneği
+- **Çalışan bir örnek uygulama** (`IdentifySample/`) — her modülün hazır ekranı ve host-tarafı örneği
 - **Modül bazlı entegrasyon rehberleri** — her ekran için "kendi tasarımınla nasıl çalıştırırsın"
 - **Kavram rehberleri** — sunucu yapısı, WebSocket, TURN/WebRTC, log, event, tema, dil
 
@@ -142,24 +142,24 @@ kullanma, **kendi tasarımınla değiştirme** ve ViewModel referansı — hepsi
 
 | Modül             | Ne yapar                                                             | Rehber                                                                         |
 | ----------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Hazırlık          | İzinleri ve bağlantı hızını kontrol eder, kullanıcıyı akışa hazırlar | [Prepare](NewTest/Modules/Prepare/Prepare.md)                                  |
-| Kimlik (OCR)      | Kimlik kartının ön/arka yüzünü çeker, cihaz üzerinde okur            | [IdCard](NewTest/Modules/IdCard/IdCard.md)                                     |
-| Kimlik (OVD)      | Hologram/optik doğrulama ile sahte kimlik tespiti                    | [IdCardOVD](NewTest/Modules/IdCardOVD/IdCardOVD.md)                            |
-| NFC               | Kimlik/pasaport çipini okur (ICAO: BAC/PACE/CA)                      | [NFC](NewTest/Modules/NFC/NFC.md)                                              |
-| Selfie            | Selfie çeker, cihaz üzerinde yüz tespiti yapar                       | [Selfie](NewTest/Modules/Selfie/Selfie.md)                                     |
-| Selfie + Canlılık | Selfie ile canlılık testini birleştirir                              | [SelfieWithLiveness](NewTest/Modules/SelfieWithLiveness/SelfieWithLiveness.md) |
-| Canlılık          | Sola dön / göz kırp / gülümse adımlarıyla canlılık testi             | [Liveness](NewTest/Modules/Liveness/Liveness.md)                               |
-| Konuşma           | Ekrandaki metni sesli okutup doğrular (STT)                          | [Speech](NewTest/Modules/Speech/Speech.md)                                     |
-| İmza              | Ekranda imza alır ve yükler                                          | [Signature](NewTest/Modules/Signature/Signature.md)                            |
-| Video Kayıt       | Kısa video kaydı alır ve yükler                                      | [VideoRecorder](NewTest/Modules/VideoRecorder/VideoRecorder.md)                |
-| Adres Onayı       | Adres belgesi fotoğrafı/PDF'i yükler                                 | [AddressConfirm](NewTest/Modules/AddressConfirm/AddressConfirm.md)             |
-| Görüntülü Görüşme | Agent ile canlı WebRTC görüşmesi                                     | [CallScreen](NewTest/Modules/CallScreen/CallScreen.md)                         |
-| Teşekkür          | Akış sonucu ekranı (başarılı/başarısız/beklemede)                    | [ThankYou](NewTest/Modules/ThankYou/ThankYou.md)                               |
-| İşaret Dili       | Görüşme öncesi işaret dili tercihi kapısı                            | [SignLang](NewTest/Modules/SignLang/SignLang.md)                               |
-|  Bağlantı Koptu   | Bağlantı kopunca çıkan overlay + otomatik toparlanma                 | [LostConnection](NewTest/Modules/LostConnection/LostConnection.md)             |
+| Hazırlık          | İzinleri ve bağlantı hızını kontrol eder, kullanıcıyı akışa hazırlar | [Prepare](IdentifySample/Modules/Prepare/Prepare.md)                                  |
+| Kimlik (OCR)      | Kimlik kartının ön/arka yüzünü çeker, cihaz üzerinde okur            | [IdCard](IdentifySample/Modules/IdCard/IdCard.md)                                     |
+| Kimlik (OVD)      | Hologram/optik doğrulama ile sahte kimlik tespiti                    | [IdCardOVD](IdentifySample/Modules/IdCardOVD/IdCardOVD.md)                            |
+| NFC               | Kimlik/pasaport çipini okur (ICAO: BAC/PACE/CA)                      | [NFC](IdentifySample/Modules/NFC/NFC.md)                                              |
+| Selfie            | Selfie çeker, cihaz üzerinde yüz tespiti yapar                       | [Selfie](IdentifySample/Modules/Selfie/Selfie.md)                                     |
+| Selfie + Canlılık | Selfie ile canlılık testini birleştirir                              | [SelfieWithLiveness](IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md) |
+| Canlılık          | Sola dön / göz kırp / gülümse adımlarıyla canlılık testi             | [Liveness](IdentifySample/Modules/Liveness/Liveness.md)                               |
+| Konuşma           | Ekrandaki metni sesli okutup doğrular (STT)                          | [Speech](IdentifySample/Modules/Speech/Speech.md)                                     |
+| İmza              | Ekranda imza alır ve yükler                                          | [Signature](IdentifySample/Modules/Signature/Signature.md)                            |
+| Video Kayıt       | Kısa video kaydı alır ve yükler                                      | [VideoRecorder](IdentifySample/Modules/VideoRecorder/VideoRecorder.md)                |
+| Adres Onayı       | Adres belgesi fotoğrafı/PDF'i yükler                                 | [AddressConfirm](IdentifySample/Modules/AddressConfirm/AddressConfirm.md)             |
+| Görüntülü Görüşme | Agent ile canlı WebRTC görüşmesi                                     | [CallScreen](IdentifySample/Modules/CallScreen/CallScreen.md)                         |
+| Teşekkür          | Akış sonucu ekranı (başarılı/başarısız/beklemede)                    | [ThankYou](IdentifySample/Modules/ThankYou/ThankYou.md)                               |
+| İşaret Dili       | Görüşme öncesi işaret dili tercihi kapısı                            | [SignLang](IdentifySample/Modules/SignLang/SignLang.md)                               |
+|  Bağlantı Koptu   | Bağlantı kopunca çıkan overlay + otomatik toparlanma                 | [LostConnection](IdentifySample/Modules/LostConnection/LostConnection.md)             |
 
 ➡️ Ortak kurallar (kurulum, üç özelleştirme yöntemi, "bypass yok" kuralı) için önce
-**[Modül Rehberleri İndeksi](NewTest/Modules/Modules.md)**'ni okuyun.
+**[Modül Rehberleri İndeksi](IdentifySample/Modules/Modules.md)**'ni okuyun.
 
 > Not: Bu rehberler kasıtlı olarak **SampleApp (public repo)** içindedir. SDK, ikili (binary)
 > XCFramework olarak dağıtıldığından SDK kaynak ağacına konan dokümanlar tüketici tarafından
@@ -215,7 +215,7 @@ Modüllerden bağımsız, akışın tamamına dokunan yetenekler:
 
 - **Sesli okuma (Read-Aloud)** — her modül ekranı açıldığında yönergesi otomatik seslendirilebilir;
   modül başına `.native` (Siri sesi) / `.customAudio` (kendi ses kaydınız) / `.off` seçilir.
-  → [ReadAloud Rehberi](NewTest/Modules/ReadAloud.md)
+  → [ReadAloud Rehberi](IdentifySample/Modules/ReadAloud.md)
 - **Tema** — tüm renk/font/ikon/metrik token'ları `SDKTheme.shared` üzerinden değiştirilebilir.
   → [Tema Rehberi](docs/guides/theming.md)
 - **Dil** — TR, EN, DE, AZ, RU; her metni tek tek ezebilirsiniz.
@@ -238,7 +238,7 @@ SDK'yı köprüleyerek RN/Flutter uygulamalarında da kullanabilirsiniz. Hazır 
 ## Örnek Uygulamanın Yapısı
 
 ```
-NewTest/
+IdentifySample/
 ├── App/            AppDelegate + RootView (SDKFlowHostView kurulumu)
 ├── Core/           Debug araçları, extension'lar
 ├── Modules/        Modül başına: örnek ekran + HostViewModel + <Modül>.md rehberi
@@ -250,7 +250,7 @@ NewTest/
 └── SupportingFiles/ Info.plist, entitlements, asset'ler
 ```
 
-Uygulamayı açıp `NewTest.xcodeproj` ile derleyin; Login ekranına bir `identId` girip
+Uygulamayı açıp `IdentifySample.xcodeproj` ile derleyin; Login ekranına bir `identId` girip
 tüm akışı cihazda uçtan uca deneyimleyebilirsiniz (NFC ve görüşme için gerçek cihaz gerekir).
 
 ---

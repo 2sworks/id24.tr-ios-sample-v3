@@ -131,4 +131,4 @@ Modüllerin hepsine dokunan yatay katmanlar ayrı rehberlerde anlatılır:
 - [TURN & WebRTC](turn-webrtc.md) — görüşme altyapısı
 - [Loglama](logging.md) · [Event sistemi](events.md) — izleme
 - [Tema](theming.md) · [Lokalizasyon](localization.md) — görünüm ve dil
-- Sesli okuma (Read-Aloud) — [ReadAloud rehberi](../../NewTest/Modules/ReadAloud.md)
+- Sesli okuma (Read-Aloud) — [ReadAloud rehberi](../../IdentifySample/Modules/ReadAloud.md)

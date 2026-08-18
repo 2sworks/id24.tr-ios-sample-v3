@@ -130,7 +130,7 @@ soket koptu   ───┘         (tek sefer)
 ```
 
 `reconnectToSocket` eşzamanlı çift çağrıya karşı korumalıdır (`isReconnecting` guard'ı).
-Kullanıcı deneyimi tarafı için: [LostConnection rehberi](../../NewTest/Modules/LostConnection/LostConnection.md).
+Kullanıcı deneyimi tarafı için: [LostConnection rehberi](../../IdentifySample/Modules/LostConnection/LostConnection.md).
 
 ---
 

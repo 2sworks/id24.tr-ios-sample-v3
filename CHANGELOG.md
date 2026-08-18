@@ -204,7 +204,7 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
 
 - Örnek uygulama **SDK tüketen bir geliştirici rehberine** dönüştürüldü: her ekran için
   Preview + View + ViewModel, SDK yeteneklerinin showcase'i.
-- Her modül için entegrasyon rehberi (`NewTest/Modules/<Module>/<Module>.md`) ve
+- Her modül için entegrasyon rehberi (`IdentifySample/Modules/<Module>/<Module>.md`) ve
   `docs/guides/` altında 10 konu rehberi (soket, TURN/WebRTC, loglama, event, sunucu &
   API, yerelleştirme, tema…).
 - Tek referans doküman: kökte `FULL-INTERGATION.md`.

@@ -7,8 +7,8 @@ ad-soyad, doğum tarihi...), MRZ okuma, perspektif düzeltme ve TCKN/MRZ doğrul
 
 İki şekilde karşınıza çıkar:
 
-1. **Dolaylı** — [IdCard](../../NewTest/Modules/IdCard/IdCard.md) ve
-   [AddressConfirm](../../NewTest/Modules/AddressConfirm/AddressConfirm.md) modüllerinin hazır
+1. **Dolaylı** — [IdCard](../../IdentifySample/Modules/IdCard/IdCard.md) ve
+   [AddressConfirm](../../IdentifySample/Modules/AddressConfirm/AddressConfirm.md) modüllerinin hazır
    ekranları bu motoru zaten kullanır; hiçbir şey yapmanız gerekmez.
 2. **Doğrudan** — `IdentityScannerView`'ı kendi ekranlarınızda **bağımsız bileşen** olarak
    kullanabilirsiniz (KYC akışı dışındaki senaryolar için: form ön-doldurma, belge arşivleme...).
@@ -135,7 +135,7 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 | `debugROI` | Alan bölgelerini ekranda çizer (geliştirme) |
 | `externalTorchOn` | El feneri kontrolünü dışarıdan bağlama (`Binding<Bool>`) |
 | `onTorchAvailability` | Cihazda fener var/yok bildirimi |
-| `speechKey` / `speechModule` | Açılışta sesli yönerge ([ReadAloud](../../NewTest/Modules/ReadAloud.md) sistemiyle) |
+| `speechKey` / `speechModule` | Açılışta sesli yönerge ([ReadAloud](../../IdentifySample/Modules/ReadAloud.md) sistemiyle) |
 | `onResult` | `Result<RecognizedDocument, Error>` |
 
 ### HUD Metinleri ve Zamanlama — `ScannerConfiguration`
@@ -259,7 +259,7 @@ belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşen
 Bu motor bağımsız bir bileşendir; ama **KYC akışının kimlik adımını bununla değiştirmeyin.**
 `IdentityScannerView`'ı doğrudan kullanıp sonucu kendiniz yüklerseniz `sendStep`/upload
 sinyalleri gitmez ve akış sunucuda ilerlemez. Akış içindeyseniz her zaman modül VM'inden
-gidin: [IdCard rehberi](../../NewTest/Modules/IdCard/IdCard.md) —
+gidin: [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md) —
 `vm.scanFront(image:)` zaten bu motoru perde arkasında kullanır.
 
 Doğrudan kullanım, **akış dışı** senaryolar içindir: müşteri kaydında form ön-doldurma,

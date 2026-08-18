@@ -1,6 +1,6 @@
 # TURN & WebRTC — Görüntülü Görüşme Altyapısı
 
-Görüntülü görüşme modülü ([CallScreen](../../NewTest/Modules/CallScreen/CallScreen.md)) altta
+Görüntülü görüşme modülü ([CallScreen](../../IdentifySample/Modules/CallScreen/CallScreen.md)) altta
 [stasel/WebRTC](https://github.com/stasel/WebRTC) kullanır. Bu rehber, görüşmenin kurulum
 zincirini ve TURN kimlik (credential) modlarını anlatır — `turnKey` parametresinin ne işe
 yaradığı burada netleşir.
@@ -80,7 +80,7 @@ Görüşme sırasında agent'ın gönderebildiği tüm komutlar için
 | `bigCustomerCam` | `setupSDK` parametresi | Müşteri kamerası büyük pencerede |
 | `agent_view_scale` | `RoomResponse` | Agent görüntüsünün ölçeği (dikey gösterim dahil) |
 | `hide_call_answer_screen` | `RoomResponse` | Çağrı cevaplama ekranını atla |
-| `signLangSupport` | `setupSDK` parametresi | Görüşme öncesi işaret dili tercihi ([SignLang](../../NewTest/Modules/SignLang/SignLang.md)) |
+| `signLangSupport` | `setupSDK` parametresi | Görüşme öncesi işaret dili tercihi ([SignLang](../../IdentifySample/Modules/SignLang/SignLang.md)) |
 
 ---
 

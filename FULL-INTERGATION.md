@@ -510,7 +510,7 @@ Açılış yönergesinin ötesinde NFC, Selfie ve Canlılık modülleri kullanı
 
 Bunun için üç giriş noktası vardır: `speak` (böler, mutlaka okunur), `speakAfterCurrent`
 (sıraya girer), `announce` (tekrar eden durum; kendini kısıtlar, kare başına çağrılabilir).
-Ayrıntı: `SampleApp/NewTest/Modules/ReadAloud.md` §7c.
+Ayrıntı: `SampleApp/IdentifySample/Modules/ReadAloud.md` §7c.
 
 ### Programatik okuma — kendi ekranlarınızda
 
@@ -918,7 +918,7 @@ ekranı açılır. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/gu
 Bağlantının neden koptuğunu okumak için `m.lastSocketCloseCode`, görüşmenin sağlık
 özeti için `m.lastCallHealthReport` — ayrıntı:
 [WebSocket → Birleşik Kapanma Kodları](docs/guides/websocket.md) ve
-[CallScreen → Görüşme Sağlık Raporu](NewTest/Modules/CallScreen/CallScreen.md).
+[CallScreen → Görüşme Sağlık Raporu](IdentifySample/Modules/CallScreen/CallScreen.md).
 
 > ⚠️ **Sunucu koordinasyonu:** Bu sürümde `4106` artık `callCompleted`; heartbeat zaman
 > aşımı **4109**'a taşındı. Sunucu tarafındaki kod eşlemesini güncelleyin.

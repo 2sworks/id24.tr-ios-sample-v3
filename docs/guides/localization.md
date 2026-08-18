@@ -4,7 +4,7 @@ SDK beş dilde hazır gelir: **Türkçe, İngilizce, Almanca, Azerbaycanca, Rus�
 Tüm ekran metinleri anahtar tabanlıdır (`SDKKeyword`) ve her biri host tarafından
 tek tek ezilebilir — kendi üslubunuzu SDK ekranlarına taşıyabilirsiniz.
 
-← [README'ye dön](../../README.md) · İlgili: [Tema](theming.md) · [ReadAloud](../../NewTest/Modules/ReadAloud.md)
+← [README'ye dön](../../README.md) · İlgili: [Tema](theming.md) · [ReadAloud](../../IdentifySample/Modules/ReadAloud.md)
 
 ---
 
@@ -90,7 +90,7 @@ SDKLocalization.shared.setOverride(
 )
 ```
 
-Ayrıntı: [ReadAloud rehberi](../../NewTest/Modules/ReadAloud.md).
+Ayrıntı: [ReadAloud rehberi](../../IdentifySample/Modules/ReadAloud.md).
 
 ---
 
