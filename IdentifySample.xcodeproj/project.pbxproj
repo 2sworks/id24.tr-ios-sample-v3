@@ -35,7 +35,6 @@
 		486A111E2B07BED000A34623 /* CameraPermission in Frameworks */ = {isa = PBXBuildFile; productRef = 486A111D2B07BED000A34623 /* CameraPermission */; };
 		486A11202B07BED000A34623 /* MicrophonePermission in Frameworks */ = {isa = PBXBuildFile; productRef = 486A111F2B07BED000A34623 /* MicrophonePermission */; };
 		486A11222B07BED000A34623 /* SpeechRecognizerPermission in Frameworks */ = {isa = PBXBuildFile; productRef = 486A11212B07BED000A34623 /* SpeechRecognizerPermission */; };
-		488B29FB2E05BFDC00D1B6A0 /* Env.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 488B29F92E05BFDC00D1B6A0 /* Env.xcdatamodeld */; };
 		48AB73FF291A762100F591A4 /* SwiftSignatureView in Frameworks */ = {isa = PBXBuildFile; productRef = 48AB73FE291A762100F591A4 /* SwiftSignatureView */; settings = {ATTRIBUTES = (Required, ); }; };
 		4EB8F9AEC50F3D16E89F571A /* SpeechHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AFA8972E6D74BABD8F8908 /* SpeechHostViewModel.swift */; };
 		4F4F4786244CE15242F72E20 /* SignLangConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF831B5FE4663D01DA67E72 /* SignLangConfig.swift */; };
@@ -137,7 +136,6 @@
 		483BDB1C28F459CC00635BCC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		485C15532907F3A7007B9ED0 /* SDKBundle+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SDKBundle+.swift"; sourceTree = "<group>"; };
 		48833D8D4390F5C09A657B43 /* SpeechConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechConfig.swift; sourceTree = "<group>"; };
-		488B29FA2E05BFDC00D1B6A0 /* Env.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Env.xcdatamodel; sourceTree = "<group>"; };
 		489CBB1A28F586D500D22CC1 /* IdentifySample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IdentifySample.entitlements; sourceTree = "<group>"; };
 		48BFF0D02BBAF3940088D67E /* v2api.identify.com.tr.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = v2api.identify.com.tr.cer; sourceTree = "<group>"; };
 		4CCC6A080892B339165DAEFE /* VideoRecorderExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VideoRecorderExample.swift; sourceTree = "<group>"; };
@@ -443,7 +441,6 @@
 				36692AAD2F11120500A67DAB /* apiqa.identify.com.tr.cer */,
 				489CBB1A28F586D500D22CC1 /* IdentifySample.entitlements */,
 				DF7BC1682D4A279600372CAB /* Env.xcdatamodeld */,
-				488B29F92E05BFDC00D1B6A0 /* Env.xcdatamodeld */,
 				483BDB1728F459CC00635BCC /* Assets.xcassets */,
 				483BDB1928F459CC00635BCC /* LaunchScreen.storyboard */,
 				483BDB1C28F459CC00635BCC /* Info.plist */,
@@ -739,7 +736,6 @@
 				DF7BC16A2D4A279600372CAB /* Env.xcdatamodeld in Sources */,
 				8AB276BB2F749D5100A764F1 /* LoginViewModel.swift in Sources */,
 				483BDB0F28F459CC00635BCC /* AppDelegate.swift in Sources */,
-				488B29FB2E05BFDC00D1B6A0 /* Env.xcdatamodeld in Sources */,
 				EB423325B7179B3F2299BD64 /* RootView.swift in Sources */,
 				20A7BD14F8A4E7E5D199F8EC /* PrepareExample.swift in Sources */,
 				9BD45CE3D0D66FF246AFBBF8 /* SelfieExample.swift in Sources */,
@@ -1133,16 +1129,6 @@
 /* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
-		488B29F92E05BFDC00D1B6A0 /* Env.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				488B29FA2E05BFDC00D1B6A0 /* Env.xcdatamodel */,
-			);
-			currentVersion = 488B29FA2E05BFDC00D1B6A0 /* Env.xcdatamodel */;
-			path = Env.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
 		DF7BC1682D4A279600372CAB /* Env.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
