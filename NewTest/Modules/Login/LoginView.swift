@@ -21,6 +21,7 @@ struct LoginView: View {
     @State private var showHamburgerMenu = false
     @State private var showLangPicker = false
     @State private var showShowcase = false
+    @State private var showDebugView = false
     @State private var pendingNavigation: HamburgerMenuItem? = nil
     @State private var pendingConnect = false
     @FocusState private var focusedField: LoginField?
@@ -182,6 +183,9 @@ struct LoginView: View {
         .sheet(isPresented: $showModuleList) {
             ModuleListView(viewModel: viewModel)
         }
+        .sheet(isPresented: $showDebugView) {
+            DebugSettingsView()
+        }
         .fullScreenCover(isPresented: $showShowcase) {
             ShowcaseCatalogView()
         }
@@ -217,6 +221,7 @@ struct LoginView: View {
             case .serverList: showServerList = true
             case .moduleList: showModuleList = true
             case .showcase: showShowcase = true
+            case .debugView: showDebugView = true
             case nil: break
             }
             pendingNavigation = nil
@@ -226,7 +231,7 @@ struct LoginView: View {
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
-                .presentationDetents([.height(350)])
+                .presentationDetents([.height(410)])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(.ultraThinMaterial)
             } else if #available(iOS 16.0, *) {
@@ -234,7 +239,7 @@ struct LoginView: View {
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
-                .presentationDetents([.height(350)])
+                .presentationDetents([.height(410)])
                 .presentationDragIndicator(.visible)
             } else {
                 HamburgerMenuSheet { item in
@@ -805,12 +810,150 @@ private struct HamburgerMenuSheet: View {
                     title: "Network Debug (Netfox)",
                     isOn: $nfxState.isEnabled
                 )
+                MenuOptionRow(icon: Image(systemName: "wrench.and.screwdriver.fill"),
+                              title: "Debug Değerleri") {
+                    onSelect(.debugView)
+                }
             }
             .padding(.horizontal, IDSpacing.xl)
             
             Spacer()
         }
         .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
+    }
+}
+
+// MARK: - DebugSettingsView
+
+/// Hamburger menü → "Debug Değerleri". SDK'nın tanılama katmanlarını çalışma zamanında
+/// açıp kapatır; değerler `SDKDebugSettings` üzerinden `UserDefaults`'a yazıldığı için
+/// uygulama yeniden başlatıldığında korunur.
+///
+/// Katmanların tamamı varsayılan olarak KAPALIDIR — nihai sürümde testçi hiçbir tanılama
+/// arayüzü görmez, gerektiğinde buradan açılır.
+private struct DebugSettingsView: View {
+
+    @ObservedObject private var debug = SDKDebugSettings.shared
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Debug Değerleri")
+                    .font(IDFont.bodyLarge(.semibold))
+                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                Spacer()
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                        .frame(width: 30, height: 30)
+                }
+            }
+            .padding(.horizontal, IDSpacing.xl)
+            .padding(.top, IDSpacing.lg)
+            .padding(.bottom, IDSpacing.sm)
+
+            Text("Tanılama katmanları varsayılan olarak kapalıdır. Açtığınız değer uygulama yeniden başlatıldığında da açık kalır.")
+                .font(IDFont.bodySmall())
+                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                .padding(.horizontal, IDSpacing.xl)
+                .padding(.bottom, IDSpacing.md)
+
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: IDSpacing.lg) {
+
+                    DebugSectionTitle("Kimlik Tarayıcı")
+                    DebugToggleRow(
+                        title: "Tanılama paneli (HUD)",
+                        subtitle: "Tarama ekranında canlı ölçüm panelini gösterir.",
+                        isOn: $debug.scannerDiagnostics
+                    )
+                    DebugToggleRow(
+                        title: "ROI / karar günlüğü",
+                        subtitle: "Kare kare okuma ve karar ayrıntısını konsola yazar.",
+                        isOn: $debug.scannerROILogging
+                    )
+
+                    DebugSectionTitle("OVD (Hologram)")
+                    DebugToggleRow(
+                        title: "Adım ve hizalama günlüğü",
+                        subtitle: "[OVD] önekli konsol dökümünü açar.",
+                        isOn: $debug.ovdConsoleLog
+                    )
+
+                    DebugSectionTitle("NFC")
+                    DebugToggleRow(
+                        title: "Ayrıntılı okuma günlüğü",
+                        subtitle: "Çip okumasını APDU seviyesinde konsola yazar.",
+                        isOn: $debug.nfcVerboseLog
+                    )
+
+                    DebugSectionTitle("Genel")
+                    DebugToggleRow(
+                        title: "SDK konsol günlüğü",
+                        subtitle: "Kapatıldığında SDK konsola hiçbir şey yazmaz. Sunucuya giden günlükler etkilenmez.",
+                        isOn: $debug.consoleLogs
+                    )
+
+                    Button {
+                        debug.resetToDefaults()
+                    } label: {
+                        Text("Tümünü varsayılana döndür")
+                            .font(IDFont.bodySmall(.semibold))
+                            .foregroundColor(IDColor.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, IDSpacing.sm)
+                }
+                .padding(.horizontal, IDSpacing.xl)
+                .padding(.bottom, IDSpacing.xl)
+            }
+        }
+        .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
+    }
+}
+
+// MARK: - DebugSectionTitle
+
+private struct DebugSectionTitle: View {
+    let text: String
+    @Environment(\.colorScheme) private var colorScheme
+
+    init(_ text: String) { self.text = text }
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(IDFont.bodySmall(.semibold))
+            .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+    }
+}
+
+// MARK: - DebugToggleRow
+
+private struct DebugToggleRow: View {
+    let title: String
+    let subtitle: String
+    @Binding var isOn: Bool
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        HStack(alignment: .top, spacing: IDSpacing.md) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(IDFont.bodySmall(.semibold))
+                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                Text(subtitle)
+                    .font(IDFont.caption())
+                    .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: IDSpacing.sm)
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+                .tint(IDColor.primary)
+        }
     }
 }
 
@@ -1447,7 +1590,7 @@ private extension View {
 // MARK: - HamburgerMenuItem
 
 private enum HamburgerMenuItem {
-    case serverList, moduleList, showcase
+    case serverList, moduleList, showcase, debugView
 }
 
 // MARK: - LoginMode

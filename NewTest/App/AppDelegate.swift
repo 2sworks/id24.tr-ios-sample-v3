@@ -18,6 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UIApplication.shared.isIdleTimerDisabled = true
+        // Debug ekranından açılan tanılama katmanları kalıcıdır; kayıtlı değerler SDK'ya
+        // burada işlenir. Çağrılmazsa katmanlar kapalı varsayılanlarıyla çalışır.
+        SDKDebugSettings.shared.apply()
         NFX.sharedInstance().start()
         NotificationCenter.default.addObserver(forName: .sdkNetworkDebugShake, object: nil, queue: .main) { _ in
             NFX.sharedInstance().show()
