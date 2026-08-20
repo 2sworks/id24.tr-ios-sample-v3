@@ -10,7 +10,16 @@ import UIKit
 
 final class NFXDebugState: ObservableObject {
     static let shared = NFXDebugState()
-    @Published var isEnabled = false
+
+    /// Login ekranındaki "Network Debug (Netfox)" anahtarı. Açıldığında log paneli
+    /// kurulur, kapatıldığında tüm katmanlar sökülür.
+    @Published var isEnabled = false {
+        didSet {
+            guard oldValue != isEnabled else { return }
+            SDKLogPanel.setEnabled(isEnabled)
+        }
+    }
+
     private init() {}
 }
 

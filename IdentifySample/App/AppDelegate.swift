@@ -21,7 +21,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Debug ekranından açılan tanılama katmanları kalıcıdır; kayıtlı değerler SDK'ya
         // burada işlenir. Çağrılmazsa katmanlar kapalı varsayılanlarıyla çalışır.
         SDKDebugSettings.shared.apply()
-        NFX.sharedInstance().start()
+        // Panelde hangi sekmelerin açılacağı burada belirlenir; panel yalnız login
+        // ekranındaki "Network Debug (Netfox)" anahtarı açıldığında kurulur.
+        SDKLogPanel.configure(requests: true, console: true, socket: true)
+        SDKLogPanel.setEnabled(NFXDebugState.shared.isEnabled)
         NotificationCenter.default.addObserver(forName: .sdkNetworkDebugShake, object: nil, queue: .main) { _ in
             NFX.sharedInstance().show()
         }
