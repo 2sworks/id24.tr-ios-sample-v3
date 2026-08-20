@@ -56,6 +56,7 @@
 		8D09EE412FE576700060F313 /* IdentifySDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8DB567A22FF5D0DD0062D77F /* ReadAloud.md in Resources */ = {isa = PBXBuildFile; fileRef = 8DB567A12FF5D0DD0062D77F /* ReadAloud.md */; };
 		8DD4665F2FED275C00710491 /* SDKNetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */; };
+		8DD466722FED275C00710491 /* SDKReadAloudSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */; };
 		8DD466702FED275C00710491 /* SDKLogPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466712FED275C00710491 /* SDKLogPanel.swift */; };
 		94955B41D87342FB90614A15 /* EventJourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDE0731CCB95FC8930B4CDF9 /* EventJourneyView.swift */; };
 		98A6E9F76B0CDEF0E6748CF1 /* LivenessHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4636F8DFEB15E2CF8A987 /* LivenessHostViewModel.swift */; };
@@ -182,6 +183,7 @@
 		8DB567A12FF5D0DD0062D77F /* ReadAloud.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ReadAloud.md; sourceTree = "<group>"; };
 		8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = IdentifySDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNetworkLogger.swift; sourceTree = "<group>"; };
+		8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKReadAloudSetting.swift; sourceTree = "<group>"; };
 		8DD466712FED275C00710491 /* SDKLogPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogPanel.swift; sourceTree = "<group>"; };
 		956407D26FD611F5BFB3EA14 /* ThankYouExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThankYouExample.swift; sourceTree = "<group>"; };
 		9B0E79159FAD6CF4165CA0EA /* ThankYouConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThankYouConfig.swift; sourceTree = "<group>"; };
@@ -510,6 +512,7 @@
 			isa = PBXGroup;
 			children = (
 				8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */,
+				8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */,
 				8DD466712FED275C00710491 /* SDKLogPanel.swift */,
 			);
 			path = Debug;
@@ -734,6 +737,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DD4665F2FED275C00710491 /* SDKNetworkLogger.swift in Sources */,
+				8DD466722FED275C00710491 /* SDKReadAloudSetting.swift in Sources */,
 				8DD466702FED275C00710491 /* SDKLogPanel.swift in Sources */,
 				485C155C2907F3A7007B9ED0 /* SDKBundle+.swift in Sources */,
 				8AB276D52F749D9600A764F1 /* LoginView.swift in Sources */,

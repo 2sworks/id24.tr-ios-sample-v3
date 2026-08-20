@@ -272,7 +272,7 @@ final class LoginViewModel: ObservableObject {
             // "Sesli Okuma (TTS)" tercihi (Ayarlar menüsündeki toggle). Hardcoded true iken
             // setupSDK, kapalıyken bile defaultMode .off → .native yükseltip toggle'ı
             // anlamsız kılıyordu. Artık gerçek tercih geçiliyor.
-            ttsEnabled: UserDefaults.standard.bool(forKey: "sdkReadAloudEnabled")
+            ttsEnabled: SDKReadAloudSetting.isEnabled
         ) { [weak self] socketStats, apiResp, webErr in
             guard let self else { return }
             Task { @MainActor in

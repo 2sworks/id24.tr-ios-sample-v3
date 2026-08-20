@@ -133,8 +133,7 @@ struct LoginView: View {
         .onPreferenceChange(BottomBarHeightKey.self) { bottomBarHeight = $0 }
         .navigationBarHidden(true)
         .onAppear {
-            SDKSpeechConfig.shared.defaultMode =
-            UserDefaults.standard.bool(forKey: "sdkReadAloudEnabled") ? .native : .off
+            SDKReadAloudSetting.apply()
         }
         .overlay {
             if viewModel.isLoading {
@@ -801,7 +800,7 @@ private struct HamburgerMenuSheet: View {
                         get: { readAloudEnabled },
                         set: { newValue in
                             readAloudEnabled = newValue
-                            SDKSpeechConfig.shared.defaultMode = newValue ? .native : .off
+                            SDKReadAloudSetting.isEnabled = newValue
                         }
                     )
                 )

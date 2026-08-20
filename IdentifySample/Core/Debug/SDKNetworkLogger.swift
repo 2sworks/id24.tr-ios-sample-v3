@@ -11,16 +11,26 @@ import UIKit
 final class NFXDebugState: ObservableObject {
     static let shared = NFXDebugState()
 
+    /// Anahtarın diskteki karşılığı. Diğer geliştirici ayarlarıyla aynı adlandırma.
+    private static let storageKey = "sdkNetworkDebugEnabled"
+
     /// Login ekranındaki "Network Debug (Netfox)" anahtarı. Açıldığında log paneli
     /// kurulur, kapatıldığında tüm katmanlar sökülür.
-    @Published var isEnabled = false {
+    ///
+    /// Değer `UserDefaults`'ta saklanır; uygulama yeniden açıldığında anahtar bırakıldığı
+    /// yerden devam eder.
+    @Published var isEnabled: Bool {
         didSet {
             guard oldValue != isEnabled else { return }
+            UserDefaults.standard.set(isEnabled, forKey: Self.storageKey)
             SDKLogPanel.setEnabled(isEnabled)
         }
     }
 
-    private init() {}
+    private init() {
+        // init içindeki atama `didSet` tetiklemez; paneli AppDelegate kuruyor.
+        isEnabled = UserDefaults.standard.bool(forKey: Self.storageKey)
+    }
 }
 
 // MARK: - SDKWindow
