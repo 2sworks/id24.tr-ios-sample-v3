@@ -185,6 +185,7 @@ struct LoginView: View {
         .sheet(isPresented: $showDebugView) {
             DebugSettingsView()
         }
+
         .fullScreenCover(isPresented: $showShowcase) {
             ShowcaseCatalogView()
         }
@@ -194,6 +195,14 @@ struct LoginView: View {
             if ProcessInfo.processInfo.arguments.contains("-showShowcase") {
                 showShowcase = true
             }
+            // Aynı gerekçe: Debug ekranı hamburger menüsünün arkasında kaldığı için
+            // otomasyon/ekran görüntüsü alırken doğrudan açılabilsin.
+            if ProcessInfo.processInfo.arguments.contains("-showDebugView") {
+                showDebugView = true
+            }
+            // Aynı gerekçe: Debug ekranı hamburger menüsünün arkasında kaldığı için
+            // otomasyon/ekran görüntüsü alırken doğrudan açılabilsin.
+
         }
         .sheet(isPresented: $showLangPicker) {
             if #available(iOS 16.4, *) {
@@ -830,6 +839,9 @@ private struct HamburgerMenuSheet: View {
 ///
 /// Katmanların tamamı varsayılan olarak KAPALIDIR — nihai sürümde testçi hiçbir tanılama
 /// arayüzü görmez, gerektiğinde buradan açılır.
+///
+/// Navigasyon diğer alt ekranlarla (Sunucu/Modül Seçimi) aynı `SubScreenTopBar` kalıbını
+/// kullanır; başlık ve açıklama gövdenin içinde durur.
 private struct DebugSettingsView: View {
 
     @ObservedObject private var debug = SDKDebugSettings.shared
@@ -837,95 +849,103 @@ private struct DebugSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Text("Debug Değerleri")
-                    .font(IDFont.bodyLarge(.semibold))
-                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
-                Spacer()
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
-                        .frame(width: 30, height: 30)
-                }
-            }
-            .padding(.horizontal, IDSpacing.xl)
-            .padding(.top, IDSpacing.lg)
-            .padding(.bottom, IDSpacing.sm)
+        ZStack {
+            IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea()
 
-            Text("Tanılama katmanları varsayılan olarak kapalıdır. Açtığınız değer uygulama yeniden başlatıldığında da açık kalır.")
-                .font(IDFont.bodySmall())
-                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
-                .padding(.horizontal, IDSpacing.xl)
-                .padding(.bottom, IDSpacing.md)
+            VStack(spacing: 0) {
+                SubScreenTopBar(
+                    title: "Debug Değerleri (HUD)",
+                    subtitle: "Tanılama katmanlarını yönetin",
+                    onBack: { dismiss() }
+                )
 
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: IDSpacing.lg) {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: IDSpacing.lg) {
 
-                    DebugSectionTitle("Kimlik Tarayıcı")
-                    DebugToggleRow(
-                        title: "Tanılama paneli (HUD)",
-                        subtitle: "Tarama ekranında canlı ölçüm panelini gösterir.",
-                        isOn: $debug.scannerDiagnostics
-                    )
-                    DebugToggleRow(
-                        title: "ROI / karar günlüğü",
-                        subtitle: "Kare kare okuma ve karar ayrıntısını konsola yazar.",
-                        isOn: $debug.scannerROILogging
-                    )
+                        VStack(alignment: .leading, spacing: IDSpacing.sm) {
+                            Text("Tanılama Katmanları")
+                                .font(IDFont.displaySmall(.bold))
+                                .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                            Text("Katmanlar varsayılan olarak kapalıdır. Açtığınız değer uygulama yeniden başlatıldığında da açık kalır.")
+                                .font(IDFont.bodySmall())
+                                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                                .lineSpacing(3)
+                        }
 
-                    DebugSectionTitle("OVD (Hologram)")
-                    DebugToggleRow(
-                        title: "Adım ve hizalama günlüğü",
-                        subtitle: "[OVD] önekli konsol dökümünü açar.",
-                        isOn: $debug.ovdConsoleLog
-                    )
+                        DebugSection(title: "Kimlik Tarayıcı") {
+                            DebugToggleRow(
+                                title: "Tanılama paneli (HUD)",
+                                subtitle: "Tarama ekranında canlı ölçüm panelini ve tarama sonrası DEBUG raporunu gösterir.",
+                                isOn: $debug.scannerDiagnostics
+                            )
+                            Divider().padding(.leading, IDSpacing.md)
+                            DebugToggleRow(
+                                title: "ROI / karar günlüğü",
+                                subtitle: "Kare kare okuma ve karar ayrıntısını konsola yazar.",
+                                isOn: $debug.scannerROILogging
+                            )
+                        }
 
-                    DebugSectionTitle("NFC")
-                    DebugToggleRow(
-                        title: "Ayrıntılı okuma günlüğü",
-                        subtitle: "Çip okumasını APDU seviyesinde konsola yazar.",
-                        isOn: $debug.nfcVerboseLog
-                    )
+                        DebugSection(title: "OVD (Hologram)") {
+                            DebugToggleRow(
+                                title: "Adım ve hizalama günlüğü",
+                                subtitle: "[OVD] önekli konsol dökümünü açar.",
+                                isOn: $debug.ovdConsoleLog
+                            )
+                        }
 
-                    DebugSectionTitle("Genel")
-                    DebugToggleRow(
-                        title: "SDK konsol günlüğü",
-                        subtitle: "Kapatıldığında SDK konsola hiçbir şey yazmaz. Sunucuya giden günlükler etkilenmez.",
-                        isOn: $debug.consoleLogs
-                    )
+                        DebugSection(title: "NFC") {
+                            DebugToggleRow(
+                                title: "Ayrıntılı okuma günlüğü",
+                                subtitle: "Çip okumasını APDU seviyesinde konsola yazar.",
+                                isOn: $debug.nfcVerboseLog
+                            )
+                        }
 
-                    Button {
-                        debug.resetToDefaults()
-                    } label: {
-                        Text("Tümünü varsayılana döndür")
-                            .font(IDFont.bodySmall(.semibold))
-                            .foregroundColor(IDColor.primary)
+                        Button {
+                            debug.resetToDefaults()
+                        } label: {
+                            Text("Tümünü varsayılana döndür")
+                                .font(IDFont.bodySmall(.semibold))
+                                .foregroundColor(IDColor.primary)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
-                    .padding(.top, IDSpacing.sm)
+                    .padding(IDSpacing.xl)
                 }
-                .padding(.horizontal, IDSpacing.xl)
-                .padding(.bottom, IDSpacing.xl)
             }
         }
-        .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
     }
 }
 
-// MARK: - DebugSectionTitle
+// MARK: - DebugSection
 
-private struct DebugSectionTitle: View {
-    let text: String
+/// Başlık + kart içinde gruplanmış anahtarlar. Diğer alt ekranlardaki liste kartlarıyla
+/// aynı yüzey/köşe değerlerini kullanır.
+private struct DebugSection<Content: View>: View {
+    let title: String
+    let content: Content
     @Environment(\.colorScheme) private var colorScheme
 
-    init(_ text: String) { self.text = text }
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
 
     var body: some View {
-        Text(text.uppercased())
-            .font(IDFont.bodySmall(.semibold))
-            .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+        VStack(alignment: .leading, spacing: IDSpacing.sm) {
+            Text(title.uppercased())
+                .font(IDFont.caption(.semibold))
+                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+
+            VStack(spacing: 0) {
+                content
+            }
+            .background(
+                RoundedRectangle(cornerRadius: IDRadius.md)
+                    .fill(IDColor.adaptiveSurface(for: colorScheme))
+            )
+        }
     }
 }
 
@@ -953,8 +973,11 @@ private struct DebugToggleRow: View {
                 .labelsHidden()
                 .tint(IDColor.primary)
         }
+        .padding(.horizontal, IDSpacing.md)
+        .padding(.vertical, IDSpacing.sm)
     }
 }
+
 
 // MARK: - MenuOptionRow
 
@@ -1470,8 +1493,13 @@ private struct SubScreenTopBar<Trailing: View>: View {
             }
             
             HStack(spacing: IDSpacing.sm) {
+                // Rozet BEYAZ çizilmiştir (düşük opak daire + tam opak kelime işareti);
+                // açık temada beyaz zeminde görünmez kalıyordu. Açık temada aynı çizim
+                // template olarak marka mavisiyle boyanır: daire açık mavi, yazı mavi.
                 Image(.icLangButtonDark)
+                    .renderingMode(colorScheme == .dark ? .original : .template)
                     .resizable()
+                    .foregroundColor(IDColor.primary)
                     .frame(width: 40, height: 40)
                 
                 VStack(alignment: .leading, spacing: 1) {
