@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -52,12 +52,11 @@
 		8AB276BB2F749D5100A764F1 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB276BA2F749D5100A764F1 /* LoginViewModel.swift */; };
 		8AB276D52F749D9600A764F1 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB276D42F749D9600A764F1 /* LoginView.swift */; };
 		8C877716827596EDABDB1A0C /* HostModuleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D3D084DA8B7D62494FBE14 /* HostModuleViewModel.swift */; };
-		8D09EE402FE576700060F313 /* IdentifySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */; };
-		8D09EE412FE576700060F313 /* IdentifySDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8DA3E9B730496B0C00A653F4 /* IdentifySDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8DA3E9B630496B0C00A653F4 /* IdentifySDK */; };
 		8DB567A22FF5D0DD0062D77F /* ReadAloud.md in Resources */ = {isa = PBXBuildFile; fileRef = 8DB567A12FF5D0DD0062D77F /* ReadAloud.md */; };
 		8DD4665F2FED275C00710491 /* SDKNetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */; };
-		8DD466722FED275C00710491 /* SDKReadAloudSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */; };
 		8DD466702FED275C00710491 /* SDKLogPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466712FED275C00710491 /* SDKLogPanel.swift */; };
+		8DD466722FED275C00710491 /* SDKReadAloudSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */; };
 		94955B41D87342FB90614A15 /* EventJourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDE0731CCB95FC8930B4CDF9 /* EventJourneyView.swift */; };
 		98A6E9F76B0CDEF0E6748CF1 /* LivenessHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4636F8DFEB15E2CF8A987 /* LivenessHostViewModel.swift */; };
 		9BD45CE3D0D66FF246AFBBF8 /* SelfieExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A57F8CBAD67C67E1AE6DEF4 /* SelfieExample.swift */; };
@@ -88,20 +87,6 @@
 		FB8139CBBFB4B72B3ABDD0C3 /* SwlExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D33FA61BFD40D861B866C43 /* SwlExample.swift */; };
 		FC35450F26C18D34AFC45912 /* IdCardHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057317BDAFB60877C85A3684 /* IdCardHostViewModel.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		8D09EE422FE576700060F313 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				8D09EE412FE576700060F313 /* IdentifySDK.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0046CF4158A838AC23E4A05E /* Prepare.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = Prepare.md; sourceTree = "<group>"; };
@@ -183,8 +168,8 @@
 		8DB567A12FF5D0DD0062D77F /* ReadAloud.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ReadAloud.md; sourceTree = "<group>"; };
 		8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = IdentifySDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNetworkLogger.swift; sourceTree = "<group>"; };
-		8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKReadAloudSetting.swift; sourceTree = "<group>"; };
 		8DD466712FED275C00710491 /* SDKLogPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogPanel.swift; sourceTree = "<group>"; };
+		8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKReadAloudSetting.swift; sourceTree = "<group>"; };
 		956407D26FD611F5BFB3EA14 /* ThankYouExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThankYouExample.swift; sourceTree = "<group>"; };
 		9B0E79159FAD6CF4165CA0EA /* ThankYouConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThankYouConfig.swift; sourceTree = "<group>"; };
 		9D371CF8DF83A9DCADBB5BDC /* CallScreenExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CallScreenExample.swift; sourceTree = "<group>"; };
@@ -222,6 +207,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				486A11222B07BED000A34623 /* SpeechRecognizerPermission in Frameworks */,
+				8DA3E9B730496B0C00A653F4 /* IdentifySDK in Frameworks */,
 				486A11202B07BED000A34623 /* MicrophonePermission in Frameworks */,
 				48AB73FF291A762100F591A4 /* SwiftSignatureView in Frameworks */,
 				486A111E2B07BED000A34623 /* CameraPermission in Frameworks */,
@@ -229,7 +215,6 @@
 				4857BFF82902D621001FE850 /* OpenSSL in Frameworks */,
 				48171405294716830095A64F /* netfox in Frameworks */,
 				4857BFFB2902D636001FE850 /* Starscream in Frameworks */,
-				8D09EE402FE576700060F313 /* IdentifySDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -634,7 +619,6 @@
 				483BDB0728F459CC00635BCC /* Sources */,
 				483BDB0828F459CC00635BCC /* Frameworks */,
 				483BDB0928F459CC00635BCC /* Resources */,
-				8D09EE422FE576700060F313 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -650,6 +634,7 @@
 				486A111D2B07BED000A34623 /* CameraPermission */,
 				486A111F2B07BED000A34623 /* MicrophonePermission */,
 				486A11212B07BED000A34623 /* SpeechRecognizerPermission */,
+				8DA3E9B630496B0C00A653F4 /* IdentifySDK */,
 			);
 			productName = IdentifySample;
 			productReference = 483BDB0B28F459CC00635BCC /* IdentifyTR.app */;
@@ -663,7 +648,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1400;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					483BDB0A28F459CC00635BCC = {
 						CreatedOnToolsVersion = 14.0;
@@ -705,6 +690,7 @@
 				48171403294716830095A64F /* XCLocalSwiftPackageReference "Vendor/netfox" */,
 				48420BA52A8B61840005250F /* XCRemoteSwiftPackageReference "WebRTC" */,
 				486A111C2B07BED000A34623 /* XCRemoteSwiftPackageReference "PermissionsKit" */,
+				8DA3E9B530496B0C00A653F4 /* XCRemoteSwiftPackageReference "id24" */,
 			);
 			productRefGroup = 483BDB0C28F459CC00635BCC /* Products */;
 			projectDirPath = "";
@@ -821,6 +807,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -851,8 +839,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 9D3UPKQ9AL;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -872,6 +862,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -881,6 +872,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -911,8 +904,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 9D3UPKQ9AL;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -925,6 +920,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
@@ -940,7 +936,6 @@
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 40;
-				DEVELOPMENT_TEAM = 9D3UPKQ9AL;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -984,7 +979,6 @@
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 40;
-				DEVELOPMENT_TEAM = 9D3UPKQ9AL;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -1090,6 +1084,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		8DA3E9B530496B0C00A653F4 /* XCRemoteSwiftPackageReference "id24" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/2sworks/id24.tr-ios-sdk-spm";
+			requirement = {
+				kind = exactVersion;
+				version = 3.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1131,6 +1133,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48AB73FD291A762100F591A4 /* XCRemoteSwiftPackageReference "SwiftSignatureView" */;
 			productName = SwiftSignatureView;
+		};
+		8DA3E9B630496B0C00A653F4 /* IdentifySDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8DA3E9B530496B0C00A653F4 /* XCRemoteSwiftPackageReference "id24" */;
+			productName = IdentifySDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 

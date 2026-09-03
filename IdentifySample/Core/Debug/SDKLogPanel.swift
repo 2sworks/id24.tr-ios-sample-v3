@@ -14,11 +14,11 @@ import IdentifySDK
 ///
 /// Panel sallayarak açılır ve üç sekme taşır:
 /// - **Network**: netfox'un kendi `URLSession` kaydı.
-/// - **Console**: yakalanan `stdout`/`stderr` satırları ile SDK'nın yapısal log akışı.
+/// - **Console**: yakalanan `stdout`/`stderr` satırları.
 /// - **Socket**: `IdentifyManager.getSocketLogs()` üzerinden WebSocket trafiği.
 ///
 /// Anahtar kapalıyken hiçbir katman kurulmaz: istek kaydı tutulmaz, konsol
-/// yakalanmaz, SDK'nın log akışı dinlenmez.
+/// yakalanmaz.
 enum SDKLogPanel {
 
     private static var requestsEnabled = true
@@ -56,30 +56,15 @@ enum SDKLogPanel {
             NFX.sharedInstance().externalLogSource = socketLogSource()
         }
         NFX.sharedInstance().start()
-
-        if consoleEnabled {
-            bindSDKLogHandler()
-        }
     }
 
     private static func stop() {
         guard isRunning else { return }
         isRunning = false
 
-        IdentifyManager.shared.logHandler = nil
         NFX.sharedInstance().stopConsoleCapture()
         NFX.sharedInstance().externalLogSource = nil
         NFX.sharedInstance().stop()
-    }
-
-    /// SDK'nın yapısal log akışını konsol sekmesine bağlar.
-    ///
-    /// Aynı satır `stdout` üzerinden de yakalanır; `NFXLogStore` yinelenen kaydı
-    /// eler ve kategori bilgisi taşıyan yapısal olanı tutar.
-    private static func bindSDKLogHandler() {
-        IdentifyManager.shared.logHandler = { entry in
-            NFX.sharedInstance().log(entry.message, type: entry.type)
-        }
     }
 
     /// WebSocket kayıtlarını panelin anlayacağı biçime çevirir.
