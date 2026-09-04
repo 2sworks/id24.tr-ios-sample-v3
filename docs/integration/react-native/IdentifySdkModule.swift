@@ -92,14 +92,22 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
                 showThankYouPage: showThankYou,
                 showNFCNotFoundPage: showNfcNotFound,
                 supportU18: supportU18
-            ) { _, roomResponse, error in
-                if let error = error {
-                    reject("E_SETUP", error.localizedDescription, error)
-                } else {
-                    // Akışı sunmak için: kendi UIViewController host'unuzu present edin,
-                    // veya SDKFlowHostView (SwiftUI) ile coordinator'ı start() edin.
-                    resolve(["result": roomResponse.result ?? false])
+            ) { socket, roomResponse, error in
+                // DİKKAT: setupSDK hata parametresini HER ZAMAN dolu gönderir; başarılı
+                // kurulumda `errorMessages` boş string olur. Bu yüzden `if let error = error`
+                // başarıda da doğrudur ve akış hiç başlamadan E_SETUP ile reddedilir.
+                // Doğru kontrol, mesajın dolu olup olmadığıdır.
+                if let message = error?.errorMessages, !message.isEmpty {
+                    reject("E_SETUP", message, nil)
+                    return
                 }
+                guard socket?.isConnected == true, roomResponse.result == true else {
+                    reject("E_SETUP", "Socket bağlantısı kurulamadı", nil)
+                    return
+                }
+                // Akışı sunmak için: kendi UIViewController host'unuzu present edin,
+                // veya SDKFlowHostView (SwiftUI) ile coordinator'ı start() edin.
+                resolve(["result": true])
             }
         }
     }

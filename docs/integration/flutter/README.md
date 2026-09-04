@@ -65,6 +65,19 @@ final result = await sdk.setupSDK(SetupOptions(
 await sub.cancel();
 ```
 
+### Hata kontrolü — `E_SETUP` tuzağı
+
+`setupSDK` geri çağrısındaki hata parametresi **her zaman doludur**; başarılı kurulumda
+`errorMessages` boş string olur. Köprüde `if let error = error { ... }` yazılırsa akış
+hiç başlamadan `E_SETUP` ile başarısız olur. Doğru kontrol mesajın dolu olmasıdır:
+
+```swift
+if let message = error?.errorMessages, !message.isEmpty {
+    result(FlutterError(code: "E_SETUP", message: message, details: nil)); return
+}
+guard socket?.isConnected == true, roomResponse.result == true else { ... }
+```
+
 ---
 
 ## 3) Olay (SDKEvent) yapısı

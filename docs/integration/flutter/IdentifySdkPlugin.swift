@@ -100,12 +100,20 @@ public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, Flutt
             showThankYouPage: args["showThankYouPage"] as? Bool ?? false,
             showNFCNotFoundPage: args["showNFCNotFoundPage"] as? Bool ?? false,
             supportU18: args["supportU18"] as? Bool ?? false
-        ) { _, roomResponse, error in
-            if let error = error {
-                result(FlutterError(code: "E_SETUP", message: error.localizedDescription, details: nil))
-            } else {
-                result(["result": roomResponse.result ?? false])
+        ) { socket, roomResponse, error in
+            // DİKKAT: setupSDK hata parametresini HER ZAMAN dolu gönderir; başarılı
+            // kurulumda `errorMessages` boş string olur. Bu yüzden `if let error = error`
+            // başarıda da doğrudur ve akış hiç başlamadan E_SETUP ile reddedilir.
+            // Doğru kontrol, mesajın dolu olup olmadığıdır.
+            if let message = error?.errorMessages, !message.isEmpty {
+                result(FlutterError(code: "E_SETUP", message: message, details: nil))
+                return
             }
+            guard socket?.isConnected == true, roomResponse.result == true else {
+                result(FlutterError(code: "E_SETUP", message: "Socket bağlantısı kurulamadı", details: nil))
+                return
+            }
+            result(["result": true])
         }
     }
 }

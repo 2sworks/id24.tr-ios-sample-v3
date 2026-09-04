@@ -93,6 +93,26 @@ await IdentifySdk.setupSDK({
 sub.remove();
 ```
 
+### Hata kontrolü — `E_SETUP` tuzağı
+
+`setupSDK` geri çağrısındaki hata parametresi **her zaman doludur**; başarılı kurulumda
+`errorMessages` boş string olur. Bu yüzden köprüde
+
+```swift
+if let error = error { reject("E_SETUP", ...) }   // YANLIŞ — başarıda da çalışır
+```
+
+yazılırsa akış hiç başlamadan `E_SETUP` ile reddedilir ve JS tarafında mesajı boş bir
+hata görülür. Doğru kontrol mesajın dolu olup olmadığıdır:
+
+```swift
+if let message = error?.errorMessages, !message.isEmpty { reject("E_SETUP", message, nil); return }
+guard socket?.isConnected == true, roomResponse.result == true else { ... }
+```
+
+`IdentifySdkModule.swift` bu kontrolü zaten doğru yapar; kendi köprünüzü yazarken aynı
+deseni koruyun.
+
 ---
 
 ## 4) Olay (SDKEvent) yapısı
