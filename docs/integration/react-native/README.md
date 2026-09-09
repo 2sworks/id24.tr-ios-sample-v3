@@ -115,6 +115,71 @@ deseni koruyun.
 
 ---
 
+## 3.1) Tema — native derleme olmadan
+
+SDK'nın hazır ekranlarının görünümü JS'ten uygulanır; renk/logo/köşe denemesi için
+**yeniden derleme gerekmez**, JS reload yeterlidir.
+
+```ts
+const { unknownKeys } = await IdentifySdk.setTheme({
+  colors: {
+    primary: '#0F172A',
+    pageBackground: { light: '#F8FAFC', dark: '#0B1120' },
+    selectedItemBackground: '#1D4ED8',
+    headerBackground: { light: '#0F172A', dark: '#0B1120' },
+    headerTitle: '#FFFFFF',
+  },
+  navBar: { preset: 'centered', showsDivider: true },  // classic | centered | minimal | prominent
+  buttons: { corner: 12, height: 54, styles: { secondary: { borderWidth: 1 } } },
+  icons: { headerLogo: 'my_mark' },   // iOS asset kataloğundaki görsel adı
+});
+
+if (unknownKeys.length) console.warn('Tema: tanınmayan anahtar', unknownKeys);
+
+IdentifySdk.resetTheme();   // SDK varsayılanlarına dön
+```
+
+Şemanın tamamı `IdentifySdk.ts` içindeki `SDKThemeConfig` tipindedir; bölümler:
+`colors`, `fonts`, `metrics`, `buttons`, `navBar`, `selection`, `alerts`, `banners`,
+`fields`, `sheets`, `capture`, `controls`, `call`, `motion`, `icons`.
+
+> **Header'daki marka işareti** `icons.logo` değil `icons.headerLogo`'dur. `logo` giriş
+> ekranı ve kamera üstü başlıkta kullanılır.
+
+`icons` değerleri host uygulamanızın **asset kataloğundaki** görsel adlarıdır; yeni bir
+görsel eklemek native tarafı ilgilendirir, ama var olan görseller arasında geçiş ve tüm
+renk/ölçü ayarları JS'ten yapılır.
+
+## 3.2) Akışın kapanış animasyonu
+
+SDK akışı kendini sunmaz ve **kapatmaz** — sunum da kapanış da host uygulamaya aittir.
+"Ekran animasyonsuz kapanıyor" durumu, akışın barındığı görünümün animasyonsuz
+kaldırılmasından gelir.
+
+React Native tarafında akışı bir modal içinde gösteriyorsanız:
+
+```tsx
+<Modal visible={flowVisible} animationType="slide" presentationStyle="fullScreen">
+  {/* akış */}
+</Modal>
+```
+
+Native tarafta kendi controller'ınızı sunuyorsanız:
+
+```swift
+host.modalPresentationStyle = .fullScreen
+host.modalTransitionStyle = .coverVertical     // yukarıdan aşağı kapanış
+presenter.present(host, animated: true)
+...
+host.dismiss(animated: true)                   // animated: false ANINDA kapatır
+```
+
+Akış içindeki adım geçişlerinin süresi tema üzerinden ayarlanır:
+
+```ts
+await IdentifySdk.setTheme({ motion: { transitionDuration: 0.35 } });
+```
+
 ## 4) Olay (SDKEvent) yapısı
 
 Köprü, native `SDKEvent.toDictionary()` çıktısını **olduğu gibi** JS'e iletir:

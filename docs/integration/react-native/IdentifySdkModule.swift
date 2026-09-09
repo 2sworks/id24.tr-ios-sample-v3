@@ -107,8 +107,46 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
                 }
                 // Akışı sunmak için: kendi UIViewController host'unuzu present edin,
                 // veya SDKFlowHostView (SwiftUI) ile coordinator'ı start() edin.
+                //
+                // KAPANIŞ ANİMASYONU: SDK akışı kendini sunmaz ve kapatmaz — sunum da
+                // kapanış da host'a aittir. Akış bittiğinde ekranı animasyonlu kaldırın:
+                //
+                //   host.modalPresentationStyle = .fullScreen
+                //   host.modalTransitionStyle = .coverVertical     // yukarıdan aşağı
+                //   presenter.present(host, animated: true)
+                //   ...
+                //   host.dismiss(animated: true)                   // animated: false ANINDA kapatır
+                //
+                // React Native tarafında akışı <Modal animationType="slide"> içinde
+                // gösteriyorsanız kapanış animasyonu oradan gelir.
                 resolve(["result": true])
             }
+        }
+    }
+
+    // MARK: Tema köprüsü
+
+    /// JS tarafından gönderilen tema sözlüğünü uygular.
+    ///
+    /// Renk/logo/köşe denemesi için **native derleme gerekmez**: JS reload yeterlidir.
+    /// Dönen dizi tanınmayan anahtarları içerir (yazım hatalarını görmek için).
+    ///
+    /// JS: `await IdentifySdk.setTheme({ colors: { primary: "#0F172A" } })`
+    @objc(setTheme:resolver:rejecter:)
+    func setTheme(_ theme: NSDictionary,
+                  resolver resolve: @escaping RCTPromiseResolveBlock,
+                  rejecter reject: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            let unknown = SDKTheme.shared.apply(theme as? [String: Any] ?? [:])
+            resolve(["result": true, "unknownKeys": unknown])
+        }
+    }
+
+    /// Tüm görünüm override'larını siler (SDK varsayılanlarına döner).
+    @objc(resetTheme)
+    func resetTheme() {
+        DispatchQueue.main.async {
+            SDKTheme.shared.resetAppearance()
         }
     }
 

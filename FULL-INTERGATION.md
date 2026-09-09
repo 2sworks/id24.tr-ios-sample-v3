@@ -337,11 +337,11 @@ Text("Alt başlık").font(IDFont.bodyRegular(.regular))
 
 ### Diller
 
-`SDKLang`: `.tr` · `.eng` · `.de` · `.az` · `.ru` — SDK bundle'ında 5 JSON
+`SDKLang`: `.tr` · `.en` · `.de` · `.az` · `.ru` — SDK bundle'ında 5 JSON
 (`TURKISH/ENGLISH/GERMAN/AZERI/RUSSIAN.json`). Aktif dil:
 
 ```swift
-IdentifyManager.shared.setSDKLang(lang: .tr)     // nil bırakılırsa .eng
+IdentifyManager.shared.setSDKLang(lang: .tr)     // nil bırakılırsa .en
 ```
 
 ### Çözümleme sırası
@@ -357,7 +357,7 @@ SDKLocalization.shared.setOverride(key: .connect, language: .tr, value: "Bağlan
 // Toplu (birden fazla dil):
 SDKLocalization.shared.registerOverrides([
     .tr:  ["Connect": "Bağlan", "ThankU": "Teşekkürler!"],
-    .eng: ["Connect": "Connect"],
+    .en: ["Connect": "Connect"],
 ])
 
 // Kendi JSON dosyanızdan ([String: String]) yükleme:
@@ -805,7 +805,7 @@ SSL pinning açıkken `.cer` arama sırası: **custom bundle'lar → SDK bundle 
 ### Dil
 
 ```swift
-IdentifyManager.shared.setSDKLang(lang: .tr)    // .tr / .eng / .de / .az / .ru
+IdentifyManager.shared.setSDKLang(lang: .tr)    // .tr / .en / .de / .az / .ru
 ```
 
 ### Belge türleri — `CardType`

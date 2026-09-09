@@ -91,9 +91,59 @@ struct FontsShowcaseView: View {
 struct NavBarShowcaseView: View {
     @Environment(\.colorScheme) private var colorScheme
 
+    /// Hazır başlık tasarımları — host tek satırla seçer.
+    @State private var preset: SDKNavBarPreset = SDKTheme.shared.navBar.preset
+    @State private var showsLogo = SDKTheme.shared.navBar.showsLogo ?? true
+    @State private var showsDivider = SDKTheme.shared.navBar.showsDivider ?? false
+    @State private var revision = 0
+
+    private var presetTitle: String {
+        switch preset {
+        case .classic:   return "Solda geri + marka işareti + başlık (SDK varsayılanı)"
+        case .centered:  return "Başlık ve marka işareti ortada"
+        case .minimal:   return "Marka işareti yok, ince çubuk (48pt)"
+        case .prominent: return "İki satır: üstte kontroller, altta büyük başlık"
+        }
+    }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: IDSpacing.xl) {
+
+                VStack(alignment: .leading, spacing: IDSpacing.md) {
+                    Text("Tasarım (preset)")
+                        .font(IDFont.bodyMedium(.semibold))
+                        .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                    Picker("", selection: $preset) {
+                        ForEach(SDKNavBarPreset.allCases, id: \.self) { p in
+                            Text(p.rawValue.capitalized).tag(p)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: preset) { _ in apply() }
+
+                    Text(presetTitle)
+                        .font(IDFont.caption(.regular))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+
+                    Toggle("Marka işaretini göster", isOn: $showsLogo)
+                        .font(IDFont.caption(.regular))
+                        .onChange(of: showsLogo) { _ in apply() }
+                    Toggle("Alt ayırıcı çizgi", isOn: $showsDivider)
+                        .font(IDFont.caption(.regular))
+                        .onChange(of: showsDivider) { _ in apply() }
+
+                    Text("SDKTheme.shared.navBar.preset = .\(preset.rawValue)")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundColor(IDColor.accentPurple)
+                    Text("Header marka işareti: SDKTheme.shared.setIcon(.headerLogo, Image(\"my_mark\"))")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                }
+                .padding(IDSpacing.lg)
+                .background(RoundedRectangle(cornerRadius: IDRadius.lg).fill(IDColor.inkSurface))
+                .padding(.horizontal, IDSpacing.lg)
+
                 labeled(".login") {
                     SDKNavigationBar(style: .login, onMenu: {})
                 }
@@ -111,8 +161,21 @@ struct NavBarShowcaseView: View {
                 }
             }
             .padding(.vertical, IDSpacing.lg)
+            .id(revision)
         }
         .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
+        .onDisappear {
+            // Global durumu temiz bırak: showcase dışına preset taşınmasın.
+            SDKTheme.shared.navBar = SDKNavBarAppearance()
+        }
+    }
+
+    /// Seçimleri global temaya yazar ve örnekleri yeniden çizdirir.
+    private func apply() {
+        SDKTheme.shared.navBar.preset = preset
+        SDKTheme.shared.navBar.showsLogo = showsLogo
+        SDKTheme.shared.navBar.showsDivider = showsDivider
+        revision += 1
     }
 
     private func labeled<V: View>(_ title: String, @ViewBuilder _ content: () -> V) -> some View {
@@ -131,19 +194,151 @@ struct NavBarShowcaseView: View {
 struct ButtonsShowcaseView: View {
     @Environment(\.colorScheme) private var colorScheme
 
+    /// Canlı denenen köşe seçenekleri.
+    private enum CornerChoice: String, CaseIterable, Identifiable {
+        case capsule = "Kapsül"
+        case soft    = "16 pt"
+        case sharp   = "4 pt"
+        case square  = "Köşeli"
+        var id: String { rawValue }
+        var corner: SDKButtonCorner {
+            switch self {
+            case .capsule: return .capsule
+            case .soft:    return .radius(16)
+            case .sharp:   return .radius(4)
+            case .square:  return .radius(0)
+            }
+        }
+    }
+
+    @State private var corner: CornerChoice = .capsule
+    @State private var height: Double = 0          // 0 → padding'e göre otomatik
+    @State private var outlined = false            // .secondary'ye kenarlık
+    @State private var shadowed = false
+    @State private var haptics = true
+    /// Görünüm token'ları global (SDKTheme.shared) olduğu için tetikleyici sayaç.
+    @State private var revision = 0
+
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: IDSpacing.lg) {
-                SDKButton(title: ".primary", style: .primary) {}
-                SDKButton(title: ".secondary", style: .secondary) {}
-                SDKButton(title: ".success", style: .success) {}
-                SDKButton(title: ".cancel", style: .cancel) {}
-                SDKButton(title: "isLoading", style: .primary, isLoading: true) {}
-                SDKButton(title: "isDisabled", style: .primary, isDisabled: true) {}
+            VStack(alignment: .leading, spacing: IDSpacing.xl) {
+
+                controls
+
+                VStack(spacing: IDSpacing.lg) {
+                    SDKButton(title: ".primary", style: .primary) {}
+                    SDKButton(title: ".secondary", style: .secondary) {}
+                    SDKButton(title: ".success", style: .success) {}
+                    SDKButton(title: ".cancel", style: .cancel) {}
+                    SDKButton(title: "isLoading", style: .primary, isLoading: true) {}
+                    SDKButton(title: "isDisabled", style: .primary, isDisabled: true) {}
+                }
+                .id(revision)
+
+                codeBlock(snippet)
+
+                Text("Köşe token'ı yalnızca SDKButton'ı değil, SDK'nın hazır ekranlarındaki "
+                     + "tüm aksiyon butonlarını da kapsar (görüşme, ThankYou, bağlantı koptu, "
+                     + "uyarı diyalogları). SDKButtonShape.themed() ile kendi ekranlarında da "
+                     + "aynı biçimi kullanabilirsin.")
+                    .font(IDFont.caption(.regular))
+                    .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
             }
             .padding(IDSpacing.xl)
         }
         .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
+        .onDisappear { SDKTheme.shared.buttons.reset() }   // global durumu temiz bırak
+    }
+
+    // MARK: Kontroller
+
+    private var controls: some View {
+        VStack(alignment: .leading, spacing: IDSpacing.md) {
+            Text("Köşe (corner)")
+                .font(IDFont.bodyMedium(.semibold))
+                .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+            Picker("", selection: $corner) {
+                ForEach(CornerChoice.allCases) { Text($0.rawValue).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: corner) { _ in apply() }
+
+            HStack {
+                Text("Yükseklik: " + (height == 0 ? "otomatik" : "\(Int(height)) pt"))
+                    .font(IDFont.caption(.regular))
+                    .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                Spacer()
+            }
+            Slider(value: $height, in: 0...72, step: 4) { editing in
+                if !editing { apply() }
+            }
+
+            Toggle("Kenarlık (.secondary)", isOn: $outlined)
+                .font(IDFont.caption(.regular))
+                .onChange(of: outlined) { _ in apply() }
+            Toggle("Gölge", isOn: $shadowed)
+                .font(IDFont.caption(.regular))
+                .onChange(of: shadowed) { _ in apply() }
+            Toggle("Titreşim (haptic)", isOn: $haptics)
+                .font(IDFont.caption(.regular))
+                .onChange(of: haptics) { _ in apply() }
+        }
+        .padding(IDSpacing.lg)
+        .background(RoundedRectangle(cornerRadius: IDRadius.lg).fill(IDColor.inkSurface))
+    }
+
+    /// Seçimleri global temaya yazar ve butonları yeniden çizdirir.
+    private func apply() {
+        var base = SDKButtonAppearance()
+        base.corner = corner.corner
+        base.height = height == 0 ? nil : CGFloat(height)
+        base.hapticsEnabled = haptics
+        if shadowed {
+            base.shadowColor = Color.black.opacity(0.25)
+            base.shadowRadius = 12
+            base.shadowOffsetY = 6
+        }
+        SDKTheme.shared.buttons.reset()
+        SDKTheme.shared.buttons.base = base
+        if outlined {
+            SDKTheme.shared.buttons[.secondary].borderWidth = 1
+            SDKTheme.shared.buttons[.secondary].borderColor = IDColor.divider
+        }
+        revision += 1
+    }
+
+    private var snippet: String {
+        var lines = ["SDKTheme.shared.buttons.base.corner = " + cornerLiteral]
+        if height > 0 { lines.append("SDKTheme.shared.buttons.base.height = \(Int(height))") }
+        if !haptics   { lines.append("SDKTheme.shared.buttons.base.hapticsEnabled = false") }
+        if shadowed {
+            lines.append("SDKTheme.shared.buttons.base.shadowColor = .black.opacity(0.25)")
+            lines.append("SDKTheme.shared.buttons.base.shadowRadius = 12")
+            lines.append("SDKTheme.shared.buttons.base.shadowOffsetY = 6")
+        }
+        if outlined {
+            lines.append("SDKTheme.shared.buttons[.secondary].borderWidth = 1")
+            lines.append("SDKTheme.shared.buttons[.secondary].borderColor = IDColor.divider")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private var cornerLiteral: String {
+        switch corner {
+        case .capsule: return ".capsule"
+        case .soft:    return ".radius(16)"
+        case .sharp:   return ".radius(4)"
+        case .square:  return ".radius(0)"
+        }
+    }
+
+    private func codeBlock(_ code: String) -> some View {
+        Text(code)
+            .font(.system(size: 11, design: .monospaced))
+            .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(IDSpacing.md)
+            .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.inkSurface))
     }
 }
 
@@ -294,7 +489,7 @@ struct CustomizationShowcaseView: View {
         for (key, _, img) in iconDemo { SDKTheme.shared.setIcon(key, img) }
         SDKLocalization.shared.registerOverrides([
             .tr: ["Continue": "İlerle ▸", "MyIntroTitle": "Hoş geldin"],
-            .eng: ["Continue": "Proceed ▸", "MyIntroTitle": "Welcome"],
+            .en: ["Continue": "Proceed ▸", "MyIntroTitle": "Welcome"],
             .de: ["Continue": "Weiter ▸", "MyIntroTitle": "Willkommen"]
         ])
         applied = true
@@ -327,6 +522,145 @@ struct CustomizationShowcaseView: View {
     }
 }
 
+// MARK: - JSON ile Tema
+
+/// Temanın **native derleme olmadan** uygulanabildiğini gösteren ekran.
+/// React Native/Flutter köprüleri aynı sözlüğü `setTheme` ile geçirir.
+struct ThemeJSONShowcaseView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var json = ThemeJSONShowcaseView.samples[0].1
+    @State private var report = ""
+    @State private var revision = 0
+
+    /// Hazır örnekler: (ad, JSON).
+    static let samples: [(String, String)] = [
+        ("Koyu kurumsal", """
+        {
+          "colors": {
+            "primary": "#0F172A",
+            "pageBackground": { "light": "#F8FAFC", "dark": "#0B1120" },
+            "moduleBackground": { "light": "#0F172A", "dark": "#0B1120" },
+            "headerBackground": { "light": "#0F172A", "dark": "#0B1120" },
+            "headerTitle": "#FFFFFF",
+            "headerIcon": "#FFFFFF",
+            "selectedItemBackground": "#1D4ED8",
+            "selectedItemText": "#EFF6FF"
+          },
+          "navBar": { "preset": "centered", "showsDivider": true },
+          "buttons": { "corner": 12, "height": 54 },
+          "selection": { "cornerRadius": 10 }
+        }
+        """),
+        ("Yumuşak / pastel", """
+        {
+          "colors": {
+            "primary": "#8C33CC",
+            "accentWarning": "#F59E0B",
+            "pageBackground": { "light": "#FFFBFF", "dark": "#160B1F" },
+            "selectedItemBackground": "#8C33CC",
+            "progressActive": "#8C33CC"
+          },
+          "navBar": { "preset": "prominent", "logoSize": 32 },
+          "buttons": { "corner": "capsule", "shadowColor": "#8C33CC", "shadowRadius": 14, "shadowOffsetY": 6 },
+          "alerts": { "cornerRadius": 28 },
+          "motion": { "transitionDuration": 0.35 }
+        }
+        """),
+        ("Köşeli / yüksek kontrast", """
+        {
+          "colors": {
+            "primary": "#000000",
+            "pageBackground": { "light": "#FFFFFF", "dark": "#000000" },
+            "selectedItemBackground": "#000000",
+            "selectedItemText": "#FFFFFF",
+            "unselectedItemBackground": { "light": "#F1F1F1", "dark": "#1C1C1E" },
+            "border": { "light": "#000000", "dark": "#FFFFFF" }
+          },
+          "navBar": { "preset": "minimal", "showsDivider": true },
+          "buttons": { "corner": 0, "borderWidth": 2, "borderColor": "#FFFFFF" },
+          "selection": { "cornerRadius": 0, "checkboxCornerRadius": 0 },
+          "fields": { "cornerRadius": 0, "borderWidth": 2 }
+        }
+        """)
+    ]
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: IDSpacing.lg) {
+
+                Text("Aşağıdaki sözlük SDK'ya olduğu gibi verilir. React Native tarafında "
+                     + "IdentifySdk.setTheme(...), Flutter'da IdentifySdk.instance.setTheme(...) "
+                     + "aynı şemayı kullanır — renk denemesi için native derleme gerekmez.")
+                    .font(IDFont.caption(.regular))
+                    .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+
+                HStack(spacing: IDSpacing.sm) {
+                    ForEach(Self.samples, id: \.0) { name, sample in
+                        Button(name) { json = sample }
+                            .font(IDFont.caption(.semibold))
+                            .padding(.horizontal, IDSpacing.md)
+                            .padding(.vertical, IDSpacing.sm)
+                            .background(RoundedRectangle(cornerRadius: IDRadius.sm).fill(IDColor.inkSurface))
+                            .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                    }
+                }
+
+                TextEditor(text: $json)
+                    .font(.system(size: 11, design: .monospaced))
+                    .frame(height: 260)
+                    .padding(IDSpacing.sm)
+                    .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.inkSurface))
+
+                HStack(spacing: IDSpacing.md) {
+                    SDKButton(title: "Uygula") { applyJSON() }
+                    SDKButton(title: "Sıfırla", style: .cancel) {
+                        SDKTheme.shared.resetAppearance()
+                        report = "Tüm görünüm override'ları silindi."
+                        revision += 1
+                    }
+                }
+
+                if !report.isEmpty {
+                    Text(report)
+                        .font(IDFont.caption(.regular))
+                        .foregroundColor(report.hasPrefix("Tanınmayan") ? IDColor.error : IDColor.success)
+                }
+
+                Text("Önizleme")
+                    .font(IDFont.bodyMedium(.semibold))
+                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+
+                VStack(spacing: IDSpacing.md) {
+                    SDKNavigationBar(style: .progress(steps: 5, current: 2),
+                                     title: "Kimlik Doğrulama", subtitle: "Adım 2/5", onBack: {})
+                    SDKButton(title: "Devam") {}
+                    SDKButton(title: "Vazgeç", style: .cancel) {}
+                }
+                .id(revision)
+                .padding(IDSpacing.md)
+                .background(RoundedRectangle(cornerRadius: IDRadius.lg)
+                    .fill(IDColor.pageBackground(for: colorScheme)))
+                .overlay(RoundedRectangle(cornerRadius: IDRadius.lg)
+                    .stroke(IDColor.adaptiveBorder(for: colorScheme), lineWidth: 1))
+            }
+            .padding(IDSpacing.xl)
+        }
+        .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
+        .onDisappear { SDKTheme.shared.resetAppearance() }
+    }
+
+    /// Metindeki JSON'u SDK'ya uygular ve tanınmayan anahtarları raporlar.
+    private func applyJSON() {
+        guard let data = json.data(using: .utf8) else { return }
+        let unknown = SDKTheme.shared.apply(json: data)
+        report = unknown.isEmpty
+            ? "Uygulandı — tüm anahtarlar tanındı."
+            : "Tanınmayan anahtar: " + unknown.joined(separator: ", ")
+        revision += 1
+    }
+}
+
 // MARK: - Previews
 #Preview("Özelleştirme") { CustomizationShowcaseView() }
 #Preview("Renkler") { ColorsShowcaseView() }
@@ -334,3 +668,4 @@ struct CustomizationShowcaseView: View {
 #Preview("Nav Bar") { NavBarShowcaseView() }
 #Preview("Buton") { ButtonsShowcaseView() }
 #Preview("Uyarı") { AlertsShowcaseView() }
+#Preview("JSON ile Tema") { ThemeJSONShowcaseView() }

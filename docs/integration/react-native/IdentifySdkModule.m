@@ -15,6 +15,12 @@ RCT_EXTERN_METHOD(setupSDK:(NSDictionary *)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(setTheme:(NSDictionary *)theme
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(resetTheme)
+
 RCT_EXTERN_METHOD(reportAbandoned:(NSString *)reason)
 
 @end

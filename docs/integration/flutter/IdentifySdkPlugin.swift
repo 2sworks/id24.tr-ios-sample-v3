@@ -61,6 +61,13 @@ public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, Flutt
         switch call.method {
         case "setupSDK":
             setupSDK(call.arguments as? [String: Any] ?? [:], result: result)
+        case "setTheme":
+            // Tema sözlüğü Dart tarafından gelir; native derleme gerekmez.
+            let unknown = SDKTheme.shared.apply(call.arguments as? [String: Any] ?? [:])
+            result(["result": true, "unknownKeys": unknown])
+        case "resetTheme":
+            SDKTheme.shared.resetAppearance()
+            result(nil)
         case "reportAbandoned":
             let reason = (call.arguments as? [String: Any])?["reason"] as? String
             IdentifyManager.shared.reportSessionAbandoned(reason: reason)

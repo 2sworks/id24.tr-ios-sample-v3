@@ -1,5 +1,8 @@
 # Lokalizasyon — Dil Desteği ve Metin Override
 
+> **3.0.1:** İngilizce dil kodu `.eng` yerine `.en`. `.eng` deprecated alias olarak
+> derlenmeye devam eder; ayrıntı: [3.0.1 Değişiklik Rehberi](migration-3.0.1.md).
+
 SDK beş dilde hazır gelir: **Türkçe, İngilizce, Almanca, Azerbaycanca, Rusça.**
 Tüm ekran metinleri anahtar tabanlıdır (`SDKKeyword`) ve her biri host tarafından
 tek tek ezilebilir — kendi üslubunuzu SDK ekranlarına taşıyabilirsiniz.
@@ -14,13 +17,13 @@ Aktif dili `IdentifyManager` üzerinden ayarlarsınız (varsayılan: Türkçe; b
 İngilizce'ye düşer):
 
 ```swift
-IdentifyManager.shared.sdkLang = .eng    // .tr / .eng / .de / .az / .ru
+IdentifyManager.shared.sdkLang = .en     // .tr / .en / .de / .az / .ru
 ```
 
 | `SDKLang` | Dil | STT kodu |
 |---|---|---|
 | `.tr` | Türkçe | `tr` |
-| `.eng` | İngilizce | `en` |
+| `.en` | İngilizce | `en` |
 | `.de` | Almanca | `de` |
 | `.az` | Azerbaycanca | `az` |
 | `.ru` | Rusça | `ru` |
@@ -58,7 +61,7 @@ SDKLocalization.shared.setOverride(key: .connect, language: .tr, value: "Bağlan
 ```swift
 SDKLocalization.shared.registerOverrides([
     .tr: ["connect": "Bağlan", "selfie_info": "Yüzünüzü çerçeveye alın"],
-    .eng: ["connect": "Connect"]
+    .en: ["connect": "Connect"]
 ])
 ```
 

@@ -172,6 +172,26 @@ class IdentifySdk {
     return (res?['result'] as bool?) ?? false;
   }
 
+  /// SDK'nın hazır ekranlarının temasını uygular; native derleme gerekmez.
+  ///
+  /// Renk değeri '#RRGGBB' ya da {'light': ..., 'dark': ...}; köşe 'capsule' ya da sayı.
+  /// Dönen liste tanınmayan (yazım hatası olan) anahtarları içerir.
+  ///
+  ///   await IdentifySdk.instance.setTheme({
+  ///     'colors': {'primary': '#0F172A', 'pageBackground': {'light': '#F8FAFC', 'dark': '#0B1120'}},
+  ///     'navBar': {'preset': 'centered'},
+  ///     'buttons': {'corner': 12},
+  ///   });
+  Future<List<String>> setTheme(Map<String, dynamic> theme) async {
+    final res = await _methods.invokeMethod<Map>('setTheme', theme);
+    return (res?['unknownKeys'] as List?)?.cast<String>() ?? const [];
+  }
+
+  /// Tüm görünüm override'larını siler (SDK varsayılanlarına döner).
+  Future<void> resetTheme() {
+    return _methods.invokeMethod('resetTheme');
+  }
+
   /// Kullanıcı SDK'yı açıkça kapatınca terk olayı tetiklemek için.
   Future<void> reportAbandoned([String? reason]) {
     return _methods.invokeMethod('reportAbandoned', {'reason': reason});

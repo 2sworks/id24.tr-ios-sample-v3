@@ -7,6 +7,43 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### 3.0.1 — Tema ve özelleştirme paketi
+
+Tamamı eklemeli: hiçbir tema ayarı vermeyen projede ekranlar 3.0.0 ile birebir aynıdır.
+Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migration-3.0.1.md).
+
+**Yeni**
+- **Buton görünümü** — `SDKTheme.shared.buttons`: köşe (`.capsule` / `.radius(x)`), yükseklik,
+  padding, font, arka plan/metin rengi, kenarlık, gölge, disabled opaklığı, basılı ölçek,
+  haptik; stil bazlı override (`buttons[.secondary]`). Kendi ekranlarınız için
+  `SDKButtonShape.themed()`.
+- **Başlık çubuğu tasarımları** — `navBar.preset`: `.classic` · `.centered` · `.minimal` ·
+  `.prominent`; yükseklik, logo/ikon ölçüleri, ilerleme çubuğu ve ayırıcı token'ları.
+- **Rol renkleri** — `SDKAdaptiveColor` (light/dark ayrı) ile 18 rol: `pageBackground`,
+  `moduleBackground`, `surface`, `title`, `subtitle`, `border`, `header*`, `progress*`,
+  `selectedItem*`, `unselectedItem*`. Ayrıca `colors.accentWarning`.
+- **Bileşen görünüm kapları** — `selection`, `alerts`, `banners`, `fields`, `sheets`,
+  `capture`, `controls`, `call`, `motion`.
+- **Tek sözlükle tema** — `SDKTheme.shared.apply(_:)`, `apply(json:)`,
+  `applyTheme(named:in:)`, `resetAppearance()`; tanınmayan anahtarların listesini döndürür.
+- **React Native / Flutter `setTheme`** — tema JS/Dart tarafından uygulanır, renk-logo
+  denemesi için **native derleme gerekmez**. Örnek: `docs/integration/theme.example.json`.
+- **`IDFont.custom(size:weight:)`** — ölçek dışı boyutlar da tema fontunu kullanır.
+
+**Değişti**
+- **Header'daki marka işaretinin anahtarı `.headerLogo`** oldu; önceki `.langButton` adı
+  yanlıştı ve `.logo`'yu ezmek header'ı değiştirmiyordu. Eski override'lar çalışmaya
+  devam eder.
+- **İngilizce dil kodu `.eng` → `.en`.** `.eng` deprecated alias olarak derlenir,
+  `SDKLang(rawValue: "eng")` kabul edilir, ses kliplerinde `_eng` eki yedek olarak denenir.
+  Tek kırılma: host kodunda `switch` içindeki `case .eng:` deseni derlenmez.
+- **Sayfa arka planları override edilebilir** — açık temadaki sabit beyaz ve modül
+  ekranlarının `primary` zemini rol token'ına bağlandı.
+- **Seçim satırları** (izin listesi, belge türü) artık `selectedItem*` / `unselectedItem*`
+  rollerinden beslenir; `primary` ile zorunlu olarak birlikte değişmez.
+- Sabit ölçüler token'landı: seçim satırı, form alanları, uyarı kartı, sheet tutamağı,
+  kamera maskesi ve kılavuz renkleri, kayıt butonu.
+
 ### Yayınlanmamış (v3)
 
 Sürüm numarası yayın anında verilir. v3, SDK'yı "başsız" (headless) bir çekirdek + hazır

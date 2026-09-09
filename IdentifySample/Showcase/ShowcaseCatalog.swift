@@ -219,11 +219,29 @@ enum ShowcaseCatalog {
             SDKTheme.shared.icons.logo      = Image("my_logo")
             SDKTheme.shared.icons.hamburger = Image("my_menu")
             // trailing: ile sağ tarafa kendi view'ını koyabilirsin.
+
+            // HEADER'DAKİ MARKA İŞARETİ ayrı bir anahtardır (.logo DEĞİL):
+            SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))
+
+            // Hazır tasarımlar — biri seçilir:
+            SDKTheme.shared.navBar.preset = .centered   // .classic / .minimal / .prominent
+
+            // İnce ayar:
+            SDKTheme.shared.navBar.height           = 64
+            SDKTheme.shared.navBar.showsLogo        = false
+            SDKTheme.shared.navBar.showsDivider     = true
+            SDKTheme.shared.navBar.progressHeight   = 4
+            SDKTheme.shared.navBar.progressCorner   = .radius(2)
+
+            // Renkler (light/dark ayrı):
+            SDKTheme.shared.colors.headerBackground = SDKAdaptiveColor(light: .white, dark: .black)
+            SDKTheme.shared.colors.headerTitle      = SDKAdaptiveColor(.primary)
+            SDKTheme.shared.colors.headerIcon       = SDKAdaptiveColor(.primary)
             """
         ),
         .init(
             id: "ds_button", title: "Buton (Button)",
-            subtitle: "SDKButton — primary / secondary / success / cancel + loading/disabled",
+            subtitle: "SDKButton — 4 stil + loading/disabled; köşe/yükseklik/kenarlık/gölge canlı denenir",
             icon: "capsule", category: "Tasarım Sistemi",
             liveView: { AnyView(ButtonsShowcaseView()) },
             integrationCode: """
@@ -233,10 +251,73 @@ enum ShowcaseCatalog {
             SDKButton(title: "Pasif", style: .primary, isDisabled: true) { ... }
             """,
             customizationCode: """
-            // Buton renkleri tema token'larına bağlı (primary→IDColor.primary,
-            // cancel→IDColor.error, success→IDColor.successBright). Tema rengini
-            // değiştirince butonlar da otomatik değişir:
+            // 1) Renk — stil renkleri tema token'larına bağlı (primary→IDColor.primary,
+            // cancel→IDColor.error, success→IDColor.successBright):
             SDKTheme.shared.colors.primary = IDColor.accentTeal
+
+            // 2) Köşe — .capsule (varsayılan) veya .radius(x); 0 → tamamen köşeli.
+            // Bu ayar SDK'nın hazır ekranlarındaki TÜM aksiyon butonlarını kapsar.
+            SDKTheme.shared.buttons.base.corner = .radius(12)
+            SDKTheme.shared.setButtonCorner(.capsule, for: .cancel)   // tek stil
+
+            // 3) Tam görünüm — ayarlanmayan alan SDK varsayılanında kalır:
+            SDKTheme.shared.buttons.base.height          = 56
+            SDKTheme.shared.buttons.base.font            = IDFont.bodyLarge(.bold)
+            SDKTheme.shared.buttons.base.shadowColor     = .black.opacity(0.25)
+            SDKTheme.shared.buttons.base.shadowRadius    = 12
+            SDKTheme.shared.buttons.base.shadowOffsetY   = 6
+            SDKTheme.shared.buttons.base.pressedScale    = 0.94
+            SDKTheme.shared.buttons.base.disabledOpacity = 0.3
+            SDKTheme.shared.buttons.base.hapticsEnabled  = false
+
+            // 4) Stile özel — outline buton:
+            SDKTheme.shared.buttons[.secondary].background  = .clear
+            SDKTheme.shared.buttons[.secondary].borderWidth = 1
+            SDKTheme.shared.buttons[.secondary].borderColor = IDColor.divider
+
+            // 5) Kendi custom ekranında aynı biçimi kullan:
+            Text("Devam").padding().background(IDColor.primary)
+                .clipShape(SDKButtonShape.themed())
+
+            // Hepsini geri al:
+            SDKTheme.shared.buttons.reset()
+            """
+        ),
+        .init(
+            id: "ds_theme_json", title: "JSON ile Tema",
+            subtitle: "Tek sözlükle tüm görünüm — RN/Flutter'da native derleme gerekmez",
+            icon: "curlybraces", category: "Tasarım Sistemi",
+            liveView: { AnyView(ThemeJSONShowcaseView()) },
+            integrationCode: """
+            // Swift:
+            SDKTheme.shared.apply([
+                "colors": ["primary": "#0F172A",
+                           "pageBackground": ["light": "#F8FAFC", "dark": "#0B1120"]],
+                "navBar": ["preset": "centered"],
+                "buttons": ["corner": 12, "height": 54]
+            ])
+            SDKTheme.shared.applyTheme(named: "theme")        // Bundle'daki theme.json
+            SDKTheme.shared.resetAppearance()                 // hepsini geri al
+
+            // React Native:
+            await IdentifySdk.setTheme({ colors: { primary: "#0F172A" },
+                                         navBar: { preset: "centered" } });
+
+            // Flutter:
+            await IdentifySdk.instance.setTheme({'colors': {'primary': '#0F172A'}});
+            """,
+            customizationCode: """
+            // Bölümler: colors, fonts, metrics, buttons, navBar, selection, alerts,
+            // banners, fields, sheets, capture, controls, call, motion, icons.
+            //
+            // Renk değeri:  "#RRGGBB"  ya da  { "light": "#…", "dark": "#…" }
+            // Köşe değeri:  "capsule"  ya da  sayı (0 = tamamen köşeli)
+            // Font değeri:  { "size": 16, "weight": "semibold" }
+            // icons değeri: HOST uygulamasının asset adı → { "headerLogo": "my_mark" }
+            //
+            // apply(...) tanınmayan anahtarların listesini döner; entegrasyonda loglayın:
+            let unknown = SDKTheme.shared.apply(config)
+            if !unknown.isEmpty { print("Tema: tanınmayan anahtar", unknown) }
             """
         ),
         .init(

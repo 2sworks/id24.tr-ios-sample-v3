@@ -10,6 +10,12 @@ hepsinin üstündeki tek altın kuralı açıklar: **"bypass yok."**
 
 ## Önce Kendinize Sorun: Hangi Seviye?
 
+> **Sıfırıncı seviye — tema.** Ekranı değiştirmeden yalnız görünümü ayarlamak istiyorsanız
+> (renk, köşe, başlık çubuğu tasarımı, logo, font, seçili satır rengi) buraya gerek yok:
+> [theming.md](theming.md) tek sözlükle bunların tümünü karşılar ve React Native/Flutter'da
+> native derleme gerektirmez. Custom ekran, ancak akış veya içerik değişecekse gerekir.
+
+
 | İhtiyaç | Çözüm | Efor |
 |---|---|---|
 | "Renkler/font/logo bizim olsun" | [Tema](theming.md) — ekran yazmadan | ⭐ |
