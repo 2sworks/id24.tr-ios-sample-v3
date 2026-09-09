@@ -1,9 +1,10 @@
 # Liveness — Canlılık Testi
 
 "Karşımdaki gerçek ve canlı bir insan mı, yoksa bir fotoğraf/video mu?" sorusunu cevaplar.
-Kullanıcıya sırayla hareket talimatları verilir — **göz kırp, gülümse, sola bak, sağa bak** —
-ve her adım bir doğrulama karesiyle kanıtlanır. Adım sırasını sunucu belirler (her oturumda
-farklı olabilir), böylece önceden kaydedilmiş videoyla aldatma zorlaşır.
+Kullanıcıya sırayla hareket talimatları verilir — **göz kırp, gülümse, başını sola/sağa çevir,
+başını öne/geriye eğ, kaşlarını kaldır, gözlerini sola/sağa/yukarı çevir** — ve her adım bir
+doğrulama karesiyle kanıtlanır. Hangi adımların hangi sırayla isteneceğini sunucu belirler (her
+oturumda farklı olabilir), böylece önceden kaydedilmiş videoyla aldatma zorlaşır.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
