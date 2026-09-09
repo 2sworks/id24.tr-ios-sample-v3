@@ -32,7 +32,7 @@ struct RootView: View {
         // 1) Host-side localization override: dışarıdan SDK string'ini değiştir.
 //        SDKLocalization.shared.registerOverrides([
 //            .tr: ["Connect": "Bağlan (host)"],
-//            .eng: ["Connect": "Connect (host)"]
+//            .en: ["Connect": "Connect (host)"]
 //        ])
 
         // 2) External ekran ekleme: Selfie modülünden ÖNCE bir bilgilendirme ekranı.

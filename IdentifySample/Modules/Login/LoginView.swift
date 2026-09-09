@@ -368,7 +368,7 @@ private struct LanguagePickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
-    private static let languages: [SDKLang] = [.tr, .eng, .de, .az, .ru]
+    private static let languages: [SDKLang] = [.tr, .en, .de, .az, .ru]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -1571,7 +1571,7 @@ private extension SDKLang {
     var flagImageName: String {
         switch self {
         case .tr:  return "turkey"
-        case .eng: return "united_kingdom"
+        case .en: return "united_kingdom"
         case .de:  return "germany"
         case .az:  return "azerbaijan"
         case .ru:  return "russia"
@@ -1582,7 +1582,7 @@ private extension SDKLang {
     var displayName: String {
         switch self {
         case .tr:  return "Türkçe"
-        case .eng: return "English"
+        case .en: return "English"
         case .de:  return "Deutsch"
         case .az:  return "Azərbaycan"
         case .ru:  return "Русский"

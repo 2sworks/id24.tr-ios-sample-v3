@@ -50,7 +50,7 @@ final class LoginViewModel: ObservableObject {
 
     // MARK: - SDK Config
 
-    @Published var selectedSDKLang: SDKLang = .eng
+    @Published var selectedSDKLang: SDKLang = .en
     @Published var selectedIdLang: IDLang = .TR
     @Published var selectedServer: ServerOption = ServerOption(
         title: "V2",
