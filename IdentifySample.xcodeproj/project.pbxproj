@@ -52,7 +52,8 @@
 		8AB276BB2F749D5100A764F1 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB276BA2F749D5100A764F1 /* LoginViewModel.swift */; };
 		8AB276D52F749D9600A764F1 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB276D42F749D9600A764F1 /* LoginView.swift */; };
 		8C877716827596EDABDB1A0C /* HostModuleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67D3D084DA8B7D62494FBE14 /* HostModuleViewModel.swift */; };
-		8DA3E9B730496B0C00A653F4 /* IdentifySDK in Frameworks */ = {isa = PBXBuildFile; productRef = 8DA3E9B630496B0C00A653F4 /* IdentifySDK */; };
+		8DB74A7A2FCF9AAD00C204AA /* IdentifySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */; };
+		8DB74A7B2FCF9AAD00C204AA /* IdentifySDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8DB74A792FCF9AAD00C204AA /* IdentifySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8DB567A22FF5D0DD0062D77F /* ReadAloud.md in Resources */ = {isa = PBXBuildFile; fileRef = 8DB567A12FF5D0DD0062D77F /* ReadAloud.md */; };
 		8DD4665F2FED275C00710491 /* SDKNetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */; };
 		8DD466702FED275C00710491 /* SDKLogPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466712FED275C00710491 /* SDKLogPanel.swift */; };
@@ -87,6 +88,20 @@
 		FB8139CBBFB4B72B3ABDD0C3 /* SwlExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D33FA61BFD40D861B866C43 /* SwlExample.swift */; };
 		FC35450F26C18D34AFC45912 /* IdCardHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057317BDAFB60877C85A3684 /* IdCardHostViewModel.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DB74A7C2FCF9AAD00C204AA /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8DB74A7B2FCF9AAD00C204AA /* IdentifySDK.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0046CF4158A838AC23E4A05E /* Prepare.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = Prepare.md; sourceTree = "<group>"; };
@@ -207,7 +222,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				486A11222B07BED000A34623 /* SpeechRecognizerPermission in Frameworks */,
-				8DA3E9B730496B0C00A653F4 /* IdentifySDK in Frameworks */,
+				8DB74A7A2FCF9AAD00C204AA /* IdentifySDK.framework in Frameworks */,
 				486A11202B07BED000A34623 /* MicrophonePermission in Frameworks */,
 				48AB73FF291A762100F591A4 /* SwiftSignatureView in Frameworks */,
 				486A111E2B07BED000A34623 /* CameraPermission in Frameworks */,
@@ -618,6 +633,7 @@
 			buildPhases = (
 				483BDB0728F459CC00635BCC /* Sources */,
 				483BDB0828F459CC00635BCC /* Frameworks */,
+				8DB74A7C2FCF9AAD00C204AA /* Embed Frameworks */,
 				483BDB0928F459CC00635BCC /* Resources */,
 			);
 			buildRules = (
@@ -634,7 +650,6 @@
 				486A111D2B07BED000A34623 /* CameraPermission */,
 				486A111F2B07BED000A34623 /* MicrophonePermission */,
 				486A11212B07BED000A34623 /* SpeechRecognizerPermission */,
-				8DA3E9B630496B0C00A653F4 /* IdentifySDK */,
 			);
 			productName = IdentifySample;
 			productReference = 483BDB0B28F459CC00635BCC /* IdentifyTR.app */;
@@ -690,7 +705,6 @@
 				48171403294716830095A64F /* XCLocalSwiftPackageReference "Vendor/netfox" */,
 				48420BA52A8B61840005250F /* XCRemoteSwiftPackageReference "WebRTC" */,
 				486A111C2B07BED000A34623 /* XCRemoteSwiftPackageReference "PermissionsKit" */,
-				8DA3E9B530496B0C00A653F4 /* XCRemoteSwiftPackageReference "id24" */,
 			);
 			productRefGroup = 483BDB0C28F459CC00635BCC /* Products */;
 			projectDirPath = "";
@@ -839,7 +853,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 9D3UPKQ9AL;
+				DEVELOPMENT_TEAM = T6Q97AQ964;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -904,7 +918,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9D3UPKQ9AL;
+				DEVELOPMENT_TEAM = T6Q97AQ964;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -935,7 +949,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 41;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -958,7 +972,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.identifytr.ios.v3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2sworks.identifytr.v3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -978,7 +992,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 41;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -1001,7 +1015,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 3.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.identifytr.ios.v3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2sworks.identifytr.v3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1084,14 +1098,6 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		8DA3E9B530496B0C00A653F4 /* XCRemoteSwiftPackageReference "id24" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/2sworks/id24.tr-ios-sdk-spm";
-			requirement = {
-				kind = exactVersion;
-				version = 3.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1133,11 +1139,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48AB73FD291A762100F591A4 /* XCRemoteSwiftPackageReference "SwiftSignatureView" */;
 			productName = SwiftSignatureView;
-		};
-		8DA3E9B630496B0C00A653F4 /* IdentifySDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8DA3E9B530496B0C00A653F4 /* XCRemoteSwiftPackageReference "id24" */;
-			productName = IdentifySDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 
