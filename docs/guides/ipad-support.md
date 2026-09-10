@@ -181,6 +181,16 @@ Yayına çıkmadan önce en az şu üç cihaz sınıfında tam akış koşulmal�
 
 | Cihaz | Beklenen |
 |---|---|
-| Face ID'li iPad Pro | Canlılık modülü normal çalışır; NFC adımı akışta yoktur |
-| Touch ID'li iPad Air / mini | Canlılık yerine selfie modülü gelir; NFC adımı akışta yoktur |
-| Face ID'siz iPhone (örn. SE) | Canlılık yerine selfie modülü gelir; NFC cihaza göre |
+| Face ID'li iPad Pro | `livenessDetection` ve `selfieWithLiveness` normal çalışır (yüz ovali ekranla büyümez); NFC adımı akışta yoktur |
+| Touch ID'li iPad Air / mini | `faceTrackingFallback` devreye girer (varsayılan: selfie); NFC adımı akışta yoktur |
+| Face ID'siz iPhone (örn. SE) | `faceTrackingFallback` devreye girer; NFC cihaza göre |
+
+Kontrol edilecekler:
+
+- Kamera kılavuzları (kimlik çerçevesi, yüz ovali) ekranla birlikte absürt büyümüyor.
+- Metin ve form sütunları ortalanmış, satırlar ekranın tamamına yayılmıyor.
+- Canlılık adımı geçince kısa titreşim alınıyor (`stepFeedbackEnabled`); iPad'de dokunsal
+  donanım yoktur — darbe sessizce atlanır, akış etkilenmez.
+- Atlanan modüller için `status == .skipped` olayı host'a ulaşıyor ve `sdk_logs`'ta hangi
+  modülün neyle değiştirildiği görünüyor.
+- Split View / Stage Manager'da kamera önizlemesi ve kırpma alanı kaymıyor.

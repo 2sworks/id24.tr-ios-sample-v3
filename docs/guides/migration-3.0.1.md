@@ -19,6 +19,9 @@ rehberdeki *Tek Sözlükle Tema (JSON)* bölümüne bakın.
 | Yapılandırma | yalnız Swift API | + sözlük/JSON (`apply`) → RN & Flutter'da `setTheme`, **native derleme gerekmez** |
 | Header marka işareti | `.langButton` (yanlış ad) | `.headerLogo` (eski ad çalışmaya devam ediyor) |
 | İngilizce dil kodu | `.eng` | `.en` |
+| Cihaz ailesi | yalnız iPhone | **iPhone + iPad** (tablette de portrait kilidi) |
+| Donanımsız cihaz | canlılık modülü akıştan düşerdi | `faceTrackingFallback` — yerine ne geleceğini entegrasyon seçer |
+| Canlılık adımı geçişi | sessiz | çok kısa onay titreşimi (`stepFeedbackEnabled`) |
 
 ---
 
@@ -121,6 +124,39 @@ TS tipleri `IdentifySdk.ts` içindeki `SDKThemeConfig`.
 
 Tasarım ölçeği dışındaki tek seferlik boyutlar için. `.system(size:)` yerine bunu kullanın;
 aksi hâlde `fonts.familyName` verildiğinde o metin sistem fontunda kalır.
+
+### 7. iPad desteği ve yetenek tabanlı modül ikamesi
+
+SDK artık iPad'de çalışır; yönelim tablette de portrait'e kilitlidir. Donanım isteyen
+modüller için karar **akış kurulurken** verilir ve yedeği siz belirlersiniz:
+
+```swift
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan
+IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çıkar
+// setupSDK'dan ÖNCE
+```
+
+TrueDepth kamera yoksa (Touch ID'li iPad, Face ID'siz iPhone) `livenessDetection` ve
+`selfieWithLiveness` bu politikaya göre değiştirilir; Face ID'li iPad Pro / iPad Air'de her
+iki modül de olduğu gibi çalışır. NFC'siz cihazlarda panele artık
+`NFCStatus = notAvailable` bildirilir.
+
+Yerleşim tarafında ölçüler ekran değil **pencere** tabanlıdır (`SDKLayout.bounds`), metin
+sütunları `.sdkReadableWidth()` ile, kılavuz çerçeveleri `SDKLayout.maxGuideWidth` /
+`maxFaceGuideWidth` ile sınırlanır. Tam ayrıntı: [iPad Desteği](ipad-support.md).
+
+### 8. Canlılık adımlarında onay titreşimi
+
+Her onaylanan canlılık adımında tek ve çok kısa bir darbe çalınır (2.x'te vardı, 3.0.0'da
+yoktu). Varsayılan **açık**:
+
+```swift
+SDKHapticConfig.shared.stepFeedbackEnabled = false   // kapat
+SDKHapticConfig.shared.stepFeedbackIntensity = 0.4   // 0…1, vars. 0.6
+```
+
+Modül anahtarı (`setEnabled(_:for:)`) hem çekim rampasını hem bu darbeyi kapsar.
+Ayrıntı: [Tema Rehberi — Titreşim](theming.md#titreşim-haptik).
 
 ---
 

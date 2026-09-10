@@ -45,7 +45,7 @@ IdentifyManager.shared.eventDelegate = analytics   // weak tutulur — referans�
 
 | Alan          | Tip                | Anlamı                                                                                           |
 | ------------- | ------------------ | ------------------------------------------------------------------------------------------------ |
-| `name`        | `String`           | Olay adı (ör. `selfie_module_completed`)                                                         |
+| `name`        | `String`           | Olay adı — `module.<modül>.<durum>` / `session.<durum>` (ör. `module.Selfie.completed`)          |
 | `category`    | `SDKEventCategory` | `session` · `module` · `call` · `network` · `error` · `navigation`                               |
 | `status`      | `SDKEventStatus`   | `info` · `presented` · `completed` · `failed` · `skipped` · `success` · `abandoned` · `notFound` |
 | `module`      | `String?`          | İlgili modül                                                                                     |

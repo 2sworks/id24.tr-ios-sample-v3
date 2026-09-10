@@ -21,6 +21,7 @@ Diğer modüllerden önemli bir farkı var: bu modül **UIKit controller tabanl�
 | Controller | `SDKSelfieWithLivenessController` (UIKit) |
 | Dış dünya | Yüz/canlılık (cihazda) + **HTTP** |
 | Ses anahtarı | `SelfieWithLivenessTts` |
+| Donanım | **TrueDepth kamera (ARKit yüz takibi) zorunlu** — yoksa modül akışa hiç girmez |
 
 ## Kullanıcı Ne Yaşar?
 
@@ -51,6 +52,32 @@ köprüler. **Composition deseni bu modülde henüz yok** — diğer modüllerde
 - **Ekranları gerçekten özelleştirmek istiyorsanız:** backend'de bu birleşik modül yerine
   ayrık `.selfie` + `.livenessDetection` modüllerini kullanın. İkisinin de tam VM API'si
   vardır: [Selfie](../Selfie/Selfie.md) · [Liveness](../Liveness/Liveness.md).
+
+## Cihaz Desteği
+
+Modül ARKit yüz takibiyle çalışır, yani **TrueDepth kamera ister**:
+
+| Cihaz | Durum |
+|---|---|
+| Face ID'li iPhone | Çalışır |
+| **Face ID'li iPad Pro / iPad Air** | **Çalışır** — ekran portrait'e kilitli, yüz ovali `SDKLayout.maxFaceGuideWidth` ile sınırlı |
+| Touch ID'li iPad / temel iPad | Çalışmaz — yedek modül devreye girer |
+| Face ID'siz iPhone (ör. SE) | Çalışmaz — yedek modül devreye girer |
+| Simülatör | Çalışmaz (ARKit yüz takibi yalnız gerçek cihazda) |
+
+Kontrol akış kurulurken yapılır (`ARFaceTrackingConfiguration.isSupported`); desteklenmeyen
+cihazda kullanıcı bu ekranı hiç görmez. Yerine ne geleceğini entegrasyon belirler:
+
+```swift
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan: selfie ile doğrula
+IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çıkar
+// setupSDK'dan ÖNCE
+```
+
+Akışta zaten selfie varsa `.selfie` yeni adım eklemez, bu modülü yalnızca çıkarır. Olay:
+`status == .skipped`, modül `Selfie With Liveness`. `.livenessDetection` değeri kabul edilir
+ama canlılık modülü de aynı donanımı istediğinden `.selfie` gibi davranır.
+Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
 
 ## Yol Haritası
 

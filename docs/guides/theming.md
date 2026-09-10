@@ -275,7 +275,11 @@ Modül anahtarı (`setEnabled(_:for:)`) hem rampayı hem adım darbesini kapsar;
 `stepFeedbackEnabled` yalnız adım darbesini hedefler. İkisi de varsayılan **açıktır**.
 
 Dokunsallık donanımı olmayan cihazlarda darbe `UIImpactFeedbackGenerator` ile çalınır;
-hiç desteklenmiyorsa sessizce atlanır.
+hiç desteklenmiyorsa sessizce atlanır — **iPad'lerde Taptic Engine yoktur**, titreşim
+hissedilmez ama akış etkilenmez.
+
+Adım darbesi `livenessDetection` modülüne özgüdür; birleşik `selfieWithLiveness` ekranında
+adım kavramı farklı olduğu için çalmaz (orada çekim rampası vardır).
 
 ---
 

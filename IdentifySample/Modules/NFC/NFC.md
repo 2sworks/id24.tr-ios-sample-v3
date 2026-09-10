@@ -138,6 +138,12 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .nfcTts, language: .tr, va
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
+- **Cihazda NFC yoksa?** (Tüm iPad'ler ve eski iPhone'lar.) Kontrol akış kurulurken yapılır
+  (`NFCNDEFReaderSession.readingAvailable`); modül akışa alınmaz, panele bir kez
+  `NFCStatus = notAvailable` bildirilir ve `sdk_logs`'a yazılır. Kullanıcıya bilgi sayfası
+  göstermek isterseniz `setupSDK(..., showNFCNotFoundPage: true, ...)`.
+  Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
+
 - **Simülatörde çalışmaz** — CoreNFC gerçek cihaz ister; NFC'yi test etmeden yayına çıkmayın.
 - **Okuma başarısız oluyor:** Kılıfı çıkartın, belgeyi telefonun **üst-arka** kısmına tutun,
   okuma bitene kadar oynatmayın. Hata sayısı `setupSDK(nfcMaxErrorCount:)` ile sınırlanır.

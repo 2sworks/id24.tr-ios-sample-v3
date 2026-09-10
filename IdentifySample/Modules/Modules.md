@@ -165,3 +165,26 @@ rehberinde kendi ses anahtarı yazar. Tam ayrıntı: [ReadAloud.md](ReadAloud.md
 
 Pasif ekranlar (ThankYou + sizin eklediğiniz ekranlar) hiçbir sinyal göndermez; araya
 eklenmeleri her zaman güvenlidir.
+
+---
+
+## Donanım Gereksinimleri ve Yedek Modüller
+
+Sunucu akışı cihazdan bağımsız kurar; iki modül donanım ister ve cihaz desteklemiyorsa
+akışa **hiç alınmaz** — kullanıcı geçemeyeceği bir ekranda kalmaz.
+
+| Modül | Gereken donanım | Desteklemeyen cihazda |
+|---|---|---|
+| `nfc` | NFC okuyucu (iPad'de yok) | Modül çıkarılır; panele `NFCStatus = notAvailable` bildirilir. `showNFCNotFoundPage: true` ile bilgi sayfası gösterilebilir |
+| `livenessDetection` | TrueDepth kamera (ARKit yüz takibi) | `faceTrackingFallback` uygulanır |
+| `selfieWithLiveness` | TrueDepth kamera (ARKit yüz takibi) | `faceTrackingFallback` uygulanır |
+
+```swift
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan: selfie ile doğrula
+IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çıkar
+// setupSDK'dan ÖNCE — karar akış kurulurken uygulanır, son kullanıcıya sorulmaz
+```
+
+Her iki durumda da olay yayınlanır (`status == .skipped`) ve hangi modülün neyle
+değiştirildiği `sdk_logs`'a yazılır. Ayrıntı ve cihaz matrisi:
+[iPad Desteği](../../docs/guides/ipad-support.md).

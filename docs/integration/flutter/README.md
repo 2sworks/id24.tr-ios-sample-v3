@@ -80,6 +80,67 @@ guard socket?.isConnected == true, roomResponse.result == true else { ... }
 
 ---
 
+## 2.1) Tema — native derleme olmadan
+
+SDK'nın hazır ekranlarının görünümü Dart'tan uygulanır; renk/logo/köşe denemesi için
+**yeniden derleme gerekmez**, hot reload yeterlidir.
+
+```dart
+final unknownKeys = await IdentifySdk.instance.setTheme({
+  'colors': {
+    'primary': '#0F172A',
+    'pageBackground': {'light': '#F8FAFC', 'dark': '#0B1120'},
+    'selectedItemBackground': '#1D4ED8',
+    'headerBackground': {'light': '#0F172A', 'dark': '#0B1120'},
+    'headerTitle': '#FFFFFF',
+  },
+  'navBar': {'preset': 'centered', 'showsDivider': true},  // classic | centered | minimal | prominent
+  'buttons': {'corner': 12, 'height': 54, 'styles': {'secondary': {'borderWidth': 1}}},
+  'icons': {'headerLogo': 'my_mark'},   // iOS asset kataloğundaki görsel adı
+});
+
+if (unknownKeys.isNotEmpty) debugPrint('Tema: tanınmayan anahtar $unknownKeys');
+
+await IdentifySdk.instance.resetTheme();   // SDK varsayılanlarına dön
+```
+
+Renk değeri `'#RRGGBB'` ya da `{'light': ..., 'dark': ...}`; köşe `'capsule'` ya da sayı.
+Bölümler: `colors`, `fonts`, `metrics`, `buttons`, `navBar`, `selection`, `alerts`,
+`banners`, `fields`, `sheets`, `capture`, `controls`, `call`, `motion`, `icons`.
+Tüm anahtarlar: [Tema Rehberi](../../guides/theming.md) ·
+örnek sözlük: [theme.example.json](../theme.example.json).
+
+> **Header'daki marka işareti** `icons.logo` değil `icons.headerLogo`'dur. `logo` giriş
+> ekranı ve kamera üstü başlıkta kullanılır.
+
+## 2.2) Cihaz yetenekleri — native tarafta ayarlanır
+
+Bunlar tema değil **akış politikasıdır** ve köprüden geçmez; `IdentifySdkPlugin.swift`
+içinde, `setupSDK` çağrısından **önce** ayarlanır:
+
+```swift
+// IdentifySdkPlugin.swift — setupSDK'dan önce
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan
+// IdentifyManager.shared.faceTrackingFallback = .skip  // adımı tamamen çıkar
+
+SDKHapticConfig.shared.stepFeedbackEnabled = true       // canlılık adım titreşimi (vars. açık)
+SDKHapticConfig.shared.stepFeedbackIntensity = 0.6      // 0…1
+```
+
+| Ne | Ne zaman devreye girer |
+|---|---|
+| `faceTrackingFallback` | Cihazda TrueDepth kamera yoksa (Touch ID'li iPad, Face ID'siz iPhone): `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler — `.selfie` (varsayılan) ya da `.skip` |
+| NFC | iPad'de ve NFC'siz iPhone'larda modül otomatik çıkarılır; panele `NFCStatus = notAvailable` gider. Bilgi sayfası için `setupSDK(..., showNFCNotFoundPage: true)` |
+| `SDKHapticConfig` | Çekim rampası + canlılık adım darbesi; ikisi de kapatılabilir |
+
+Dart tarafında bu durumları olaylardan izlersiniz: atlanan adım `module.<Modül>.skipped`
+olarak gelir.
+
+SDK iPhone ve iPad'de çalışır, yönelim ikisinde de portrait'e kilitlidir.
+Ayrıntı: [iPad Desteği](../../guides/ipad-support.md).
+
+---
+
 ## 3) Olay (SDKEvent) yapısı
 
 EventChannel, native `SDKEvent.toDictionary()` çıktısını **olduğu gibi** Dart'a iletir.

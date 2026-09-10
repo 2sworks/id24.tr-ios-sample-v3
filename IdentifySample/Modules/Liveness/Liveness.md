@@ -20,6 +20,7 @@ oturumda farklı olabilir), böylece önceden kaydedilmiş videoyla aldatma zorl
 | ViewModel | `SDKLivenessViewModel` |
 | Dış dünya | Adım API'si (`getNextLivenessTest`) + **HTTP** (kare + isteğe bağlı video) |
 | Ses anahtarı | `LivenessTts` |
+| Donanım | **TrueDepth kamera (ARKit yüz takibi) zorunlu** — yoksa modül akışa hiç girmez |
 
 ## Kullanıcı Ne Yaşar?
 
@@ -148,3 +149,22 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
   isteneceğini host daraltabilir.
 - **Adım sırası neden rastgele?** `RoomResponse.liveness` dizisi sırayı belirler —
   replay saldırılarını zorlaştırmak için oturum başına değişebilir.
+- **Cihaz desteklemiyorsa ne olur?** Göz kırpma/gülümseme ARKit blend shape'lerinden, baş
+  açısı yüz dönüşümünden okunur; bu yüzden modül **TrueDepth kamera ister**. Face ID'siz
+  iPhone'larda ve Touch ID'li iPad'lerde çalışamaz. Kontrol akış kurulurken yapılır
+  (`ARFaceTrackingConfiguration.isSupported`) ve modül akışa alınmaz — kullanıcı
+  geçemeyeceği bir ekranda kalmaz. Yerine ne geleceğini siz seçersiniz:
+
+  ```swift
+  IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan: selfie ile doğrula
+  IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çıkar
+  ```
+
+  Akışta zaten selfie varsa `.selfie` yeni adım eklemez, canlılık adımını yalnızca çıkarır.
+  Olay: `status == .skipped`, modül `Liveness Detection`.
+  Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
+- **Adım geçince titreşim:** her onaylanan adımda tek ve çok kısa bir darbe çalınır.
+  `SDKHapticConfig.shared.stepFeedbackEnabled = false` ile kapatılır,
+  `stepFeedbackIntensity` (0…1, vars. 0.6) ile şiddeti ayarlanır.
+- **iPad:** Face ID'li iPad Pro / iPad Air'de tam çalışır. Yüz ovali tablette pencereyle
+  birlikte büyümez; `SDKLayout.maxFaceGuideWidth` ile sınırlanır.

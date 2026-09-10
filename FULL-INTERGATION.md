@@ -33,6 +33,7 @@ buradadır.
 15. [Navigasyon Sahipliği — Sheet mi, Push mu, Window mu?](#15-navigasyon-sahipliği)
 16. [IdentityScanner — Detaylı İmplementasyon](#16-identityscanner--detaylı-i̇mplementasyon)
 17. [Çoklu İş Senaryosu — Aynı SDK, Farklı Akışlar](#17-çoklu-i̇ş-senaryosu)
+18. [Cihaz Yetenekleri, Yedek Modüller ve Titreşim](#18-cihaz-yetenekleri-yedek-modüller-ve-titreşim)
 
 ---
 
@@ -788,6 +789,10 @@ IdentifyManager.shared.setupSDK(
 ```
 
 Parametrelerin sunucu tarafı ayrıntıları: [Sunucu & API Rehberi](docs/guides/server-api.md).
+
+Cihazın donanımı bazı modülleri hiç çalıştıramaz (NFC'siz cihaz, TrueDepth'siz cihaz). O
+durumda akışa ne konulacağını **siz** belirlersiniz — `setupSDK`'dan önce:
+[18) Cihaz Yetenekleri, Yedek Modüller ve Titreşim](#18-cihaz-yetenekleri-yedek-modüller-ve-titreşim).
 
 ### `SDKNetworkOptions`
 
@@ -1635,3 +1640,79 @@ IdentifyManager.shared.eventDelegate = bridge     // setupSDK'dan ÖNCE, referan
 - Karar tablosu basit kalsın: senaryo sayısı arttıkça `switch`'leri tek dosyada
   (senaryo enum'unun extension'larında) toplayın; ekranlara `if scenario == ...`
   serpiştirmeyin.
+
+
+---
+
+## 18) Cihaz Yetenekleri, Yedek Modüller ve Titreşim
+
+Sunucu akışı cihazdan bağımsız kurar; bazı modüller ise donanım ister. SDK bu kontrolü
+**akış kurulurken** yapar — kullanıcı geçemeyeceği bir ekranı hiç görmez — ve yerine ne
+konacağını entegrasyon belirler.
+
+### 18.1 Yetenek matrisi
+
+| Modül | Gereken donanım | Kontrol |
+|---|---|---|
+| `nfc` | NFC okuyucu | `NFCNDEFReaderSession.readingAvailable` |
+| `livenessDetection` | TrueDepth kamera (ARKit yüz takibi) | `ARFaceTrackingConfiguration.isSupported` |
+| `selfieWithLiveness` | TrueDepth kamera (ARKit yüz takibi) | `ARFaceTrackingConfiguration.isSupported` |
+| Diğer tüm modüller | Ön/arka kamera + mikrofon | İzin akışı |
+
+TrueDepth kamera Face ID'li iPhone'larda ve Face ID'li iPad Pro / iPad Air'de vardır;
+Touch ID'li iPad ve Face ID'siz iPhone'larda yoktur. **iPad'de NFC hiç yoktur.**
+
+### 18.2 TrueDepth yoksa — yedeği siz seçersiniz
+
+```swift
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan
+IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çıkar
+// setupSDK'dan ÖNCE ayarlanır
+```
+
+| Değer | Davranış |
+|---|---|
+| `.selfie` | **Varsayılan.** Normal selfie modülü ile doğrulanır (çekilen kare kimlik fotoğrafıyla karşılaştırılır). Akışta selfie zaten varsa yeni adım eklenmez, desteklenmeyen modül yalnızca çıkarılır — aynı doğrulama iki kez yapılmasın |
+| `.skip` | Yerine bir şey konmaz, modül akıştan çıkarılır. Yüz doğrulaması akışın başka bir adımıyla veya operatör görüşmesiyle yapılıyorsa uygundur |
+| `.livenessDetection` | **Kabul edilir ama uygulanamaz; `.selfie` gibi davranır.** Canlılık ekranı da ARKit yüz takibine dayanır (göz kırpma/gülümseme blend shape'lerden, baş açısı yüz dönüşümünden okunur), yani TrueDepth yokken o da çalışamaz. `sdk_logs`'a açıklama satırı yazılır |
+
+> "TrueDepth yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü de
+> aynı donanımı ister. Gerçek seçim **selfie ile doğrula** ya da **adımı çıkar** arasındadır.
+
+Her iki durumda da ilgili olay yayınlanır — `livelinessModuleSkipped` /
+`selfieWithLivenessModuleSkipped` — ve hangi modülün neyle değiştirildiği `sdk_logs`'a yazılır.
+Panele ayrıca NFC'siz cihazlarda `NFCStatus = notAvailable` bildirilir.
+
+```swift
+func onEvent(_ event: SDKEvent) {
+    guard event.status == .skipped else { return }      // hangi adım atlandı
+    analytics.log("kyc_module_skipped", ["module": event.module ?? "-"])
+}
+```
+
+### 18.3 Titreşim — `SDKHapticConfig`
+
+SDK iki yerde titreşim kullanır; ikisi de kapatılabilir.
+
+| Nerede | Ne yapar |
+|---|---|
+| Otomatik çekim yapan modüller | Çekim anı yaklaştıkça hızlanan darbeler (ramp) |
+| Canlılık adımları | Adım onaylandığında **tek ve çok kısa** darbe — kullanıcı ekrana bakmadan geçtiğini anlar |
+
+```swift
+SDKHapticConfig.shared.stepFeedbackEnabled = false                // yalnız adım darbesi
+SDKHapticConfig.shared.stepFeedbackIntensity = 0.4                // 0…1, vars. 0.6
+SDKHapticConfig.shared.isEnabled = false                          // tüm titreşimler
+SDKHapticConfig.shared.setEnabled(false, for: .livenessDetection)  // tek modül (ramp + adım)
+```
+
+Dokunsal donanım yoksa `UIImpactFeedbackGenerator`'a düşer; o da yoksa sessizce atlanır.
+Ayrıntı: [Tema Rehberi — Titreşim](docs/guides/theming.md#titreşim-haptik).
+
+### 18.4 iPad
+
+SDK iPad'de çalışır (`TARGETED_DEVICE_FAMILY = "1,2"`), yönelim tablette de portrait'e
+kilitlidir. Metin sütunları `.sdkReadableWidth()` ile, kılavuz çerçeveleri
+`SDKLayout.maxGuideWidth` / `maxFaceGuideWidth` ile sınırlanır; ölçüler ekran değil
+**pencere** tabanlıdır (`SDKLayout.bounds`) — Split View / Stage Manager altında doğru olsun
+diye. Tam ayrıntı ve test matrisi: [iPad Desteği](docs/guides/ipad-support.md).

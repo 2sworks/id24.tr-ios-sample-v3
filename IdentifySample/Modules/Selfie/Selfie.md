@@ -126,6 +126,15 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .selfieTts, language: .tr,
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
+- **Bu modül aynı zamanda yedektir:** cihazda TrueDepth kamera yoksa `livenessDetection` ve
+  `selfieWithLiveness` yerine bu modül konur (varsayılan `faceTrackingFallback = .selfie`) —
+  doğrulama yine yüz üzerinden yapılır, çekilen kare kimlik fotoğrafıyla karşılaştırılır.
+  Akışta selfie zaten varsa ikinci bir adım eklenmez.
+  Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
+- **Tablet yerleşimi:** yüz ovali pencere genişliğiyle birlikte büyümez;
+  `SDKLayout.maxFaceGuideWidth` (vars. 560) ile sınırlanır. Kılavuz ile analiz aynı
+  dikdörtgeni paylaştığı için "çok uzak / çok yakın" değerlendirmesi de bu sınırla uyumludur.
+
 - **Yüz bulunamadı:** `faceDetected` `false` kalır, `canContinue` açılmaz — kullanıcıyı
   `reset()` ile yeniden çekime yönlendirin (ışık ve tek-yüz koşulunu hatırlatın).
 - **Birden fazla yüz:** SDK yalnızca **tek yüz** algılandığında ilerletir (2.3.15+).

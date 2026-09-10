@@ -180,6 +180,32 @@ Akış içindeki adım geçişlerinin süresi tema üzerinden ayarlanır:
 await IdentifySdk.setTheme({ motion: { transitionDuration: 0.35 } });
 ```
 
+## 3.3) Cihaz yetenekleri — native tarafta ayarlanır
+
+Bunlar tema değil **akış politikasıdır** ve köprüden geçmez; `IdentifySdkModule.swift`
+içinde, `setupSDK` çağrısından **önce** ayarlanır:
+
+```swift
+// IdentifySdkModule.swift — setupSDK'dan önce
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan
+// IdentifyManager.shared.faceTrackingFallback = .skip  // adımı tamamen çıkar
+
+SDKHapticConfig.shared.stepFeedbackEnabled = true       // canlılık adım titreşimi (vars. açık)
+SDKHapticConfig.shared.stepFeedbackIntensity = 0.6      // 0…1
+```
+
+| Ne | Ne zaman devreye girer |
+|---|---|
+| `faceTrackingFallback` | Cihazda TrueDepth kamera yoksa (Touch ID'li iPad, Face ID'siz iPhone): `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler — `.selfie` (varsayılan) ya da `.skip` |
+| NFC | iPad'de ve NFC'siz iPhone'larda modül otomatik çıkarılır; panele `NFCStatus = notAvailable` gider. Bilgi sayfası için `setupSDK(..., showNFCNotFoundPage: true)` |
+| `SDKHapticConfig` | Çekim rampası + canlılık adım darbesi; ikisi de kapatılabilir |
+
+JS tarafında bu durumları olaylardan izlersiniz: atlanan adım
+`module.<Modül>.skipped` olarak gelir.
+
+SDK iPhone ve iPad'de çalışır, yönelim ikisinde de portrait'e kilitlidir.
+Ayrıntı: [iPad Desteği](../../guides/ipad-support.md).
+
 ## 4) Olay (SDKEvent) yapısı
 
 Köprü, native `SDKEvent.toDictionary()` çıktısını **olduğu gibi** JS'e iletir:
