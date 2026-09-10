@@ -76,6 +76,8 @@ struct LoginView: View {
                         .padding(.horizontal, IDSpacing.lg)
                         .padding(.top, IDSpacing.xl)
                         .padding(.bottom, bottomBarHeight + keyboardHeight + IDSpacing.lg)
+                        // Tablette form sütunu ekranın tamamına yayılmasın.
+                        .sdkReadableWidth()
                     }
                     .keyboardNeverDismisses()
                     .toolbar {
@@ -298,6 +300,7 @@ struct LoginView: View {
         }
         .padding(.horizontal, IDSpacing.lg)
         .padding(.vertical, IDSpacing.lg)
+        .sdkReadableWidth()
         .frame(maxWidth: .infinity)
         .background(IDColor.adaptiveBackground(for: colorScheme))
     }

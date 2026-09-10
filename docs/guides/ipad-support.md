@@ -1,0 +1,162 @@
+# iPad Desteği ve Cihaz Yetenekleri
+
+SDK 3.0.1'den itibaren iPad'de çalışır. Bu rehber neyin değiştiğini, hangi modülün hangi
+donanımı istediğini ve cihaz o donanıma sahip değilse akışın nasıl ilerlediğini anlatır.
+
+---
+
+## Özet
+
+| Konu | Davranış |
+|---|---|
+| Cihaz ailesi | iPhone + iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) |
+| Yönelim | **Portrait** — iPad'de de dik kilitli |
+| NFC | Hiçbir iPad'de yok → NFC modülü akıştan çıkarılır, panel bilgilendirilir |
+| Canlılık (TrueDepth) | Cihazda yoksa **normal selfie modülü ile doğrulanır** |
+| Yerleşim | Metin ve form sütunları okunabilir genişlikte ortalanır; kamera ekranları tam ekran |
+
+---
+
+## Yönelim
+
+SDK ekranları portrait'e kilitlidir ve yakalama bağlantıları dik varsayımıyla kurulur.
+iPad'de de aynı kural geçerlidir; host uygulamanın Info.plist'inde iPad için de yalnız
+portrait tanımlanmalıdır:
+
+```
+UISupportedInterfaceOrientations~ipad = UIInterfaceOrientationPortrait
+```
+
+Kullanıcı cihazı yan tutarsa arayüz dik kalır ama sensör görüntüsü döner; SDK bunu
+yerçekiminden ölçüp "dik tutun" uyarısı gösterir (`SDKDeviceOrientationMonitor`). Bu uyarı
+tablette de geçerlidir — iPad genelde masaya yatık kullanıldığından eşikler toleranslıdır ve
+düz duran cihaz uyarı üretmez.
+
+---
+
+## Donanım yetenekleri ve modül davranışı
+
+### NFC — hiçbir iPad'de yok
+
+Akış kurulurken cihazın NFC donanımı yoksa **NFC modülü modül listesine hiç eklenmez** ve
+panele `NFCStatus = notAvailable` bildirilir; kullanıcı geçemeyeceği bir adımda beklemez.
+
+Ekranın yine de gösterilmesini isteyen entegrasyonlar için:
+
+```swift
+IdentifyManager.shared.setupSDK(..., showNFCNotFoundPage: true, ...)
+```
+
+### TrueDepth (ARKit yüz takibi) — yalnız Face ID'li cihazlarda
+
+TrueDepth kamera Face ID'li iPhone'larda ve Face ID'li iPad Pro'larda bulunur. Touch ID'li
+iPad Air / iPad mini / temel iPad ile Face ID'siz iPhone'larda **yoktur**.
+
+Bu cihazlarda:
+
+| Sunucudan gelen modül | Cihazda TrueDepth yoksa |
+|---|---|
+| `livenessDetection` | Akışta selfie modülü zaten varsa canlılık adımı çıkarılır; yoksa yerine **selfie modülü** eklenir |
+| `selfieWithLiveness` | Yerine **selfie modülü** konur (akışta selfie varsa yalnız çıkarılır) |
+
+Yani doğrulama yine yüz üzerinden yapılır: selfie modülü çekilen kareyi kimlik fotoğrafıyla
+karşılaştırır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen bir ekranı hiç görmez;
+`sdk_logs`'a hangi modülün neyle değiştirildiği yazılır ve ilgili `TrackingEventType`
+(`livelinessModuleSkipped` / `selfieWithLivenessModuleSkipped`) yayınlanır.
+
+> Emniyet supabı: canlılık ekranı elle akışa eklenirse ve cihaz desteklemiyorsa, kullanıcı
+> uyarı görüp modül atlanır — donmuş ekranda kalınmaz.
+
+### Diğer donanımlar
+
+| Yetenek | iPad durumu |
+|---|---|
+| Ön/arka kamera | Var — kimlik, selfie, video ve görüşme modülleri çalışır |
+| Mikrofon | Var |
+| Konuşma tanıma | Var |
+| Apple Pencil | İmza modülünde kullanılabilir (ek ayar gerekmez) |
+
+---
+
+## Yerleşim
+
+Geniş ekranda metin ve form sütunlarının uçtan uca yayılmaması için SDK içerik genişliğini
+sınırlar. Kendi ekranlarınızda aynı davranışı almak için:
+
+```swift
+VStack { ... }
+    .sdkReadableWidth()          // varsayılan 600 pt
+    .sdkReadableWidth(720)       // kendi sınırınız
+```
+
+Telefonda bu değişikliğin görünür etkisi yoktur (pencere zaten dar).
+
+Ölçüler artık **ekran değil pencere** tabanlıdır:
+
+```swift
+SDKLayout.bounds          // etkin pencerenin sınırları (UIScreen yerine)
+SDKLayout.isPad           // cihaz türü
+SDKLayout.readableWidth   // metin sütunu üst sınırı (varsayılan 600)
+SDKLayout.maxGuideWidth   // kimlik/pasaport kılavuz çerçevesi üst sınırı (varsayılan 420)
+SDKLayout.maxFaceGuideWidth // yüz ovali referans genişliği üst sınırı (varsayılan 560)
+```
+
+`UIScreen.main.bounds` iPad'de yanıltıcıdır: uygulama ekranın yalnız bir bölümünü
+kaplayabilir. Kamera kırpma alanı (ROI), kılavuz çerçevesi ve canlılık ekran kaydı bu yüzden
+pencereyi referans alır. Kendi kamera ekranlarınızı yazarken aynı kuralı izleyin.
+
+Kimlik/pasaport kılavuz çerçevesi tablette belgeye göre absürt büyümesin diye üst sınırla
+kesilir; sınırı temadan değiştirebilirsiniz:
+
+```swift
+SDKLayout.maxGuideWidth = 480
+```
+
+Selfie ve canlılık ekranlarındaki **yüz ovali** de aynı nedenle sınırlıdır. Oval, pencere
+genişliğinin değil `maxFaceGuideWidth` ile kesilmiş referans genişliğin bir oranı kadar
+çizilir; sınır olmasa tablette oval ekranla birlikte büyür ve kullanıcının kameraya
+gerçekçi olmayan bir yakınlıkta durması gerekirdi. Kılavuz ile analiz aynı dikdörtgeni
+paylaştığı için "çok uzak / çok yakın" değerlendirmesi de bu sınırla birlikte kayar:
+
+```swift
+SDKLayout.maxFaceGuideWidth = 620   // tablette daha büyük oval
+```
+
+---
+
+## Modül ekranlarını tablette gözden geçirme
+
+Backend oturumu açmadan, her modülün **tam ekran** hâli simülatörde açılabilir. Örnek uygulama
+iki test kancası taşır:
+
+```bash
+SIM="iPad Pro 11-inch (M5)"
+BID=com.2sworks.identifytr.v3
+
+SIMCTL_CHILD_SHOWCASE_ITEM=addressConfirm \
+SIMCTL_CHILD_SHOWCASE_FULLSCREEN=1 \
+xcrun simctl launch "$SIM" $BID -showShowcase
+
+xcrun simctl io "$SIM" screenshot addressConfirm.png
+```
+
+- `-showShowcase` — açılışta modül rehberini açar.
+- `SHOWCASE_ITEM` — o modülün detayını doğrudan açar.
+- `SHOWCASE_FULLSCREEN=1` — modülü rehber kartı yerine **tam ekran** çizer; kart 540 pt'a
+  sabit olduğu için tablet yerleşimi ancak bu modda değerlendirilebilir.
+
+Modül id'leri `Showcase/ShowcaseCatalog.swift` içindedir (`prepare`, `idCard`, `nfc`,
+`addressConfirm`, `signature`, `speech`, `thankYou`, …).
+
+Kamera, NFC ve ARKit simülatörde çalışmadığından bu modlarda **yerleşim** doğrulanır; yakalama
+davranışı gerçek cihaz ister.
+
+## Test matrisi
+
+Yayına çıkmadan önce en az şu üç cihaz sınıfında tam akış koşulmalıdır:
+
+| Cihaz | Beklenen |
+|---|---|
+| Face ID'li iPad Pro | Canlılık modülü normal çalışır; NFC adımı akışta yoktur |
+| Touch ID'li iPad Air / mini | Canlılık yerine selfie modülü gelir; NFC adımı akışta yoktur |
+| Face ID'siz iPhone (örn. SE) | Canlılık yerine selfie modülü gelir; NFC cihaza göre |

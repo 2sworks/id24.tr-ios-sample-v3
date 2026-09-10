@@ -30,6 +30,30 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
   denemesi için **native derleme gerekmez**. Örnek: `docs/integration/theme.example.json`.
 - **`IDFont.custom(size:weight:)`** — ölçek dışı boyutlar da tema fontunu kullanır.
 
+**Yeni**
+- **Canlılık adımlarında onay titreşimi geri geldi:** her adım onaylandığında çok kısa tek
+  darbe çalınır. `SDKHapticConfig.shared.stepFeedbackEnabled` ile kapatılabilir,
+  `stepFeedbackIntensity` ile şiddeti ayarlanır (varsayılan açık, 0.6).
+
+**iPad desteği**
+- SDK ve örnek uygulama artık **iPad'de çalışır** (`TARGETED_DEVICE_FAMILY = "1,2"`);
+  yönelim iPad'de de portrait'e kilitlidir. Ayrıntı:
+  [iPad Desteği rehberi](docs/guides/ipad-support.md).
+- **Yetenek tabanlı modül ikamesi:** cihazda TrueDepth kamera yoksa (Touch ID'li iPad'ler,
+  Face ID'siz iPhone'lar) `livenessDetection` ve `selfieWithLiveness` yerine **normal selfie
+  modülü** ile doğrulama yapılır; akışta selfie zaten varsa desteklenmeyen modül yalnızca
+  çıkarılır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen ekranı görmez.
+- **NFC'siz cihazlarda** modül akıştan çıkarılırken panele `NFCStatus = notAvailable`
+  bildirilir (önceden yalnız log yazılıyordu).
+- Canlılık ekranı desteklenmeyen cihazda artık sessizce donmuyor: uyarı gösterilip modül
+  atlanıyor.
+- **Ölçüler ekran yerine pencere tabanlı** (`SDKLayout.bounds`): Split View / Stage Manager
+  altında kamera kırpma alanı ve canlılık ekran kaydı doğru boyutlanır.
+- Metin ve form sütunları geniş ekranda okunabilir genişlikte ortalanır
+  (`.sdkReadableWidth()`); kimlik kılavuz çerçevesi (`SDKLayout.maxGuideWidth`) ve selfie /
+  canlılık ekranlarındaki yüz ovali (`SDKLayout.maxFaceGuideWidth`) tablette üst sınırla
+  kesilir.
+
 **Değişti**
 - **Header'daki marka işaretinin anahtarı `.headerLogo`** oldu; önceki `.langButton` adı
   yanlıştı ve `.logo`'yu ezmek header'ı değiştirmiyordu. Eski override'lar çalışmaya

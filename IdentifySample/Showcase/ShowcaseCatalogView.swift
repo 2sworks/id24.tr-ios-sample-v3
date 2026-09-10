@@ -24,11 +24,18 @@ struct ShowcaseCatalogView: View {
             .flatMap { id in ShowcaseCatalog.items.first { $0.id == id } }
     @State private var autoOpenActive = false
 
+    /// Debug/test: `SHOWCASE_FULLSCREEN=1` ile açılan modül, rehber kartı yerine **tam ekran**
+    /// çizilir. iPad/telefon yerleşimini gerçek pencere boyutunda görmek için; kart 540 pt
+    /// yüksekliğe sabit olduğundan tablet yerleşimi orada değerlendirilemez.
+    private var autoOpenFullScreen: Bool {
+        ProcessInfo.processInfo.environment["SHOWCASE_FULLSCREEN"] == "1"
+    }
+
     var body: some View {
         NavigationView {
             ScrollView(showsIndicators: false) {
                 LazyVStack(alignment: .leading, spacing: IDSpacing.md) {
-                    if let item = autoOpenItem {
+                    if let item = autoOpenItem, !autoOpenFullScreen {
                         NavigationLink(isActive: $autoOpenActive) {
                             ShowcaseDetailView(item: item)
                         } label: { EmptyView() }
@@ -61,6 +68,13 @@ struct ShowcaseCatalogView: View {
             }
         }
         .navigationViewStyle(.stack)
+        // Debug/test: seçilen modülü tam ekran çizer (yerleşim kontrolü için).
+        .fullScreenCover(isPresented: .constant(autoOpenFullScreen && autoOpenItem != nil)) {
+            if let item = autoOpenItem {
+                item.liveView()
+                    .showcaseHost()
+            }
+        }
         // Mock oturum verisi: katalog açıkken SDK ekranları gerçekçi içerikle çizilir
         // (konuşma cümlesi, NFC ön-doldurma, sıra bilgisi...). Kapanışta geri yüklenir
         // ki mock değerler sonraki gerçek oturuma sızmasın.

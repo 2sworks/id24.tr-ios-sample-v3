@@ -251,6 +251,34 @@ SDKTheme.shared.resetAppearance()   // renk/font/metrik/bileşen override'ların
 
 ---
 
+## Titreşim (Haptik)
+
+SDK iki yerde titreşim kullanır ve ikisi de host tarafından kapatılabilir:
+
+| Nerede | Ne yapar |
+|---|---|
+| Otomatik çekim yapan modüller | Çekim yaklaştıkça hızlanan darbeler (ramp): kullanıcı çekimin geldiğini hisseder |
+| **Canlılık adımları** | Adım (göz kırpma, gülümseme, başı çevirme…) onaylandığında **çok kısa tek darbe** — kullanıcı ekrana bakmadan adımı geçtiğini anlar |
+
+```swift
+// Adım onay darbesi — canlılık testindeki "geçtim" hissi:
+SDKHapticConfig.shared.stepFeedbackEnabled = false     // yalnız bu darbeyi kapat
+SDKHapticConfig.shared.stepFeedbackIntensity = 0.4     // daha hafif (0…1, varsayılan 0.6)
+
+// Çekim rampası + adım darbesi birlikte:
+SDKHapticConfig.shared.isEnabled = false                          // tüm modüllerde kapat
+SDKHapticConfig.shared.setEnabled(false, for: .livenessDetection) // tek modül
+SDKHapticConfig.shared.setEnabled(false, for: [.selfie, .idCard])
+```
+
+Modül anahtarı (`setEnabled(_:for:)`) hem rampayı hem adım darbesini kapsar;
+`stepFeedbackEnabled` yalnız adım darbesini hedefler. İkisi de varsayılan **açıktır**.
+
+Dokunsallık donanımı olmayan cihazlarda darbe `UIImpactFeedbackGenerator` ile çalınır;
+hiç desteklenmiyorsa sessizce atlanır.
+
+---
+
 ## Tek Sözlükle Tema (JSON)
 
 Tüm bölümler tek bir sözlükten uygulanabilir. React Native ve Flutter köprüleri de bunu

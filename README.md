@@ -182,6 +182,7 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.0.1 Değişiklikleri](docs/guides/migration-3.0.1.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
+| [iPad Desteği](docs/guides/ipad-support.md) | Cihaz yetenekleri (NFC / TrueDepth), modül ikamesi, yönelim ve tablet yerleşimi |
 | [Lokalizasyon](docs/guides/localization.md) | 5 dil (TR/EN/DE/AZ/RU), metin override |
 | [Özelleştirme](docs/guides/customization.md) | Üç özelleştirme yöntemi derinlemesine + "bypass yok" kuralı |
 | [IdentityScanner](docs/guides/identity-scanner.md) | Gerçek zamanlı belge tarama motoru: profiller, alan OCR, TCKN/MRZ doğrulama, bağımsız kullanım |
