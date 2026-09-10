@@ -12,7 +12,7 @@ donanımı istediğini ve cihaz o donanıma sahip değilse akışın nasıl iler
 | Cihaz ailesi | iPhone + iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) |
 | Yönelim | **Portrait** — iPad'de de dik kilitli |
 | NFC | Hiçbir iPad'de yok → NFC modülü akıştan çıkarılır, panel bilgilendirilir |
-| Canlılık (TrueDepth) | Cihazda yoksa **normal selfie modülü ile doğrulanır** |
+| Canlılık (TrueDepth) | Face ID'li iPad Pro / Air'de tam çalışır; yoksa yedek modül (`faceTrackingFallback`, varsayılan selfie) |
 | Yerleşim | Metin ve form sütunları okunabilir genişlikte ortalanır; kamera ekranları tam ekran |
 
 ---
@@ -49,10 +49,15 @@ IdentifyManager.shared.setupSDK(..., showNFCNotFoundPage: true, ...)
 
 ### TrueDepth (ARKit yüz takibi) — yalnız Face ID'li cihazlarda
 
-TrueDepth kamera Face ID'li iPhone'larda ve Face ID'li iPad Pro'larda bulunur. Touch ID'li
-iPad Air / iPad mini / temel iPad ile Face ID'siz iPhone'larda **yoktur**.
+TrueDepth kamera Face ID'li iPhone'larda ve Face ID'li iPad Pro / iPad Air (M-serisi)
+modellerinde bulunur. Touch ID'li iPad Air / iPad mini / temel iPad ile Face ID'siz
+iPhone'larda **yoktur**.
 
-Bu cihazlarda:
+Destekleyen cihazlarda `livenessDetection` ve `selfieWithLiveness` **olduğu gibi çalışır** —
+iPad Pro dahil, ikame devreye girmez. Kontrol tek yerde yapılır
+(`ARFaceTrackingConfiguration.isSupported`) ve akış kurulurken okunur.
+
+Desteklemeyen cihazlarda:
 
 | Sunucudan gelen modül | Cihazda TrueDepth yoksa |
 |---|---|
@@ -66,6 +71,25 @@ karşılaştırır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen 
 
 > Emniyet supabı: canlılık ekranı elle akışa eklenirse ve cihaz desteklemiyorsa, kullanıcı
 > uyarı görüp modül atlanır — donmuş ekranda kalınmaz.
+
+#### Yerine ne geleceğini siz seçersiniz
+
+Yedek davranış koda gömülü değildir; `setupSDK` çağrısından **önce** belirlenir. Seçim son
+kullanıcıya sorulmaz:
+
+```swift
+IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan
+IdentifyManager.shared.faceTrackingFallback = .skip     // modülü tamamen çıkar
+```
+
+| Değer | Davranış |
+|---|---|
+| `.selfie` | **Varsayılan.** Normal selfie modülü ile doğrulanır; akışta selfie zaten varsa modül yalnızca çıkarılır |
+| `.skip` | Yerine bir şey konmaz, modül akıştan çıkarılır. Yüz doğrulaması akışın başka bir adımıyla veya operatör görüşmesiyle yapılıyorsa uygundur |
+| `.livenessDetection` | **Uygulanamaz, `.selfie` gibi davranır.** Canlılık ekranı da ARKit yüz takibine dayanır (göz kırpma / gülümseme blend shape'lerden, baş açısı yüz dönüşümünden okunur); TrueDepth yokken o da çalışamaz. Seçenek, ileride donanım istemeyen bir canlılık akışı eklenirse entegrasyonu değiştirmek gerekmesin diye kabul edilir ve `sdk_logs`'a bir satır yazılır |
+
+Yani "TrueDepth yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü
+de aynı donanımı ister. Gerçek seçim **selfie ile doğrula** ya da **adımı çıkar** arasındadır.
 
 ### Diğer donanımlar
 

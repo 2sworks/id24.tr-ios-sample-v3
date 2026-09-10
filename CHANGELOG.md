@@ -43,6 +43,11 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
   Face ID'siz iPhone'lar) `livenessDetection` ve `selfieWithLiveness` yerine **normal selfie
   modülü** ile doğrulama yapılır; akışta selfie zaten varsa desteklenmeyen modül yalnızca
   çıkarılır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen ekranı görmez.
+  Face ID'li iPad Pro / iPad Air'de her iki modül de olduğu gibi çalışır.
+- **`IdentifyManager.shared.faceTrackingFallback`** — yedek davranışı entegrasyon belirler:
+  `.selfie` (varsayılan) veya `.skip` (modülü tamamen çıkar). `setupSDK`'dan önce ayarlanır,
+  son kullanıcıya sorulmaz. `.livenessDetection` değeri kabul edilir ancak canlılık ekranı da
+  aynı donanımı istediğinden `.selfie` gibi davranır ve log'a yazılır.
 - **NFC'siz cihazlarda** modül akıştan çıkarılırken panele `NFCStatus = notAvailable`
   bildirilir (önceden yalnız log yazılıyordu).
 - Canlılık ekranı desteklenmeyen cihazda artık sessizce donmuyor: uyarı gösterilip modül
