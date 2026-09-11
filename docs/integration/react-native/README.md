@@ -15,11 +15,15 @@ anlatır. Köprü iskeleti bu klasördedir; kopyalayıp projenize uyarlayabilirs
 
 ### Swift Package Manager (önerilen)
 React Native projenizin iOS `Podfile`'ı varsa bile SDK'yı SPM ile ekleyebilirsiniz:
-Xcode → **File → Add Packages** →
+`ios/<App>.xcworkspace` → **File → Add Packages** →
 
 ```
 https://github.com/2sworks/id24.tr-ios-sdk-spm
 ```
+
+**Dependency Rule `Exact Version` olmalı** (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılır;
+Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış
+sürümü çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
 Bu paket runtime bağımlılıklarını da getirir: OpenSSL, Starscream, WebRTC,
 SwiftSignatureView, PermissionsKit.
@@ -44,13 +48,48 @@ NFC için ayrıca `*.entitlements` dosyasına `com.apple.developer.nfc.readerses
 
 ## 2) Native köprü dosyaları
 
-Bu klasördeki dosyaları `ios/` altına kopyalayın:
+Bu klasördeki dosyaları aşağıdaki hedeflere kopyalayın. Swift/Obj-C dosyalarını Xcode'da
+**uygulama target'ına** ekleyin (Target Membership işaretli olmalı; sürükleyip bırakırken
+"Copy items if needed" + target kutusu).
 
-| Dosya | Görev |
+| Dosya | Hedef | Görev |
+|---|---|---|
+| `IdentifySdkModule.swift` | `ios/<App>/IdentifySdkModule.swift` | `RCTEventEmitter` köprüsü: `setupSDK` + `setTheme` + olay yayını |
+| `IdentifySdkModule.m`     | `ios/<App>/IdentifySdkModule.m` | Obj-C `RCT_EXTERN_MODULE` köprü kaydı |
+| `IdentifySdk.ts`          | `src/native/IdentifySdk.ts` | JS/TS sarmalayıcı + tip tanımlı `SDKEvent` + `SDKThemeConfig` |
+| `../theme.example.json`   | `src/theme/identifyTheme.json` | isteğe bağlı başlangıç teması; `setTheme` ile gönderilir |
+
+Köprü dört metot açar:
+
+| JS/TS | Native karşılığı | Ne zaman |
+|---|---|---|
+| `IdentifySdk.setTheme(config)` → `{ unknownKeys }` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan **önce**; JS reload yeter, derleme yok |
+| `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönüş |
+| `IdentifySdk.setupSDK(options)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | akışı başlatır |
+| `IdentifySdk.addEventListener(h)` | `SDKEventListener` → `RCTEventEmitter` | `setupSDK`'dan **önce** bağlayın |
+| `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | kullanıcı akışı JS tarafından terk ettiğinde |
+
+### Örnek uygulamadan kopyalanacaklar (iOS tarafı)
+
+Köprü dosyaları dışında örnekten alınacak bir şey yoktur; ekranlar XCFramework'ün içindedir.
+İki istisna:
+
+| Kaynak | Hedef | Ne zaman |
+|---|---|---|
+| `IdentifySample/SupportingFiles/*.cer` | `ios/<App>/` + *Copy Bundle Resources* | `useSslPinning: true` ise zorunlu |
+| `IdentifySample/Modules/<Modül>/<Modül>Example.swift` + `<Modül>HostViewModel.swift` ve `IdentifySample/Showcase/HostModuleViewModel.swift` + `ShowcaseSupport.swift` | `ios/<App>/Modules/` | bir SDK ekranını **native tarafta** kendi tasarımınızla değiştirecekseniz (`registry.override`); JS'ten ekran override edilemez |
+
+`IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift` kopyalanmaz ama
+referans olarak okunmalıdır: `prepareForSetup()` → `setupSDK` → `start()` sıralaması ve akışın
+`SDKFlowHostView` ile sunumu orada çalışır hâlde durur.
+
+**JS'ten yapılamayan üç şey**, `IdentifySdkModule.swift` içinde yapılır:
+
+| Ne | Nerede |
 |---|---|
-| `IdentifySdkModule.swift` | `RCTEventEmitter` köprüsü: `setupSDK` + olay yayını |
-| `IdentifySdkModule.m`     | Obj-C `RCT_EXTERN_MODULE` köprü kaydı |
-| `IdentifySdk.ts`          | JS/TS sarmalayıcı + tip tanımlı `SDKEvent` |
+| Yeni bir görsel (logo) eklemek | iOS asset kataloğu; JS yalnız **adını** gönderir (`icons.headerLogo`) |
+| Dil ve metin override'ı | `setupSDK` dalının başına `IdentifyManager.shared.setSDKLang(lang:)` ve `SDKLocalization.shared.registerOverrides([.tr: ["IdVerifyTitle": "…"]])`; isterseniz `options.language` alanı ekleyip JS'ten geçirin (3 satır) |
+| Cihaz yeteneği politikası (TrueDepth/NFC yoksa) | bkz. [§3.3](#33-cihaz-yetenekleri--native-tarafta-ayarlanır) |
 
 `AppDelegate` köprü başlığına (`<App>-Bridging-Header.h`) ekleyin:
 

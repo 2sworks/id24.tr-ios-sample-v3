@@ -26,7 +26,13 @@ class NFXListController: NFXGenericController {
     
     // MARK: - Private Properties
     
-    private lazy var dataSubscription = Subscription<[NFXHTTPModel]> { [weak self] in self?.allModels = $0 }
+    // Sabit çekim (vendored, upstream'de düzeltilmedi): bu alan `lazy` idi ve `deinit`
+    // `cancel()` çağırıyordu. Sekme hiç açılmadıysa `viewDidLoad` koşmaz, lazy ilkleme
+    // `deinit` İÇİNDE tetiklenir; kapanış `[weak self]` ile deallocate olmakta olan nesneye
+    // weak referans kurmaya çalışır ve ObjC runtime abort eder ("Cannot form weak reference
+    // ... in the process of deallocation"). TestFlight 3.0 (43), netfox kapatılırken.
+    // Abonelik artık `viewDidLoad`'da kurulur; kurulmadıysa `deinit`'te dokunulacak şey yok.
+    private var dataSubscription: Subscription<[NFXHTTPModel]>?
     
     private var allModels = [NFXHTTPModel]() {
         didSet {
@@ -37,13 +43,15 @@ class NFXListController: NFXGenericController {
     // MARK: - Overloads
     
     deinit {
-        dataSubscription.cancel()
+        dataSubscription?.cancel()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NFXHTTPModelManager.shared.publisher.subscribe(dataSubscription)
+        let subscription = Subscription<[NFXHTTPModel]> { [weak self] in self?.allModels = $0 }
+        dataSubscription = subscription
+        NFXHTTPModelManager.shared.publisher.subscribe(subscription)
         populate(with: NFXHTTPModelManager.shared.filteredModels)
     }
     

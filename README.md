@@ -37,8 +37,24 @@ Xcode → *File → Add Package Dependencies* →
 https://github.com/2sworks/id24.tr-ios-sdk-spm
 ```
 
-Paket, SDK ile birlikte üç çalışma zamanı bağımlılığını da getirir: `OpenSSL` (NFC kripto),
-`Starscream` (WebSocket) ve `WebRTC` (görüntülü görüşme).
+**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.0.0`).
+
+Sebebi: **2.x ve 3.x aynı depodan dağıtılır.** Bunlar iki ayrı sürüm ailesidir — 3.x, hazır
+SwiftUI ekranlarını (DefaultUI) SDK'nın içine taşıyan farklı bir entegrasyon modelidir ve
+2.x ile kaynak uyumlu değildir. Xcode'un varsayılan kuralı (*Up to Next Major*) en son
+etiketten başlar; 2.x kullanan bir projeye paketi varsayılanla eklerseniz 3.x çekilir ve
+proje derlenmez. `Exact Version` ayrıca sürüm yükseltmesini bilinçli bir karar hâline
+getirir: bağımlılık kümesi sürüme göre farklıdır (3.x ayrıca `PermissionsKit` ve
+`SwiftSignatureView` getirir) ve `Package.resolved` sessizce kaymaz.
+
+| Sürüm | Etiket aralığı | Ne zaman |
+|---|---|---|
+| 3.x | `3.0.0` ve üzeri | Bu depodaki rehberlerin anlattığı sürüm — hazır ekranlar SDK'nın içinde |
+| 2.x | `2.5.x` | Eski entegrasyon; ekranlar host uygulamada |
+
+Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto),
+`Starscream` (WebSocket), `WebRTC` (görüntülü görüşme), `PermissionsKit` ve
+`SwiftSignatureView` (3.x).
 
 ### 2. İzinleri tanımlayın
 
@@ -48,6 +64,7 @@ Paket, SDK ile birlikte üç çalışma zamanı bağımlılığını da getirir:
 | Mikrofon | `NSMicrophoneUsageDescription` | Görüşme, Video kayıt, Konuşma |
 | Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Konuşma (Speech) modülü |
 | NFC | `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
+| iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK portrait kilitlidir; bu anahtar olmadan App Store yüklemesi iPad çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
 
 ### 3. Akışı başlatın
 
@@ -99,6 +116,55 @@ Hiçbir modül ekranı yazmanıza gerek yok — hepsinin hazır (drop-in) SwiftU
 Tam parametre listesi için: [Sunucu & API Rehberi](docs/guides/server-api.md).
 
 > Minimum iOS sürümü: **iOS 14** (örnek uygulama iOS 15 hedefler).
+
+### 4. Görünümü ve metinleri ayarlayın
+
+Görünüm ve dil **`setupSDK`'dan önce** verilir; ekranlar ilk çizimde bu değerleri okur.
+Kaynak dosya kopyalamanız gerekmez — tek isteğe bağlı dosya, projenize ekleyip
+`applyTheme(named:)` ile yükleyebileceğiniz [`docs/integration/theme.example.json`](docs/integration/theme.example.json).
+
+| İstediğiniz | Çağrı |
+|---|---|
+| Marka renkleri | `SDKTheme.shared.colors.primary = Color("Brand")` (`success`, `error`, `accentWarning`…) |
+| Zemin / seçili satır / başlık — light+dark | `SDKTheme.shared.colors.pageBackground = SDKAdaptiveColor(light:dark:)`; `selectedItemBackground`, `headerBackground`, `headerTitle` |
+| Font ailesi | `SDKTheme.shared.fonts.familyName = "Inter"` |
+| Köşe / boşluk | `SDKTheme.shared.metrics.radiusMD = 12`, `metrics.radiusCard = 24`, `metrics.spacingLG = 16` |
+| Buton biçimi | tümü: `SDKTheme.shared.buttons.base.corner = .radius(12)`, `buttons.base.height = 54` · tek stil: `SDKTheme.shared.buttons[.secondary].borderWidth = 1` |
+| Başlık çubuğu tasarımı | `SDKTheme.shared.navBar.preset = .centered` (`classic / centered / minimal / prominent`) |
+| Başlık çubuğunda marka adı | `SDKTheme.shared.navBar.brandTitle = "Acme Bank"` + `navBar.titleMode = .brandWithModule` |
+| Logo / geri / yardım / menü ikonu | `SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))` — anahtarlar `SDKIconKey`; geri al: `resetIcon(_:)` |
+| Titreşim | `SDKHapticConfig.shared.stepFeedbackEnabled = false` · per-modül `setEnabled(false, for: .selfie)` · hepsi `setEnabledForAll(false)` |
+| Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın |
+| Varsayılanlara dön | `SDKTheme.shared.resetAppearance()` |
+| Dil | `IdentifyManager.shared.setSDKLang(lang: .tr)` (`.tr .en .de .az .ru`) |
+| Tek metni değiştir | `SDKLocalization.shared.setOverride(key: .idVerifyTitle, language: .tr, value: "Kimlik Kontrolü")` |
+| Toplu metin | `SDKLocalization.shared.registerOverrides([.tr: ["IdVerifyTitle": "…"]])` · dosyadan: `loadOverrides(from:language:)` |
+
+Ekranın **kendisini** değiştirmek ayrı bir seviyedir (`SDKViewRegistry`) — aşağıdaki
+[Ekranları Özelleştirme](#ekranları-özelleştirme) bölümüne bakın.
+Derinlemesine: [Tema](docs/guides/theming.md) · [Lokalizasyon](docs/guides/localization.md).
+
+### 5. Örnekten hangi dosyaları kopyalayacaksınız
+
+Drop-in kullanımda **hiçbir dosya kopyalamanız gerekmez** — adım 3'teki kurulum yeterlidir.
+Aşağıdakiler ihtiyaca göre alınır. Hedef yollar sizin projenizdeki karşılıklarıdır.
+
+| Kaynak (bu depo) | Hedef | Ne zaman |
+|---|---|---|
+| `IdentifySample/App/RootView.swift` | `<App>/App/RootView.swift` | `SDKFlowHostView` + coordinator + registry kurulumunun çalışan hâli. Kendi kök view'ınıza adım 3'teki kodu yazmak da aynı işi görür. **Opsiyonel** |
+| `IdentifySample/Modules/Login/LoginView.swift`, `LoginViewModel.swift` | `<App>/Modules/Login/` | `prepareForSetup()` → `setupSDK` → `start()` sıralamasının ve hata durumlarının referansı. Kendi giriş ekranınıza uyarlayın. **Referans** |
+| `IdentifySample/SupportingFiles/*.cer` | app target → *Copy Bundle Resources* | `useSslPinning: true` ise sunucu sertifikası bundle'da olmak zorundadır. **Pinning açıksa zorunlu** |
+| `IdentifySample/Modules/<Modül>/<Modül>Example.swift`, `<Modül>HostViewModel.swift`, `<Modül>Config.swift` | `<App>/Modules/<Modül>/` | O ekranı kendi tasarımınızla değiştirecekseniz (`registry.override`). Üçü bir kalıptır: *Example* = view, *HostViewModel* = SDK ViewModel sarmalayıcı, *Config* = dışarıdan verilen ayarlar. **Opsiyonel** |
+| `IdentifySample/Showcase/HostModuleViewModel.swift`, `ShowcaseSupport.swift` | `<App>/Modules/Shared/` | Üstteki üçlüyü kopyaladıysanız **zorunlu**: `HostModuleViewModel` taban sınıfı ile `IDColor` / `showcaseThemed()` yardımcıları buradadır |
+| `IdentifySample/Core/Debug/SDKLogPanel.swift`, `SDKNetworkLogger.swift` | `<App>/Core/Debug/` | Geliştirme sırasında SDK logunu ve ağ trafiğini cihazda görmek için. `SDKLogPanel` netfox ister. **Opsiyonel** |
+| `docs/integration/theme.example.json` | `<App>/Resources/IdentifyTheme.json` | Temayı kod yerine JSON ile vermek isterseniz (`applyTheme(named:)`). **Opsiyonel** |
+
+Kopyalamayın, gerekmez: modül ekranları, kamera HUD'ları, dil dosyaları, ikonlar ve sesler
+XCFramework'ün içindedir. `Assets.xcassets`, `Info.plist`, `Env.xcdatamodeld` ve
+`Vendor/netfox/` örnek uygulamaya özeldir; kendi projenizdekiler kullanılır.
+
+Kopyaladığınız her `.swift` dosyasını Xcode'da **uygulama target'ına** eklemeyi unutmayın
+(*Target Membership* işaretli olmalı).
 
 ---
 
@@ -251,6 +317,9 @@ IdentifySample/
 │                   cross-platform rehber ekranı, tasarım kataloğu
 └── SupportingFiles/ Info.plist, entitlements, asset'ler
 ```
+
+Hangi dosyanın kopyalanacağı ve nereye konacağı: [§5 Örnekten hangi dosyaları
+kopyalayacaksınız](#5-örnekten-hangi-dosyaları-kopyalayacaksınız).
 
 Uygulamayı açıp `IdentifySample.xcodeproj` ile derleyin; Login ekranına bir `identId` girip
 tüm akışı cihazda uçtan uca deneyimleyebilirsiniz (NFC ve görüşme için gerçek cihaz gerekir).

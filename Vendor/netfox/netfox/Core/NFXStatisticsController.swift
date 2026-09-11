@@ -41,16 +41,19 @@ class NFXStatisticsController: NFXGenericController {
     var fastestResponseTime: Float = 999
     var slowestResponseTime: Float = 0
     
-    private lazy var dataSubscription = Subscription<[NFXHTTPModel]> { [weak self] in self?.reloadData(with: $0) }
+    // Bkz. NFXListController: lazy ilklemenin `deinit`te tetiklenmesi çökertiyordu.
+    private var dataSubscription: Subscription<[NFXHTTPModel]>?
     
     deinit {
-        dataSubscription.cancel()
+        dataSubscription?.cancel()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NFXHTTPModelManager.shared.publisher.subscribe(dataSubscription)
+        let subscription = Subscription<[NFXHTTPModel]> { [weak self] in self?.reloadData(with: $0) }
+        dataSubscription = subscription
+        NFXHTTPModelManager.shared.publisher.subscribe(subscription)
         reloadData(with: NFXHTTPModelManager.shared.filteredModels)
     }
     

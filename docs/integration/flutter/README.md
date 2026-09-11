@@ -12,8 +12,13 @@ köprüsü** kurmayı ve SDK'nın **birleşik olay akışını** (SDKEvent) Dart
 ## 1) Kurulum
 
 ### iOS native bağımlılığı
-Plugin'inizin `ios/` tarafında `IdentifySDK`'yı Swift Package Manager veya CocoaPods
-ile ekleyin (XCFramework + OpenSSL/Starscream/WebRTC/SwiftSignatureView/PermissionsKit).
+`ios/Runner.xcworkspace` → **File → Add Packages** →
+`https://github.com/2sworks/id24.tr-ios-sdk-spm`
+(XCFramework + OpenSSL/Starscream/WebRTC/SwiftSignatureView/PermissionsKit).
+
+**Dependency Rule `Exact Version` olmalı** (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılır;
+Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış
+sürümü çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
 `ios/Runner/Info.plist` izinleri:
 
@@ -26,8 +31,44 @@ ile ekleyin (XCFramework + OpenSSL/Starscream/WebRTC/SwiftSignatureView/Permissi
 ### Köprü dosyaları
 | Dosya | Konum | Görev |
 |---|---|---|
-| `IdentifySdkPlugin.swift` | `ios/Classes/` | MethodChannel (setupSDK) + EventChannel (olaylar) |
-| `identify_sdk.dart`       | `lib/`         | Dart sarmalayıcı + `SDKEvent` modeli + `Stream` |
+| `IdentifySdkPlugin.swift` | plugin: `ios/Classes/` — doğrudan uygulama: `ios/Runner/` | MethodChannel (`setupSDK`, `setTheme`, `resetTheme`, `reportAbandoned`) + EventChannel (olaylar) |
+| `identify_sdk.dart`       | `lib/identify_sdk.dart` | Dart sarmalayıcı + `SDKEvent` modeli + `Stream` |
+| `../theme.example.json`   | `assets/identify_theme.json` (+ `pubspec.yaml` → `assets:`) | isteğe bağlı başlangıç teması; `setTheme` ile gönderilir |
+
+Plugin'i `Runner` içine koyduysanız `AppDelegate`'te kaydedin:
+`IdentifySdkPlugin.register(with: registrar(forPlugin: "IdentifySdkPlugin")!)`.
+
+Plugin dört metot açar:
+
+| Dart | Native karşılığı | Ne zaman |
+|---|---|---|
+| `IdentifySdk.setTheme(map)` → `unknownKeys` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan **önce**; hot reload yeter, derleme yok |
+| `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönüş |
+| `IdentifySdk.setupSDK(...)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | akışı başlatır |
+| `IdentifySdk.events` (`Stream<SDKEvent>`) | `SDKEventListener` → `EventChannel` | `listen` **önce**, sonra `setupSDK` |
+| `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | kullanıcı akışı Dart tarafından terk ettiğinde |
+
+### Örnek uygulamadan kopyalanacaklar (iOS tarafı)
+
+Köprü dosyaları dışında örnekten alınacak bir şey yoktur; ekranlar XCFramework'ün içindedir.
+İki istisna:
+
+| Kaynak | Hedef | Ne zaman |
+|---|---|---|
+| `IdentifySample/SupportingFiles/*.cer` | `ios/Runner/` + *Copy Bundle Resources* | `useSslPinning: true` ise zorunlu |
+| `IdentifySample/Modules/<Modül>/<Modül>Example.swift` + `<Modül>HostViewModel.swift` ve `IdentifySample/Showcase/HostModuleViewModel.swift` + `ShowcaseSupport.swift` | `ios/Runner/Modules/` | bir SDK ekranını **native tarafta** kendi tasarımınızla değiştirecekseniz (`registry.override`); Dart'tan ekran override edilemez |
+
+`IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift` kopyalanmaz ama
+referans olarak okunmalıdır: `prepareForSetup()` → `setupSDK` → `start()` sıralaması ve akışın
+`SDKFlowHostView` ile sunumu orada çalışır hâlde durur.
+
+**Dart'tan yapılamayan üç şey**, `IdentifySdkPlugin.swift` içinde yapılır:
+
+| Ne | Nerede |
+|---|---|
+| Yeni bir görsel (logo) eklemek | iOS asset kataloğu; Dart yalnız **adını** gönderir (`icons.headerLogo`) |
+| Dil ve metin override'ı | `setupSDK` dalının başına `IdentifyManager.shared.setSDKLang(lang:)` ve `SDKLocalization.shared.registerOverrides([.tr: ["IdVerifyTitle": "…"]])`; isterseniz `setupSDK` argümanlarına `language` ekleyip Dart'tan geçirin |
+| Cihaz yeteneği politikası (TrueDepth/NFC yoksa) | bkz. [§2.2](#22-cihaz-yetenekleri--native-tarafta-ayarlanır) |
 
 ---
 
