@@ -66,6 +66,18 @@ SDKTheme.shared.navBar.preset = .centered
 `subtitleFont`, `progressHeight`, `progressSpacing`, `progressCorner`,
 `overlayGradientOpacity`, `showsDivider`.
 
+**Marka başlığı** — çubuk artık adım adı yerine markanızı yazabilir:
+
+```swift
+SDKTheme.shared.navBar.brandTitle = "Acme Bank"
+SDKTheme.shared.navBar.titleMode  = .brandWithModule   // .module | .brand | .brandWithModule
+```
+
+JSON: `"navBar": { "brandTitle": "Acme Bank", "titleMode": "brandWithModule" }`.
+`.prominent` yüksekliği 92'ye çıktı (iki satır; 56'da başlık alttaki bileşene biniyordu).
+Geri / yardım / menü ikonları `setIcon(.back | .help | .hamburger, …)` ile değişir.
+Ayrıntı: [Tema → Başlık Metni](theming.md#başlık-metni--marka-adı).
+
 ### 3. Rol renkleri — `SDKAdaptiveColor`
 
 Marka renkleri ile yüzey rolleri ayrıldı. Artık `primary`'yi değiştirmeden yalnız seçili

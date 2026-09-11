@@ -27,6 +27,8 @@
   "fonts": { "family": "Inter" },
   "navBar": {
     "preset": "centered",
+    "brandTitle": "Acme Bank",
+    "titleMode": "brandWithModule",
     "height": 60,
     "showsLogo": true,
     "logoSize": 36,

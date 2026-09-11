@@ -18,6 +18,9 @@ buradadır.
    - [Fontlar (`SDKFonts`) — aile değiştirme + runtime kayıt](#fontlar--sdkfonts)
    - [İkonlar (`SDKIconKey`) — tam liste + varsayılanlar](#i̇konlar--sdkiconkey)
    - [Metrikler (`SDKMetrics`) — boşluk + köşe yarıçapları](#metrikler--sdkmetrics)
+   - [Başlık çubuğu (`SDKNavBarAppearance`) — preset + marka başlığı](#başlık-çubuğu--sdknavbarappearance)
+   - [Butonlar (`SDKButtons`) — köşe, yükseklik, stil başına görünüm](#butonlar--sdkbuttons)
+   - [JSON ile tema — `applyTheme` / `resetAppearance`](#json-ile-tema)
 3. [Tasarım Token'ları — `IDColor` / `IDFont` / `IDSpacing` / `IDRadius`](#3-tasarım-tokenları)
 4. [Lokalizasyon — `SDKLocalization` (5 dil + override)](#4-lokalizasyon--sdklocalization)
 5. [Sesli Okuma (TTS) — `SDKSpeechConfig` + `SDKSpeechService`](#5-sesli-okuma-tts)
@@ -96,12 +99,19 @@ public final class SDKTheme {
     public var fonts   = SDKFonts()       // font ailesi
     public var icons   = SDKIcons()       // logo/hamburger/langButton (eski stil)
     public var metrics = SDKMetrics()     // boşluk + köşe yarıçapı
+    public var navBar  = SDKNavBarAppearance()  // preset, marka başlığı, yükseklik
+    public var buttons = SDKButtons()           // tüm butonlar + stil başına override
+    public var selection, alerts, banners, fields, sheets   // bileşen görünümleri
 
     public func setIcon(_ key: SDKIconKey, _ image: Image)   // tek ikon override
     public func setIcons(_ map: [SDKIconKey: Image])          // toplu override
     public func resetIcon(_ key: SDKIconKey)                  // varsayılana dön
     public func registerFont(at url: URL) -> Bool             // font dosyası kaydet
     public func registerFont(data: Data) -> Bool              // bellekteki font verisi
+    public func applyTheme(named: String, in: Bundle) -> [String]  // JSON tema; bilinmeyen anahtarları döner
+    public func apply(_ dict: [String: Any]) -> [String]
+    public func apply(json: Data) -> [String]
+    public func resetAppearance()                              // tüm görünümü SDK varsayılanına al
 }
 ```
 
@@ -279,6 +289,87 @@ Image.sdk(.camera)                             // host override varsa onu dönd�
 ```swift
 SDKTheme.shared.metrics.radiusCard = 12    // daha keskin köşeli kartlar
 ```
+
+### Başlık Çubuğu — `SDKNavBarAppearance`
+
+```swift
+SDKTheme.shared.navBar.preset = .centered
+```
+
+| Preset | Yerleşim | Yükseklik |
+|---|---|---|
+| `.classic` | Solda geri, yanında marka işareti + başlık (varsayılan) | 56 |
+| `.centered` | Başlık ve marka işareti ortada, geri solda | 56 |
+| `.minimal` | Marka işareti yok, ince çubuk | 48 |
+| `.prominent` | İki satır: üstte kontroller, altta büyük başlık | 92 (alt sınır; içerik kadar uzar) |
+
+**Marka başlığı** — varsayılanda çubuk adım adını yazar; markanızı koymak için:
+
+```swift
+SDKTheme.shared.navBar.brandTitle = "Acme Bank"
+SDKTheme.shared.navBar.titleMode  = .brandWithModule
+```
+
+| `titleMode` | Üst satır | Alt satır |
+|---|---|---|
+| `.module` | adım adı | ekranın alt başlığı (varsayılan) |
+| `.brandWithModule` | `brandTitle` | adım adı |
+| `.brand` | `brandTitle` | `brandSubtitle` (verilmişse) |
+
+`brandTitle` verilip `titleMode` `.module` bırakılırsa `.brandWithModule` uygulanır. Kamera üstü
+ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır.
+
+| Property | Ne yapar |
+|---|---|
+| `height` | Çubuk yüksekliği; `nil` → preset değeri |
+| `showsLogo`, `logoSize` | Marka işareti (`SDKIconKey.headerLogo`) |
+| `circleButtonSize`, `iconSize` | Geri / yardım / menü düğmesi ve içindeki ikon (`.back`, `.help`, `.hamburger`, `.close`) |
+| `titleFont`, `subtitleFont` | Başlık ve alt başlık fontu |
+| `progressHeight`, `progressSpacing`, `progressCorner` | İlerleme çubuğu |
+| `overlayGradientOpacity` | Kamera üstü çubuğun gradyan koyuluğu |
+| `showsDivider` | Alt çizgi |
+
+Adım adlarının kendisini değiştirmek tema değil metin işidir:
+`SDKLocalization.shared.setOverride(key: .idVerifyTitle, language: .tr, value: "Kimlik Kontrolü")`.
+
+### Butonlar — `SDKButtons`
+
+`buttons.base` tüm butonlara uygulanır; `buttons[.style]` yalnız o stile. Stil değeri `base`'i ezer.
+Stiller: `.primary` · `.secondary` · `.cancel` · `.success`.
+
+```swift
+SDKTheme.shared.buttons.base.corner = .radius(12)     // .capsule (varsayılan) | .radius(0) = köşeli
+SDKTheme.shared.buttons.base.height = 54
+SDKTheme.shared.buttons[.secondary].borderWidth = 1
+SDKTheme.shared.buttons[.secondary].borderColor = IDColor.divider
+SDKTheme.shared.buttons.reset()                       // yalnız butonları varsayılana al
+```
+
+| `SDKButtonAppearance` | Ne yapar |
+|---|---|
+| `corner` | `.capsule` / `.radius(CGFloat)` |
+| `height`, `verticalPadding`, `horizontalPadding` | Ölçü; `height` verilince `verticalPadding` yok sayılır |
+| `font` | Etiket fontu |
+| `background`, `foreground` | Renkler; verilmezse stilin rol rengi |
+| `borderWidth`, `borderColor` | Kenarlık |
+| `shadowColor`, `shadowRadius`, `shadowOffsetY` | Gölge |
+| `pressedScale`, `disabledOpacity` | Basılı ölçek, pasif saydamlık |
+| `hapticsEnabled` | Dokunmada titreşim |
+| `fullWidth` | Genişliği doldursun mu |
+
+Aksiyon kapsülleri (kamera ekranlarındaki yuvarlak düğmeler) aynı `corner` token'ını okur; ayrı ayar gerekmez.
+
+### JSON ile tema
+
+Kod yerine tek dosya: [`docs/integration/theme.example.json`](docs/integration/theme.example.json).
+Bilinmeyen anahtarlar dönüş değerinde listelenir — geliştirmede loglayın.
+
+```swift
+let unknown = SDKTheme.shared.applyTheme(named: "IdentifyTheme")   // setupSDK'dan önce
+SDKTheme.shared.resetAppearance()                                   // tümünü sıfırla
+```
+
+Yukarıdaki her alanın JSON karşılığı ve anahtar adları: [Tema Rehberi → JSON](docs/guides/theming.md).
 
 ---
 
