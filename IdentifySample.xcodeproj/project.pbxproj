@@ -66,6 +66,8 @@
 		A2C6F79A2026898757BC42B9 /* SelfieHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E30CE984870EE743797F86 /* SelfieHostViewModel.swift */; };
 		A32B80ACE7ACCDAA93A5809C /* ShowcaseDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF207A18079E2DEBDDF2C291 /* ShowcaseDesignSystem.swift */; };
 		AA10C0DE920EA35AF9F2E099 /* ShowcaseMockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10C0DE0DB438E924B42099 /* ShowcaseMockData.swift */; };
+		AA10C0DE920EA35AF9F2E100 /* ShowcaseScenarioPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10C0DE0DB438E924B42100 /* ShowcaseScenarioPanel.swift */; };
+		AA10C0DE920EA35AF9F2E101 /* ShowcaseStubServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10C0DE0DB438E924B42101 /* ShowcaseStubServer.swift */; };
 		AB88553E8E9E8E75A287A860 /* VideoRecorderHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC8B7BA0254177A2E9F18BF /* VideoRecorderHostViewModel.swift */; };
 		B390BD395DF48592BBEC30F4 /* CrossPlatformIntegrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323CD02657B616528C3DB18D /* CrossPlatformIntegrationView.swift */; };
 		B3F4C30D4C97A3506304946A /* SignatureConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 132D8A6DC4548828A606F69A /* SignatureConfig.swift */; };
@@ -194,6 +196,8 @@
 		A8A1A3ABDF159420BA98A49A /* LostConnectionConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LostConnectionConfig.swift; path = LostConnection/LostConnectionConfig.swift; sourceTree = "<group>"; };
 		A976FA2849055FDBA027C5F9 /* Liveness.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = Liveness.md; sourceTree = "<group>"; };
 		AA10C0DE0DB438E924B42099 /* ShowcaseMockData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShowcaseMockData.swift; sourceTree = "<group>"; };
+		AA10C0DE0DB438E924B42100 /* ShowcaseScenarioPanel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShowcaseScenarioPanel.swift; sourceTree = "<group>"; };
+		AA10C0DE0DB438E924B42101 /* ShowcaseStubServer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShowcaseStubServer.swift; sourceTree = "<group>"; };
 		AEEB7D72CC9A421C38C8C68D /* Selfie.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = Selfie.md; sourceTree = "<group>"; };
 		B594ADE180C9067F9BC3918F /* SwlConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwlConfig.swift; path = SelfieWithLiveness/SwlConfig.swift; sourceTree = "<group>"; };
 		C2EA1D1725FD5B313D46D172 /* AddressConfirmExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddressConfirmExample.swift; sourceTree = "<group>"; };
@@ -335,6 +339,8 @@
 			children = (
 				0403CFDF0DB438E924B42014 /* ShowcaseSupport.swift */,
 				AA10C0DE0DB438E924B42099 /* ShowcaseMockData.swift */,
+				AA10C0DE0DB438E924B42100 /* ShowcaseScenarioPanel.swift */,
+				AA10C0DE0DB438E924B42101 /* ShowcaseStubServer.swift */,
 				A74668EDBCF178CDC326A0CB /* ShowcaseCatalog.swift */,
 				428C48EC43106C38A1B1CF96 /* ShowcaseCatalogView.swift */,
 				1C85D70669B1F7007C0C56C8 /* ShowcaseDetailView.swift */,
@@ -758,6 +764,8 @@
 				603C8C37208CCC7F131712AF /* ThankYouExample.swift in Sources */,
 				85F7CAB3920EA35AF9F2E7C3 /* ShowcaseSupport.swift in Sources */,
 				AA10C0DE920EA35AF9F2E099 /* ShowcaseMockData.swift in Sources */,
+				AA10C0DE920EA35AF9F2E100 /* ShowcaseScenarioPanel.swift in Sources */,
+				AA10C0DE920EA35AF9F2E101 /* ShowcaseStubServer.swift in Sources */,
 				C6F2438F86CC1A84EAB1D579 /* ShowcaseCatalog.swift in Sources */,
 				F7266D24C6CEF67A2157AC3B /* ShowcaseCatalogView.swift in Sources */,
 				648C062BF824A6EFC090BF54 /* ShowcaseDetailView.swift in Sources */,
@@ -949,7 +957,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -967,6 +975,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -993,7 +1002,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 42;
+				CURRENT_PROJECT_VERSION = 43;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -1011,6 +1020,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
