@@ -227,6 +227,34 @@ SDKTheme.shared.navBar.preset = .centered
 `iconSize`, `titleFont`, `subtitleFont`, `progressHeight`, `progressSpacing`, `progressCorner`,
 `overlayGradientOpacity`, `showsDivider`.
 
+### Başlık Metni — Marka Adı
+
+Varsayılanda çubuk her adımın adını yazar ("Kimlik Doğrulama", "Adres Doğrulama"…). Çubuğa
+kendi markanızı koymak için:
+
+```swift
+SDKTheme.shared.navBar.brandTitle = "Acme Bank"
+SDKTheme.shared.navBar.titleMode  = .brandWithModule   // varsayılan: marka verilince bu
+```
+
+| `titleMode` | Üst satır | Alt satır |
+|---|---|---|
+| `.module` | adım adı | ekranın alt başlığı (SDK varsayılanı) |
+| `.brandWithModule` | `brandTitle` | adım adı |
+| `.brand` | `brandTitle` | `brandSubtitle` (verilmişse) |
+
+`brandTitle` verilip `titleMode` `.module` bırakılırsa `.brandWithModule` uygulanır. Kamera üstü
+ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır. `.prominent` preset'i iki
+satırlı olduğundan marka + adım adı için en uygun yerleşimdir.
+
+Adım adlarının **kendisini** değiştirmek için metin override'ı kullanın — bkz. `SDKLocalization`:
+
+```swift
+SDKLocalization.shared.setOverride(key: .idVerifyTitle, language: .tr, value: "Kimlik Kontrolü")
+```
+
+JSON temada: `"navBar": { "brandTitle": "Acme Bank", "titleMode": "brandWithModule" }`.
+
 ---
 
 ## Bileşen Görünümleri
@@ -295,7 +323,7 @@ SDKTheme.shared.apply([
         "pageBackground": ["light": "#F8FAFC", "dark": "#0B1120"],
         "selectedItemBackground": "#1D4ED8"
     ],
-    "navBar":  ["preset": "centered", "showsDivider": true],
+    "navBar":  ["preset": "centered", "showsDivider": true, "brandTitle": "Acme Bank"],
     "buttons": ["corner": 12, "height": 54,
                 "styles": ["secondary": ["borderWidth": 1]]],
     "icons":   ["headerLogo": "my_mark"]        // HOST asset adı

@@ -9,6 +9,14 @@
 		<string>Inter.ttf</string>
 		<string>Inter-Italic.ttf</string>
 	</array>
+	<!-- Showcase'teki yerel dummy API (ShowcaseStubServer) 127.0.0.1 üzerinde cleartext
+	     HTTP konuşur. NSAllowsLocalNetworking YALNIZ yerel/loopback adresleri açar;
+	     uzak sunuculara cleartext izni vermez. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
 	<array>
 		<string>A0000002471001</string>

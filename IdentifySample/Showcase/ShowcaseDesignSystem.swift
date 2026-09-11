@@ -95,7 +95,49 @@ struct NavBarShowcaseView: View {
     @State private var preset: SDKNavBarPreset = SDKTheme.shared.navBar.preset
     @State private var showsLogo = SDKTheme.shared.navBar.showsLogo ?? true
     @State private var showsDivider = SDKTheme.shared.navBar.showsDivider ?? false
+    /// Marka başlığı: boş bırakılırsa SDK adım adını yazar; dolu ise çubuk markayı yazar.
+    @State private var brandTitle = ""
+    @State private var titleMode: SDKNavBarTitleMode = .brandWithModule
     @State private var revision = 0
+
+    /// İkon override örnekleri. Boş seçenek = SDK varsayılanı (`resetIcon`).
+    /// Host gerçek kullanımda `Image("kendi_asset")` verir; burada SF Symbol'ler yeter.
+    private struct IconChoice: Identifiable, Hashable {
+        let id: String       // SF Symbol adı; "" = SDK varsayılanı
+        let label: String
+    }
+    private static let backChoices  = [IconChoice(id: "", label: "SDK"), IconChoice(id: "arrow.left", label: "ok"),
+                                       IconChoice(id: "arrow.backward.circle.fill", label: "daire"), IconChoice(id: "xmark", label: "kapat")]
+    private static let menuChoices  = [IconChoice(id: "", label: "SDK"), IconChoice(id: "ellipsis", label: "üç nokta"),
+                                       IconChoice(id: "square.grid.2x2", label: "ızgara"), IconChoice(id: "person.crop.circle", label: "profil")]
+    private static let helpChoices  = [IconChoice(id: "", label: "SDK"), IconChoice(id: "info.circle", label: "bilgi"),
+                                       IconChoice(id: "lifepreserver", label: "destek"), IconChoice(id: "bubble.left", label: "sohbet")]
+    private static let logoChoices  = [IconChoice(id: "", label: "SDK"), IconChoice(id: "building.columns.fill", label: "banka"),
+                                       IconChoice(id: "shield.checkered", label: "kalkan"), IconChoice(id: "leaf.fill", label: "yaprak")]
+    @State private var backIcon = ""
+    @State private var menuIcon = ""
+    @State private var helpIcon = ""
+    @State private var logoIcon = ""
+
+    /// Örneklerin hangi renk şemasıyla çizileceği. Başlık çubuğu renkleri light/dark
+    /// ayrı token'lardan gelir; ikisini cihaz ayarını değiştirmeden karşılaştırmak için.
+    private enum PreviewScheme: String, CaseIterable, Identifiable {
+        case system = "Cihaz"
+        case light  = "Açık"
+        case dark   = "Koyu"
+        var id: String { rawValue }
+    }
+
+    @State private var previewScheme: PreviewScheme = .system
+
+    /// Örneklere uygulanacak şema (`.system` ise cihazın şeması).
+    private var resolvedScheme: ColorScheme {
+        switch previewScheme {
+        case .system: return colorScheme
+        case .light:  return .light
+        case .dark:   return .dark
+        }
+    }
 
     private var presetTitle: String {
         switch preset {
@@ -126,6 +168,24 @@ struct NavBarShowcaseView: View {
                         .font(IDFont.caption(.regular))
                         .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
 
+                    Divider().padding(.vertical, 2)
+
+                    Text("Önizleme şeması")
+                        .font(IDFont.bodyMedium(.semibold))
+                        .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                    Picker("", selection: $previewScheme) {
+                        ForEach(PreviewScheme.allCases) { sch in
+                            Text(sch.rawValue).tag(sch)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Text("Başlık renkleri light ve dark için ayrı token'lardır (`headerBackground`, `headerTitle`, `headerIcon`); bu seçici cihaz ayarını değiştirmeden ikisini de gösterir.")
+                        .font(IDFont.caption(.regular))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+
+                    Divider().padding(.vertical, 2)
+
                     Toggle("Marka işaretini göster", isOn: $showsLogo)
                         .font(IDFont.caption(.regular))
                         .onChange(of: showsLogo) { _ in apply() }
@@ -133,41 +193,128 @@ struct NavBarShowcaseView: View {
                         .font(IDFont.caption(.regular))
                         .onChange(of: showsDivider) { _ in apply() }
 
+                    Divider().padding(.vertical, 2)
+
+                    Text("İkonlar")
+                        .font(IDFont.bodyMedium(.semibold))
+                        .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                    iconRow("Geri",   selection: $backIcon, choices: Self.backChoices)
+                    iconRow("Menü",   selection: $menuIcon, choices: Self.menuChoices)
+                    iconRow("Yardım", selection: $helpIcon, choices: Self.helpChoices)
+                    iconRow("Logo",   selection: $logoIcon, choices: Self.logoChoices)
+                    Text("Geri/menü/yardım ve marka işareti `SDKTheme.shared.setIcon(_:_:)` ile değişir; anahtarlar `.back`, `.hamburger`, `.help`, `.logo` (login + kamera üstü), `.headerLogo` (modül dairesi). Burada SF Symbol; host kendi asset'ini verir.")
+                        .font(IDFont.caption(.regular))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                    if !(backIcon.isEmpty && menuIcon.isEmpty && helpIcon.isEmpty && logoIcon.isEmpty) {
+                        Text(iconSnippet)
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(IDColor.accentPurple)
+                    }
+
+                    Divider().padding(.vertical, 2)
+
+                    Text("Marka başlığı")
+                        .font(IDFont.bodyMedium(.semibold))
+                        .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                    TextField("Örn. Acme Bank (boş = adım adı)", text: $brandTitle)
+                        .font(IDFont.bodyRegular())
+                        .textFieldStyle(.roundedBorder)
+                        .autocorrectionDisabled()
+                        .onChange(of: brandTitle) { _ in apply() }
+                    Picker("", selection: $titleMode) {
+                        Text("Marka + adım").tag(SDKNavBarTitleMode.brandWithModule)
+                        Text("Yalnız marka").tag(SDKNavBarTitleMode.brand)
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(brandTitle.isEmpty)
+                    .onChange(of: titleMode) { _ in apply() }
+                    Text("Varsayılanda çubuk adım adını yazar (\"Kimlik Doğrulama\"). Marka verilince üst satır marka, alt satır adım adı olur; \"Yalnız marka\" adım adını kaldırır. Kamera üstü ekranlarda marka logonun yanına yazılır. Adım adlarının kendisi `SDKLocalization.shared.setOverride` ile değiştirilir.")
+                        .font(IDFont.caption(.regular))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+
                     Text("SDKTheme.shared.navBar.preset = .\(preset.rawValue)")
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundColor(IDColor.accentPurple)
+                    if !brandTitle.isEmpty {
+                        Text("SDKTheme.shared.navBar.brandTitle = \"\(brandTitle)\"\nSDKTheme.shared.navBar.titleMode = .\(titleMode.rawValue)")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(IDColor.accentPurple)
+                    }
                     Text("Header marka işareti: SDKTheme.shared.setIcon(.headerLogo, Image(\"my_mark\"))")
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
                 }
                 .padding(IDSpacing.lg)
-                .background(RoundedRectangle(cornerRadius: IDRadius.lg).fill(IDColor.inkSurface))
+                .background(RoundedRectangle(cornerRadius: IDRadius.lg).fill(IDColor.adaptiveSurface(for: colorScheme)))
                 .padding(.horizontal, IDSpacing.lg)
 
+                // Yalnız ÖRNEKLER yeniden kurulur. `.id(revision)` sayfanın tamamındayken her
+                // tuşta TextField de yeniden yaratılıyor, klavye kapanıyordu.
+                Group {
                 labeled(".login") {
-                    SDKNavigationBar(style: .login, onMenu: {})
+                    themedPreview {
+                        SDKNavigationBar(style: .login, onMenu: {})
+                    }
                 }
                 labeled(".module") {
-                    SDKNavigationBar(style: .module, title: "Kimlik Doğrulama", subtitle: "Adım 2/5", onBack: {})
+                    themedPreview {
+                        SDKNavigationBar(style: .module, title: "Kimlik Doğrulama", subtitle: "Adım 2/5", onBack: {})
+                    }
                 }
                 labeled(".progress(steps: 5, current: 2)") {
-                    SDKNavigationBar(style: .progress(steps: 5, current: 2), title: "Süreç", onBack: {})
-                        .background(IDColor.primary)
+                    themedPreview {
+                        SDKNavigationBar(style: .progress(steps: 5, current: 2), title: "Süreç", onBack: {})
+                    }
                 }
                 labeled(".overlay (görüntü üstü)") {
                     SDKNavigationBar(style: .overlay, onBack: {}, onHelp: {})
                         .frame(height: 120)
                         .background(IDColor.inkDarkest)
+                        .environment(\.colorScheme, .dark)   // kamera görüntüsü üstü: her zaman koyu zemin
                 }
+                }
+                .id(revision)
             }
             .padding(.vertical, IDSpacing.lg)
-            .id(revision)
         }
+        .scrollDismissesKeyboardCompat()
         .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
         .onDisappear {
-            // Global durumu temiz bırak: showcase dışına preset taşınmasın.
+            // Global durumu temiz bırak: showcase dışına preset/ikon taşınmasın.
             SDKTheme.shared.navBar = SDKNavBarAppearance()
+            for key in [SDKIconKey.back, .hamburger, .help, .logo, .headerLogo] { SDKTheme.shared.resetIcon(key) }
         }
+    }
+
+    /// Tek ikon seçici satırı.
+    private func iconRow(_ label: String, selection: Binding<String>, choices: [IconChoice]) -> some View {
+        HStack(spacing: IDSpacing.sm) {
+            Text(label)
+                .font(IDFont.caption(.regular))
+                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                .frame(width: 52, alignment: .leading)
+            Picker("", selection: selection) {
+                ForEach(choices) { c in
+                    if c.id.isEmpty { Text(c.label).tag(c.id) }
+                    else { Image(systemName: c.id).tag(c.id) }
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: selection.wrappedValue) { _ in apply() }
+        }
+    }
+
+    /// Seçili ikonlar için kopyalanacak kod.
+    private var iconSnippet: String {
+        var lines: [String] = []
+        if !backIcon.isEmpty { lines.append("SDKTheme.shared.setIcon(.back, Image(systemName: \"\(backIcon)\"))") }
+        if !menuIcon.isEmpty { lines.append("SDKTheme.shared.setIcon(.hamburger, Image(systemName: \"\(menuIcon)\"))") }
+        if !helpIcon.isEmpty { lines.append("SDKTheme.shared.setIcon(.help, Image(systemName: \"\(helpIcon)\"))") }
+        if !logoIcon.isEmpty {
+            lines.append("SDKTheme.shared.setIcon(.logo, Image(systemName: \"\(logoIcon)\"))")
+            lines.append("SDKTheme.shared.setIcon(.headerLogo, Image(systemName: \"\(logoIcon)\"))")
+        }
+        return lines.joined(separator: "\n")
     }
 
     /// Seçimleri global temaya yazar ve örnekleri yeniden çizdirir.
@@ -175,7 +322,30 @@ struct NavBarShowcaseView: View {
         SDKTheme.shared.navBar.preset = preset
         SDKTheme.shared.navBar.showsLogo = showsLogo
         SDKTheme.shared.navBar.showsDivider = showsDivider
+        SDKTheme.shared.navBar.brandTitle = brandTitle.isEmpty ? nil : brandTitle
+        SDKTheme.shared.navBar.titleMode = titleMode
+        applyIcon(.back, backIcon)
+        applyIcon(.hamburger, menuIcon)
+        applyIcon(.help, helpIcon)
+        applyIcon(.logo, logoIcon)
+        applyIcon(.headerLogo, logoIcon)
         revision += 1
+    }
+
+    private func applyIcon(_ key: SDKIconKey, _ symbol: String) {
+        if symbol.isEmpty { SDKTheme.shared.resetIcon(key) }
+        else { SDKTheme.shared.setIcon(key, Image(systemName: symbol)) }
+    }
+
+    /// Örneği seçilen şemada, o şemanın sayfa zemini üzerinde çizer. Başlık çubuğu
+    /// varsayılanda şeffaftır (zemini sayfa verir); zemin olmadan koyu şemadaki açık
+    /// metin açık zeminde kalıyor ve okunmuyordu. Host `headerBackground` verdiyse
+    /// çubuk kendi zeminini zaten boyar.
+    @ViewBuilder
+    private func themedPreview<V: View>(@ViewBuilder _ content: () -> V) -> some View {
+        content()
+            .background(IDColor.adaptiveBackground(for: resolvedScheme))
+            .environment(\.colorScheme, resolvedScheme)
     }
 
     private func labeled<V: View>(_ title: String, @ViewBuilder _ content: () -> V) -> some View {
@@ -284,7 +454,7 @@ struct ButtonsShowcaseView: View {
                 .onChange(of: haptics) { _ in apply() }
         }
         .padding(IDSpacing.lg)
-        .background(RoundedRectangle(cornerRadius: IDRadius.lg).fill(IDColor.inkSurface))
+        .background(RoundedRectangle(cornerRadius: IDRadius.lg).fill(IDColor.adaptiveSurface(for: colorScheme)))
     }
 
     /// Seçimleri global temaya yazar ve butonları yeniden çizdirir.
@@ -338,7 +508,7 @@ struct ButtonsShowcaseView: View {
             .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(IDSpacing.md)
-            .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.inkSurface))
+            .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.adaptiveSurface(for: colorScheme)))
     }
 }
 
@@ -518,7 +688,7 @@ struct CustomizationShowcaseView: View {
             .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(IDSpacing.md)
-            .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.inkSurface))
+            .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.adaptiveSurface(for: colorScheme)))
     }
 }
 
@@ -601,7 +771,7 @@ struct ThemeJSONShowcaseView: View {
                             .font(IDFont.caption(.semibold))
                             .padding(.horizontal, IDSpacing.md)
                             .padding(.vertical, IDSpacing.sm)
-                            .background(RoundedRectangle(cornerRadius: IDRadius.sm).fill(IDColor.inkSurface))
+                            .background(RoundedRectangle(cornerRadius: IDRadius.sm).fill(IDColor.adaptiveSurface(for: colorScheme)))
                             .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
                     }
                 }
@@ -610,7 +780,7 @@ struct ThemeJSONShowcaseView: View {
                     .font(.system(size: 11, design: .monospaced))
                     .frame(height: 260)
                     .padding(IDSpacing.sm)
-                    .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.inkSurface))
+                    .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.adaptiveSurface(for: colorScheme)))
 
                 HStack(spacing: IDSpacing.md) {
                     SDKButton(title: "Uygula") { applyJSON() }
@@ -669,3 +839,14 @@ struct ThemeJSONShowcaseView: View {
 #Preview("Buton") { ButtonsShowcaseView() }
 #Preview("Uyarı") { AlertsShowcaseView() }
 #Preview("JSON ile Tema") { ThemeJSONShowcaseView() }
+
+
+// MARK: - Klavye yardımcısı
+
+private extension View {
+    /// Kaydırınca klavyeyi kapatır; iOS 16+ API'si, 15'te etkisiz kalır (zararsız).
+    @ViewBuilder
+    func scrollDismissesKeyboardCompat() -> some View {
+        if #available(iOS 16.0, *) { self.scrollDismissesKeyboard(.interactively) } else { self }
+    }
+}

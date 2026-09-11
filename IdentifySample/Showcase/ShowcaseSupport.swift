@@ -203,11 +203,12 @@ struct ShowcaseLivePreview<Content: View>: View {
                 .navigationBarHidden(true)
         }
         .navigationViewStyle(.stack)
-        .frame(height: 540)
-        .frame(maxWidth: .infinity)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        // Kart değil: kalan dikey alanın tamamını kaplar ve ekranın altına kadar iner.
+        // Modül ekranları gerçek akıştaki ölçüsüyle görünsün diye (iPhone + iPad).
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipShape(ShowcaseTopRoundedRect(radius: 20))
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
+            ShowcaseTopRoundedRect(radius: 20)
                 .stroke(IDColor.inkBorder, lineWidth: 1)
         )
         .overlay(alignment: .topTrailing) {
@@ -218,6 +219,21 @@ struct ShowcaseLivePreview<Content: View>: View {
                 .foregroundColor(.white)
                 .padding(10)
         }
+        .ignoresSafeArea(edges: .bottom)
+    }
+}
+
+// MARK: - Üstten yuvarlatılmış çerçeve
+
+/// Yalnız üst köşeleri yuvarlatır. Önizleme ekranın alt kenarına dayandığı için alt
+/// köşelerin yuvarlatılması cihaz kenarında boşluk gibi görünürdü.
+struct ShowcaseTopRoundedRect: Shape {
+    let radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        Path(UIBezierPath(roundedRect: rect,
+                          byRoundingCorners: [.topLeft, .topRight],
+                          cornerRadii: CGSize(width: radius, height: radius)).cgPath)
     }
 }
 

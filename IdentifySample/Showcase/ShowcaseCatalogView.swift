@@ -73,6 +73,7 @@ struct ShowcaseCatalogView: View {
             if let item = autoOpenItem {
                 item.liveView()
                     .showcaseHost()
+                    .showcaseScenarios(ShowcaseScenarios.groups(for: item.id))
             }
         }
         // Mock oturum verisi: katalog açıkken SDK ekranları gerçekçi içerikle çizilir
@@ -84,10 +85,10 @@ struct ShowcaseCatalogView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: IDSpacing.sm) {
-            Text("Entegrasyon Rehberi")
+            Text("Modül Rehberi")
                 .font(IDFont.bodyLarge(.semibold))
                 .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
-            Text("Her SDK modülünü canlı görün, entegrasyon ve özelleştirme kodunu inceleyin. Modüller gerçek akışta backend'in döndürdüğü sıraya göre otomatik gelir.")
+            Text("Her SDK modülünü örnek veriyle canlı görün. Modüller gerçek akışta backend'in döndürdüğü sıraya göre gelir; burada sırayı siz seçersiniz.")
                 .font(IDFont.bodyRegular())
                 .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
         }

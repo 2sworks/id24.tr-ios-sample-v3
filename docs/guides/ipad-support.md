@@ -102,6 +102,20 @@ de aynı donanımı ister. Gerçek seçim **selfie ile doğrula** ya da **adım�
 
 ---
 
+## App Store doğrulaması — iPad hedefi eklendiğinde
+
+`TARGETED_DEVICE_FAMILY` içine iPad eklenince App Store Connect yüklemesi üç şart koşar;
+üçü de SDK'dan değil host uygulamanın paketinden kaynaklanır:
+
+| Şart | Çözüm |
+|---|---|
+| iPad uygulama ikonları (20/29/40/76 pt @1x-2x, 83.5 @2x) | AppIcon setine `idiom: ipad` girişleri ekleyin; tek 1024 px kaynaktan üretilebilir |
+| Çoklu görev için 4 yön + Launch Storyboard | SDK portrait kilitli olduğundan çoklu görevden çıkın: `UIRequiresFullScreen = YES` (`INFOPLIST_KEY_UIRequiresFullScreen`) |
+| Launch Storyboard (çoklu görev şartı) | `UIRequiresFullScreen = YES` ile birlikte düşer; storyboard zaten varsa dokunmayın |
+
+`UIRequiresFullScreen` olmadan portrait-only bir iPad paketi yükleme aşamasında reddedilir
+("you need to include all of the … orientations to support iPad multitasking").
+
 ## Yerleşim
 
 Geniş ekranda metin ve form sütunlarının uçtan uca yayılmaması için SDK içerik genişliğini

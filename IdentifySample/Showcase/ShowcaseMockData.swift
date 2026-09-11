@@ -40,6 +40,9 @@ enum ShowcaseMockData {
         let nfcComparisonCount: Int
         let selfieComparisonCount: Int
         let ocrComparisonCount: Int
+        let modulesControllersArray: [UIViewController]
+        let manipulatedModulesControllersArray: [UIViewController]
+        let moduleStepOrder: Int
     }
 
     private static var snapshot: Snapshot?
@@ -54,6 +57,10 @@ enum ShowcaseMockData {
     static func apply() {
         guard snapshot == nil else { return }   // zaten aktif (yeniden girişte üst üste yazma)
         let m = IdentifyManager.shared
+
+        // Yerel dummy API: showcase'te setupSDK çalışmadığı için BASE_URL boştur ve her
+        // yükleme "unsupported URL" ile düşerdi. Sunucu BASE_URL'i 127.0.0.1'e çevirir.
+        ShowcaseStubServer.shared.start()
 
         snapshot = Snapshot(
             speechExpectedSentence: m.speechExpectedSentence,
@@ -70,7 +77,10 @@ enum ShowcaseMockData {
             needSpeedTest: m.needSpeedTest,
             nfcComparisonCount: m.nfcComparisonCount,
             selfieComparisonCount: m.selfieComparisonCount,
-            ocrComparisonCount: m.ocrComparisonCount
+            ocrComparisonCount: m.ocrComparisonCount,
+            modulesControllersArray: m.modulesControllersArray,
+            manipulatedModulesControllersArray: m.manipulatedModulesControllersArray,
+            moduleStepOrder: m.moduleStepOrder
         )
 
         // Konuşma tanıma (Speech) — okunacak/soylenecek cümle sunucudan gelir.
@@ -101,12 +111,31 @@ enum ShowcaseMockData {
         m.nfcComparisonCount = 5
         m.selfieComparisonCount = 5
         m.ocrComparisonCount = 5
+
+        // Akış dizisi — CRASH ÖNLEMİ.
+        //
+        // Modül tamamlanınca koordinatör `getNextModule` çağırır ve SDK sıradaki ekranı
+        // `modulesControllersArray[moduleStepOrder]` ile okur. Showcase'te gerçek oturum
+        // olmadığı için bu dizi BOŞTUR; ilk tamamlanma sayacı 1'e çıkarır, ikincisinde
+        // `1 == 0` tutmadığı için boş diziye index atılır ve "Index out of range" ile
+        // uygulama düşer (kimlik modülü ön + arka yüz yükleyince tam olarak bu oluyordu).
+        //
+        // Diziyi yer tutucu controller'larla dolduruyoruz: index her zaman geçerli olur,
+        // SDK "bilinmeyen modül" deyip akışı bitmiş sayar, ekran yerinde kalır. Sayaç her
+        // modül açılışında da sıfırlanır (ShowcaseDetailView), böylece dizinin sonuna —
+        // yani `closeSDK()` çağıran akış-sonu dalına — hiç gelinmez.
+        m.modulesControllersArray = (0..<12).map { _ in UIViewController() }
+        m.manipulatedModulesControllersArray = m.modulesControllersArray
+        m.moduleStepOrder = 0
     }
 
     /// Katalog kapanırken çağrılır: apply() öncesi değerleri geri yükler.
     static func restore() {
         guard let s = snapshot else { return }
         let m = IdentifyManager.shared
+
+        // Dummy API kapanır ve BASE_URL gerçek değerine döner.
+        ShowcaseStubServer.shared.stop()
 
         m.speechExpectedSentence = s.speechExpectedSentence
         m.videoRecordSpeechEnabled = s.videoRecordSpeechEnabled
@@ -123,6 +152,9 @@ enum ShowcaseMockData {
         m.nfcComparisonCount = s.nfcComparisonCount
         m.selfieComparisonCount = s.selfieComparisonCount
         m.ocrComparisonCount = s.ocrComparisonCount
+        m.modulesControllersArray = s.modulesControllersArray
+        m.manipulatedModulesControllersArray = s.manipulatedModulesControllersArray
+        m.moduleStepOrder = s.moduleStepOrder
 
         snapshot = nil
     }

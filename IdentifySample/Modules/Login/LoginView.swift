@@ -241,7 +241,7 @@ struct LoginView: View {
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
-                .presentationDetents([.height(410)])
+                .presentationDetents([.height(470)])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(.ultraThinMaterial)
             } else if #available(iOS 16.0, *) {
@@ -249,7 +249,7 @@ struct LoginView: View {
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
-                .presentationDetents([.height(410)])
+                .presentationDetents([.height(470)])
                 .presentationDragIndicator(.visible)
             } else {
                 HamburgerMenuSheet { item in
@@ -796,9 +796,10 @@ private struct HamburgerMenuSheet: View {
             .padding(.bottom, IDSpacing.md)
             
             VStack(spacing: IDSpacing.sm) {
-                //                MenuOptionRow(icon: Image(systemName: "books.vertical.fill"), title: "SDK Modül Rehberi") {
-                //                    onSelect(.showcase)
-                //                }
+                MenuOptionRow(icon: Image(systemName: "books.vertical.fill"),
+                              title: "SDK Modül Rehberi") {
+                    onSelect(.showcase)
+                }
                 MenuOptionRow(icon: .init(.icCubeFocus), title: "Modül Seçme Ekranı") {
                     onSelect(.moduleList)
                 }
@@ -892,7 +893,7 @@ private struct DebugSettingsView: View {
                         DebugSection(title: "OVD (Hologram)") {
                             DebugToggleRow(
                                 title: "Adım ve hizalama günlüğü",
-                                subtitle: "[OVD] önekli konsol dökümünü açar.",
+                                subtitle: "OVD ekranında canlı tanılama panelini (belge/hareket/renk/bekleme) ve [OVD] önekli konsol dökümünü açar.",
                                 isOn: $debug.ovdConsoleLog
                             )
                         }

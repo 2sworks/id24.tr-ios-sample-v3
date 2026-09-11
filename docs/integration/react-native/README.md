@@ -129,7 +129,8 @@ const { unknownKeys } = await IdentifySdk.setTheme({
     headerBackground: { light: '#0F172A', dark: '#0B1120' },
     headerTitle: '#FFFFFF',
   },
-  navBar: { preset: 'centered', showsDivider: true },  // classic | centered | minimal | prominent
+  navBar: { preset: 'centered', showsDivider: true,     // classic | centered | minimal | prominent
+           brandTitle: 'Acme Bank', titleMode: 'brandWithModule' },  // marka: üst satır marka, alt satır adım adı
   buttons: { corner: 12, height: 54, styles: { secondary: { borderWidth: 1 } } },
   icons: { headerLogo: 'my_mark' },   // iOS asset kataloğundaki görsel adı
 });
