@@ -136,6 +136,7 @@ SDKLayout.bounds          // etkin pencerenin sınırları (UIScreen yerine)
 SDKLayout.isPad           // cihaz türü
 SDKLayout.readableWidth   // metin sütunu üst sınırı (varsayılan 600)
 SDKLayout.maxGuideWidth   // kimlik/pasaport kılavuz çerçevesi üst sınırı (varsayılan 420)
+SDKLayout.maxCaptureGuideWidth // OVD çekim kılavuzu üst sınırı (varsayılan 630) — kırpılıp yüklenen bölge
 SDKLayout.maxFaceGuideWidth // yüz ovali referans genişliği üst sınırı (varsayılan 560)
 ```
 
@@ -149,6 +150,13 @@ kesilir; sınırı temadan değiştirebilirsiniz:
 ```swift
 SDKLayout.maxGuideWidth = 480
 ```
+
+**Çekim kılavuzları ayrı ve daha geniştir.** OVD kılavuzu (`SDKLayout.maxCaptureGuideWidth`)
+ve tarayıcının sabit çerçevesi (`ScannerFixedFrame.maxWidth`) varsayılan 630 pt'tir: bu
+dikdörtgen yalnız yönlendirme değil, **kırpılıp sunucuya giden görüntüdür**. Daraltmak
+sensörün küçük bir bölümünü kullanır ve OCR/sunucu kalitesini düşürür; genişletmek belgeyi
+lensin yakın odak sınırının içine iter ve otomatik çekim tetiklenmez. Telefonda etkisi
+yoktur (ekran zaten dar).
 
 Selfie ve canlılık ekranlarındaki **yüz ovali** de aynı nedenle sınırlıdır. Oval, pencere
 genişliğinin değil `maxFaceGuideWidth` ile kesilmiş referans genişliğin bir oranı kadar

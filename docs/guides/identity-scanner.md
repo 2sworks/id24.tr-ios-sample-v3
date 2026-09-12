@@ -141,8 +141,9 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 ### HUD Metinleri ve Zamanlama — `ScannerConfiguration`
 
 Tarayıcının tüm rehber metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
-`align`, `manualCapture`, `orientation`...) aktif SDK diline göre hazır gelir ve tek tek
-değiştirilebilir. Üç hazır kompozisyon vardır ve **global override kancaları** sunar:
+`tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`, `orientation`...) aktif SDK
+diline göre hazır gelir ve tek tek değiştirilebilir. `glare` boş verilirse yalnız metin
+kapanır, kapı çalışmaya devam eder. Üç hazır kompozisyon vardır ve **global override kancaları** sunar:
 
 ```swift
 ScannerConfiguration.default    // kimlik kartı (override: .overrideDefault)
@@ -188,7 +189,14 @@ ScannerFrameMode.idCardDefault = .fixedFrame(
 ```
 
 Hazır geometriler: `.idCard` (ID-1, 1.585), `.passport` (TD3 veri sayfası, 1.42),
-`.document` (A4 dikey, 0.707) — üçü de 15pt yan boşluk + 16pt köşe yarıçapı.
+`.document` (A4 dikey, 0.707) — üçü de 15pt yan boşluk + 16pt köşe yarıçapı +
+`maxWidth: 630`.
+
+`maxWidth` çerçevenin nokta cinsinden üst genişliğidir; telefonda devreye girmez, tablette
+belirleyicidir. Yan boşluk kuralı iPad'de ~790 pt'lik bir çerçeve çizer ve kullanıcıdan
+85 mm'lik kartı lensin yakın odak sınırının içine sokmasını ister — belge çerçeveyi asla
+dolduramaz, otomatik çekim tetiklenmez. Değeri düşürmek de bedelsiz değildir: çerçeve
+kırpılıp gönderilen bölgedir, yarıya indirmek OCR'a giden pikseli dörtte bire düşürür.
 
 > Çerçeve **ekran noktasında** ölçülür, sonra kamera koordinatına çevrilir. Tersi
 > (kamera tamponuna göre ölçmek) sezgisel ama yanlıştır: önizleme tamponu kırparak
@@ -217,6 +225,14 @@ gerektiği HUD'da yazar:
 | Belge çerçeveyi taşıyor | "Kimliği biraz uzaklaştırın" |
 | Belge çerçevenin epey içinde (uzaktan çekim) | "Kimliği biraz yaklaştırın" |
 | Boyut doğru ama bir yana kaymış | "Kimliği çerçeveye ortalayın" |
+| Netlik gelmiyor ve lens yakın sınırda | "Kimliği biraz uzaklaştırın" — belge asgari odak mesafesinin içinde |
+| Belgede parlama var | `texts.glare` — patlamış piksel oranı eşiği aşınca çekim bekletilir |
+
+Oturduktan sonra da çekim hemen değil, **görüntü sabitlenince** alınır: ardışık kareler
+arası fark (kamera ya da belge hareketi) ve cihaz IMU'su birlikte sakin okunmalı, ardından
+0.5 sn beklenir. Amaç hareket yasağı değil, bulanık kare yüklenmesini engellemektir. Mesafe
+kararında histerezis vardır; belge bir kez oturduktan sonra sınırda "yaklaştır / uzaklaştır"
+arasında titremez.
 
 Ölçü `ScannerFixedFrame` üzerinden ayarlanır:
 
@@ -247,7 +263,8 @@ belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşen
 ### Akıllı Davranışlar (kutudan çıkar)
 
 - Belge sensöre çok yaklaşınca **ultra-geniş lense otomatik geçiş** (+ "uzaklaştırın" metni) — yalnız `.dynamicQuad` modunda
-- Dokunarak odaklama (sarı odak göstergesi)
+- Dokunarak odaklama (sarı odak göstergesi); sabit çerçevede belge oturunca **tek atış odak
+  dürtmesi** — nokta değişmediği için sürekli AF'e ikinci kez yazmak hiçbir şey yapmıyordu
 - Otomatik yakalama üst üste başarısız olursa **manuel yakalama** teklifi
 - Pasaport dik tutulursa **"yana çevirin"** yönlendirmesi
 - Işık yetersizse fener önerisi (torch API'siyle)

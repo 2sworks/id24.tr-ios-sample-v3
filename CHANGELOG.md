@@ -59,6 +59,36 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
   canlılık ekranlarındaki yüz ovali (`SDKLayout.maxFaceGuideWidth`) tablette üst sınırla
   kesilir.
 
+**Başlık çubuğunda marka adı**
+- `navBar.brandTitle` / `brandSubtitle` / `titleMode` (`.module` · `.brand` ·
+  `.brandWithModule`): çubuk adım adı yerine markanızı yazabilir; kamera üstü ekranlarda
+  logonun yanına gelir. JSON anahtarları aynı adla. `.prominent` yüksekliği 92 pt oldu
+  (56'da iki satırlı başlık alttaki bileşene biniyordu).
+
+**Çekim kalitesi — bulanık ve parlamalı kare yüklenmez**
+- **Sabitlik kapısı** (kimlik tarayıcı + OVD): çekim, ardışık kareler arası fark ve cihaz
+  IMU'su birlikte sakin okuyana kadar bekler; koşul tutunca 0.5 sn ertelenir. Amaç hareket
+  yasağı değil, hareket bulanıklığını engellemektir — daha önce sabit çerçeve modu sabitliği
+  koşulsuz "var" sayıyordu.
+- **Parlama kapısı** (tarayıcı, yeni): belgede patlamış piksel oranı eşiği aşınca çekim
+  bekletilir; HUD metni `ScannerGuidanceTexts.glare`. OVD'de alan ortalaması yerine aynı
+  oran ölçülür — yerel parlama artık kaçmıyor.
+- **OVD still netlik tabanı**: çekilen kare bulanıksa kullanıcıya gösterilmeden en fazla
+  iki kez yeniden çekilir (daha önce OVD'de netlik kontrolü yoktu).
+- **Hologram adımında belge kapısı**: gökkuşağı efekti yalnız ön yüzde onaylanan belge
+  çerçevede kaldığı sürece sayılır; kart çekilir ya da renkli başka bir yüzey girerse adım
+  sıfırlanır. Çekim kör zamanlayıcı yerine sakinlik penceresinde alınır (0.75–2.5 sn).
+- **Sabit çerçeve üst genişliği**: `ScannerFixedFrame.maxWidth` ve OVD
+  `SDKLayout.maxCaptureGuideWidth` (varsayılan 630 pt). iPad'de yan boşluk kuralı ~790 pt
+  çerçeve çiziyor, belge lensin yakın odak sınırına girmeden çerçeveyi dolduramıyor ve
+  otomatik çekim tetiklenmiyordu. Mesafe kararı boyut/konum ayrımı ve histerezisle
+  "yaklaştır / uzaklaştır" arasında titremiyor.
+- **Otomatik netleme**: sabit çerçevede belge oturunca tek atış odak dürtmesi (aynı noktaya
+  ikinci yazım sürekli AF'te hiçbir şey yapmıyordu); lens yakın sınırda ve netlik yoksa
+  "uzaklaştırın" yönergesi. OVD odak ayarları tarayıcıyla hizalandı (yumuşak AF kapalı,
+  yakın aralık, sahne değişimi izleme). `SDKIdCardOVDViewModel.debugLive` kapı değerlerini
+  tanılama için yayınlar.
+
 **Değişti**
 - **Header'daki marka işaretinin anahtarı `.headerLogo`** oldu; önceki `.langButton` adı
   yanlıştı ve `.logo`'yu ezmek header'ı değiştirmiyordu. Eski override'lar çalışmaya
@@ -263,11 +293,26 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
 
 ## Sample App
 
-### Yayınlanmamış (v3 · build 23)
+### Yayınlanmamış (v3 · build 44)
 
 > Not: v3 ile birlikte örnek uygulama sıfırdan numaralandı (`CURRENT_PROJECT_VERSION` 23);
 > aşağıdaki "Build 178" ve öncesi eski numaralandırmaya aittir.
 
+**Build 24–44**
+- Hamburger menüsü: **SDK Modül Rehberi** (showcase: tasarım kataloğu, nav bar marka/ikon
+  örnekleri, tema JSON köprüsü, senaryolu dummy API) ve **Debug Değerleri** ekranı
+  (`SDKDebugSettings`, tümü varsayılan kapalı; OVD kapı paneli dahil).
+- Birleşik log paneli: netfox forku ile Requests / Console / Socket sekmeleri; netfox ve TTS
+  tercihleri kalıcı. Panel kapatılırken oluşan `deinit` çökmesi giderildi.
+- iPad: ikon seti ve `UIRequiresFullScreen = YES` (SDK portrait kilitli; App Store çoklu
+  görev şartı bu anahtarla karşılanır).
+- Proje adı `NewTest` → `IdentifySample`; SDK uzak SPM paketi yerine kaynağa bağlanır,
+  arşiv `-workspace` ile alınır; 2sworks TestFlight imzası.
+- Canlılık yeni adımları için sunucusuz deneme anahtarı.
+- Dokümanlar: README'ye SPM `Exact Version` uyarısı, tema/metin API tablosu ve
+  "örnekten hangi dosyalar kopyalanır" bölümü; RN/Flutter rehberlerinde kopyalama hedefleri.
+
+**Build 23**
 - Örnek uygulama **SDK tüketen bir geliştirici rehberine** dönüştürüldü: her ekran için
   Preview + View + ViewModel, SDK yeteneklerinin showcase'i.
 - Her modül için entegrasyon rehberi (`IdentifySample/Modules/<Module>/<Module>.md`) ve

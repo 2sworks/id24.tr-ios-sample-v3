@@ -25,9 +25,14 @@ fotokopi ya da ekran görüntüsüyle yapılan sahtecilik denemeleri bu adımda 
 0. **Belge tipi seçim ekranı** açılır (IdCardView deseni): **Çipli Kimlik** ya da **Pasaport**.
    Seçime göre çekim akışı belirlenir. (Host `SDKIdCardOVDView(documentType:)` ile bu ekranı atlayabilir.)
 1. Belgeyi çerçeveye hizalar; SDK kareleri canlı değerlendirir (dikdörtgen/coverage + netlik +
-   cihaz sabitliği + parlama). Uygun olunca **otomatik** yüksek-çözünürlüklü fotoğraf çekilir.
+   görüntü ve cihaz sabitliği + parlama oranı). Uygun olunca **otomatik** yüksek-çözünürlüklü
+   fotoğraf çekilir. Çekilen kare bulanıksa (still netlik tabanının altında) kullanıcıya
+   göstermeden en fazla iki kez yeniden çekilir.
 2. (Yalnız kimlik) Hologram adımında torch açılır ve belgeyi hafifçe eğip çevirmesi istenir —
-   gökkuşağı efekti ölçülür (`rainbowProgress` doluyor, baseline'a göre delta).
+   gökkuşağı efekti ölçülür (`rainbowProgress` doluyor, baseline'a göre delta). Efekt yakalanınca
+   çekim **belge sakinleşince** alınır (en az 0.75 sn, en çok 2.5 sn); bu sırada çerçevede belge
+   görünmüyorsa (kart çekildi, renkli başka bir yüzey girdi) adım sıfırlanır — ölçüm ilk yüzde
+   onaylanan belgenin çerçevede kalmasını şart koşar.
 3. (Yalnız kimlik) arka yüz hizalanır — **MRZ okunana kadar** yakalama tetiklenmez.
 4. Adımlar (`OVDStep`) sırayla tamamlanır; her yakalama sunucuya yüklenir. Son adım bitince
    akış otomatik ilerler.
@@ -114,6 +119,7 @@ public enum OVDStep: Int, CaseIterable {
 | `rainbowProgress` | `Double` | Hologram adımı ilerlemesi |
 | `guideDetected` | `Bool` | Çerçeve yeşil (yakalama koşulu tuttu) |
 | `instruction` | `String` | Anlık ekran talimatı (adım/gating'e göre değişir) |
+| `debugLive` | `DebugLive?` | Kapıların anlık değerleri (belge, hareket, IMU, hizalama, gökkuşağı, odak, netlik); tanılama ekranı için, üretimde `nil` bırakılabilir |
 
 ### Ayar
 | Üye | Varsayılan | Anlam |
@@ -148,7 +154,8 @@ public enum OVDStep: Int, CaseIterable {
 
 ```
 ingest(ciImage:roi:)  → Vision(VNDetectRectangles) + ovdTextureMean + ovdColorMetrics(whiteOut)
-                        + CMMotion sabitlik + (arka) probeMRZPresence + ovdRainbowMaxScoreDetailed
+                        + kare-farkı hareket ölçeri ∧ CMMotion sabitlik + (arka) probeMRZPresence
+                        + (hologram) belge süreklilik kapısı + ovdRainbowMaxScoreDetailed
                         → readyScore histerezis → uygun olunca onRequestCapture (kamera fotoğraf çeker)
 handleCaptured(_:roi:) → processCaptured + (front/back) startFrontIdOcr/startBackIdOcr + uploadIdPhoto [HTTP]
 advance()  (son adım) → onCompleted?()  → host: coordinator.advanceToNextModule() [modulePresented]
