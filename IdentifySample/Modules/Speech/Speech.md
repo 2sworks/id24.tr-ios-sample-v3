@@ -61,6 +61,13 @@ struct MySpeechView: View {
 }
 ```
 
+- `targetWord` sunucudan (`speech_expected_sentence`) gelir; sunucu boş gönderirse varsayılan
+  `"Berlin"` kalır.
+- **Karşılaştırma cihazda yapılır** (Apple konuşma tanıma + `SDKSpeechMatcher`); sunucuya
+  transkript değil yalnız "tamamlandı" bilgisi gider.
+- `confirmSpeech()` yalnız `speechSuccess` true iken bildirim yapar; öncesinde çağrılırsa
+  hiçbir şey göndermez ve ilerlemez. Onay düğmesini yine de `speechSuccess`'e bağlayın.
+
 > ❌ **Bypass yapmayın:** `confirmSpeech()` çağrılmadan ilerlerseniz `sendSpeechStatus`
 > gitmez — backend konuşma doğrulamasını hiç görmez.
 > Kural: [bypass yok](../../../docs/guides/customization.md#bypass-yok-kuralı).
@@ -82,7 +89,7 @@ struct MySpeechView: View {
 |---|---|
 | `startRecording()` | Mikrofon + tanımayı başlatır |
 | `stopRecording()` | Kaydı durdurur, sonucu değerlendirir |
-| `confirmSpeech()` | **`manager.sendSpeechStatus` (soket)** + `onCompleted?()` |
+| `confirmSpeech()` | `speechSuccess` ise **`manager.sendSpeechStatus` (soket)** + `onCompleted?()`; değilse yok sayılır |
 
 ### Closure'lar
 | Üye | Ne zaman |

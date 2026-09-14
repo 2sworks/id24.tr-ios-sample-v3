@@ -88,6 +88,16 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
   "uzaklaştırın" yönergesi. OVD odak ayarları tarayıcıyla hizalandı (yumuşak AF kapalı,
   yakın aralık, sahne değişimi izleme). `SDKIdCardOVDViewModel.debugLive` kapı değerlerini
   tanılama için yayınlar.
+- **`SDKIdCardOVDViewModel.motionFeed`**: kendi kamerasıyla OVD ekranı yazan entegrasyon
+  hareket ölçerini buradan besler. Beslenmezse görüntü sabitlik kapısı atlanır ve yalnız IMU
+  kullanılır (log uyarısı yazılır) — önceden bu durumda otomatik çekim hiç tetiklenmiyordu.
+- **`SDKSpeechRecViewModel.confirmSpeech()`** artık ifade doğrulanmadan bildirim yapmıyor;
+  özel ekranda onay düğmesi başarıya bağlanmasa bile söylenmeyen ifade tamamlandı sayılmaz.
+
+**Dokümantasyon — override sözleşmeleri netleştirildi**
+- OVD, Liveness, Selfie, Görüşme, Adres, NFC, Konuşma ve Kimlik rehberlerinde "override
+  ederseniz sizde kalanlar" açıkça yazıldı: zorunlu kancalar, iş parçacığı kuralları,
+  değiştirilemeyen parçalar (tarayıcı HUD'u, iOS NFC sayfası, canlılık algılaması).
 
 **Değişti**
 - **Header'daki marka işaretinin anahtarı `.headerLogo`** oldu; önceki `.langButton` adı

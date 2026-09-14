@@ -138,6 +138,15 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 | `speechKey` / `speechModule` | Açılışta sesli yönerge ([ReadAloud](../../IdentifySample/Modules/ReadAloud.md) sistemiyle) |
 | `onResult` | `Result<RecognizedDocument, Error>` |
 
+**Değiştirilemeyenler (şu an):** tarayıcının kendi HUD'u — talimat metninin konumu ve yazı
+stili, manuel çekim ve iptal düğmeleri — gizlenemez; yalnız metinleri değişir. Çerçevenin
+**içine** host içeriği (ör. kart çizimi) konamaz. Fener, kapat, adım göstergesi gibi öğeleri
+tarayıcının üstüne `ZStack` ile kendiniz çizebilirsiniz.
+
+Tarayıcı sonucu teslim edince kendini `dismiss()` eder: `fullScreenCover` / `sheet` içinde
+sunun, bir ekranın gövdesine doğrudan gömmeyin. En kısa yol `.documentScanner(isPresented:…)`
+modifier'ıdır — sunumu ve kapanışı kendisi yapar, `navOverlay` ile üstüne katman koyarsınız.
+
 ### HUD Metinleri ve Zamanlama — `ScannerConfiguration`
 
 Tarayıcının tüm rehber metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
@@ -273,11 +282,15 @@ belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşen
 
 ## ⚠️ KYC Akışı İçinde Kullanmayın (Bypass)
 
-Bu motor bağımsız bir bileşendir; ama **KYC akışının kimlik adımını bununla değiştirmeyin.**
-`IdentityScannerView`'ı doğrudan kullanıp sonucu kendiniz yüklerseniz `sendStep`/upload
-sinyalleri gitmez ve akış sunucuda ilerlemez. Akış içindeyseniz her zaman modül VM'inden
-gidin: [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md) —
-`vm.scanFront(image:)` zaten bu motoru perde arkasında kullanır.
+Kural tarayıcıyı kullanmak değil, **sonucu kendiniz yüklemek** üzerinedir. KYC akışında:
 
-Doğrudan kullanım, **akış dışı** senaryolar içindir: müşteri kaydında form ön-doldurma,
-belge arşivleme, şube içi araçlar...
+| Yapılış | Sonuç |
+|---|---|
+| Override ekranında `IdentityScannerView` → `doc.croppedImage` → `vm.scanFront(image:)` / `vm.scanBack(image:)` | ✅ Doğru. SDK'nın kendi kimlik ekranı da tam olarak bunu yapar. |
+| `RecognizedDocument`'i kendi HTTP isteğinizle göndermek | ❌ `upload` / `sendStep` gitmez, akış sunucuda ilerlemez. |
+
+`vm.scanFront(image:)` tarayıcıyı çalıştırmaz; verilen görüntüye OCR yapıp yükler. Görüntünün
+tarayıcıdan mı kendi kameranızdan mı geldiğini bilmez — kalite farkı buradan doğar.
+Örnek ve iki yolun karşılaştırması: [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md#kendi-tasarımınızla-override).
+
+Akış dışında (form ön-doldurma, belge arşivleme, şube içi araçlar) tarayıcı tek başına da kullanılır.

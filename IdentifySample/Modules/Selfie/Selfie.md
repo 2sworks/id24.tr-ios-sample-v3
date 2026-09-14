@@ -38,7 +38,14 @@ Hiçbir şey yazmayın; rota gelince `SDKSelfieView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
-Kamera ve tüm UI sizin; yüz tespiti + yükleme SDK VM'inde kalır:
+Kamera ve UI sizin. Kameranızın karelerini VM'e verirseniz **canlı yönlendirme ve otomatik
+çekim de çalışır** — yalnız fotoğrafı verirseniz yalnız yüz tespiti + yükleme çalışır.
+
+| Verdiğiniz | Çalışan |
+|---|---|
+| `updatePreviewSize(_:)` + her kare `analyzeFrame(_:cameraPosition:)` | `faceCondition`, `guidanceText`, `isFaceAligned`, `holdProgress`, `shouldAutoCapture` |
+| Çekilen fotoğraf → `processSelfie(image:)` | Yüz tespiti + yükleme (onay adımı yok) |
+| Çekilen fotoğraf → `presentCaptured(image:)` + kullanıcı onayı → `confirmSelfie()` | SDK ekranıyla aynı: önce önizleme, onayda yükleme |
 
 ```swift
 registry.override(.selfie) { MySelfieView() }
@@ -46,21 +53,34 @@ registry.override(.selfie) { MySelfieView() }
 struct MySelfieView: View {
     @EnvironmentObject var coordinator: SDKFlowCoordinator
     @StateObject private var vm = SDKSelfieViewModel()
+    let camera = MyFrontCamera()
 
     var body: some View {
-        VStack {
-            MyFrontCameraView { captured in
-                vm.processSelfie(image: captured)    // ✅ yüz tespiti + upload
+        GeometryReader { geo in
+            ZStack {
+                MyCameraPreview(camera: camera)
+                MyOval(aligned: vm.isFaceAligned, progress: vm.holdProgress)
+                Text(vm.guidanceText)
+                if vm.awaitingConfirmation {
+                    MyConfirm(image: vm.selfieImage, onConfirm: vm.confirmSelfie, onRetake: vm.reset)
+                }
             }
-            Text(vm.resultText)
-            Button("Yeniden Çek") { vm.reset() }
-            Button("Devam") { coordinator.advanceToNextModule() }   // ✅ modulePresented
-                .disabled(!vm.canContinue)
+            .onAppear {
+                vm.updatePreviewSize(geo.size)                                  // ✅ zorunlu
+                camera.onPixelBuffer = { vm.analyzeFrame($0, cameraPosition: .front) }  // kamera kuyruğundan
+            }
         }
+        .onChange(of: vm.shouldAutoCapture) { if $0 { camera.takePhoto { vm.presentCaptured(image: $0) } } }
+        .onChange(of: vm.canContinue) { if $0 { coordinator.advanceToNextModule() } }   // ✅
         .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
     }
 }
 ```
+
+- Oval, `updatePreviewSize` ile verilen ölçüye göre hesaplanır; önizlemeniz ekranı
+  kaplamıyorsa gerçek önizleme boyutunu verin.
+- Sesli okuma sürerken çekimi bekletmek için `vm.isCaptureSuspended = true`.
+- Eşikler (tutma süresi vb.): `SDKSelfieViewModel(config: SDKSelfieGuidanceConfig(...))`.
 
 ---
 
@@ -73,11 +93,22 @@ struct MySelfieView: View {
 | `faceDetected` | `Bool` | salt-okunur | Yüz tespit edildi mi |
 | `canContinue` | `Bool` | salt-okunur | Devam edilebilir mi |
 | `resultText` | `String` | salt-okunur | Sonuç metni |
+| `faceCondition` | `SDKSelfieFaceCondition` | salt-okunur | Canlı yüz durumu (yok, uzak, yakın, ortada değil, uygun…) |
+| `guidanceText` | `String` | salt-okunur | Duruma göre yönlendirme metni |
+| `isFaceAligned` | `Bool` | salt-okunur | Yüz ovale oturdu mu |
+| `holdProgress` | `Double` | salt-okunur | Otomatik çekime kalan tutma süresi (0…1) |
+| `shouldAutoCapture` | `Bool` | salt-okunur | Şimdi çek |
+| `awaitingConfirmation` | `Bool` | salt-okunur | Çekilen fotoğraf onay bekliyor |
+| `isCaptureSuspended` | `Bool` | r/w | Otomatik çekimi geçici beklet |
 
 ### Metotlar
 | Metot | Etki |
 |---|---|
-| `processSelfie(image: UIImage)` | Yüz tespiti (`detectHumanFace`) → `uploadIdPhoto` |
+| `updatePreviewSize(_ size: CGSize)` | Önizleme boyutu; oval ve hizalama buna göre hesaplanır |
+| `analyzeFrame(_:cameraPosition:)` | Canlı kare analizi; kamera kuyruğundan çağrılabilir |
+| `presentCaptured(image:)` | Çekilen fotoğrafı onaya alır, yüklemez |
+| `confirmSelfie()` | Onaylanan fotoğrafı yüz tespiti + yüklemeye gönderir |
+| `processSelfie(image: UIImage)` | Onaysız doğrudan yüz tespiti (`detectHumanFace`) → `uploadIdPhoto` |
 | `reset()` | Durumu sıfırlar (yeniden çekim) |
 
 ### Closure'lar

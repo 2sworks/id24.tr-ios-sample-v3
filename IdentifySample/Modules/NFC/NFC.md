@@ -52,8 +52,10 @@ struct MyNfcView: View {
         VStack {
             Text(vm.nfcStatus)                                      // canlı durum
             Button("Çipi Oku") { vm.startNFC() }                    // ✅ manager.startNFC
-            Button("Devam") { coordinator.advanceToNextModule() }   // ✅
-                .disabled(!vm.canContinue)
+        }
+        .sheet(isPresented: $vm.showEditScreen) {                   // OCR bilgisi eksikse açılır
+            MyMrzForm(serial: $vm.serialNo, birth: $vm.birthDate, valid: $vm.validDate,
+                      onSave: vm.saveManualDates)
         }
         .onAppear {
             vm.onCompleted     = { coordinator.advanceToNextModule() }
@@ -62,6 +64,14 @@ struct MyNfcView: View {
     }
 }
 ```
+
+- İlerlemeyi **yalnız `onCompleted`** yapar; ayrıca bir "Devam" düğmesi `advanceToNextModule`
+  çağırırsa akış iki adım ilerler.
+- `startNFC()`, belge no / doğum / geçerlilik tarihi boşsa okuma başlatmaz,
+  `showEditScreen`'i açar. Bu alanları gösteren formu siz sunarsınız.
+- **Çipe dokundurma sırasında açılan sayfa iOS'a aittir** (Core NFC); tasarımı
+  değiştirilemez, yalnız içindeki metinler SDK dil dosyalarından gelir.
+
 
 ---
 

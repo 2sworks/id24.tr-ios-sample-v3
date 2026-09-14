@@ -37,34 +37,68 @@ Hiçbir şey yazmayın; rota gelince `SDKLivenessView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
-Talimat sunumu ve kamera sizin; adım sırası, kare doğrulama ve yükleme SDK'da kalır:
+> **Önce okuyun:** İfade algılama (göz kırpma, gülümseme, baş/göz yönü) **VM'de değil,
+> SDK'nın hazır ekranındadır.** Override ederseniz ARKit yüz takibini ve her adımın algılama
+> kuralını **siz yazarsınız**. Yalnız görünümü değiştirmek istiyorsanız
+> [tema](../../../docs/guides/theming.md) ve metin override'ı yeterlidir; önerilen yol budur.
+
+| SDK'da kalan | Sizde kalan |
+|---|---|
+| Adım sırası (sunucudan), kare yükleme, sonraki adıma geçiş | ARKit oturumu (`ARFaceTrackingConfiguration`, A12+ cihaz) |
+| Ekran kaydı (ReplayKit) ve bitince yükleme | `vm.currentStep` için ifadeyi algılamak |
+| Uygulama arka plana geçince kaydın yönetimi | Algılanınca ekran görüntüsünü `uploadFrame` ile vermek |
+
+Çağrı sırası:
 
 ```swift
 registry.override(.liveness) { MyLivenessView() }
 
 struct MyLivenessView: View {
     @EnvironmentObject var coordinator: SDKFlowCoordinator
-    @StateObject private var vm = SDKLivenessViewModel()
+    @StateObject private var vm = SDKLivenessViewModel()   // init ilk adımı zaten ister
+    let face = MyARFaceTracker()
 
     var body: some View {
-        VStack {
-            Text(vm.stepInstruction)                    // "Göz kırpın" vb.
-            MyCameraFeed { frame in
-                // hareket algılandığında doğrulama karesi:
-                vm.uploadFrame(image: frame)            // ✅ HTTP
-            }
+        ZStack {
+            MyARView(tracker: face)
+            Text(vm.stepInstruction)
         }
         .onAppear {
-            vm.onCompleted = { coordinator.advanceToNextModule() }   // ✅
-            vm.fetchNextStep()                          // ✅ ilk adımı sunucudan al
+            vm.onCompleted     = { coordinator.advanceToNextModule() }   // ✅
+            vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed    = { coordinator.finishFlowAsFailed() }
+            vm.onRecordingReady = { face.start() }       // ✅ kamerayı kayıt hazır olunca aç
+            vm.prepareRecording()                         // ✅ ekran kaydını başlatır
+            face.onDetected = { step, snapshot in
+                guard step == vm.currentStep else { return }
+                face.pause()                              // yükleme sürerken ikinci tetik olmasın
+                vm.uploadFrame(image: snapshot)           // ✅ başarıda sıradaki adım kendiliğinden gelir
+            }
         }
-        // tüm adımlar bitince: vm.uploadVideo(videoData: data)      // ✅
+        .onChange(of: vm.currentStep) { _ in if !vm.allStepsCompleted { face.resume() } }
+        .onDisappear { face.stop(); vm.abandonRecording() }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in vm.noteWillResignActive() }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in vm.noteDidBecomeActive() }
     }
 }
 ```
 
+- Son adım yüklenince VM kaydı durdurup yükler ve `onCompleted`'ı çağırır; `uploadVideo` ya da
+  `fetchNextStep` elle çağrılmaz.
+- Cihaz yüz takibini desteklemiyorsa `vm.reportFaceTrackingUnsupported()` çağırın; modül
+  entegrasyonun `faceTrackingFallback` politikasıyla atlanır.
+
+SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikler cihazda ayarlandı):
+
+| Adım | Kural |
+|---|---|
+| `turnLeft` / `turnRight` | `jawLeft` / `jawRight` > 0.12 |
+| `blinkEyes` | `eyeBlinkLeft` ve `eyeBlinkRight` > 0.35, `jawLeft/Right` < 0.03 |
+| `smile` | `mouthSmileLeft + mouthSmileRight` > 1.2, `jawLeft/Right` < 0.03 |
+| `nodDown` `nodUp` `lookUp` `browUp` `eyesLeft` `eyesRight` | Adım başında nötr baş pozu ölçülür; açı/blendshape farkı belirli süre tutulmalı. Bu kurallar public değildir — bu adımlar sunucuda açıksa override önerilmez. |
+
 > ❌ **Bypass yapmayın:** Adımları kendi mantığınızla "geçti" sayıp ilerlemeyin — her adım
-> `uploadFrame`, kapanış `uploadVideo` ile kanıtlanmalıdır.
+> `uploadFrame` ile kanıtlanmalıdır.
 > Kural: [bypass yok](../../../docs/guides/customization.md#bypass-yok-kuralı).
 
 ---
@@ -74,7 +108,7 @@ struct MyLivenessView: View {
 ### State (`@Published`, salt-okunur)
 | Üye | Tip | Anlam |
 |---|---|---|
-| `currentStep` | `LivenessTestStep?` | Mevcut adım (`turnLeft/turnRight/blinkEyes/smile/completed`) |
+| `currentStep` | `LivenessTestStep?` | Mevcut adım (`turnLeft/turnRight/blinkEyes/smile/nodDown/nodUp/lookUp/browUp/eyesLeft/eyesRight/completed`) |
 | `stepInstruction` | `String` | Adım talimatı (ör. "Göz kırpın") |
 | `allStepsCompleted` | `Bool` | Tüm adımlar bitti mi |
 
@@ -88,15 +122,22 @@ struct MyLivenessView: View {
 ### Metotlar
 | Metot | Etki |
 |---|---|
-| `fetchNextStep()` | Sıradaki adımı sunucudan alır (`getNextLivenessTest`) |
-| `uploadFrame(image: UIImage)` | Mevcut adımın doğrulama karesini yükler |
-| `uploadVideo(videoData: Data)` | Adımlar bitince videoyu yükler; kayıt kapalıysa doğrudan `onCompleted` |
+| `prepareRecording()` | Ekran kaydını başlatır; hazır olunca `onRecordingReady` (kayıt kapalıysa hemen) |
+| `uploadFrame(image: UIImage)` | Mevcut adımın karesini yükler; başarıda sıradaki adımı ister, son adımda kaydı yükleyip `onCompleted` |
+| `abandonRecording()` | Ekrandan çıkışta kaydı bırakır |
+| `noteWillResignActive()` / `noteDidBecomeActive()` | Uygulama aktiflik bildirimleri (kesilen kayıt yönetimi) |
+| `reportFaceTrackingUnsupported()` | Cihaz ARKit yüz takibini desteklemiyor — modül atlanır |
+| `fetchNextStep()` | Sıradaki adımı sunucudan alır; `init` ve `uploadFrame` zaten çağırır |
+| `finishRecordingAndUpload()` / `uploadVideo(videoData:)` | İç akış; son adımda VM kendisi çağırır |
 | `resetTest()` | Testi başa alır |
 
 ### Closure'lar
 | Üye | Ne zaman |
 |---|---|
 | `onCompleted: (() -> Void)?` | Tüm akış (adımlar + varsa video) tamamlandı |
+| `onRecordingReady: (() -> Void)?` | Ekran kaydı başladı — kamerayı şimdi açın |
+| `onSkipRequested: (() -> Void)?` | Atlama istendi |
+| `onFlowFailed: (() -> Void)?` | Akış başarısız sonlandı |
 
 ## Sinyal Zinciri — Perde Arkası
 

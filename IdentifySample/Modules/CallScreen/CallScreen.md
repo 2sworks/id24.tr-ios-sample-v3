@@ -62,8 +62,8 @@ struct MyCallView: View {
     var body: some View {
         ZStack {
             // WebRTC video katmanları — kendiniz peer connection KURMAYIN:
-            if let remote = vm.remoteVideoView { UIViewWrapper(remote) }   // ✅
-            if let local  = vm.localVideoView  { UIViewWrapper(local) }    // ✅
+            if let remote = vm.remoteVideoView { MyVideoHost(view: remote) }   // ✅
+            if let local  = vm.localVideoView  { MyVideoHost(view: local) }    // ✅
 
             VStack {
                 Text("Sıra: \(vm.queuePosition)")
@@ -78,6 +78,34 @@ struct MyCallView: View {
             }
         }
         .onAppear { vm.checkSignLangIfNeeded() }
+    }
+}
+```
+
+Video katmanları için bilmeniz gerekenler:
+
+- `remoteVideoView` / `localVideoView` kendini boyutlayan kapsayıcılardır: görüntünün en-boy
+  oranını SDK korur. Kendi `UIViewRepresentable`'ınızda view'ı **dört kenara sabitleyin**,
+  frame'ini elle vermeyin ve `contentMode` ile oynamayın (render view bunu dikkate almaz).
+- İki özellik `@Published` değildir; görüşme başlamadan `nil` olabilir. Görünümü
+  `vm.callState` değişiminde yeniden okuyun.
+- Her görüşmede view yeniden yaratılır; bir önceki görüşmenin view referansını saklamayın.
+
+```swift
+struct MyVideoHost: UIViewRepresentable {
+    let view: UIView
+    func makeUIView(context: Context) -> UIView { UIView() }
+    func updateUIView(_ container: UIView, context: Context) {
+        guard view.superview !== container else { return }
+        view.removeFromSuperview()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(view)
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: container.topAnchor),
+            view.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            view.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: container.trailingAnchor)
+        ])
     }
 }
 ```

@@ -43,7 +43,21 @@ SDKIdCardView(viewModel: myIdCardVM)  // dışarıdan VM enjeksiyonu (host VM il
 
 ## Kendi Tasarımınızla (Override)
 
-Kamerayı ve tüm görselliği siz çizersiniz; okuma + yükleme + adım sinyali SDK VM'inde kalır:
+Ekranı siz çizersiniz; OCR + yükleme + adım sinyali SDK VM'inde kalır. Görüntüyü nereden
+aldığınıza göre iki yol vardır:
+
+| | A) SDK tarayıcısı (önerilen) | B) Kendi kameranız |
+|---|---|---|
+| Otomatik çekim | ✅ | ❌ siz tetiklersiniz |
+| Mesafe / bulanıklık / parlama kapıları | ✅ | ❌ |
+| Belgeye kırpma, pasaport oryantasyon düzeltmesi | ✅ | ❌ |
+| Tasarım serbestliği | Çerçeve, çizgi stili, metinler, fener; HUD gizlenemez ([sınırlar](../../../docs/guides/identity-scanner.md#görünüm-ve-davranış-ayarları)) | Tam |
+| Risk | — | Bulanık/parlamalı kare → "okunamadı" ya da sunucu karşılaştırma reddi |
+
+### A) SDK tarayıcısıyla
+
+`.documentScanner` modifier'ı tarayıcıyı tam ekran açar, sonuç gelince kapatır ve üstüne
+kendi katmanınızı koymanıza izin verir (iOS 15+):
 
 ```swift
 registry.override(.idCard) { MyIdCardScanView() }
@@ -51,24 +65,50 @@ registry.override(.idCard) { MyIdCardScanView() }
 struct MyIdCardScanView: View {
     @EnvironmentObject var coordinator: SDKFlowCoordinator
     @StateObject private var vm = SDKIdCardViewModel()
+    @State private var scanning = false
+    @State private var torchOn = false
 
     var body: some View {
-        VStack {
-            Text(vm.resultText)                       // durum metni
-            MyCameraView { captured in                // sizin kameranız
-                if vm.currentSide == .front {
-                    vm.scanFront(image: captured)     // ✅ OCR + upload + sendStep
-                } else {
-                    vm.scanBack(image: captured)      // ✅
-                }
+        MyIdCardIntro(side: vm.currentSide, isLoading: vm.isLoading,
+                      error: vm.errorMessage) { scanning = true }      // "Tara" düğmesi
+            .documentScanner(
+                isPresented: $scanning,
+                profile: vm.currentSide == .front ? .turkishIDFront : .turkishIDBack,
+                style: QuadrilateralStyle(strokeColor: .white, lockedStrokeColor: .green,
+                                          dashPattern: [16, 8]),
+                configuration: vm.currentSide == .front ? .default : .idBack,
+                externalTorchOn: $torchOn,                   // verilince tarayıcının fener düğmesi gizlenir
+                navOverlay: { MyScannerChrome(torchOn: $torchOn, side: vm.currentSide) { scanning = false } }
+            ) { result in
+                guard case .success(let doc) = result else { return }   // iptal / hata
+                vm.currentSide == .front
+                    ? vm.scanFront(image: doc.croppedImage)   // ✅ OCR + upload + sendStep
+                    : vm.scanBack(image: doc.croppedImage)    // ✅
             }
-            Button("Devam") { coordinator.advanceToNextModule() }  // ✅ modulePresented
-                .disabled(!vm.canContinue)
-        }
-        .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
+            .onChange(of: vm.canContinue) { if $0 { coordinator.advanceToNextModule() } }
+            .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
     }
 }
 ```
+
+- Ön yüz yüklenince `vm.currentSide` kendiliğinden `.back` olur; arka yüz için tarayıcıyı
+  yeniden açın. OCR ya da yükleme düşerse `vm.errorMessage` dolar, yüz değişmez.
+- Arka yüzde `configuration: .idBack` kullanın: arka yüz daha az dokulu, netlik eşikleri ayrı.
+- Pasaport: `profile: .passport` + `configuration: .passport`.
+- `IdentityScannerView`'ı modifier olmadan kullanacaksanız mutlaka `fullScreenCover` içinde
+  sunun: sonuç gelince kendini `dismiss()` eder, bir ekranın gövdesine gömülürse o ekranı kapatır.
+
+### B) Kendi kameranızla
+
+```swift
+MyCameraView { captured in
+    vm.currentSide == .front ? vm.scanFront(image: captured) : vm.scanBack(image: captured)
+}
+```
+
+Bu yolda kalite kontrolü sizdedir: çekimden önce görüntünün net, parlamasız ve belgeye
+kırpılmış olduğundan emin olun. `vm.errorMessage` OCR başarısızlığını, `vm.isLoading`
+yüklemeyi bildirir.
 
 ### Örnek Senaryo: Akışı 4 Ekranla Sarmak
 

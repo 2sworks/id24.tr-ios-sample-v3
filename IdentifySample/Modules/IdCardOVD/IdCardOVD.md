@@ -70,7 +70,22 @@ Hiçbir şey yazmayın; rota gelince `SDKIdCardOVDView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
-Kamera akışını siz çizersiniz; **her kareyi analiz için VM'e verirsiniz**:
+OVD, kamerayı SDK'dan en çok isteyen modüldür: VM kararı verir, **kamerayı siz sürersiniz**.
+Aşağıdaki kancaların hepsi bağlanmadan otomatik çekim çalışmaz.
+
+| Kanca | Yön | Bağlanmazsa |
+|---|---|---|
+| `ingest(ciImage:roi:)` | host → VM, her kare | Hiçbir analiz yapılmaz |
+| `onRequestCapture` → `handleCaptured(_:roi:)` | VM "çek" der, host fotoğrafı verir | **Çekim olmaz** |
+| `onSetTorch` | VM → host | Hologram adımında fener yanmaz, gökkuşağı ölçülemez |
+| `startMotion()` / `stopMotion()` | host → VM | IMU sabitlik kapısı hiç açılmaz |
+| `motionFeed` | host → VM, her kare (`CVPixelBuffer`) | Görüntü sabitlik kapısı atlanır, yalnız IMU'ya bakılır — elde eğilen kartta bulanık kare riski |
+| `onRequestLensSwitch` | VM → host | İsteğe bağlı: çok yakın belgede lens geçişi yok |
+| `onRequestFocusNudge`, `focusProbe` | VM ↔ host | İsteğe bağlı: aktif odak dürtmesi ve "uzaklaştırın" yönergesi yok |
+
+`roi`, kılavuz çerçevenizin **kamera karesi koordinatındaki** karşılığıdır (`CIImage.extent`
+içinde). Ekrandaki çerçeveyi önizlemenin `aspectFill` ölçeğiyle kareye çevirin; yanlış `roi`
+belge tespitini ve kırpmayı kaydırır.
 
 ```swift
 registry.override(.idCardOVD) { MyOVDView() }
@@ -78,24 +93,38 @@ registry.override(.idCardOVD) { MyOVDView() }
 struct MyOVDView: View {
     @EnvironmentObject var coordinator: SDKFlowCoordinator
     @StateObject private var vm = SDKIdCardOVDViewModel()
+    let camera = MyCamera()                              // AVCaptureSession + foto çıkışı
 
     var body: some View {
-        VStack {
-            Text(vm.instruction)                       // adım talimatı
-            ProgressView(value: vm.progress)           // genel ilerleme
-            MyCameraFeed { ciImage, roi in
-                vm.ingest(ciImage: ciImage, roi: roi)  // ✅ her kare: cihazda skor
-            }
-            // yakalama: vm.capture(image: img)        // ✅ işle + upload
-            // adım geçişi: vm.advance()
+        ZStack {
+            MyCameraPreview(camera: camera)
+            MyGuide(detected: vm.guideDetected, progress: vm.rainbowProgress)
+            Text(vm.instruction)
         }
-        .onAppear { vm.onCompleted = { coordinator.advanceToNextModule() } }  // ✅
+        .onAppear {
+            vm.onCompleted       = { coordinator.advanceToNextModule() }      // ✅
+            vm.onSkipRequested   = { coordinator.skipCurrentModule() }
+            vm.onRequestCapture  = { camera.capturePhoto() }                  // ✅ zorunlu
+            vm.onSetTorch        = { camera.setTorch($0) }                    // ✅ zorunlu (hologram)
+            let motion = vm.motionFeed
+            camera.onPixelBuffer = { motion($0) }            // ✅ önerilir — her kare, kamera kuyruğu
+            camera.onFrame = { ci in vm.ingest(ciImage: ci, roi: camera.roi(for: ci)) }  // ana thread, ~0.18 sn
+            camera.onPhoto = { ci in vm.handleCaptured(ci, roi: camera.roi(for: ci)) }
+            camera.start(); vm.startMotion()
+        }
+        .onDisappear { vm.stopMotion(); camera.stop() }
     }
 }
 ```
 
+- `ingest` ve `handleCaptured` **ana iş parçacığından** çağrılır (VM `@MainActor`). SDK'nın
+  kendi kamerası `ingest`'i ~0.18 sn'de bir çağırır; hologram analizi karede pahalı olduğundan
+  siz de benzer bir seyreltme uygulayın.
+- `motionFeed` ise **her kareyle, kamera kuyruğunda** çağrılır — seyreltmeden önce.
+- Yükleme, adım geçişi ve fener kararları VM'dedir; `advance()` elle çağrılmaz.
+
 > ❌ **Bypass yapmayın:** Skorları kendiniz hesaplayıp upload'u atlamayın —
-> `ingest` → `capture` → `advance` zincirini kullanın, aksi halde OVD doğrulaması
+> `ingest` → `handleCaptured` zincirini kullanın, aksi halde OVD doğrulaması
 > backend'e hiç ulaşmaz. Kural: [bypass yok](../../../docs/guides/customization.md#bypass-yok-kuralı).
 
 ---
@@ -138,6 +167,9 @@ public enum OVDStep: Int, CaseIterable {
 | Metot | Etki |
 |---|---|
 | `ingest(ciImage:roi:)` | Canlı kareyi değerlendirir (glare/texture/rainbow skorları) |
+| `handleCaptured(_:roi:)` | `onRequestCapture` sonrası çekilen fotoğrafı işler ve yükler |
+| `startMotion()` / `stopMotion()` | IMU sabitlik ölçümünü başlatır / durdurur |
+| `motionFeed` | Kare-farkı hareket ölçeri besleyicisi: `(CVPixelBuffer) -> Void`, kamera kuyruğundan çağrılabilir |
 | `forceCapture(ciImage:roi:)` | Skorları beklemeden zorla yakalar |
 | `capture(image:)` | Yakalanan görseli işler (`makeUIImage` + `processCaptured`) |
 | `advance()` | Sonraki adım; son adımda **`onCompleted?()`** |
@@ -149,6 +181,12 @@ public enum OVDStep: Int, CaseIterable {
 |---|---|
 | `onCompleted: (() -> Void)?` | Tüm OVD adımları + yükleme bitti |
 | `onSkipRequested: (() -> Void)?` | Atlama istendi |
+| `onRequestCapture: (() -> Void)?` | Kapılar tuttu — host fotoğraf çekip `handleCaptured` çağırmalı |
+| `onSetTorch: ((Bool) -> Void)?` | Feneri aç/kapat (hologram adımı) |
+| `onRequestLensSwitch: (() -> Void)?` | Belge çok yakın — sonraki lense geç (isteğe bağlı) |
+| `onRequestFocusNudge: (() -> Void)?` | Netlik gelmiyor — tek atış odak turu başlat (isteğe bağlı) |
+| `focusProbe: (() -> (Bool, Float, Int?, Bool))?` | Odak durumu: ayarlıyor mu, `lensPosition`, asgari odak mm, yakın sınırda mı (isteğe bağlı) |
+| `onFlowFailed: (() -> Void)?` | Akış başarısız sonlandı |
 
 ## Sinyal Zinciri — Perde Arkası
 

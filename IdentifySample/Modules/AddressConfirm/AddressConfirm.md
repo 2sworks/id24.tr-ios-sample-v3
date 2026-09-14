@@ -46,15 +46,29 @@ struct MyAddressView: View {
     var body: some View {
         VStack {
             TextField("Adres", text: $vm.addressText)
-            Button("Belgeyi tara") { vm.openScanner() }
-            Button("PDF seç") { vm.openPDFPicker() }
-            Button("Gönder") { vm.submit() }        // ✅ uploadAddressInfo[WithPdf]
+            Button("Belgeyi tara") { vm.openScanner() }     // yalnız showScanner = true
+            Button("PDF seç") { vm.openPDFPicker() }        // yalnız showPDFPicker = true
+            Button("Gönder") { vm.submit() }                // ✅ uploadAddressInfo[WithPdf]
                 .disabled(!vm.canSubmit)
+        }
+        // Sunum sizde: bayrakları dinleyip seçiciyi açın, sonucu VM'e geri verin.
+        .documentScanner(isPresented: $vm.showScanner, profile: .generic,
+                         configuration: .document, navOverlay: { EmptyView() }) { result in
+            if case .success(let doc) = result { vm.photoSelected(doc.croppedImage) }   // ✅
+        }
+        .fileImporter(isPresented: $vm.showPDFPicker, allowedContentTypes: [.pdf]) { result in
+            guard case .success(let url) = result else { return }
+            let access = url.startAccessingSecurityScopedResource()
+            vm.pdfSelectedFromURL(url)                                                  // ✅ boyut kontrolü dahil
+            if access { url.stopAccessingSecurityScopedResource() }
         }
         .onAppear { vm.onCompleted = { coordinator.advanceToNextModule() } }  // ✅
     }
 }
 ```
+
+`openScanner()` / `openPDFPicker()` hiçbir şey sunmaz, yalnız bayrağı açar. Galeriden seçim de
+aynı şekilde: seçilen görseli `photoSelected(_:)` ile verin. PDF sınırı: `vm.maxPDFSizeMB`.
 
 ---
 
