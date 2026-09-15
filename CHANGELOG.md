@@ -39,11 +39,11 @@ Ayrıntı ve geçiş adımları: [3.1.0 Değişiklik Rehberi](docs/guides/migrat
 - SDK ve örnek uygulama artık **iPad'de çalışır** (`TARGETED_DEVICE_FAMILY = "1,2"`);
   yönelim iPad'de de portrait'e kilitlidir. Ayrıntı:
   [iPad Desteği rehberi](docs/guides/ipad-support.md).
-- **Yetenek tabanlı modül ikamesi:** cihazda TrueDepth kamera yoksa (Touch ID'li iPad'ler,
-  Face ID'siz iPhone'lar) `livenessDetection` ve `selfieWithLiveness` yerine **normal selfie
+- **Yetenek tabanlı modül ikamesi:** cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth'siz A11 ve öncesi:
+  iPhone 8, iPad 7…) `livenessDetection` ve `selfieWithLiveness` yerine **normal selfie
   modülü** ile doğrulama yapılır; akışta selfie zaten varsa desteklenmeyen modül yalnızca
   çıkarılır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen ekranı görmez.
-  Face ID'li iPad Pro / iPad Air'de her iki modül de olduğu gibi çalışır.
+  Face ID'li cihazlarda ve A12+ Touch ID'li iPad'lerde her iki modül de çalışır.
 - **`IdentifyManager.shared.faceTrackingFallback`** — yedek davranışı entegrasyon belirler:
   `.selfie` (varsayılan) veya `.skip` (modülü tamamen çıkar). `setupSDK`'dan önce ayarlanır,
   son kullanıcıya sorulmaz. `.livenessDetection` değeri kabul edilir ancak canlılık ekranı da

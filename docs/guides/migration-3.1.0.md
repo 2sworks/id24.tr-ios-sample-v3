@@ -151,9 +151,9 @@ IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çık
 // setupSDK'dan ÖNCE
 ```
 
-TrueDepth kamera yoksa (Touch ID'li iPad, Face ID'siz iPhone) `livenessDetection` ve
-`selfieWithLiveness` bu politikaya göre değiştirilir; Face ID'li iPad Pro / iPad Air'de her
-iki modül de olduğu gibi çalışır. NFC'siz cihazlarda panele artık
+ARKit yüz takibi yoksa (TrueDepth'siz A11 ve öncesi: iPhone 8, iPad 7…) `livenessDetection` ve
+`selfieWithLiveness` bu politikaya göre değiştirilir; Face ID'li cihazlarda ve A12+ Touch ID'li
+iPad'lerde her iki modül de çalışır. NFC'siz cihazlarda panele artık
 `NFCStatus = notAvailable` bildirilir.
 
 **Selfie + canlılık TrueDepth modu:** varsayılan `.automatic` önceki davranıştır, geçiş gerekmez.
