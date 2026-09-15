@@ -51,9 +51,9 @@ yazıyorsanız ilgilendiğiniz aksiyonları dinlersiniz.
 | Aksiyon | Anlamı |
 |---|---|
 | `incomingCall` | Agent arıyor — çağrı ekranı açılmalı |
-| `endCall` | Agent görüşmeyi bitirdi |
-| `missedCall` | Çağrı cevapsız kaldı |
-| `terminateCall(reason, statusSummary)` | Görüşme sebep/durum bilgisiyle sonlandırıldı |
+| `endCall` | Görüşme kapandı — `terminateCall` gelmediyse müşteri kapatmıştır ([Görüşmenin Kapanışı](#görüşmenin-kapanışı--terminatecall)) |
+| `missedCall` | Çağrı cevapsız kaldı — oturumu bitirmez, müşteri bekleme odasında kalır |
+| `terminateCall(reason, statusSummary)` | Panel görüşmeyi sonlandırdı — sebep ve statüye göre oturum biter ya da yeniden bağlanmaya düşer ([karar tablosu](#görüşmenin-kapanışı--terminatecall)) |
 | `comingSms` / `approveSms(Bool)` | SMS doğrulama akışı |
 | `openWarningCircle` / `closeWarningCircle` | Agent, müşteri ekranında uyarı çemberi açtı/kapadı |
 | `openCardCircle` / `closeCardCircle` | Kimlik gösterme çemberi açıldı/kapandı |
@@ -131,6 +131,138 @@ soket koptu   ───┘         (tek sefer)
 
 `reconnectToSocket` eşzamanlı çift çağrıya karşı korumalıdır (`isReconnecting` guard'ı).
 Kullanıcı deneyimi tarafı için: [LostConnection rehberi](../../IdentifySample/Modules/LostConnection/LostConnection.md).
+
+---
+
+## Görüşmenin Kapanışı — `terminateCall`
+
+Panel görüşmeyi **yalnızca `terminateCall`** ile bitirir. Temsilci kapatmaya hazırlanırken önce
+`disableEndCallButton` gönderir (müşterinin "Görüşmeyi bitir" butonu kilitlenir), ardından her
+durumda `terminateCall` gelir. `terminateCall` gelmeden kapanan görüşmeyi müşteri kapatmıştır.
+
+Mesaj iki bilgi taşır:
+
+| Alan | Anlamı |
+|---|---|
+| `terminateReason` | Görüşmenin **nasıl** kapandığı (ör. `NORMAL_CLOSE_BY_AGENT`) |
+| `statusSummary` | Temsilcinin panelde seçtiği **karar**: `id`, `type` (`positive` · `negative` · `neutral`), `status`, `name_tr` / `name_en` / `name_de` |
+
+`type` kararın yönünü, `id` ise **hangi** statünün seçildiğini söyler. Statü listesi (ve
+id'leri) panelde tanımlanır; SDK statü adlarına bakmaz, yalnızca `type` ve aşağıdaki sabit
+id'leri yorumlar.
+
+### Host bu bilgiyi nereden alır?
+
+| Kanal | Ne zaman gelir | Ne taşır |
+|---|---|---|
+| `setupSDK(onFinished:)` / `onFlowFinished` / `flowResultDelegate` | Yalnızca **oturumu bitiren** kapanışlarda, bir kez | `result`, `reason = .agentDecision`, `terminateReason` ve `statusSummary` birebir |
+| `eventDelegate` → `session.finished` | Aynı an | metadata: `result`, `endReason`, `terminateReason`, `statusSummary`, `statusId` |
+| `eventDelegate` → `call.ended` | **Her** `terminateCall`'da | metadata: `reason`, `statusSummary` (type) |
+| `delegate.terminateCall(terminateReason:statusSummaryType:)` | **Her** `terminateCall`'da, ham | sebep + `type` |
+| `socketMessageListener` → `.terminateCall(reason, type)` | **Her** `terminateCall`'da, ham | sebep + `type` (DefaultUI'da görüşme ekranı devralır) |
+| `IdentifyManager.shared.lastStatusSummary` | Son `terminateCall`'dan sonra | tüm `StatusSummary` (id dahil) |
+
+> Sonuca göre iş yapacaksanız `onFinished` kullanın: ham kanallar karar içermeyen, yeniden
+> bağlanmaya düşen kapanışlarda da tetiklenir.
+
+### SDK hangi değere göre ne yapar?
+
+Kural `SDKTerminateClassifier` içindedir ve **yukarıdan aşağı ilk eşleşen satır** uygulanır.
+Varsayılan görüşme ekranı ve `onFinished` aynı kuralı kullanır.
+
+| # | `terminateReason` | Koşul | SDK ne yapar | Ekran | `onFinished` |
+|---|---|---|---|---|---|
+| 1 | `TURN_DISCONNECTED` · `RINGING_TIMEOUT` | — (bu değerleri panel değil **SDK üretir**: medya hattı düştü / çağrı yanıtlanmadı) | Yeniden bağlanma ekranı; socket 4104 / 4108 ile kapanır | Bağlantı Koptu | — (oturum sürer) |
+| 2 | `NORMAL_CLOSE_BY_AGENT` | `type` karar (`positive` · `negative` · `neutral`) **ve** `id ≠ -3` | Oturum biter, SDK kapanır (4103) | ThankYou: `positive` → başarılı, diğerleri → tamamlanamadı · `showThankYouPage: false` ise ekran yok | `approved` · `rejected` · `neutral` |
+| 3 | `NORMAL_CLOSE_BY_AGENT` | `id == -3` ("Durum Seçilmedi") **ya da** statü yok / tanınmayan `type` | Karar yok: yeniden bağlanma → bekleme odası | Bağlantı Koptu | — |
+| 4 | `ADMIN_DISCONNECTED_TURN` · `AGENT_SOCKET_NETWORK_PROBLEM` · `AGENT_FORCE_DISCONNECT_FOR_AUTO_CLOSE` · `UNKNOW` / `UNKNOWN` | Statüden **bağımsız** (panelin otomatik yazdığı `id 8` "Müşteri cevap vermedi", `negative` dahil) | Temsilci hüküm vermemiştir: yeniden bağlanma → bekleme odası | Bağlantı Koptu | — |
+| 5 | `CLIENT_IS_DISCONNECTED` | Socket açıksa | Panelin yanlış alarmı sayılır, görüşme **sürer** | değişmez | — |
+| | | Socket kapalıysa | Yeniden bağlanma | Bağlantı Koptu | — |
+| 6 | Diğer tüm değerler (ör. `PING_TIMEOUT`) | `type` karar ise | Oturum biter (satır 2 gibi) | ThankYou | `approved` · `rejected` · `neutral` |
+| | | Karar yoksa | Yeniden bağlanma (`PING_TIMEOUT` → 4107, diğerleri 4104) | Bağlantı Koptu | — |
+
+Sabit statü id'leri:
+
+| `id` | Anlamı | SDK'nın yorumu |
+|---|---|---|
+| `-3` | Durum Seçilmedi | Karar değildir — `type` gelse bile oturumu bitirmez |
+| `-4` | Auto Approved | `positive` tipinde gelir; yeniden bağlanmada da oturumu bitirir |
+| `8` | Müşteri cevap vermedi | Panelin otomatik etiketi; satır 4'teki sebeplerle geldiğinde karar sayılmaz |
+
+Yeniden bağlanma sonrası panelin kayıtlı statüsü sorgulanır (`SendIdentStatusInfo`). Bu bir
+**sorgudur**, karar değildir: yalnızca `positive` oturumu bitirir (`onFinished` → `approved`);
+`negative`, `neutral` ve `-3` müşteriyi bekleme odasına döndürür. Olumsuz karar gerekiyorsa
+panel `terminateCall` gönderir.
+
+Kapanış dışı ilgili aksiyonlar:
+
+| Aksiyon | SDK ne yapar | `onFinished` |
+|---|---|---|
+| `missedCall` | Oturumu **bitirmez**, zil susar, müşteri bekleme odasında kalır | — |
+| `endCall` (`terminateCall` olmadan) | Görüşmeyi müşteri kapatmıştır; akış sıradaki modüle, yoksa ThankYou'ya (tamamlanamadı) geçer | akış sonunda `notCompleted` / `userEndedCall` |
+| Müşteri "Görüşmeyi bitir"e basar | Panele `terminateCallOnMobile` gider, SDK kapanır | `notCompleted` / `userEndedCall` |
+
+### Örnek: temsilci şüpheli bir durum görüp görüşmeyi sonlandırdı
+
+Temsilci görüşme sırasında şüpheli bir durum görür (ör. belge ile yüz uyuşmuyor, ekrandan
+gösterilen belge) ve panelde bu durum için tanımlı **olumsuz** statüyü seçerek görüşmeyi
+kapatır. Soketten şuna benzer bir mesaj gelir (statü adı ve id'si panelinizdeki tanıma göre
+değişir):
+
+```json
+{
+  "action": "terminateCall",
+  "terminateReason": "NORMAL_CLOSE_BY_AGENT",
+  "statusSummary": { "id": 12, "type": "negative", "name_tr": "Şüpheli İşlem", "name_en": "Suspicious Transaction" }
+}
+```
+
+SDK'nın yaptıkları (tablodaki satır 2):
+
+1. Oturum biter; socket kapatılır, görüşme medyası bırakılır.
+2. `onFinished` **karar anında** çağrılır: `result = .rejected`, `reason = .agentDecision`,
+   `terminateReason = "NORMAL_CLOSE_BY_AGENT"`, `statusSummary` mesajdaki haliyle.
+3. Müşteriye ThankYou "tamamlanamadı" gösterilir — **şüphe sebebi müşteriye gösterilmez**.
+   `showThankYouPage: false` ise ekran açılmaz, SDK aşağı kayarak kapanır.
+4. `sdk_logs`'a sebep, statü ve id ile yazılır:
+
+   ```
+   Akış sonucu — sonuç: rejected, sebep: agentDecision, son modül: Call Wait Screen, adım: 5/5, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12).
+   Görüşme sonlandırma bildirimi alındı — sebep: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12)
+   Sonlandırma sonucu: temsilci normal kapattı, oturum panelin statüsüyle bitiriliyor (negative)
+   Oturum sonlandı — son modül: Call Wait Screen, akış tamamlandı, sebep: 4103 (forceQuit): forceQuitSDK — zorla kapatma
+   ```
+
+Host tarafında şüpheli kapanışı diğer retlerden **statü id'si** ile ayırın (adlar
+yerelleştirilir ve panelde değiştirilebilir; `type` yalnızca yönü söyler):
+
+```swift
+let suspiciousStatusIds: Set<Int> = [12]   // panelinizdeki "şüpheli" statülerinin id'leri
+
+IdentifyManager.shared.setupSDK(
+    ...,
+    onFinished: { outcome in
+        guard outcome.reason == .agentDecision else { return handleOther(outcome) }
+        let statusId = outcome.statusSummary?.id
+
+        switch outcome.result {
+        case .approved:
+            router.show(.kycSuccess)
+        case .rejected where statusId.map(suspiciousStatusIds.contains) == true:
+            fraudService.flag(sessionId: outcome.sessionId, statusId: statusId,
+                              reason: outcome.terminateReason)
+            router.show(.kycFailedGeneric)          // müşteriye sebep gösterilmez
+        case .rejected, .neutral:
+            router.show(.kycFailed(statusName: outcome.statusSummary?.name_tr))
+        default:
+            break
+        }
+    }
+) { socket, room, error in ... }
+```
+
+Olay akışıyla (RN/Flutter köprüleri dahil) aynı ayrım `session.finished` olayının
+`metadata.result == "rejected"` ve `metadata.statusId` alanlarıyla yapılır.
 
 ---
 

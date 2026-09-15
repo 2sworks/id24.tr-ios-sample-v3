@@ -86,7 +86,8 @@ Oturum nasıl biterse bitsin **tam bir kez** iki olay yayınlanır: sonucu taş�
 `session.finished` ve sonuca göre `session.completed` / `session.failed` / `session.abandoned`.
 Aynı sonuç `setupSDK(onFinished:)`, `IdentifyManager.shared.onFlowFinished` ve
 `flowResultDelegate` ile tipli (`SDKFlowOutcome`) olarak da alınır —
-[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301).
+[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301) ·
+tüm çıkış yolları ve yönlendirme: [Oturum Çıkışları](session-exit.md).
 
 | Olay | `status` | Ne zaman |
 |---|---|---|
@@ -102,6 +103,7 @@ Aynı sonuç `setupSDK(onFinished:)`, `IdentifyManager.shared.onFlowFinished` ve
 | `reason` | Panelin `terminateReason`'ı; yoksa `endReason` (3.0.0 uyumu) |
 | `terminateReason`, `statusSummary`, `statusId` | Panel kapattıysa birebir |
 | `lastScreen`, `lastModule`, `stepIndex`, `totalSteps` | Oturumun bittiği yer |
+| `skippedModules` | Doğrulanmadan geçilen modüller, virgülle ayrılmış (boşsa anahtar yok) |
 | `closeCode`, `errorMessage` | Son kapanış kodu / setup hatası |
 
 > **3.0.0'dan fark:** `session.completed` / `session.failed` eskiden her `terminateCall`'da

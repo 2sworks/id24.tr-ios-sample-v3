@@ -992,6 +992,7 @@ Hepsi main thread'de ve oturum başına **bir kez** çağrılır. Son sonuç
 | `result` | `SDKFlowResult` — ilerleme kararını buna göre verin |
 | `reason` | `SDKFlowEndReason` — ayrıntılı sebep |
 | `lastModule`, `modules`, `stepIndex`, `totalSteps` | Oturumun bittiği yer ve akış sırası |
+| `skippedModules` | Doğrulanmadan geçilen modüller (atlandı, cihazda/belgede bulunamadı, NFC hata sınırı) — `approved` ile birlikte gelebilir |
 | `terminateReason`, `statusSummary` | Panel kapattıysa birebir (`statusSummary.type`: `positive` / `negative` / `neutral`) |
 | `closeCode`, `errorMessage` | Son socket kapanış kodu / `setupSDK` hatası |
 | `isSuccess` | Yalnızca `.approved` için `true` |
@@ -1011,6 +1012,10 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
 **üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
+
+Her çıkış yolu için gelen veriler, "panelde tek modül açık, müşteri adımı tamamladı" senaryosu ve kapanıştan
+sonra SwiftUI / UIKit / RN-Flutter'da yönlendirmenin nereye yazılacağı:
+[Oturum Çıkışları Rehberi](docs/guides/session-exit.md).
 
 ---
 
@@ -1262,6 +1267,12 @@ durumda `terminateCall` gelir). `terminateCall` gelmeden kapanan görüşmeyi ku
 | Görüşme `terminateCall` olmadan biter | `.endCall` | `.notCompleted` | `notCompleted` / `userEndedCall` |
 
 Cevapsız çağrı (`.missedCall`) oturumu **bitirmez**; kullanıcı bekleme odasında kalır.
+
+Her `terminateReason` değeri için SDK'nın ne yaptığı, sabit statü id'leri (`-3`, `-4`, `8`) ve
+"temsilci şüpheli bir durum görüp kapattı" senaryosunun host tarafında statü id'siyle nasıl
+ayrılacağı: [WebSocket → Görüşmenin Kapanışı](docs/guides/websocket.md#görüşmenin-kapanışı--terminatecall).
+Görüşme dışındaki çıkışlar (modül hatası, geri çıkış, kurulum hatası…) ve yönlendirme kalıpları:
+[Oturum Çıkışları](docs/guides/session-exit.md).
 
 Kendi başarı/başarısız ekranlarınızı kullanmanın **iki yolu** var:
 

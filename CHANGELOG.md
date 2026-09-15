@@ -111,6 +111,12 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
   anında `SDKFlowOutcome` gelir — `result` (`approved` · `rejected` · `neutral` ·
   `notCompleted` · `cancelled` · `error`), `reason` (`SDKFlowEndReason`), `lastModule`,
   panelin `terminateReason`'ı ve `statusSummary`'si birebir, `closeCode`, `toDictionary()`.
+- **`SDKFlowOutcome.skippedModules`**: doğrulanmadan geçilen modüller (atlandı, cihazda/belgede
+  bulunamadı, NFC okuma hata sınırı, manuel MRZ düzeltmesinin tükenmesi). Akış `approved`
+  bitse bile burada modül olabilir.
+- Yeni rehber: [Oturum Çıkışları](docs/guides/session-exit.md) — tüm çıkış yolları, kapanış
+  verileri, tek modüllü / üç modüllü / görüntülü görüşmeli akış senaryoları, modül bazında çıkış
+  kataloğu (12 modül), SwiftUI/UIKit/RN-Flutter yönlendirme kalıpları.
 - Olay akışına **`session.finished`** eklendi (metadata: `result`, `endReason`,
   `terminateReason`, `statusSummary`, `lastModule`…).
 - **`showThankYouPage: false`** artık her yolda geçerli: sonuç ekranı hiç açılmaz, SDK

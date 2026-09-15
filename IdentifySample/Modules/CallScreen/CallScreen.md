@@ -164,7 +164,7 @@ public enum SDKCallNetworkQuality { case none, /* ... */ good, poor }
 | `checkSignLangIfNeeded()` | `connectToSignLang` ise işaret dili kapısını açar |
 | `signLangCompleted()` | İşaret dili adımını tamamlar |
 | `acceptCall()` | Çağrıyı kabul eder (`manager.acceptCall`) — TURN kimliği + SDP offer. Çalan çağrı yoksa ya da bağlantı kapanıyorsa **başarısız döner** ve `errorMessage` dolar |
-| `terminateCall(coordinator:)` | Görüşmeyi bitirir + dinleyiciyi geri verir + ThankYou'ya geçer (`showThankYouPage: false` ise akış aşağı kayarak kapanır). Sonuç: `onFinished` → `notCompleted` / `userEndedCall` |
+| `terminateCall(coordinator:)` | Görüşmeyi bitirir + dinleyiciyi geri verir + ThankYou'ya geçer (`showThankYouPage: false` ise akış aşağı kayarak kapanır). Sonuç: `onFinished` → `notCompleted` / `userEndedCall`. Panelin kapatması (`terminateCall`) için: [Görüşmenin Kapanışı](../../../docs/guides/websocket.md#görüşmenin-kapanışı--terminatecall) |
 | `verifySMS()` | SMS kodunu doğrular (`manager.smsVerification`) |
 | `startRemoteNFC(birthDate:validDate:docNo:)` | Uzaktan NFC okumayı başlatır |
 | `saveAndRestartRemoteNFC(serial:birth:valid:)` | MRZ'yi düzeltip NFC'yi yeniden başlatır |

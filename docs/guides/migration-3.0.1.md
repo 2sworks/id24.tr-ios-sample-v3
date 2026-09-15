@@ -203,7 +203,9 @@ IdentifyManager.shared.flowResultDelegate = resultHandler   // IdentifyFlowResul
 ```
 
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
-üretmez; kullanıcı yeniden bağlanır. Tüm alanlar ve sebep tablosu:
+üretmez; kullanıcı yeniden bağlanır. Doğrulanmadan geçilen modüller (atlandı, NFC yok…)
+`outcome.skippedModules`'tadır. Tüm çıkış yolları ve yönlendirme:
+[Oturum Çıkışları](session-exit.md). Alanlar ve sebep tablosu:
 [FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301).
 
 ---

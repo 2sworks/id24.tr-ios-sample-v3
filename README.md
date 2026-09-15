@@ -246,6 +246,7 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [TURN & WebRTC](docs/guides/turn-webrtc.md) | STUN/TURN kimlik üretimi, şifreli TURN, görüşme akışı |
 | [Loglama](docs/guides/logging.md) | `SDKLog` facade'i, severity/kategori, online log, redaksiyon |
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
+| [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.0.1 Değişiklikleri](docs/guides/migration-3.0.1.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
 | [iPad Desteği](docs/guides/ipad-support.md) | Cihaz yetenekleri (NFC / TrueDepth), modül ikamesi, yönelim ve tablet yerleşimi |

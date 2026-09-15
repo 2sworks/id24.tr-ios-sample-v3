@@ -63,7 +63,7 @@ Müşteri kabul eder → acceptCall()
   ├─ karşı taraf answer + ICE adayları ──► medya akışı başlar
   └─ data channel açılır (agent komutları: fotoğraf çek, çember aç...)
 Görüşme biter
-  ├─ agent bitirirse: endCall / terminateCall(reason, statusSummary)
+  ├─ agent bitirirse: terminateCall(reason, statusSummary) — karar tablosu: websocket.md → Görüşmenin Kapanışı
   ├─ müşteri bitirebilir (disableEndCallButton ile kilitlenebilir)
   └─ sonuç → ThankYou ekranı (pushThankYouDirectly)
 ```

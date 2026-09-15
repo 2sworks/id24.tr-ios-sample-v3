@@ -107,8 +107,13 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .thankYouTts, language: .t
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
-- **Bu ekran gösterilmesin istiyorum:** `setupSDK(showThankYouPage: false)` — akış sonunda
-  kontrol size döner; kendi kapanış deneyiminizi kurarsınız.
+- **Bu ekran gösterilmesin istiyorum:** `setupSDK(showThankYouPage: false)` — hiçbir çıkış
+  yolunda (akış sonu, panel kararı, modül hatası, kullanıcının görüşmeyi bitirmesi) açılmaz;
+  SDK bulunduğu ekrandan aşağı kayarak kapanır ve sonuç `onFinished`'a gelir. Parametre
+  verilmezse varsayılan `true`'dur. Yönlendirme kalıpları:
+  [Oturum Çıkışları](../../../docs/guides/session-exit.md#9-kapanıştan-sonra-yönlendirme--kodu-nereye-yazacağım).
+- **Ekrandayken sonucu okumak:** `IdentifyManager.shared.lastFlowOutcome` — ThankYou açıldığında
+  sonuç bildirilmiştir (`result`, `reason`, panelin `terminateReason` / `statusSummary`'si).
 - **Özelleştirmesi risksiz mi?** Evet — pasif olduğundan yerine/arasına ne koyarsanız koyun
   akış bozulmaz.
 - **Kapanış kim yapar?** KYC sonrası `disconnect`/`closeSDK` SDK tarafında, ekrandan

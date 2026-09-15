@@ -97,8 +97,10 @@ struct MyNfcView: View {
 ### Closure'lar
 | Üye | Ne zaman |
 |---|---|
-| `onCompleted: (() -> Void)?` | Okuma başarılı |
+| `onCompleted: (() -> Void)?` | Okuma başarılı — ayrıca okuma hata sınırında (`MAX_ERR_COUNT`) ve manuel MRZ düzeltmesi tükendiğinde doğrulanmadan geçilirken |
 | `onSkipRequested: (() -> Void)?` | Deneme hakkı tükenip atlamaya izin varsa |
+| `onFlowFailed: (() -> Void)?` | Karşılaştırma hakkı tükendi, atlama kapalı → `coordinator.finishFlowAsFailed()` |
+| `onRetryFromPreviousStep: (() -> Void)?` | Çip ile belge verisi uyuşmadı, hak var → önceki adıma dön (NFC ilk ekransa ekranda kalınır) |
 
 MRZ alanları VM açılışında otomatik dolar: `manager.mrzDocNo`, `manager.mrzBirthDay`,
 `manager.mrzValidDate` (önceki OCR adımından). `manager.useKpsData` aktifse KPS verisi
@@ -145,6 +147,24 @@ SDKSpeechConfig.shared.setMode(.customAudio, for: .nfc)     // dosya yoksa nativ
 
 Metni ezmek: `SDKLocalization.shared.setOverride(key: .nfcTts, language: .tr, value: "...")`
 · Tüm ayrıntı: [ReadAloud](../ReadAloud.md)
+
+## NFC Sonrası Çıkış — Oturum Nasıl Biter?
+
+NFC akışın son modülüyse (ör. panelde yalnızca NFC açık) oturum NFC ekranından sonra biter ve
+sonuç `setupSDK(onFinished:)`'a gelir:
+
+| Ne oldu | `onFinished` | `skippedModules` |
+|---|---|---|
+| Çip okundu ve doğrulandı | `approved` / `allModulesCompleted` | `[]` |
+| Hak bitti, atlama izinli | `approved` / `allModulesCompleted` | `[nfc]` |
+| Hak bitti, atlama kapalı | `notCompleted` / `moduleFailed` | `[]` |
+| Okuma hata sınırı (`nfcMaxErrorCount`) / manuel düzeltme tükendi | `approved` / `allModulesCompleted` | `[nfc]` |
+| Cihazda NFC yok (modül akışa alınmadı) | `approved` / `allModulesCompleted` | `[nfc]` |
+| İlk ekranda geri | `cancelled` / `userExited` | `[]` |
+
+Çipin gerçekten doğrulandığını anlamak için `result == .approved` **ve**
+`!skippedModules.contains(.nfc)` kontrol edin. Tüm ayrıntı, loglar ve yönlendirme kalıpları:
+[Oturum Çıkışları → Senaryo: panelde tek modül açık](../../../docs/guides/session-exit.md#5-senaryo-1--tek-modüllü-akış-müşteri-adımı-tamamladı-sdk-işini-bitirdi).
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
