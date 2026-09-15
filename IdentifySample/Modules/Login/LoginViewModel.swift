@@ -272,7 +272,20 @@ final class LoginViewModel: ObservableObject {
             // "Sesli Okuma (TTS)" tercihi (Ayarlar menüsündeki toggle). Hardcoded true iken
             // setupSDK, kapalıyken bile defaultMode .off → .native yükseltip toggle'ı
             // anlamsız kılıyordu. Artık gerçek tercih geçiliyor.
-            ttsEnabled: SDKReadAloudSetting.isEnabled
+            ttsEnabled: SDKReadAloudSetting.isEnabled,
+            // Oturum nasıl biterse bitsin burası tam bir kez çağrılır (panel kararı, kullanıcı
+            // çıkışı, modül hatası, bağlantı kurulamaması…). `showThankYouPage: false` verilirse
+            // teşekkür ekranı açılmaz; yönlendirme burada yapılır.
+            onFinished: { outcome in
+                switch outcome.result {
+                case .approved:     print("KYC onaylandı — \(outcome.reason.rawValue)")
+                case .rejected:     print("KYC reddedildi — \(outcome.terminateReason ?? "-")")
+                case .neutral:      print("KYC nötr sonuçlandı — \(outcome.terminateReason ?? "-")")
+                case .notCompleted: print("KYC tamamlanamadı — \(outcome.reason.rawValue), son modül: \(outcome.lastModule?.rawValue ?? "-")")
+                case .cancelled:    print("KYC iptal edildi — \(outcome.reason.rawValue)")
+                case .error:        print("KYC hatayla bitti — \(outcome.reason.rawValue) \(outcome.errorMessage ?? "")")
+                }
+            }
         ) { [weak self] socketStats, apiResp, webErr in
             guard let self else { return }
             Task { @MainActor in

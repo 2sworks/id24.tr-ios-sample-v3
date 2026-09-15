@@ -176,8 +176,8 @@ akışa **hiç alınmaz** — kullanıcı geçemeyeceği bir ekranda kalmaz.
 | Modül | Gereken donanım | Desteklemeyen cihazda |
 |---|---|---|
 | `nfc` | NFC okuyucu (iPad'de yok) | Modül çıkarılır; panele `NFCStatus = notAvailable` bildirilir. `showNFCNotFoundPage: true` ile bilgi sayfası gösterilebilir |
-| `livenessDetection` | TrueDepth kamera (ARKit yüz takibi) | `faceTrackingFallback` uygulanır |
-| `selfieWithLiveness` | TrueDepth kamera (ARKit yüz takibi) | `faceTrackingFallback` uygulanır |
+| `livenessDetection` | ARKit yüz takibi (TrueDepth kamera ya da A12+ çip) | `faceTrackingFallback` uygulanır |
+| `selfieWithLiveness` | Moda bağlı: `selfieWithLivenessTrueDepth` (`.automatic` ARKit · `.required` TrueDepth · `.disabled` donanım istemez) | `faceTrackingFallback` uygulanır — [TrueDepth modu](SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) |
 
 ```swift
 IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan: selfie ile doğrula

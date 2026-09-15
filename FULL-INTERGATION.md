@@ -29,7 +29,7 @@ buradadır.
 8. [Hazır Modül Ekranları ve ViewModel'leri](#8-hazır-modül-ekranları)
 9. [Ortak UI Bileşenleri](#9-ortak-ui-bileşenleri)
 10. [`setupSDK` — Tüm Parametreler + `SDKNetworkOptions`](#10-setupsdk-konfigürasyonu)
-11. [Olay Akışı — `SDKEvent` / `eventDelegate` / `trackingDelegate`](#11-olay-akışı)
+11. [Olay Akışı — `SDKEvent` / `eventDelegate` / `trackingDelegate` / Akış Sonucu (`onFinished`)](#11-olay-akışı)
 12. [Loglama — `SDKLog` / `SDKLogLevel`](#12-loglama)
 13. [Global Bağlantı Kopması Katmanı](#13-global-bağlantı-kopması-katmanı)
 14. ["Bypass Yok" Kuralı + Yayın Öncesi Kontrol Listesi](#14-bypass-yok-kuralı)
@@ -642,6 +642,7 @@ vm.stopSpeech()
 | `showLostConnection: Bool` | Global bağlantı-koptu ekranı görünür mü |
 | `moduleRestartToken: Int` | Artınca aktif modül view+VM'i yeniden yaratılır |
 | `pendingThankYouStatus` | Görüşme sonucu için geçici statü |
+| `isDismissingFlow: Bool` | `showThankYouPage: false` iken akış aşağı kayarak kapanıyor (3.0.1) |
 
 **Metotlar:**
 
@@ -657,7 +658,7 @@ vm.stopSpeech()
 | `insert(_:before:)` / `insert(_:after:)` | Custom ekranları belirli rotanın önüne/arkasına planlar |
 | `showExternalScreen(_:)` | Anlık custom ekran push eder (adım sayacı değişmez) |
 | `advanceExternal()` | Custom ekranın "Devam"ı — kuyruktaki sonraki ekrana/modüle geçer |
-| `pushThankYouDirectly(status:)` | Doğrudan ThankYou'ya git (statülü) |
+| `pushThankYouDirectly(status:)` | Doğrudan ThankYou'ya git (statülü); `showThankYouPage: false` ise ThankYou yerine akışı aşağı kayarak kapatır |
 | `restartCurrentModule()` | Reconnect sonrası aktif modülü baştan başlat |
 | `dismissLostConnection()` | Bağlantı-koptu ekranını restart etmeden kapat |
 | `restoreSocketListener()` | CallScreen'den dönüşte soket dinleyicisini geri al |
@@ -670,7 +671,7 @@ SDKFlowHostView(coordinator: coordinator, registry: registry) { MyLoginView() }
 
 Yaptıkları (hepsi otomatik):
 - Path boşken kök (login) view'ınızı, doluysa en üstteki rotayı çizer (iOS 15 uyumlu, `NavigationStack` yok).
-- İleri geçiş sağdan, geri geçiş soldan animasyonlu.
+- İleri geçiş sağdan, geri geçiş soldan animasyonlu; ThankYou'suz kapanışta (`showThankYouPage: false`) üstteki ekran aşağı kayarak kalkar.
 - Her rota için önce registry'ye bakar → override / custom / SDK default.
 - `speakOnAppear` ile rota TTS'ini tetikler. Okuma ekranı **kilitlemez**; modül geçişinde kesilir.
 - Global klavye tap-to-dismiss (yalnızca SDK akış ekranlarında; kök/login ekranınız ve kendi sheet'leriniz kendi klavye davranışını yönetir).
@@ -683,7 +684,7 @@ Yaptıkları (hepsi otomatik):
 `.liveness` · `.speech` · `.addressConfirm` · `.signature` · `.videoRecorder` ·
 `.callScreen` · `.thankYou(ThankYouStatus?)` · `.custom(String)`
 
-`ThankYouStatus`: `.completed` · `.missedCall` · `.notCompleted`
+`ThankYouStatus`: `.completed` · `.missedCall` · `.notCompleted` (`.missedCall` rezervdir; cevapsız çağrı oturumu bitirmez)
 
 ---
 
@@ -869,12 +870,13 @@ IdentifyManager.shared.setupSDK(
     needCertForNfc: Bool?,                  // NFC sertifika (CSCA) doğrulaması (vars. false)
     turnKey: String,                        // zorunlu — TURN kimlik üretim anahtarı
     wsSecretKey: String?,                   // WebSocket token anahtarı
-    showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. false)
+    showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. true) — false: ThankYou'suz kapanış, bkz. Akış Sonucu
     showNFCNotFoundPage: Bool?,             // NFC yoksa bilgi sayfası (vars. false)
     supportU18: Bool?,                      // 18 yaş altı desteği (vars. false)
     AESKey: String?,                        // AES şifreleme anahtarı
     enableAutoRotateOCR: Bool?,             // OCR otomatik oryantasyon düzeltme (vars. false)
     ttsEnabled: Bool?,                      // sesli okumayı native modda aç (vars. false)
+    onFinished: ((SDKFlowOutcome) -> Void)?, // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
     callback: (WebSocket?, RoomResponse, SDKWebError?) -> ()
 )
 ```
@@ -937,6 +939,78 @@ IdentifyManager.shared.trackingDelegate = self   // IdentifyTrackingListener.eve
 
 İkisi bağımsızdır, aynı anda kullanılabilir. Kategori/isim envanteri ve RN/Flutter köprü
 örnekleri: [Event Sistemi Rehberi](docs/guides/events.md).
+
+### Akış Sonucu — `onFinished` (3.0.1)
+
+Oturum **nasıl biterse bitsin** (panel kararı, kullanıcı/host çıkışı, modül hatası, oda dolu,
+bağlantı kurulamaması, uygulamanın kapatılması) sonuç **tam bir kez** gelir. Bildirim karar
+anında yapılır; teşekkür ekranındaki butona basılması beklenmez.
+
+```swift
+IdentifyManager.shared.setupSDK(
+    ...,
+    showThankYouPage: false,   // teşekkür ekranı yok: SDK aşağı kayarak kapanır
+    onFinished: { outcome in
+        switch outcome.result {
+        case .approved:     break   // panel onayladı / görüşmesiz akış tamamlandı
+        case .rejected:     break   // panel reddetti (statusSummary.type == "negative")
+        case .neutral:      break   // panel nötr kapattı (statusSummary.type == "neutral")
+        case .notCompleted: break   // modül başarısız / kullanıcı görüşmeyi bitirdi
+        case .cancelled:    break   // kullanıcı ya da host çıktı, uygulama kapatıldı
+        case .error:        break   // setup hatası, oda dolu, bağlantı kaybı
+        }
+        outcome.reason            // SDKFlowEndReason — ayrıntılı sebep
+        outcome.lastModule        // oturumun bittiği modül
+        outcome.terminateReason   // panelin terminateCall sebebi, birebir
+        outcome.statusSummary     // panel kararı: id / type / name_tr…
+        outcome.toDictionary()    // RN/Flutter köprüsü
+    }
+) { socket, room, error in ... }
+```
+
+Aynı sonuç üç kanaldan daha gelir; hangisini kullanacağınız size kalmış, birlikte de
+kullanılabilir:
+
+```swift
+// Closure — setupSDK dışında bir yerde bağlamak için
+IdentifyManager.shared.onFlowFinished = { outcome in ... }
+
+// Delegate — weak tutulur, referansı siz saklayın; setupSDK'dan ÖNCE atayın
+final class KYCResultHandler: IdentifyFlowResultListener {
+    func identifyFlowDidFinish(_ outcome: SDKFlowOutcome) { ... }
+}
+IdentifyManager.shared.flowResultDelegate = resultHandler
+
+// Olay akışı — eventDelegate'e "session.finished" (metadata: result, endReason, terminateReason…)
+```
+
+Hepsi main thread'de ve oturum başına **bir kez** çağrılır. Son sonuç
+`IdentifyManager.shared.lastFlowOutcome` üzerinden de okunabilir.
+
+| `SDKFlowOutcome` alanı | Anlamı |
+|---|---|
+| `result` | `SDKFlowResult` — ilerleme kararını buna göre verin |
+| `reason` | `SDKFlowEndReason` — ayrıntılı sebep |
+| `lastModule`, `modules`, `stepIndex`, `totalSteps` | Oturumun bittiği yer ve akış sırası |
+| `terminateReason`, `statusSummary` | Panel kapattıysa birebir (`statusSummary.type`: `positive` / `negative` / `neutral`) |
+| `closeCode`, `errorMessage` | Son socket kapanış kodu / `setupSDK` hatası |
+| `isSuccess` | Yalnızca `.approved` için `true` |
+| `toDictionary()` | RN/Flutter köprüsüne hazır sözlük |
+
+Karar kuralı `SDKTerminateClassifier` içindedir; varsayılan görüşme ekranı da aynı kuralı
+kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
+
+| `reason` | `result` | Ne zaman |
+|---|---|---|
+| `agentDecision` | approved / rejected / neutral | Panel `terminateCall` ile karar verdi |
+| `allModulesCompleted` | approved | Modüller bitti (görüşmesiz akış) |
+| `userEndedCall` | notCompleted | Kullanıcı görüşmeyi kapattı (`terminateCall` gelmedi) |
+| `moduleFailed` | notCompleted | Deneme hakkı bitti, atlama kapalı |
+| `userExited` / `hostQuit` / `hostExit` / `hostForceQuit` / `appTerminated` | cancelled | Bilinçli çıkış |
+| `roomOccupied` / `connectionLost` / `setupFailed` | error | Oturum kurulamadı ya da sürdürülemedi |
+
+Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
+**üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
 
 ---
 
@@ -1175,37 +1249,56 @@ gösterilir.** Kendi sheet'inizi custom ekranınızın İÇİNDEN açmakta özg�
 
 ### Görüşme bitişi (terminate call) ve KENDİ sonuç ekranlarınız
 
-En kritik devir-teslim anı görüşmenin bitişidir. Önce SDK'nın ne yaptığını bilin —
-görüşme üç yoldan biter ve **hepsi `.thankYou(status)` rotasında toplanır**:
+En kritik devir-teslim anı görüşmenin bitişidir. Panel görüşmeyi **yalnızca `terminateCall`**
+ile bitirir (önce `disableEndCallButton` ile müşterinin "bitir" butonunu kilitler, ardından her
+durumda `terminateCall` gelir). `terminateCall` gelmeden kapanan görüşmeyi kullanıcı kapatmıştır.
 
-| Tetikleyici | Socket/aksiyon | Sonuç statüsü |
-|---|---|---|
-| Temsilci görüşmeyi sonuçlandırır | `.terminateCall(reason, statusType)` / `.endCall` | `statusType == "positive"` → `.completed`, değilse → `.notCompleted` |
-| Kullanıcı "Görüşmeyi bitir"e basar | `vm.terminateCall(coordinator:)` → `terminateCallByUser` | `.notCompleted` |
-| Çağrı cevaplanmaz | `.missedCall` | `.missedCall` |
+| Tetikleyici | Socket/aksiyon | ThankYou statüsü | `onFinished` |
+|---|---|---|---|
+| Panel karar verir | `.terminateCall(reason, "positive")` | `.completed` | `approved` / `agentDecision` |
+| | `.terminateCall(reason, "negative" \| "neutral")` | `.notCompleted` | `rejected` \| `neutral` / `agentDecision` |
+| Panel karar vermeden kapatır (statü yok, id -3, bağlantı sorunu) | `.terminateCall(…)` | — (yeniden bağlanma) | sonuç yok, oturum sürer |
+| Kullanıcı "Görüşmeyi bitir"e basar | `vm.terminateCall(coordinator:)` → `terminateCallByUser` | `.notCompleted` | `notCompleted` / `userEndedCall` |
+| Görüşme `terminateCall` olmadan biter | `.endCall` | `.notCompleted` | `notCompleted` / `userEndedCall` |
 
-Yani başarı/başarısızlık kararı **sunucudan gelir**; SDK bu statüyü rotaya gömüp kendi
-`SDKThankYouView(status:)` ekranını çizer. O ekranın "Tamam" butonu
-`coordinator.resetFlow()` çağırır → akış köke (login/root'unuza) döner.
+Cevapsız çağrı (`.missedCall`) oturumu **bitirmez**; kullanıcı bekleme odasında kalır.
 
 Kendi başarı/başarısız ekranlarınızı kullanmanın **iki yolu** var:
 
-**Yol 1 — ThankYou'yu override edin (akışın içinde kalır):**
+**Yol 1 — SDK sonuç ekranı olmadan kapansın (önerilen):**
+
+```swift
+IdentifyManager.shared.setupSDK(
+    ...,
+    showThankYouPage: false,           // ThankYou hiçbir yolda açılmaz
+    onFinished: { outcome in
+        switch outcome.result {
+        case .approved: router.show(.kycSuccess)
+        case .rejected, .neutral, .notCompleted: router.show(.kycFailure(outcome.reason))
+        case .cancelled: router.show(.kycAbandoned)
+        case .error: router.show(.kycError(outcome.errorMessage))
+        }
+    }
+) { socket, room, error in ... }
+```
+
+SDK işini bitirir, sonucu `onFinished`'a verir ve bulunduğu ekrandan (ör. görüntülü görüşme)
+**aşağı kayarak** kapanır; alttaki `SDKFlowHostView` kök ekranınız görünür. SDK'yı bir
+`fullScreenCover` / modal içinde sunuyorsanız kabı `onFinished` içinde kapatın.
+
+**Yol 2 — ThankYou'yu override edin (akışın içinde kalır):**
 
 `.thankYou` rotası statüyü **associated value** olarak taşır ve registry eşleşmesi
 birebir Hashable eşleşmesidir. Bu yüzden tek bir `override(.thankYou(nil))` yetmez —
-**dört varyantı ayrı ayrı** kaydedin:
+kullanılan varyantları ayrı ayrı kaydedin:
 
 ```swift
-registry.override(.thankYou(.completed))    { MySuccessView() }     // görüşme pozitif
-registry.override(.thankYou(.notCompleted)) { MyFailureView() }     // negatif / kullanıcı bitirdi
-registry.override(.thankYou(.missedCall))   { MyMissedCallView() }  // cevapsız çağrı
+registry.override(.thankYou(.completed))    { MySuccessView() }     // panel onayı
+registry.override(.thankYou(.notCompleted)) { MyFailureView() }     // red / nötr / kullanıcı bitirdi
 registry.override(.thankYou(nil))           { MySuccessView() }     // görüşmesiz akış sonu
 ```
 
-Her varyant ayrı kayıt olduğundan statüyü ekranınıza parametre geçmenize gerek yok —
-hangi closure çalıştıysa sonuç odur. Ekranınızın kapanış butonu SDK'nınkiyle aynı işi
-yapmalı:
+Ekranınızın kapanış butonu SDK'nınkiyle aynı işi yapmalı:
 
 ```swift
 struct MySuccessView: View {
@@ -1214,44 +1307,13 @@ struct MySuccessView: View {
         VStack { ... }                                   // tamamen sizin tasarımınız
         Button("Ana Sayfaya Dön") {
             coordinator.resetFlow()                      // akışı köke döndürür
-            // fullScreenCover'daysanız burada ayrıca kapatın: isPresented = false
         }
     }
 }
 ```
 
-**Yol 2 — SDK kabını tamamen kapatıp kendi native ekranınıza geçin:**
-
-ThankYou'yu hiç göstermek istemiyorsanız, akış sonunu dinleyip SDK'yı barındıran kabı
-(fullScreenCover / modal VC) kapatın ve kendi navigasyonunuzda devam edin:
-
-```swift
-// a) Olay akışıyla (önerilen — statü bilgisi hazır gelir):
-final class MyEvents: SDKEventListener {
-    func onSDKEvent(_ event: SDKEvent) {
-        switch event.name {
-        case "session.completed":  router.show(.kycSuccess)   // SDK kabını kapat + kendi ekranın
-        case "session.failed":     router.show(.kycFailure)
-        case "session.abandoned":  router.show(.kycAbandoned) // metadata.lastScreen = nerede bıraktı
-        default: break
-        }
-    }
-}
-IdentifyManager.shared.eventDelegate = myEvents   // setupSDK'dan ÖNCE
-
-// b) Veya coordinator'ı gözleyerek (SwiftUI):
-.onChange(of: coordinator.path) { path in
-    if case .thankYou(let status) = path.last {
-        showKyc = false                            // fullScreenCover'ı kapat
-        myResultRoute = (status == .completed) ? .success : .failure
-    }
-}
-```
-
-> İkisini karıştırmayın: Yol 1'de akış SDK kabının içinde biter (resetFlow köke döner);
-> Yol 2'de kabı siz kapatırsınız. Yol 2'de bile `.thankYou` rotası bir an çizilebilir —
-> istemiyorsanız dört varyantı boş/geçiş view'ı ile override edip kapanışı oradan
-> tetikleyin (Yol 1 + kapatma).
+Ayrıntılı sebebe (ör. panelin `terminateReason`'ı) bu ekranda da ihtiyacınız varsa
+`IdentifyManager.shared.lastFlowOutcome`'ı okuyun — ThankYou açıldığında sonuç bildirilmiştir.
 
 > "Bypass yok" hatırlatması: görüşmeyi kendiniz bitirmek istiyorsanız bunun tek doğru
 > yolu `SDKCallScreenViewModel.terminateCall(coordinator:)`'dır — sunucuya
@@ -1701,6 +1763,7 @@ gösterir, kimi akış kabı kapatıp uygulamanın kendi sayfasına döner:
 final class KycEventBridge: SDKEventListener {
     func onSDKEvent(_ event: SDKEvent) {
         let scenario = KycContext.shared.scenario
+        // Tipli alternatif: setupSDK(onFinished:) — bkz. 11) Akış Sonucu
         switch (event.name, scenario) {
         case ("session.completed", .limitIncrease):
             appRouter.dismissKyc(); appRouter.show(.limitApproved)   // kendi native sayfası
@@ -1746,14 +1809,30 @@ konacağını entegrasyon belirler.
 | Modül | Gereken donanım | Kontrol |
 |---|---|---|
 | `nfc` | NFC okuyucu | `NFCNDEFReaderSession.readingAvailable` |
-| `livenessDetection` | TrueDepth kamera (ARKit yüz takibi) | `ARFaceTrackingConfiguration.isSupported` |
-| `selfieWithLiveness` | TrueDepth kamera (ARKit yüz takibi) | `ARFaceTrackingConfiguration.isSupported` |
+| `livenessDetection` | ARKit yüz takibi | `ARFaceTrackingConfiguration.isSupported` |
+| `selfieWithLiveness` | Moda bağlı (`selfieWithLivenessTrueDepth`) | `.automatic`: ARKit desteği · `.required`: TrueDepth kamera · `.disabled`: yok |
 | Diğer tüm modüller | Ön/arka kamera + mikrofon | İzin akışı |
 
-TrueDepth kamera Face ID'li iPhone'larda ve Face ID'li iPad Pro / iPad Air'de vardır;
-Touch ID'li iPad ve Face ID'siz iPhone'larda yoktur. **iPad'de NFC hiç yoktur.**
+ARKit yüz takibi **TrueDepth kamera ya da A12+ çip** ister: Face ID'li cihazlarda derinlikli,
+TrueDepth'siz A12+ cihazlarda (iPhone SE 2/3, A12+ Touch ID'li iPad'ler) derinliksiz (RGB) çalışır;
+TrueDepth'siz A11 ve öncesinde çalışmaz. **iPad'de NFC hiç yoktur.**
 
-### 18.2 TrueDepth yoksa — yedeği siz seçersiniz
+### 18.1a Selfie + canlılık — TrueDepth modu
+
+```swift
+IdentifyManager.shared.selfieWithLivenessTrueDepth = .automatic   // varsayılan: ARKit varsa ARKit
+IdentifyManager.shared.selfieWithLivenessTrueDepth = .required    // yalnız TrueDepth kamerada ARKit
+IdentifyManager.shared.selfieWithLivenessTrueDepth = .disabled    // ARKit yok, Vision ile her cihazda
+// setupSDK'dan ÖNCE — akış kurulumunu belirler
+
+SDKSelfieWithLivenessView(trueDepthMode: .disabled)                // yalnız bu ekran (override ile)
+```
+
+`.disabled` derinlik tabanlı sahtecilik korumasını kaldırır. Cihaz tablosu, global değer ile ekran
+parametresinin ilişkisi ve Vision yolunun farkları:
+[SelfieWithLiveness → TrueDepth modu](IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu).
+
+### 18.2 Donanım yoksa — yedeği siz seçersiniz
 
 ```swift
 IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan

@@ -21,7 +21,10 @@ rehberdeki *Tek Sözlükle Tema (JSON)* bölümüne bakın.
 | İngilizce dil kodu | `.eng` | `.en` |
 | Cihaz ailesi | yalnız iPhone | **iPhone + iPad** (tablette de portrait kilidi) |
 | Donanımsız cihaz | canlılık modülü akıştan düşerdi | `faceTrackingFallback` — yerine ne geleceğini entegrasyon seçer |
+| Selfie + canlılık derinliği | ARKit varsa ARKit (A12+ cihazda derinliksiz de) | `selfieWithLivenessTrueDepth`: `.automatic` · `.required` · `.disabled` (Vision) |
 | Canlılık adımı geçişi | sessiz | çok kısa onay titreşimi (`stepFeedbackEnabled`) |
+| Oturum sonucu | dağınık (`terminateCall` delegate, `session.*` olayları) | `setupSDK(onFinished:)` / `onFlowFinished` / `flowResultDelegate` — tek `SDKFlowOutcome`, oturum başına bir kez |
+| `showThankYouPage: false` | yalnız görüşmesiz akış sonunda, kullanıcı son ekranda kalıyordu | her yolda: sonuç ekranı yok, SDK aşağı kayarak kapanır |
 
 ---
 
@@ -153,6 +156,11 @@ TrueDepth kamera yoksa (Touch ID'li iPad, Face ID'siz iPhone) `livenessDetection
 iki modül de olduğu gibi çalışır. NFC'siz cihazlarda panele artık
 `NFCStatus = notAvailable` bildirilir.
 
+**Selfie + canlılık TrueDepth modu:** varsayılan `.automatic` önceki davranıştır, geçiş gerekmez.
+Derinlik şartı olan entegrasyonlar `.required`, ARKit'siz her cihazda çalıştırmak isteyenler
+`.disabled` seçer. Ekran bazında: `SDKSelfieWithLivenessView(trueDepthMode:)`.
+[Ayrıntı](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu)
+
 Yerleşim tarafında ölçüler ekran değil **pencere** tabanlıdır (`SDKLayout.bounds`), metin
 sütunları `.sdkReadableWidth()` ile, kılavuz çerçeveleri `SDKLayout.maxGuideWidth` /
 `maxFaceGuideWidth` ile sınırlanır. Tam ayrıntı: [iPad Desteği](ipad-support.md).
@@ -169,6 +177,34 @@ SDKHapticConfig.shared.stepFeedbackIntensity = 0.4   // 0…1, vars. 0.6
 
 Modül anahtarı (`setEnabled(_:for:)`) hem çekim rampasını hem bu darbeyi kapsar.
 Ayrıntı: [Tema Rehberi — Titreşim](theming.md#titreşim-haptik).
+
+### 9. Akış sonucu — `onFinished`
+
+SDK nasıl kapanırsa kapansın (panel kararı, kullanıcı/host çıkışı, modül hatası, oda dolu,
+kurulum hatası, uygulamanın kapatılması) sonuç **tam bir kez** ve karar anında gelir:
+
+```swift
+IdentifyManager.shared.setupSDK(
+    ...,
+    showThankYouPage: false,              // isteğe bağlı: sonuç ekranı olmadan kapan
+    onFinished: { outcome in
+        switch outcome.result {
+        case .approved:                          router.show(.success)
+        case .rejected, .neutral, .notCompleted: router.show(.failure(outcome.reason))
+        case .cancelled:                         router.show(.abandoned)
+        case .error:                             router.show(.error(outcome.errorMessage))
+        }
+        // outcome.terminateReason / outcome.statusSummary → panel kapattıysa birebir
+    }
+) { socket, room, error in ... }
+
+// Delegate ile
+IdentifyManager.shared.flowResultDelegate = resultHandler   // IdentifyFlowResultListener, weak
+```
+
+Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
+üretmez; kullanıcı yeniden bağlanır. Tüm alanlar ve sebep tablosu:
+[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301).
 
 ---
 
@@ -200,6 +236,14 @@ Ayrıntı: [Tema Rehberi — Titreşim](theming.md#titreşim-haptik).
   ölçüleri, sheet tutamağı, kamera maskesi opaklığı, kılavuz çerçevesi renkleri, kayıt
   butonu ölçüsü.
 
+- **`showThankYouPage` varsayılanı `true`.** 3.0.0'da `false` görünüyordu ama görüşme sonu
+  bayrağa bakmadığı için sonuç ekranı yine açılıyordu; görünür davranış korunur. `false`
+  artık her yolda geçerlidir (bkz. *Akış sonucu*).
+
+- **`session.completed` / `session.failed` olayları yalnızca gerçek bir bitişte gelir.**
+  3.0.0'da her `terminateCall`'da yayınlanıyordu ve panelin `positive` statüsünü başarı
+  saymıyordu. Karar içermeyen sonlandırmalarda artık bu olaylar gelmez.
+
 ---
 
 ## Geçiş Adımları
@@ -228,6 +272,14 @@ gerekir:
 3. **Kendi ekranlarınızda `.font(.system(size:))`** kullanıyorsanız `IDFont.custom(_:_:)`
    ile değiştirin ki tema fontu bu metinlerde de geçerli olsun.
 
+4. **Sonucu `session.completed` / `session.failed` ile okuyorsanız** mantığınızı
+   `onFinished` (ya da `session.finished` + `metadata.result`) ile değiştirin; onaylanan
+   oturumlar artık doğru olarak `session.completed` gelir.
+
+5. **Kendi UIKit akışında `getNextModule` kullanıyor ve `showThankYouPage` vermiyorsanız**
+   son adımda artık `thankYouViewController` döner. Sonuç ekranı istemiyorsanız
+   `showThankYouPage: false` geçin.
+
 ---
 
 ## Kapanış Animasyonu Hakkında
@@ -243,6 +295,10 @@ presenter.present(host, animated: true)
 ...
 host.dismiss(animated: true)     // animated: false ANINDA kapatır
 ```
+
+`showThankYouPage: false` iken akış **içinde** üstteki ekran aşağı kayarak kalkar ve
+`onFinished` çağrılır; kabı (modal / `fullScreenCover`) kapatmak yine host'undur — bunu
+`onFinished` içinde yapın.
 
 React Native tarafında akışı `<Modal animationType="slide">` içinde gösterin. Akış
 **içindeki** adım geçişlerinin süresi tema üzerinden ayarlanır:

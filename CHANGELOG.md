@@ -94,6 +94,30 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
 - **`SDKSpeechRecViewModel.confirmSpeech()`** artık ifade doğrulanmadan bildirim yapmıyor;
   özel ekranda onay düğmesi başarıya bağlanmasa bile söylenmeyen ifade tamamlandı sayılmaz.
 
+**Selfie + canlılık: TrueDepth modu**
+- **`IdentifyManager.shared.selfieWithLivenessTrueDepth`** (`SDKTrueDepthMode`) ve ekran bazında
+  **`SDKSelfieWithLivenessView(trueDepthMode:)`**:
+  `.automatic` (varsayılan, önceki davranış) · `.required` (yalnız gerçek TrueDepth kamerasında ARKit;
+  TrueDepth'siz A12+ cihazda yedek modül) · `.disabled` (ARKit yok; ön kamera + Vision ile her cihazda).
+- Vision yolu aynı deneyimi sunar: iki fazlı oval, 3 sn tutma, ekran flaşı, aynı metinler ve
+  karşılaştırma kuralı. Derinlik tabanlı sahtecilik koruması yoktur; baş eğimi ölçülmez.
+- Kullanılan yol `sdk_logs`'a yazılır (`arkit-truedepth` / `arkit-rgb` / `vision`).
+- Düzeltme: dokümanlar TrueDepth'siz A12+ cihazları (iPhone SE 2/3, A12+ Touch ID'li iPad'ler)
+  "desteklenmiyor" sayıyordu; bu cihazlarda ARKit derinliksiz çalışır.
+
+**Akış sonucu — oturum nasıl biterse bitsin tek yerden**
+- **`setupSDK(onFinished:)`**, **`IdentifyManager.shared.onFlowFinished`** ve
+  **`flowResultDelegate`** (`IdentifyFlowResultListener`): oturum başına tam bir kez, karar
+  anında `SDKFlowOutcome` gelir — `result` (`approved` · `rejected` · `neutral` ·
+  `notCompleted` · `cancelled` · `error`), `reason` (`SDKFlowEndReason`), `lastModule`,
+  panelin `terminateReason`'ı ve `statusSummary`'si birebir, `closeCode`, `toDictionary()`.
+- Olay akışına **`session.finished`** eklendi (metadata: `result`, `endReason`,
+  `terminateReason`, `statusSummary`, `lastModule`…).
+- **`showThankYouPage: false`** artık her yolda geçerli: sonuç ekranı hiç açılmaz, SDK
+  bulunduğu ekrandan (ör. görüntülü görüşme) aşağı kayarak kapanır.
+- `terminateCall` karar kuralı `SDKTerminateClassifier`'da tek yerde; varsayılan görüşme ekranı
+  ve sonuç bildirimi aynı kuralı kullanır.
+
 **Dokümantasyon — override sözleşmeleri netleştirildi**
 - OVD, Liveness, Selfie, Görüşme, Adres, NFC, Konuşma ve Kimlik rehberlerinde "override
   ederseniz sizde kalanlar" açıkça yazıldı: zorunlu kancalar, iş parçacığı kuralları,
@@ -112,6 +136,14 @@ Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migrat
   rollerinden beslenir; `primary` ile zorunlu olarak birlikte değişmez.
 - Sabit ölçüler token'landı: seçim satırı, form alanları, uyarı kartı, sheet tutamağı,
   kamera maskesi ve kılavuz renkleri, kayıt butonu.
+- **`setupSDK(showThankYouPage:)` varsayılanı `true`.** 3.0.0'da varsayılan `false` idi ama
+  görüşme sonu yolları bayrağa bakmadığı için sonuç ekranı yine açılıyordu; görünür davranış
+  korunur. Kendi UIKit akışında `getNextModule` kullanıp parametreyi vermeyen host'a son
+  adımda boş controller yerine `thankYouViewController` döner.
+- **`session.completed` / `session.failed`** yalnızca gerçek bir bitişte yayınlanır.
+  3.0.0'da her `terminateCall`'da gidiyor ve başarıyı `success`/`approve` içeren statüde
+  arıyordu (panel `positive` gönderdiğinden onaylanan oturumlar `failed` görünüyordu);
+  karar içermeyen, yeniden bağlanmaya düşen sonlandırmalarda da `failed` gidiyordu.
 
 ### Yayınlanmamış (v3)
 

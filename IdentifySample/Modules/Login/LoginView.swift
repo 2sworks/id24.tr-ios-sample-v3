@@ -917,6 +917,28 @@ private struct DebugSettingsView: View {
                             )
                         }
 
+                        DebugSection(title: "Selfie + Canlılık") {
+                            VStack(alignment: .leading, spacing: IDSpacing.sm) {
+                                Text("TrueDepth modu")
+                                    .font(IDFont.bodySmall(.semibold))
+                                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                                Text("Otomatik: ARKit (TrueDepth'siz A12+ cihazda RGB). "
+                                   + "Zorunlu: yalnız TrueDepth donanımında ARKit, diğerlerinde yedek modül. "
+                                   + "Kapalı: ARKit yok, Vision ile her cihazda. Bir sonraki bağlantıda geçerli olur.")
+                                    .font(IDFont.caption())
+                                    .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Picker("TrueDepth modu", selection: $debug.swlTrueDepthMode) {
+                                    Text("Otomatik").tag(SDKTrueDepthMode.automatic)
+                                    Text("Zorunlu").tag(SDKTrueDepthMode.required)
+                                    Text("Kapalı").tag(SDKTrueDepthMode.disabled)
+                                }
+                                .pickerStyle(.segmented)
+                            }
+                            .padding(.horizontal, IDSpacing.md)
+                            .padding(.vertical, IDSpacing.sm)
+                        }
+
                         Button {
                             debug.resetToDefaults()
                         } label: {

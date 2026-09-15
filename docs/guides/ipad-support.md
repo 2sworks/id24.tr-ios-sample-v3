@@ -12,7 +12,7 @@ donanımı istediğini ve cihaz o donanıma sahip değilse akışın nasıl iler
 | Cihaz ailesi | iPhone + iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) |
 | Yönelim | **Portrait** — iPad'de de dik kilitli |
 | NFC | Hiçbir iPad'de yok → NFC modülü akıştan çıkarılır, panel bilgilendirilir |
-| Canlılık (TrueDepth) | Face ID'li iPad Pro / Air'de tam çalışır; yoksa yedek modül (`faceTrackingFallback`, varsayılan selfie) |
+| Canlılık (ARKit) | Face ID'li iPad Pro / Air'de derinlikli; A12+ Touch ID'li iPad'de derinliksiz (RGB); daha eskilerde yedek modül (`faceTrackingFallback`). Selfie + canlılık için derinlik şartı `selfieWithLivenessTrueDepth` ile seçilir |
 | Yerleşim | Metin ve form sütunları okunabilir genişlikte ortalanır; kamera ekranları tam ekran |
 
 ---
@@ -88,8 +88,21 @@ IdentifyManager.shared.faceTrackingFallback = .skip     // modülü tamamen çı
 | `.skip` | Yerine bir şey konmaz, modül akıştan çıkarılır. Yüz doğrulaması akışın başka bir adımıyla veya operatör görüşmesiyle yapılıyorsa uygundur |
 | `.livenessDetection` | **Uygulanamaz, `.selfie` gibi davranır.** Canlılık ekranı da ARKit yüz takibine dayanır (göz kırpma / gülümseme blend shape'lerden, baş açısı yüz dönüşümünden okunur); TrueDepth yokken o da çalışamaz. Seçenek, ileride donanım istemeyen bir canlılık akışı eklenirse entegrasyonu değiştirmek gerekmesin diye kabul edilir ve `sdk_logs`'a bir satır yazılır |
 
-Yani "TrueDepth yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü
+Yani "ARKit yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü
 de aynı donanımı ister. Gerçek seçim **selfie ile doğrula** ya da **adımı çıkar** arasındadır.
+
+#### Selfie + canlılık: TrueDepth modu
+
+ARKit yüz takibi TrueDepth kamera **ya da** A12+ çip ister; A12+ Touch ID'li iPad'lerde (ör. iPad
+Air 5) ekran derinliksiz çalışır. Bunu entegrasyon seçer:
+
+```swift
+IdentifyManager.shared.selfieWithLivenessTrueDepth = .required   // yalnız TrueDepth'li cihazda ARKit
+IdentifyManager.shared.selfieWithLivenessTrueDepth = .disabled   // ARKit yok, Vision ile her iPad'de
+```
+
+Cihaz tablosu, güvenlik notu ve ekran parametresi:
+[SelfieWithLiveness → TrueDepth modu](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu).
 
 ### Diğer donanımlar
 
@@ -204,8 +217,8 @@ Yayına çıkmadan önce en az şu üç cihaz sınıfında tam akış koşulmal�
 | Cihaz | Beklenen |
 |---|---|
 | Face ID'li iPad Pro | `livenessDetection` ve `selfieWithLiveness` normal çalışır (yüz ovali ekranla büyümez); NFC adımı akışta yoktur |
-| Touch ID'li iPad Air / mini | `faceTrackingFallback` devreye girer (varsayılan: selfie); NFC adımı akışta yoktur |
-| Face ID'siz iPhone (örn. SE) | `faceTrackingFallback` devreye girer; NFC cihaza göre |
+| A12+ Touch ID'li iPad Air / mini | Canlılık modülleri ARKit ile derinliksiz çalışır; `selfieWithLivenessTrueDepth = .required` iken selfie + canlılık yedeğe düşer, `.disabled` iken Vision ile çalışır. NFC adımı akışta yoktur |
+| Face ID'siz iPhone (SE 2/3) | iPad Air / mini ile aynı (A12+); SE 1 ve iPhone 8 gibi A11 ve öncesinde `faceTrackingFallback` devreye girer |
 
 Kontrol edilecekler:
 

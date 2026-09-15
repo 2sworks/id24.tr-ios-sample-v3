@@ -85,6 +85,10 @@ final sub = sdk.events.listen((SDKEvent event) {
 
   switch (event.name) {
     case 'session.started':   break;
+    case 'session.finished':  /* NİHAİ sonuç, oturum başına bir kez:
+                                 event.metadata['result']    → approved | rejected | neutral | notCompleted | cancelled | error
+                                 event.metadata['endReason'] → agentDecision | userEndedCall | moduleFailed | …
+                                 event.metadata['terminateReason'] → panel kapattıysa birebir */ break;
     case 'session.completed': /* event.status == SDKEventStatus.success */ break;
     case 'session.failed':    /* event.metadata['reason'] */ break;
     case 'session.abandoned': /* event.metadata['lastScreen'] */ break;
@@ -99,7 +103,7 @@ final result = await sdk.setupSDK(SetupOptions(
   signLangSupport: false,
   nfcMaxErrorCount: 3,
   selectedModules: const [],     // boş = backend sırası
-  showThankYouPage: true,
+  showThankYouPage: true,        // false: sonuç ekranı yok, SDK kapanır — sonucu 'session.finished' ile alın
 ));
 
 // 3) Temizlik
@@ -164,6 +168,7 @@ içinde, `setupSDK` çağrısından **önce** ayarlanır:
 // IdentifySdkPlugin.swift — setupSDK'dan önce
 IdentifyManager.shared.faceTrackingFallback = .selfie   // varsayılan
 // IdentifyManager.shared.faceTrackingFallback = .skip  // adımı tamamen çıkar
+IdentifyManager.shared.selfieWithLivenessTrueDepth = .automatic  // .required | .disabled
 
 SDKHapticConfig.shared.stepFeedbackEnabled = true       // canlılık adım titreşimi (vars. açık)
 SDKHapticConfig.shared.stepFeedbackIntensity = 0.6      // 0…1
@@ -171,7 +176,8 @@ SDKHapticConfig.shared.stepFeedbackIntensity = 0.6      // 0…1
 
 | Ne | Ne zaman devreye girer |
 |---|---|
-| `faceTrackingFallback` | Cihazda TrueDepth kamera yoksa (Touch ID'li iPad, Face ID'siz iPhone): `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler — `.selfie` (varsayılan) ya da `.skip` |
+| `faceTrackingFallback` | Cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth'siz A11 ve öncesi): `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler — `.selfie` (varsayılan) ya da `.skip` |
+| `selfieWithLivenessTrueDepth` | Selfie + canlılık ekranının derinlik kullanımı: `.automatic` (varsayılan), `.required` (yalnız TrueDepth kamerada), `.disabled` (ARKit yok, Vision ile her cihazda — derinlik koruması yok). [Ayrıntı](../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) |
 | NFC | iPad'de ve NFC'siz iPhone'larda modül otomatik çıkarılır; panele `NFCStatus = notAvailable` gider. Bilgi sayfası için `setupSDK(..., showNFCNotFoundPage: true)` |
 | `SDKHapticConfig` | Çekim rampası + canlılık adım darbesi; ikisi de kapatılabilir |
 
@@ -213,9 +219,12 @@ class SDKEvent {
 | `module.<Modül>.skipped` | module | Atlanınca | Adım atlandı |
 | `call.connected` | call | Çağrı başlayınca | Görüşme başladı |
 | `call.ended` | call | Çağrı bitince | Görüşme bitti (metadata['statusSummary']) |
-| `session.completed` | session | Onay | Oturum **başarıyla** kapandı (status `success`) |
-| `session.failed` | session | Ret | Oturum **başarısız** kapandı |
-| `session.abandoned` | session | Terk/kapatma | Kullanıcı yarıda bıraktı (metadata['lastScreen'] = nerede kaldı) |
+| `session.finished` | session | Oturum nasıl biterse bitsin, bir kez | Nihai sonuç: `metadata['result']`, `endReason`, `terminateReason`, `statusSummary`, `lastModule` (3.0.1) |
+| `session.completed` | session | `result == approved` | Oturum **başarıyla** kapandı (status `success`) |
+| `session.failed` | session | `rejected` · `neutral` · `notCompleted` · `error` | Oturum **başarısız** kapandı |
+| `session.abandoned` | session | `cancelled` | Kullanıcı ya da host çıktı (metadata['lastScreen'] = nerede kaldı) |
+
+Metadata anahtarlarının tamamı: [Event Sistemi → Oturum Sonucu Olayları](../../guides/events.md#oturum-sonucu-olayları-301).
 
 > **Geriye uyumluluk:** Bu birleşik akış, SDK'nın mevcut `IdentifyTrackingListener`
 > mekanizmasının **yanına** eklenmiştir; mevcut entegrasyonları bozmaz.

@@ -2,13 +2,14 @@
 //  SwlExample.swift
 //  IdentifySample
 //
-//  SDK "Canlılıkla Selfie" (ARKit yüz canlılığı) modülü — ENTEGRASYON REHBERİ.
-//  1) SwlExample         → SDK hazır ekranı (ARKit ARFaceTracking)
-//  2) SwlExampleThemed   → tema override
-//  3) SwlExampleReplaced → kendi başlık/temanı bindirip SDK ekranını kullanma
+//  SDK "Canlılıkla Selfie" modülü — ENTEGRASYON REHBERİ.
+//  1) SwlExample          → SDK hazır ekranı (mod: IdentifyManager.shared.selfieWithLivenessTrueDepth)
+//  2) SwlExampleThemed    → tema override
+//  3) SwlExampleReplaced  → kendi başlık/temanı bindirip SDK ekranını kullanma
+//  4) SwlExampleTrueDepth → ekran bazında TrueDepth modu (.automatic / .required / .disabled)
 //
 //  Devreye alma: registry.override(.selfieWithLiveness) { SwlExampleReplaced() }
-//  ⚠️ ARFaceTracking yalnızca TrueDepth kameralı GERÇEK cihazda çalışır (simülatör değil).
+//  ⚠️ Gerçek cihaz gerekir (simülatörde kamera ve ARKit yok).
 //
 
 import SwiftUI
@@ -42,6 +43,18 @@ struct SwlExampleReplaced: View {
                 .padding(.top, 60)
         }
     }
+}
+
+// MARK: - 4) TrueDepth modu — yalnız bu ekran
+/// Akışın tamamı için `IdentifyManager.shared.selfieWithLivenessTrueDepth` setupSDK'dan önce
+/// ayarlanır. Burada verilen değer yalnız ekranın yolunu seçer; modülün A11 ve öncesi cihazda
+/// akışta kalması için global değer de `.disabled` olmalıdır.
+///
+///     registry.override(.selfieWithLiveness) { SwlExampleTrueDepth(mode: .disabled) }
+struct SwlExampleTrueDepth: View {
+    let mode: SDKTrueDepthMode
+
+    var body: some View { SDKSelfieWithLivenessView(trueDepthMode: mode) }
 }
 
 // MARK: - Previews

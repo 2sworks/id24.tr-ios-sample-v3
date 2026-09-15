@@ -80,6 +80,35 @@ Soket/TURN kapanmaları ve ön/arka plan geçişleri de olay üretir:
 | `session.foreground` | `session` | Ön plana dönüşte | `elapsedSeconds`, `socketConnected` |
 | `app.background` | `navigation` | (DefaultUI) arka plana geçiş — modül bilgisiyle | `state` |
 
+### Oturum Sonucu Olayları (3.0.1)
+
+Oturum nasıl biterse bitsin **tam bir kez** iki olay yayınlanır: sonucu taşıyan
+`session.finished` ve sonuca göre `session.completed` / `session.failed` / `session.abandoned`.
+Aynı sonuç `setupSDK(onFinished:)`, `IdentifyManager.shared.onFlowFinished` ve
+`flowResultDelegate` ile tipli (`SDKFlowOutcome`) olarak da alınır —
+[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301).
+
+| Olay | `status` | Ne zaman |
+|---|---|---|
+| `session.finished` | sonuca göre | Her bitişte |
+| `session.completed` | `success` | `result == approved` |
+| `session.failed` | `failed` | `rejected` · `neutral` · `notCompleted` · `error` |
+| `session.abandoned` | `abandoned` | `cancelled` (kullanıcı/host çıkışı, uygulama kapatıldı) |
+
+| Metadata | Anlamı |
+|---|---|
+| `result` | `approved` · `rejected` · `neutral` · `notCompleted` · `cancelled` · `error` |
+| `endReason` | `agentDecision` · `allModulesCompleted` · `userEndedCall` · `moduleFailed` · `userExited` · `hostQuit` · `hostExit` · `hostForceQuit` · `appTerminated` · `roomOccupied` · `connectionLost` · `setupFailed` |
+| `reason` | Panelin `terminateReason`'ı; yoksa `endReason` (3.0.0 uyumu) |
+| `terminateReason`, `statusSummary`, `statusId` | Panel kapattıysa birebir |
+| `lastScreen`, `lastModule`, `stepIndex`, `totalSteps` | Oturumun bittiği yer |
+| `closeCode`, `errorMessage` | Son kapanış kodu / setup hatası |
+
+> **3.0.0'dan fark:** `session.completed` / `session.failed` eskiden her `terminateCall`'da
+> gönderiliyordu ve başarıyı `success`/`approve` içeren statüde arıyordu — panel `positive`
+> gönderdiği için onaylanan oturumlar da `failed` görünüyordu. Artık yalnızca gerçek bir karar
+> (ya da başka bir bitiş) gönderilir; karar içermeyen sonlandırmalar olay üretmez.
+
 `status` alanı bilinçli kapanışlarda `info`, kopmalarda `failed` gelir. Kod
 tablosunun tamamı: [WebSocket rehberi → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100).
 

@@ -99,7 +99,7 @@ yürütür — buna ["bypass yok" kuralı](customization.md#bypass-yok-kuralı) 
 | `appendModules(_:)` / `appendModules(moduleList:)` | Akışın devamına yeni SDK modülü ekle (dallanan senaryolar; `progressTotal` otomatik güncellenir) |
 | `showExternalScreen(_:)` / `advanceExternal()` | Anlık custom ekran göster / custom ekrandan devam et |
 | `popBack()` | Geri; kökteyse `exitSDK()` |
-| `pushThankYouDirectly(status:)` | Görüşme sonucuyla doğrudan sonuç ekranına |
+| `pushThankYouDirectly(status:)` | Görüşme sonucuyla doğrudan sonuç ekranına; `showThankYouPage: false` ise sonuç ekranı yerine akış aşağı kayarak kapanır |
 | `resetFlow()` | Her şeyi sıfırla |
 
 Yayınlanan durumlar: `path`, `activeModule`, `progressStep`, `progressTotal`, `sdkError`,
