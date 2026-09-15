@@ -356,7 +356,6 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
   görev şartı bu anahtarla karşılanır).
 - Proje adı `NewTest` → `IdentifySample`; SDK uzak SPM paketi yerine kaynağa bağlanır,
   arşiv `-workspace` ile alınır; 2sworks TestFlight imzası.
-- Canlılık yeni adımları için sunucusuz deneme anahtarı.
 - Dokümanlar: README'ye SPM `Exact Version` uyarısı, tema/metin API tablosu ve
   "örnekten hangi dosyalar kopyalanır" bölümü; RN/Flutter rehberlerinde kopyalama hedefleri.
 
