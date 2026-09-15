@@ -12,7 +12,7 @@ donanımı istediğini ve cihaz o donanıma sahip değilse akışın nasıl iler
 | Cihaz ailesi | iPhone + iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) |
 | Yönelim | **Portrait** — iPad'de de dik kilitli |
 | NFC | Hiçbir iPad'de yok → NFC modülü akıştan çıkarılır, panel bilgilendirilir |
-| Canlılık (ARKit) | Face ID'li iPad Pro / Air'de derinlikli; A12+ Touch ID'li iPad'de derinliksiz (RGB); daha eskilerde yedek modül (`faceTrackingFallback`). Selfie + canlılık için derinlik şartı `selfieWithLivenessTrueDepth` ile seçilir |
+| Canlılık (ARKit) | Face ID'li iPad Pro'da derinlikli; A12+ Touch ID'li iPad'de derinliksiz (RGB); daha eskilerde yedek modül (`faceTrackingFallback`). Selfie + canlılık için derinlik şartı `selfieWithLivenessTrueDepth` ile seçilir |
 | Yerleşim | Metin ve form sütunları okunabilir genişlikte ortalanır; kamera ekranları tam ekran |
 
 ---
@@ -47,14 +47,16 @@ Ekranın yine de gösterilmesini isteyen entegrasyonlar için:
 IdentifyManager.shared.setupSDK(..., showNFCNotFoundPage: true, ...)
 ```
 
-### TrueDepth (ARKit yüz takibi) — yalnız Face ID'li cihazlarda
+### ARKit yüz takibi — TrueDepth kamera ya da A12+ çip
 
-TrueDepth kamera Face ID'li iPhone'larda ve Face ID'li iPad Pro / iPad Air (M-serisi)
-modellerinde bulunur. Touch ID'li iPad Air / iPad mini / temel iPad ile Face ID'siz
-iPhone'larda **yoktur**.
+TrueDepth kamera Face ID'li iPhone'larda ve **yalnız iPad Pro'da** (2018 ve sonrası) bulunur;
+hiçbir iPad Air, iPad mini ya da temel iPad'de yoktur. ARKit yüz takibi ise TrueDepth **ya da**
+A12+ çip ister: A12+ Touch ID'li iPad'lerde (iPad 8+, mini 5+, Air 3+) derinliksiz (RGB) çalışır,
+daha eski iPad'lerde çalışmaz. Model listesi:
+[SelfieWithLiveness → Cihaz modelleri](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#cihaz-modelleri).
 
 Destekleyen cihazlarda `livenessDetection` ve `selfieWithLiveness` **olduğu gibi çalışır** —
-iPad Pro dahil, ikame devreye girmez. Kontrol tek yerde yapılır
+ikame devreye girmez. Kontrol tek yerde yapılır
 (`ARFaceTrackingConfiguration.isSupported`) ve akış kurulurken okunur.
 
 Desteklemeyen cihazlarda:

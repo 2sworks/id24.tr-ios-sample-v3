@@ -81,10 +81,43 @@ Cihaza göre sonuç:
 
 | Cihaz | `.automatic` | `.required` | `.disabled` |
 |---|---|---|---|
-| Face ID'li iPhone / iPad Pro / iPad Air | ARKit, derinlikli | ARKit, derinlikli | Vision |
+| Face ID'li iPhone / iPad Pro | ARKit, derinlikli | ARKit, derinlikli | Vision |
 | TrueDepth'siz, A12 ve sonrası (iPhone SE 2/3, A12+ Touch ID'li iPad'ler) | **ARKit, derinliksiz (RGB)** | yedek modül | Vision |
 | TrueDepth'siz, A11 ve öncesi (iPhone 8, iPad 7…) | yedek modül | yedek modül | Vision |
 | Simülatör | çalışmaz | çalışmaz | çalışmaz (kamera yok) |
+
+### Cihaz modelleri
+
+SDK en az **iOS 15** ister; aşağıdaki tüm modeller iOS 15 ya da üstünü çalıştırır. Modlar ek bir
+iOS şartı getirmez: TrueDepth'siz A12+ cihazlarda ARKit yüz takibi iOS 14 ile geldi, Vision yüz
+tespiti iOS 11'den beri var.
+
+**1. TrueDepth kameralı (Face ID)** — `.automatic` ARKit derinlikli · `.required` ARKit derinlikli · `.disabled` Vision
+
+| Aile | Modeller |
+|---|---|
+| iPhone | X · XS · XS Max · XR · 11 · 11 Pro · 11 Pro Max · 12 mini · 12 · 12 Pro · 12 Pro Max · 13 mini · 13 · 13 Pro · 13 Pro Max · 14 · 14 Plus · 14 Pro · 14 Pro Max · 15 · 15 Plus · 15 Pro · 15 Pro Max · 16 · 16 Plus · 16 Pro · 16 Pro Max · 16e · 17 · Air · 17 Pro · 17 Pro Max |
+| iPad | iPad Pro 11" (1. nesil, 2018 ve sonrası) · iPad Pro 12.9" (3. nesil, 2018 ve sonrası) · iPad Pro 13" (M4 ve sonrası) |
+
+**2. TrueDepth'siz, A12 ve sonrası çip** — `.automatic` ARKit derinliksiz (RGB) · `.required` yedek modül · `.disabled` Vision
+
+| Aile | Modeller |
+|---|---|
+| iPhone | SE 2. nesil (2020) · SE 3. nesil (2022) |
+| iPad | iPad 8. nesil (2020) · 9. nesil (2021) · 10. nesil (2022) · iPad A16 (2025) |
+| iPad mini | mini 5 (2019) · mini 6 (2021) · mini A17 Pro (2024) |
+| iPad Air | Air 3 (2019) · Air 4 (2020) · Air 5 (2022) · Air M2 (2024) · Air M3 (2025) — **hiçbir iPad Air'de Face ID yoktur** |
+
+**3. TrueDepth'siz, A11 ve öncesi çip** — `.automatic` yedek modül · `.required` yedek modül · `.disabled` Vision
+
+| Aile | iOS 15+ çalıştıran modeller |
+|---|---|
+| iPhone | 6s · 6s Plus · SE 1. nesil · 7 · 7 Plus · 8 · 8 Plus |
+| iPad | iPad 5 · 6 · 7. nesil · iPad mini 4 · iPad Air 2 · iPad Pro 9.7" · iPad Pro 10.5" · iPad Pro 12.9" 1. ve 2. nesil |
+
+Listede olmayan yeni bir model için kural: **Face ID varsa grup 1**, Face ID yoksa (tüm yeni
+çipler A12 ve sonrası olduğundan) **grup 2**. Kod tarafında karar donanım sorgusuyla verilir,
+model listesiyle değil; bu tablo yalnız bilgilendirme içindir.
 
 **Neden `.required` var:** Apple'ın `ARFaceTrackingConfiguration.isSupported` kontrolü TrueDepth
 değil "TrueDepth ya da A12+ çip" ister. `.automatic` bu yüzden TrueDepth'siz A12+ cihazlarda da

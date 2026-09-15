@@ -191,8 +191,9 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
 - **Adım sırası neden rastgele?** `RoomResponse.liveness` dizisi sırayı belirler —
   replay saldırılarını zorlaştırmak için oturum başına değişebilir.
 - **Cihaz desteklemiyorsa ne olur?** Göz kırpma/gülümseme ARKit blend shape'lerinden, baş
-  açısı yüz dönüşümünden okunur; bu yüzden modül **TrueDepth kamera ister**. Face ID'siz
-  iPhone'larda ve Touch ID'li iPad'lerde çalışamaz. Kontrol akış kurulurken yapılır
+  açısı yüz dönüşümünden okunur; bu yüzden modül **ARKit yüz takibi ister** (TrueDepth kamera
+  ya da A12+ çip). TrueDepth'siz A11 ve öncesi cihazlarda (iPhone 8, iPad 7…) çalışamaz; model
+  listesi: [Cihaz modelleri](../SelfieWithLiveness/SelfieWithLiveness.md#cihaz-modelleri). Kontrol akış kurulurken yapılır
   (`ARFaceTrackingConfiguration.isSupported`) ve modül akışa alınmaz — kullanıcı
   geçemeyeceği bir ekranda kalmaz. Yerine ne geleceğini siz seçersiniz:
 
@@ -207,5 +208,5 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
 - **Adım geçince titreşim:** her onaylanan adımda tek ve çok kısa bir darbe çalınır.
   `SDKHapticConfig.shared.stepFeedbackEnabled = false` ile kapatılır,
   `stepFeedbackIntensity` (0…1, vars. 0.6) ile şiddeti ayarlanır.
-- **iPad:** Face ID'li iPad Pro / iPad Air'de tam çalışır. Yüz ovali tablette pencereyle
+- **iPad:** Face ID'li iPad Pro'da derinlikli, A12+ Touch ID'li iPad'lerde (iPad 8+, mini 5+, Air 3+) derinliksiz çalışır. Yüz ovali tablette pencereyle
   birlikte büyümez; `SDKLayout.maxFaceGuideWidth` ile sınırlanır.

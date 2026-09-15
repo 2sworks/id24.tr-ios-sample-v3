@@ -115,7 +115,7 @@ Bu kadar. Backend'in `modules` listesinde ne varsa, ekranlar o sırayla otomatik
 Hiçbir modül ekranı yazmanıza gerek yok — hepsinin hazır (drop-in) SwiftUI sürümü SDK'nın içindedir.
 Tam parametre listesi için: [Sunucu & API Rehberi](docs/guides/server-api.md).
 
-> Minimum iOS sürümü: **iOS 14** (örnek uygulama iOS 15 hedefler).
+> Minimum iOS sürümü: **iOS 15** (SDK ve örnek uygulama).
 
 ### 4. Görünümü ve metinleri ayarlayın
 
