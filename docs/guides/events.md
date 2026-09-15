@@ -80,7 +80,7 @@ Soket/TURN kapanmaları ve ön/arka plan geçişleri de olay üretir:
 | `session.foreground` | `session` | Ön plana dönüşte | `elapsedSeconds`, `socketConnected` |
 | `app.background` | `navigation` | (DefaultUI) arka plana geçiş — modül bilgisiyle | `state` |
 
-### Oturum Sonucu Olayları (3.0.1)
+### Oturum Sonucu Olayları (3.1.0)
 
 Oturum nasıl biterse bitsin **tam bir kez** iki olay yayınlanır: sonucu taşıyan
 `session.finished` ve sonuca göre `session.completed` / `session.failed` / `session.abandoned`.

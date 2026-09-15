@@ -642,7 +642,7 @@ vm.stopSpeech()
 | `showLostConnection: Bool` | Global bağlantı-koptu ekranı görünür mü |
 | `moduleRestartToken: Int` | Artınca aktif modül view+VM'i yeniden yaratılır |
 | `pendingThankYouStatus` | Görüşme sonucu için geçici statü |
-| `isDismissingFlow: Bool` | `showThankYouPage: false` iken akış aşağı kayarak kapanıyor (3.0.1) |
+| `isDismissingFlow: Bool` | `showThankYouPage: false` iken akış aşağı kayarak kapanıyor (3.1.0) |
 
 **Metotlar:**
 
@@ -940,7 +940,7 @@ IdentifyManager.shared.trackingDelegate = self   // IdentifyTrackingListener.eve
 İkisi bağımsızdır, aynı anda kullanılabilir. Kategori/isim envanteri ve RN/Flutter köprü
 örnekleri: [Event Sistemi Rehberi](docs/guides/events.md).
 
-### Akış Sonucu — `onFinished` (3.0.1)
+### Akış Sonucu — `onFinished` (3.1.0)
 
 Oturum **nasıl biterse bitsin** (panel kararı, kullanıcı/host çıkışı, modül hatası, oda dolu,
 bağlantı kurulamaması, uygulamanın kapatılması) sonuç **tam bir kez** gelir. Bildirim karar

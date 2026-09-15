@@ -1,4 +1,4 @@
-# 3.0.1 — Neler Değişti, Neler Eklendi
+# 3.1.0 — Neler Değişti, Neler Eklendi
 
 Bu sürüm **tema ve özelleştirme** odaklıdır. Tamamı eklemeli (additive) tasarlandı:
 hiçbir tema ayarı vermezseniz ekranlar 3.0.0 ile birebir aynı görünür.
@@ -10,7 +10,7 @@ rehberdeki *Tek Sözlükle Tema (JSON)* bölümüne bakın.
 
 ## Özet
 
-| Alan | 3.0.0 | 3.0.1 |
+| Alan | 3.0.0 | 3.1.0 |
 |---|---|---|
 | Buton | 4 stil, sabit kapsül köşe | `SDKTheme.shared.buttons` — köşe, ölçü, font, kenarlık, gölge, haptik; stil bazlı override |
 | Başlık çubuğu | tek tasarım | 4 hazır tasarım (`preset`) + ölçü/renk token'ları |

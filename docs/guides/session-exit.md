@@ -5,7 +5,7 @@ SDK bir oturumu birçok yoldan bitirebilir: temsilci karar verir, modüller bite
 **her çıkış yolunu tek yerde** anlatır: hangi yoldan çıkıldığını nerede görürsünüz, sonuç hangi
 verilerle gelir, kapanıştan sonra kendi uygulamanızda nereye ve nasıl yönlendirirsiniz.
 
-> 3.0.1 ile gelir. Görüşme kapanışındaki `terminateReason` / statü karar tablosu:
+> 3.1.0 ile gelir. Görüşme kapanışındaki `terminateReason` / statü karar tablosu:
 > [WebSocket → Görüşmenin Kapanışı](websocket.md#görüşmenin-kapanışı--terminatecall).
 
 ---

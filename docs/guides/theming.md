@@ -1,6 +1,6 @@
 # Tema — SDK Ekranlarını Markanıza Boyamak
 
-> 3.0.1 ile gelen yenilikler ve geçiş adımları: [3.0.1 Değişiklik Rehberi](migration-3.0.1.md)
+> 3.1.0 ile gelen yenilikler ve geçiş adımları: [3.1.0 Değişiklik Rehberi](migration-3.1.0.md)
 
 SDK'nın hazır ekranları tek bir tema kaynağından beslenir: **`SDKTheme.shared`**.
 Renkleri, fontu, ikonları ve boşluk/köşe metriklerini `setupSDK`'dan önce bir kez ayarlarsınız;

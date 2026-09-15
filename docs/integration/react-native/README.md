@@ -282,7 +282,7 @@ interface SDKEvent {
 | `module.<Modül>.skipped` | module | Atlanınca | Adım atlandı |
 | `call.connected` | call | Çağrı başlayınca | Temsilciyle görüşme başladı |
 | `call.ended` | call | Çağrı bitince | Görüşme bitti (metadata.statusSummary) |
-| `session.finished` | session | Oturum nasıl biterse bitsin, bir kez | Nihai sonuç: `metadata.result`, `endReason`, `terminateReason`, `statusSummary`, `lastModule` (3.0.1) |
+| `session.finished` | session | Oturum nasıl biterse bitsin, bir kez | Nihai sonuç: `metadata.result`, `endReason`, `terminateReason`, `statusSummary`, `lastModule` (3.1.0) |
 | `session.completed` | session | `result == approved` | Oturum **başarıyla** kapandı (status `success`) |
 | `session.failed` | session | `rejected` · `neutral` · `notCompleted` · `error` | Oturum **başarısız** kapandı |
 | `session.abandoned` | session | `cancelled` | Kullanıcı ya da host çıktı (metadata.lastScreen = nerede kaldı) |

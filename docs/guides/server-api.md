@@ -65,7 +65,7 @@ IdentifyManager.shared.setupSDK(
 | `turnKey` | `String` | — | TURN kimlik üretim anahtarı → [TURN & WebRTC](turn-webrtc.md) |
 | `wsSecretKey` | `String?` | `nil` | `socket_auth` aktifse soket token anahtarı → [WebSocket](websocket.md) |
 | `showThankYouPage` | `Bool?` | `true` | Akış sonunda SDK'nın sonuç ekranı gösterilsin mi. `false`: sonuç ekranı hiç açılmaz, SDK aşağı kayarak kapanır, sonuç `onFinished`'a gelir |
-| `onFinished` | `((SDKFlowOutcome) -> Void)?` | `nil` | Oturum nasıl biterse bitsin tam bir kez çağrılır (3.0.1) |
+| `onFinished` | `((SDKFlowOutcome) -> Void)?` | `nil` | Oturum nasıl biterse bitsin tam bir kez çağrılır (3.1.0) |
 | `showNFCNotFoundPage` | `Bool?` | `false` | Çipsiz belge için "NFC yok" ekranı |
 | `supportU18` | `Bool?` | `false` | 18 yaş altı desteği |
 | `AESKey` | `String?` | `""` | Sunucudan gelen şifreli MRZ alanlarını çözme anahtarı |

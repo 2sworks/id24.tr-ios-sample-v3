@@ -7,10 +7,10 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
-### 3.0.1 — Tema ve özelleştirme paketi
+### 3.1.0 — Tema ve özelleştirme paketi
 
 Tamamı eklemeli: hiçbir tema ayarı vermeyen projede ekranlar 3.0.0 ile birebir aynıdır.
-Ayrıntı ve geçiş adımları: [3.0.1 Değişiklik Rehberi](docs/guides/migration-3.0.1.md).
+Ayrıntı ve geçiş adımları: [3.1.0 Değişiklik Rehberi](docs/guides/migration-3.1.0.md).
 
 **Yeni**
 - **Buton görünümü** — `SDKTheme.shared.buttons`: köşe (`.capsule` / `.radius(x)`), yükseklik,

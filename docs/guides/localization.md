@@ -1,7 +1,7 @@
 # Lokalizasyon — Dil Desteği ve Metin Override
 
-> **3.0.1:** İngilizce dil kodu `.eng` yerine `.en`. `.eng` deprecated alias olarak
-> derlenmeye devam eder; ayrıntı: [3.0.1 Değişiklik Rehberi](migration-3.0.1.md).
+> **3.1.0:** İngilizce dil kodu `.eng` yerine `.en`. `.eng` deprecated alias olarak
+> derlenmeye devam eder; ayrıntı: [3.1.0 Değişiklik Rehberi](migration-3.1.0.md).
 
 SDK beş dilde hazır gelir: **Türkçe, İngilizce, Almanca, Azerbaycanca, Rusça.**
 Tüm ekran metinleri anahtar tabanlıdır (`SDKKeyword`) ve her biri host tarafından

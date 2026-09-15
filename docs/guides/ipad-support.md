@@ -1,6 +1,6 @@
 # iPad Desteği ve Cihaz Yetenekleri
 
-SDK 3.0.1'den itibaren iPad'de çalışır. Bu rehber neyin değiştiğini, hangi modülün hangi
+SDK 3.1.0'den itibaren iPad'de çalışır. Bu rehber neyin değiştiğini, hangi modülün hangi
 donanımı istediğini ve cihaz o donanıma sahip değilse akışın nasıl ilerlediğini anlatır.
 
 ---
