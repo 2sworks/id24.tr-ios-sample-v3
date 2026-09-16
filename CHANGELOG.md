@@ -346,6 +346,26 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
 > Not: v3 ile birlikte örnek uygulama sıfırdan numaralandı (`CURRENT_PROJECT_VERSION` 23);
 > aşağıdaki "Build 178" ve öncesi eski numaralandırmaya aittir.
 
+**Tam özel ekran örnekleri (SDK 3.1.0)**
+- Her modül için `XxxCustomView.swift`: SDK'nın hazır ekranının **yalnızca public API ile**
+  yazılmış, çalışan birebir kopyası (14 ekran). Değişiklik yapmadan takıldığında SDK
+  ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Selfie + Canlılık
+  hariç (3.1.0'da public ViewModel yok).
+- `Modules/CustomKit/`: kamera önizlemesi (iOS 17 `RotationCoordinator` portrait düzeltmesi),
+  oval/çerçeve maskeleri ve ortak yardımcılar; `CustomScreens.swift` tüm override'ları toplu
+  takar.
+- Hamburger menü → **Tam Özel Ekranlar**: anahtar açıkken akıştaki her ekran özel sürümüyle
+  çizilir, kapalıyken SDK ekranları; aynı ekrandan her modül tek tek önizlenir.
+- `XxxExample.swift` dosyaları sadeleşti: (1) SDK ekranı, (2) tema, (3) `XxxCustomView`
+  önizlemesi. `XxxConfig.swift` dosyaları ve "Replaced" örnekleri kaldırıldı (eski
+  "özelleştirme" örnekleri SDK ekranıyla aynı sonucu vermiyordu; bu kaldırmanın nedenidir).
+- `RootView.swift` başında entegrasyon rehberi: üç yapı taşı, akış sırası, özelleştirme
+  katmanları A–D, özel ekran kuralları.
+- `main` dalı IdentifySDK'yı uzak SPM paketinden (`id24.tr-ios-sdk-spm`, **exact 3.1.0**)
+  bağlar; kaynağa bağlı derleme yalnızca geliştirme dallarındadır.
+- Dokümanlar: README kopyalama tablosu, `customization.md` (CustomView tablosu + CustomKit +
+  bitiş durumu notu), `FULL-INTERGATION.md` bölüm 7/8, `Modules.md` ve 14 modül rehberi.
+
 **Build 24–44**
 - Hamburger menüsü: **SDK Modül Rehberi** (showcase: tasarım kataloğu, nav bar marka/ikon
   örnekleri, tema JSON köprüsü, senaryolu dummy API) ve **Debug Değerleri** ekranı
@@ -354,8 +374,8 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
   tercihleri kalıcı. Panel kapatılırken oluşan `deinit` çökmesi giderildi.
 - iPad: ikon seti ve `UIRequiresFullScreen = YES` (SDK portrait kilitli; App Store çoklu
   görev şartı bu anahtarla karşılanır).
-- Proje adı `NewTest` → `IdentifySample`; SDK uzak SPM paketi yerine kaynağa bağlanır,
-  arşiv `-workspace` ile alınır; 2sworks TestFlight imzası.
+- Proje adı `NewTest` → `IdentifySample`; 2sworks TestFlight imzası. (Geliştirme dallarında
+  SDK kaynağına bağlanıp arşiv `-workspace` ile alınır; `main` daima uzak SPM paketi.)
 - Dokümanlar: README'ye SPM `Exact Version` uyarısı, tema/metin API tablosu ve
   "örnekten hangi dosyalar kopyalanır" bölümü; RN/Flutter rehberlerinde kopyalama hedefleri.
 
