@@ -5,7 +5,7 @@
 //  SDK "Canlılıkla Selfie" modülü — ENTEGRASYON REHBERİ.
 //  1) SwlExample          → SDK hazır ekranı (mod: IdentifyManager.shared.selfieWithLivenessTrueDepth)
 //  2) SwlExampleThemed    → tema override
-//  3) Tam özel ekran YOK: SDK 3.1.0 bu modül için public ViewModel sunmuyor (bkz. SelfieWithLiveness.md)
+//  3) SelfieWithLivenessCustomView → tam özel ekran: SDK ekranının public API ile birebir kopyası (SelfieWithLivenessCustomView.swift)
 //  4) SwlExampleTrueDepth → ekran bazında TrueDepth modu (.automatic / .required / .disabled)
 //
 //  ⚠️ Gerçek cihaz gerekir (simülatörde kamera ve ARKit yok).
@@ -41,3 +41,4 @@ struct SwlExampleTrueDepth: View {
 // MARK: - Previews
 #Preview("Canlılıkla Selfie — Varsayılan") { SwlExample().showcaseHost() }
 #Preview("Canlılıkla Selfie — Tema") { SwlExampleThemed().showcaseHost() }
+#Preview("Canlılıkla Selfie — Özel Ekran") { SDKModulePreviewHost { SelfieWithLivenessCustomView() } }

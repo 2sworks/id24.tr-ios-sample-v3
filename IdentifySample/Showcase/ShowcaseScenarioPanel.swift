@@ -527,6 +527,15 @@ enum ShowcaseScenarios {
         // MARK: Kimlik (OCR)
         case "idCard":
             return [
+                .init(title: "Ekran modu",
+                      note: "Kimlik modülünün hangi ekranla açılacağı; değişince ekran yeniden kurulur.",
+                      controls: [
+                        .flag(title: "Tek ekran tarama",
+                              note: "Açıkken ön + arka yüz tek tam ekranda sırayla çekilir (IdCardSingleScreenCustomView). Oturum yoksa her çekim dummy onayla geçer; ret olursa 2 sn sonra aynı yüz tekrar çekilir.",
+                              get: { CustomScreens.isIdCardSingleScreenEnabled },
+                              set: { UserDefaults.standard.set($0, forKey: CustomScreens.idCardSingleScreenKey) })
+                      ]),
+
                 .init(title: "İzin verilen belge türleri",
                       note: "Seçim ekranındaki seçenekleri backend belirler.",
                       controls: [

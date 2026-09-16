@@ -54,7 +54,7 @@ Profil = "bu belge nasıl taranır" tarifi (strateji + alan bölgeleri + anahtar
 | Profil | Strateji | Ne yapar |
 |---|---|---|
 | `.turkishIDFront` | `visionText` | TC kimlik ön yüz: TCKN, soyad, ad, doğum tarihi, belge no — **bölgesel OCR** ile |
-| `.turkishIDBack` | `visionText` | TC kimlik arka yüz (MRZ satırları dahil) |
+| `.turkishIDBack` | `mrzTurkishID` | TC kimlik arka yüz: anne adı / baba adı / veren makam basılı **etiketine göre** (`labelAnchor`), MRZ kuralı `.td1` zorunlu `.presence` |
 | `.turkishID` | — | Ön/arka birleşik anahtar kelime kümesi |
 | `.passport` | `mrzPassport` | Pasaport veri sayfası (TD3 MRZ); dik tutulursa "yana çevirin" yönergesi |
 | `.turkishDrivingLicense` | `visionText` | TR ehliyet |
@@ -88,7 +88,46 @@ let profile = DocumentProfile(
 ```
 
 `FieldRegion` normalize koordinattır (0–1); alan yalnızca belgedeki o bölgede aranır — bu,
-hem hızı hem isabeti ciddi artırır.
+hem hızı hem isabeti ciddi artırır. Sabit bölge yerine basılı etikete göre bulmak için
+`labelAnchor: LabelAnchor(variants: ["ANNE ADI", "MOTHER'S NAME"], direction: .below)` verin;
+belge çerçeveyi tam doldurmadığında bölge kaymaz.
+
+### Neyin çekimi beklettiğine profil karar verir
+
+Otomatik çekim iki şeye bakar ve ikisi de profilden okunur:
+
+| Ne | Nasıl ayarlanır | Etkisi |
+|---|---|---|
+| Basılı alan | `FieldDescriptor.isRequired` | `true` → alan okunmadan çekmez; `false` → okunursa döner, beklemez |
+| MRZ | `DocumentProfile.mrz: MRZRequirement?` | `nil` → aranmaz; `isRequired: false` → okunur ama beklemez; `true` → `level`'a göre bekler |
+
+`MRZRequirement(format:isRequired:level:)`: `format` `.td1` (kimlik, 3×30) / `.td3` (pasaport,
+2×44); `level` `.presence` (bölge görünüyor — en az iki MRZ yapılı satır, uzunluk/kontrol hanesi
+aranmaz) / `.parsed` (belge no + doğum + geçerlilik ayrıştı). Kesin MRZ okuması çekim
+**sonrası** yapılır; canlı kural yalnızca "ne zaman çekilsin" sorusunu yanıtlar.
+
+`.mrzTurkishID` profili `mrz` vermezse eski kural (`MRZRequirement.legacyTurkishID`: `.td1`,
+zorunlu, `.parsed`) uygulanır; JSON profillerde `mrz` anahtarı yoksa da aynı.
+
+### Hazır profili değiştirmek — kopya yardımcıları
+
+Hazır profiller sabittir; her yardımcı değiştirilmiş bir **kopya** döner:
+
+```swift
+let back = DocumentProfile.turkishIDBack
+    .settingRequired(false, for: "fatherName")          // bir/birden çok alanı zorunlu ↔ zorunsuz
+    .settingMRZRequired(false)                           // MRZ okunsun ama çekimi beklemesin
+    // .settingMRZ(MRZRequirement(format: .td1, isRequired: true, level: .parsed))
+    // .settingField(FieldDescriptor(key: "issuedBy", isRequired: true))   // alanı değiştir / ekle
+    // .removingFields("documentType")                                       // hiç arama
+    // .settingKeywordSet(nil)                                               // anahtar kelime kapısını kapat
+
+IdentityScannerView(profile: back) { result in … }
+```
+
+Kopya kendi ekranınızda (`IdentityScannerView(profile:)`) ya da aynı `id` ile
+`DocumentProfileRegistry.shared.register(_:)` sonrası `DocumentScanner`'da geçerlidir;
+SDK'nın hazır kimlik ekranı (`SDKIdCardView`) hazır profili doğrudan kullanır.
 
 ## Doğrulayıcılar
 
@@ -136,6 +175,9 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 | `externalTorchOn` | El feneri kontrolünü dışarıdan bağlama (`Binding<Bool>`) |
 | `onTorchAvailability` | Cihazda fener var/yok bildirimi |
 | `speechKey` / `speechModule` | Açılışta sesli yönerge ([ReadAloud](../../IdentifySample/Modules/ReadAloud.md) sistemiyle) |
+| `dismissesOnResult` | Sonuçtan sonra ortamın `dismiss`'ini çağırsın mı (varsayılan `true`). Tarayıcıyı bir ekranın parçası olarak gömüyorsanız `false` — yoksa ekranın kendisi kapanır |
+| `keepsCameraRunning` | Başarılı çekimden sonra kamera açık kalsın mı (varsayılan `false`); `true` ile yalnız kare işleme durur, önizleme canlı kalır |
+| `scanSession` | Değeri değişince tarayıcı kamerayı yeniden kurmadan güncel `profile`/`configuration` ile yeni çekime hazırlanır (ön → arka yüz); `keepsCameraRunning` ile anlamlı |
 | `onResult` | `Result<RecognizedDocument, Error>` |
 
 **Değiştirilemeyenler (şu an):** tarayıcının kendi HUD'u — talimat metninin konumu ve yazı
@@ -143,9 +185,12 @@ stili, manuel çekim ve iptal düğmeleri — gizlenemez; yalnız metinleri değ
 **içine** host içeriği (ör. kart çizimi) konamaz. Fener, kapat, adım göstergesi gibi öğeleri
 tarayıcının üstüne `ZStack` ile kendiniz çizebilirsiniz.
 
-Tarayıcı sonucu teslim edince kendini `dismiss()` eder: `fullScreenCover` / `sheet` içinde
-sunun, bir ekranın gövdesine doğrudan gömmeyin. En kısa yol `.documentScanner(isPresented:…)`
-modifier'ıdır — sunumu ve kapanışı kendisi yapar, `navOverlay` ile üstüne katman koyarsınız.
+Tarayıcı varsayılan olarak sonucu teslim edince kendini `dismiss()` eder: `fullScreenCover` /
+`sheet` içinde sunun. En kısa yol `.documentScanner(isPresented:…)` modifier'ıdır — sunumu ve
+kapanışı kendisi yapar, `navOverlay` ile üstüne katman koyarsınız. Tarayıcıyı bir ekranın
+gövdesine gömmek istiyorsanız `dismissesOnResult: false` verin; ön ve arka yüzü aynı kamera
+oturumunda çekmek için `keepsCameraRunning: true` + her yüzde artan `scanSession` kullanın —
+çalışan örnek: [IdCardSingleScreenCustomView.swift](../../IdentifySample/Modules/IdCard/IdCardSingleScreenCustomView.swift).
 
 ### HUD Metinleri ve Zamanlama — `ScannerConfiguration`
 

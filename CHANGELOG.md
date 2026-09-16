@@ -12,6 +12,43 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 Tamamı eklemeli: hiçbir tema ayarı vermeyen projede ekranlar 3.0.0 ile birebir aynıdır.
 Ayrıntı ve geçiş adımları: [3.1.0 Değişiklik Rehberi](docs/guides/migration-3.1.0.md).
 
+**Selfie + Canlılık ViewModel'i**
+- **`SDKSelfieWithLivenessViewModel`** (`: SDKBaseModuleViewModel`, public final) — iki fazlı
+  oval durum makinesi, ışık/eğim/mesafe/konum eşikleri (histerezis), tutma süresi, çekim
+  zamanı, yükleme ve `SDKComparisonGate` kararı tek ViewModel'de. Girdi: ARKit yolunda
+  `analyzeFace(SDKFaceObservation)` / `analyzeNoFace()`, Vision yolunda
+  `analyzeFrame(_:cameraPosition:)`. Çıktı: `phase`, `ovalPhase`/`ovalScale`/`ovalRect`,
+  `guidanceText`, `holdProgress`, `isFaceAligned`, `shouldCapture`, `isSessionActive`/`sessionGeneration`,
+  `isFaceMeshHidden`, `canContinue`; `onCompleted` / `onSkipRequested` / `onFlowFailed`.
+- **`SDKSelfieWithLivenessConfig`** — süreler, oval oranları ve ARKit eşikleri (init'e verilir).
+- **`SDKFaceCapturePath`** public — ekranın hangi yolla çalıştığı (`.arkit` / `.vision` / `.unsupported`).
+- `SDKSelfieWithLivenessView(viewModel:)` — kendi ViewModel'ini enjekte etme.
+
+**Değişti**
+- `SDKSelfieWithLivenessView` artık diğer modüller gibi **SwiftUI + ViewModel**: UIKit
+  `SDKSelfieWithLivenessController` / `SDKSelfieWithLivenessVisionController` kaldırıldı
+  (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
+  ekran flaşı, yönerge metinleri, titreşim, yükleme kararı. Hata/yeniden deneme alert'i artık
+  diğer modüllerle ortak `idErrorAlert` stilinde.
+
+**Kimlik tarayıcı (IdentityScanner)**
+- **`DocumentProfile.mrz: MRZRequirement?`** — MRZ artık profilin kuralı: `format` (`.td1` kimlik /
+  `.td3` pasaport), `isRequired` ve `level` (`.presence` = bölge görünüyor / `.parsed` = belge no +
+  tarihler ayrıştı). Basılı alanlar `FieldDescriptor.isRequired`, MRZ `mrz.isRequired` ile zorunlu
+  olur; koda gömülü "MRZ ayrışmadan çekme" kuralı kaldırıldı. `mrz` verilmeyen `.mrzTurkishID`
+  profili eski kuralla (`MRZRequirement.legacyTurkishID`) çalışır.
+- **Profil kopya yardımcıları** — `settingRequired(_:for:)`, `settingMRZ(_:)`,
+  `settingMRZRequired(_:)`, `settingField(_:)`, `removingFields(_:)`, `settingKeywordSet(_:)`;
+  hazır profiller sabittir, her yardımcı kopya döner.
+- `turkishIDBack`: anne adı / baba adı / veren makam sabit ROI yerine basılı **etiketine** göre
+  bulunur (`labelAnchor`); MRZ kuralı `.td1` zorunlu `.presence`. Kart çerçeveyi tam
+  doldurmadığında bölgeler kayıp arka yüz elle çekime düşüyordu.
+- MRZ okuması: `«`/`‹` → `<`, satırlar konuma göre sıralanıp parçaları birleştirilir, TD1
+  satırları yapılarına göre tanınır (yanlış satır seçimi ve kısa satır elemesi giderildi).
+- **`IdentityScannerView`**: `dismissesOnResult` (varsayılan `true`), `keepsCameraRunning`
+  (varsayılan `false`) ve `scanSession` — tarayıcıyı bir ekranın parçası olarak gömüp aynı
+  kamera oturumunda ön → arka yüz geçişi yapmak için.
+
 **Yeni**
 - **Buton görünümü** — `SDKTheme.shared.buttons`: köşe (`.capsule` / `.radius(x)`), yükseklik,
   padding, font, arka plan/metin rengi, kenarlık, gölge, disabled opaklığı, basılı ölçek,
@@ -346,6 +383,31 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
 > Not: v3 ile birlikte örnek uygulama sıfırdan numaralandı (`CURRENT_PROJECT_VERSION` 23);
 > aşağıdaki "Build 178" ve öncesi eski numaralandırmaya aittir.
 
+**Tam özel ekran örnekleri**
+- `SelfieWithLivenessCustomView.swift`: ARKit yolu (`FaceTrackingCameraView`) ve Vision
+  yolu (`SelfieCameraController`) tek dosyada; "Tam Özel Ekranlar" listesine ve anahtara eklendi.
+- Her modül için `XxxCustomView.swift`: SDK'nın hazır ekranının **yalnızca public API ile**
+  yazılmış, çalışan birebir kopyası (15 ekran). Değişiklik yapmadan takıldığında SDK
+  ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır.
+- `IdCardSingleScreenCustomView.swift`: kimlik ön + arka yüzü **tek tam ekranda** sırayla
+  çeken örnek (`keepsCameraRunning` + `scanSession`, sunucu onayı, retta 2 sn sonra otomatik
+  tekrar çekim, oturum yokken dummy onay). "Tam Özel Ekranlar" ve Modül Rehberi → Senaryo →
+  "Ekran modu" anahtarıyla açılır.
+- `Modules/CustomKit/`: kamera önizlemesi (iOS 17 `RotationCoordinator` portrait düzeltmesi),
+  oval/çerçeve maskeleri ve ortak yardımcılar; `CustomScreens.swift` tüm override'ları toplu
+  takar.
+- Hamburger menü → **Tam Özel Ekranlar**: anahtar açıkken akıştaki her ekran özel sürümüyle
+  çizilir, kapalıyken SDK ekranları; aynı ekrandan her modül tek tek önizlenir.
+- `XxxExample.swift` dosyaları sadeleşti: (1) SDK ekranı, (2) tema, (3) `XxxCustomView`
+  önizlemesi. `XxxConfig.swift` dosyaları ve "Replaced" örnekleri kaldırıldı (eski
+  "özelleştirme" örnekleri SDK ekranıyla aynı sonucu vermiyordu; bu kaldırmanın nedenidir).
+- `RootView.swift` başında entegrasyon rehberi: üç yapı taşı, akış sırası, özelleştirme
+  katmanları A–D, özel ekran kuralları.
+- `main` dalı IdentifySDK'yı uzak SPM paketinden (`id24.tr-ios-sdk-spm`, **exact 3.1.0**)
+  bağlar; kaynağa bağlı derleme yalnızca geliştirme dallarındadır.
+- Dokümanlar: README kopyalama tablosu, `customization.md` (CustomView tablosu + CustomKit +
+  bitiş durumu notu), `FULL-INTERGATION.md` bölüm 7/8, `Modules.md` ve 14 modül rehberi.
+
 **Build 24–44**
 - Hamburger menüsü: **SDK Modül Rehberi** (showcase: tasarım kataloğu, nav bar marka/ikon
   örnekleri, tema JSON köprüsü, senaryolu dummy API) ve **Debug Değerleri** ekranı
@@ -354,8 +416,8 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
   tercihleri kalıcı. Panel kapatılırken oluşan `deinit` çökmesi giderildi.
 - iPad: ikon seti ve `UIRequiresFullScreen = YES` (SDK portrait kilitli; App Store çoklu
   görev şartı bu anahtarla karşılanır).
-- Proje adı `NewTest` → `IdentifySample`; SDK uzak SPM paketi yerine kaynağa bağlanır,
-  arşiv `-workspace` ile alınır; 2sworks TestFlight imzası.
+- Proje adı `NewTest` → `IdentifySample`; 2sworks TestFlight imzası. (Geliştirme dallarında
+  SDK kaynağına bağlanıp arşiv `-workspace` ile alınır; `main` daima uzak SPM paketi.)
 - Dokümanlar: README'ye SPM `Exact Version` uyarısı, tema/metin API tablosu ve
   "örnekten hangi dosyalar kopyalanır" bölümü; RN/Flutter rehberlerinde kopyalama hedefleri.
 

@@ -47,6 +47,18 @@ SDKIdCardView(viewModel: myIdCardVM)  // dışarıdan VM enjeksiyonu (host VM il
 >
 > Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
 
+> **İkinci örnek — tek ekranda ön + arka yüz:** [IdCardSingleScreenCustomView.swift](IdCardSingleScreenCustomView.swift).
+> Kamera modül açılır açılmaz tam ekran çalışır; ön yüz çekilip sunucuda onaylanınca aynı ekranda
+> arka yüze geçilir, arka yüz onaylanınca modül tamamlanır. Ret olursa çerçevenin altında mesaj
+> gösterilir ve 2 sn sonra aynı yüz otomatik yeniden çekilir. Oturum yokken (socket bağlı değil)
+> her çekim dummy onayla geçer (`init(simulateServer:)` ile zorlanabilir).
+> Kullandığı SDK parçaları: `IdentityScannerView(dismissesOnResult: false, keepsCameraRunning: true,
+> scanSession:)` — tarayıcı ekranın parçası olarak gömülür, kamera oturumu yüzler arasında
+> kapanmaz; `scanSession` değişince aynı oturumda yeni profille (ön → arka) yeniden çekime hazırlanır.
+> Çerçevedeki silik `frontID` / `backID` görselleri `Bundle.sdkUI`'dan gelir. Örnek uygulamada
+> **Tam Özel Ekranlar → "Kimlik: tek ekran tarama"** anahtarı ya da Modül Rehberi → Senaryo →
+> **Ekran modu** ile açılır. Takmak için: `registry.override(.idCard) { IdCardSingleScreenCustomView() }`
+
 
 Ekranı siz çizersiniz; OCR + yükleme + adım sinyali SDK VM'inde kalır. Görüntüyü nereden
 aldığınıza göre iki yol vardır:
@@ -58,6 +70,10 @@ aldığınıza göre iki yol vardır:
 | Belgeye kırpma, pasaport oryantasyon düzeltmesi | ✅ | ❌ |
 | Tasarım serbestliği | Çerçeve, çizgi stili, metinler, fener; HUD gizlenemez ([sınırlar](../../../docs/guides/identity-scanner.md#görünüm-ve-davranış-ayarları)) | Tam |
 | Risk | — | Bulanık/parlamalı kare → "okunamadı" ya da sunucu karşılaştırma reddi |
+
+> **Arka yüzde neyin zorunlu olduğunu değiştirmek:** `DocumentProfile.turkishIDBack`
+> `.settingRequired(false, for: "fatherName")` / `.settingMRZRequired(false)` ile kopyalanıp
+> `IdentityScannerView(profile:)`'a verilir; ayrıntı [IdentityScanner rehberi](../../docs/guides/identity-scanner.md#neyin-çekimi-beklettiğine-profil-karar-verir).
 
 ### A) SDK tarayıcısıyla
 

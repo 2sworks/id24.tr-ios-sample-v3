@@ -25,6 +25,12 @@ enum CustomScreens {
 
     static var isEnabled: Bool { UserDefaults.standard.bool(forKey: storageKey) }
 
+    /// "Kimlik: tek ekran tarama" anahtarı. Açıkken kimlik modülü, genel anahtardan bağımsız olarak
+    /// `IdCardSingleScreenCustomView` ile açılır (ön + arka yüz tek tam ekranda).
+    static let idCardSingleScreenKey = "sampleIdCardSingleScreenEnabled"
+
+    static var isIdCardSingleScreenEnabled: Bool { UserDefaults.standard.bool(forKey: idCardSingleScreenKey) }
+
     /// Görüşme socket üzerinden bittiğinde (ör. panel `.endCall`) teşekkür ekranında gösterilecek durum.
     ///
     /// SDK'nın kendi görüşme ekranı bunu `coordinator.pendingThankYouStatus`'a yazar; o alanın
@@ -36,7 +42,14 @@ enum CustomScreens {
     static func register(in registry: SDKViewRegistry) {
         registry.override(.prepare)        { pick(PrepareCustomView(), else: SDKPrepareView()) }
         registry.override(.selfie)         { pick(SelfieCustomView(), else: SDKSelfieView()) }
-        registry.override(.idCard)         { pick(IdCardCustomView(), else: SDKIdCardView()) }
+        registry.override(.selfieWithLiveness) { pick(SelfieWithLivenessCustomView(), else: SDKSelfieWithLivenessView()) }
+        registry.override(.idCard) {
+            if isIdCardSingleScreenEnabled {
+                IdCardSingleScreenCustomView()
+            } else {
+                pick(IdCardCustomView(), else: SDKIdCardView())
+            }
+        }
         registry.override(.idCardOVD)      { pick(IdCardOVDCustomView(), else: SDKIdCardOVDView()) }
         registry.override(.nfc)            { pick(NfcCustomView(), else: SDKNfcView()) }
         registry.override(.liveness)       { pick(LivenessCustomView(), else: SDKLivenessView()) }
@@ -56,9 +69,6 @@ enum CustomScreens {
             }
         }
 
-        // `.selfieWithLiveness` burada YOK: SDK 3.1.0 bu modül için public bir ViewModel sunmuyor
-        // (yalnızca hazır `SDKSelfieWithLivenessView(trueDepthMode:)` ekranı). Bkz. SwlExample.swift.
-        //
         // Bağlantı Koptu ve İşaret Dili ekranları rota değildir; özel sürümleri
         // CallScreenCustomView içinde kullanılır.
     }

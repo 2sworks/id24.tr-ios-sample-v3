@@ -15,6 +15,7 @@ import IdentifySDK
 struct CustomScreensView: View {
 
     @AppStorage(CustomScreens.storageKey) private var isEnabled = false
+    @AppStorage(CustomScreens.idCardSingleScreenKey) private var isIdCardSingleScreen = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
 
@@ -29,9 +30,11 @@ struct CustomScreensView: View {
     private let entries: [Entry] = [
         .init(id: "prepare", title: "Hazırlık", file: "PrepareCustomView.swift", icon: "checklist") { AnyView(PrepareCustomView()) },
         .init(id: "idCard", title: "Kimlik (OCR)", file: "IdCardCustomView.swift", icon: "person.text.rectangle") { AnyView(IdCardCustomView()) },
+        .init(id: "idCardSingle", title: "Kimlik — Tek Ekran Tarama", file: "IdCardSingleScreenCustomView.swift", icon: "rectangle.on.rectangle") { AnyView(IdCardSingleScreenCustomView()) },
         .init(id: "ovd", title: "Kimlik + OVD", file: "IdCardOVDCustomView.swift", icon: "sparkles.rectangle.stack") { AnyView(IdCardOVDCustomView()) },
         .init(id: "nfc", title: "NFC", file: "NfcCustomView.swift", icon: "wave.3.right") { AnyView(NfcCustomView()) },
         .init(id: "selfie", title: "Selfie", file: "SelfieCustomView.swift", icon: "person.crop.square") { AnyView(SelfieCustomView()) },
+        .init(id: "swl", title: "Canlılıkla Selfie", file: "SelfieWithLivenessCustomView.swift", icon: "faceid") { AnyView(SelfieWithLivenessCustomView()) },
         .init(id: "liveness", title: "Canlılık", file: "LivenessCustomView.swift", icon: "faceid") { AnyView(LivenessCustomView()) },
         .init(id: "speech", title: "Konuşma", file: "SpeechCustomView.swift", icon: "waveform") { AnyView(SpeechCustomView()) },
         .init(id: "address", title: "Adres Onayı", file: "AddressConfirmCustomView.swift", icon: "house") { AnyView(AddressConfirmCustomView()) },
@@ -52,6 +55,7 @@ struct CustomScreensView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: IDSpacing.lg) {
                             toggleCard
+                            idCardSingleScreenToggle
                             Text("Bu ekranlar SDK ekranlarının yalnızca public API ile yazılmış birebir kopyasıdır. Listeden açılan ekran kamerayı gerçekten çalıştırır; oturum olmadığı için yükleme ve ilerleme olmaz. Uçtan uca davranış için anahtar açılır ve giriş yapılır.")
                                 .font(IDFont.caption(.regular))
                                 .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
@@ -124,6 +128,32 @@ struct CustomScreensView: View {
                     .stroke(isEnabled ? IDColor.primary.opacity(0.4) : IDColor.adaptiveBorder(for: colorScheme), lineWidth: 1))
         )
         .animation(.easeInOut(duration: 0.2), value: isEnabled)
+    }
+
+    private var idCardSingleScreenToggle: some View {
+        HStack(spacing: IDSpacing.md) {
+            Image(systemName: "rectangle.on.rectangle")
+                .foregroundColor(IDColor.primary)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Kimlik: tek ekran tarama")
+                    .font(IDFont.bodyRegular(.semibold))
+                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                Text(isIdCardSingleScreen ? "Kimlik modülü ön + arka yüzü tek tam ekranda çeker." : "Kapalı: kimlik modülü yukarıdaki anahtara göre açılır.")
+                    .font(IDFont.caption())
+                    .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+            }
+            Spacer()
+            Toggle("", isOn: $isIdCardSingleScreen).labelsHidden().tint(IDColor.primary)
+        }
+        .padding(IDSpacing.lg)
+        .background(
+            RoundedRectangle(cornerRadius: IDRadius.lg)
+                .fill(IDColor.adaptiveSurface(for: colorScheme))
+                .overlay(RoundedRectangle(cornerRadius: IDRadius.lg)
+                    .stroke(isIdCardSingleScreen ? IDColor.primary.opacity(0.4) : IDColor.adaptiveBorder(for: colorScheme), lineWidth: 1))
+        )
+        .animation(.easeInOut(duration: 0.2), value: isIdCardSingleScreen)
     }
 
     private func row(_ entry: Entry) -> some View {

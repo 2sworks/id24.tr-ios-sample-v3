@@ -208,6 +208,28 @@ Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sor
 [Oturum Çıkışları](session-exit.md). Alanlar ve sebep tablosu:
 [FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301).
 
+### 10. Kimlik tarayıcı — MRZ kuralı, etiketli arka yüz, gömülebilir tarayıcı
+
+- **`DocumentProfile.mrz: MRZRequirement?`** — MRZ artık profilin kuralı: `format`
+  (`.td1`/`.td3`), `isRequired`, `level` (`.presence`/`.parsed`). Basılı alanlar
+  `FieldDescriptor.isRequired`, MRZ `mrz.isRequired` ile zorunlu olur; koda gömülü "MRZ tam
+  ayrışmadan çekme" kuralı kalktı. `mrz` vermeyen `.mrzTurkishID` profili eski kuralla çalışır.
+- **Kopya yardımcıları** — `settingRequired(_:for:)`, `settingMRZ(_:)`, `settingMRZRequired(_:)`,
+  `settingField(_:)`, `removingFields(_:)`, `settingKeywordSet(_:)`: hazır profili
+  yeniden kurmadan istediğiniz alanı açıp kapatın.
+- **`turkishIDBack`** — anne adı / baba adı / veren makam sabit bölge yerine basılı etiketine
+  göre bulunur; MRZ kuralı `.td1` zorunlu `.presence`. Kart çerçeveyi tam doldurmadığında arka
+  yüz elle çekime düşüyordu.
+- **MRZ okuması** — `«`/`‹` → `<`, satırlar konuma göre sıralanıp parçaları birleştirilir,
+  TD1 satırları yapılarına göre tanınır.
+- **`IdentityScannerView`** — `dismissesOnResult`, `keepsCameraRunning`, `scanSession`:
+  tarayıcıyı bir ekranın parçası olarak gömme ve aynı kamera oturumunda ön → arka yüz.
+  Örnek: `IdCardSingleScreenCustomView`.
+- **`SDKSelfieWithLivenessViewModel`** public (ARKit / Vision); SWL ekranı SwiftUI + ViewModel.
+  Örnek: `SelfieWithLivenessCustomView`.
+
+Ayrıntı: [IdentityScanner rehberi](identity-scanner.md#neyin-çekimi-beklettiğine-profil-karar-verir).
+
 ---
 
 ## Değişti

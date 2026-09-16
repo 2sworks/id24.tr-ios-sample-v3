@@ -6,6 +6,7 @@
 //  1) IdCardExample         → SDK hazır ekranı
 //  2) IdCardExampleThemed   → tema override
 //  3) IdCardCustomView → tam özel ekran: SDK ekranının public API ile birebir kopyası (IdCardCustomView.swift)
+//  4) IdCardSingleScreenCustomView → tek tam ekranda ön + arka yüz tarama, sunucu onayıyla (IdCardSingleScreenCustomView.swift)
 //
 
 import SwiftUI
@@ -28,4 +29,7 @@ struct IdCardExampleThemed: View {
 #Preview("Kimlik — Tema") { IdCardExampleThemed().showcaseHost() }
 #Preview("Kimlik — Özel Ekran") {
     SDKModulePreviewHost { IdCardCustomView() }
+}
+#Preview("Kimlik — Tek Ekran Tarama") {
+    SDKModulePreviewHost { IdCardSingleScreenCustomView() }
 }

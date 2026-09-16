@@ -707,6 +707,14 @@ struct MyCustomSelfieView: View {
 }
 ```
 
+**Sıfırdan yazmak yerine:** örnek uygulamada her modülün klasöründe `XxxCustomView.swift`
+vardır — SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (bölüm 8'deki
+tabloda "Tam özel örnek" sütunu). Projeye kopyalanır, `registry.override(...)` ile takılır,
+üzerinde değişiklik yapılır. Kamera kullananlar `Modules/CustomKit/` içindeki
+`CustomCameraPreview.swift` + `CustomComponents.swift` dosyalarını da ister. Örnek uygulamada
+hamburger menü → **Tam Özel Ekranlar** anahtarı tümünü akışta SDK ekranlarının yerine koyar.
+Ayrıntı: [Özelleştirme Rehberi](docs/guides/customization.md#sıfırdan-yazmak-yerine-xxxcustomviewswift).
+
 ### B) Akışa custom ekran ekleme
 
 ```swift
@@ -759,23 +767,26 @@ Her modülün View + ViewModel'i public'tir; override ederken VM'i yeniden kulla
 Modül bazlı VM API tabloları için [Modül Kataloğu](README.md#modül-kataloğu)ndaki
 ilgili rehbere bakın.
 
-| Rota | Default View | ViewModel | İşlev |
-|---|---|---|---|
-| `.prepare` | `SDKPrepareView` | `SDKPrepareViewModel` | İzinler + hazırlık kontrol listesi + hız testi |
-| `.selfie` | `SDKSelfieView` | `SDKSelfieViewModel` | Selfie çekimi + yüz tespiti + upload |
-| `.selfieWithLiveness` | `SDKSelfieWithLivenessView` | (controller) | Canlılıklı selfie |
-| `.idCard` | `SDKIdCardView` | `SDKIdCardViewModel` | Belge türü seçimi + OCR tarama (kimlik/pasaport/diğer) |
-| `.idCardOVD` | `SDKIdCardOVDView` | `SDKIdCardOVDViewModel` | Hologram (OVD) doğrulamalı kimlik tarama |
-| `.nfc` | `SDKNfcView` | `SDKNfcViewModel` | MRZ girişi + NFC çip okuma |
-| `.liveness` | `SDKLivenessView` | `SDKLivenessViewModel` | Canlılık adımları (ARKit) + video kaydı |
-| `.speech` | `SDKSpeechRecView` | `SDKSpeechRecViewModel` | Konuşma tanıma (kelime söyleme) |
-| `.addressConfirm` | `SDKAddressConfirmView` | `SDKAddressConfirmViewModel` | Adres belgesi (foto/PDF) yükleme |
-| `.signature` | `SDKSignatureView` | `SDKSignatureViewModel` | İmza çizimi + upload |
-| `.videoRecorder` | `SDKVideoRecorderView` | `SDKVideoRecorderViewModel` | Video kaydı (+ sesli okuma doğrulaması) |
-| `.callScreen` | `SDKCallScreenView` | `SDKCallScreenViewModel` | WebRTC görüntülü görüşme + bekleme odası |
-| `.thankYou` | `SDKThankYouView` | `SDKThankYouViewModel` | Sonuç ekranı (statülü/statüsüz) |
-| (global) | `SDKLostConnectionView` | `SDKLostConnectionViewModel` | Bağlantı koptu + reconnect |
-| (görüşme içi) | `SDKSignLangView` | `SDKSignLangViewModel` | İşaret dili tercümanı |
+| Rota | Default View | ViewModel | İşlev | Tam özel örnek (Sample App) |
+|---|---|---|---|---|
+| `.prepare` | `SDKPrepareView` | `SDKPrepareViewModel` | İzinler + hazırlık kontrol listesi + hız testi | `PrepareCustomView.swift` |
+| `.selfie` | `SDKSelfieView` | `SDKSelfieViewModel` | Selfie çekimi + yüz tespiti + upload | `SelfieCustomView.swift` |
+| `.selfieWithLiveness` | `SDKSelfieWithLivenessView` | `SDKSelfieWithLivenessViewModel` | Canlılıklı selfie (ARKit / Vision) | `SelfieWithLivenessCustomView.swift` |
+| `.idCard` | `SDKIdCardView` | `SDKIdCardViewModel` | Belge türü seçimi + OCR tarama (kimlik/pasaport/diğer) | `IdCardCustomView.swift` |
+| `.idCardOVD` | `SDKIdCardOVDView` | `SDKIdCardOVDViewModel` | Hologram (OVD) doğrulamalı kimlik tarama | `IdCardOVDCustomView.swift` |
+| `.nfc` | `SDKNfcView` | `SDKNfcViewModel` | MRZ girişi + NFC çip okuma | `NfcCustomView.swift` |
+| `.liveness` | `SDKLivenessView` | `SDKLivenessViewModel` | Canlılık adımları (ARKit) + video kaydı | `LivenessCustomView.swift` |
+| `.speech` | `SDKSpeechRecView` | `SDKSpeechRecViewModel` | Konuşma tanıma (kelime söyleme) | `SpeechCustomView.swift` |
+| `.addressConfirm` | `SDKAddressConfirmView` | `SDKAddressConfirmViewModel` | Adres belgesi (foto/PDF) yükleme | `AddressConfirmCustomView.swift` |
+| `.signature` | `SDKSignatureView` | `SDKSignatureViewModel` | İmza çizimi + upload | `SignatureCustomView.swift` |
+| `.videoRecorder` | `SDKVideoRecorderView` | `SDKVideoRecorderViewModel` | Video kaydı (+ sesli okuma doğrulaması) | `VideoRecorderCustomView.swift` |
+| `.callScreen` | `SDKCallScreenView` | `SDKCallScreenViewModel` | WebRTC görüntülü görüşme + bekleme odası | `CallScreenCustomView.swift` |
+| `.thankYou` | `SDKThankYouView` | `SDKThankYouViewModel` | Sonuç ekranı (statülü/statüsüz) | `ThankYouCustomView.swift` |
+| (global) | `SDKLostConnectionView` | `SDKLostConnectionViewModel` | Bağlantı koptu + reconnect | `LostConnectionCustomView.swift` |
+| (görüşme içi) | `SDKSignLangView` | `SDKSignLangViewModel` | İşaret dili tercümanı | `SignLangCustomView.swift` |
+
+Son sütundaki dosyalar `IdentifySample/Modules/<Modül>/` altındadır; SDK ekranının yalnızca
+public API ile yazılmış birebir kopyasıdır (bölüm 7-A).
 
 > Kimlik/pasaport tarama motorunu (IdentityScanner) akıştan bağımsız da kullanabilirsiniz —
 > profiller, alan OCR'ı, TCKN/MRZ doğrulama: [IdentityScanner Rehberi](docs/guides/identity-scanner.md).
@@ -1381,6 +1392,9 @@ struct MyKycStep: View {
 - `externalTorchOn` verirseniz scanner'ın kendi fener butonu gizlenir; binding'i siz sürersiniz.
 - Tam kontrol isterseniz `IdentityScannerView(profile:style:configuration:onResult:)`'ı
   modifier olmadan istediğiniz yerde kendiniz sunabilirsiniz (o da sıradan bir View'dır).
+- Tarayıcıyı bir ekranın parçası olarak gömmek için `dismissesOnResult: false`; ön ve arka
+  yüzü aynı kamera oturumunda çekmek için `keepsCameraRunning: true` + her yüzde artan
+  `scanSession` (örnek: `IdCardSingleScreenCustomView`).
 
 ### 16.2 Gereksinimler
 
@@ -1397,7 +1411,7 @@ Profil = "hangi belgeyi, hangi stratejiyle, hangi alanları okuyarak tarıyorum"
 |---|---|---|---|
 | `.generic` | `generic` | `imageOnly` | Yok — sadece düzeltilmiş görüntü |
 | `.turkishIDFront` | `tr.id.front` | `visionText` | `tckn`, `surname`, `givenNames`, `birthDate`, `documentNumber`, `expirationDate` |
-| `.turkishIDBack` | `tr.id.back` | `visionText` | MRZ satırları |
+| `.turkishIDBack` | `tr.id.back` | `mrzTurkishID` | anne/baba adı, veren makam (etiketine göre) + MRZ (`.td1`, zorunlu, `.presence`) |
 | `.turkishID` | — | `visionText` | Ön/arka ayrımı olmayan genel TC kimlik |
 | `.passport` | — | `visionText` | Pasaport veri sayfası (TD3 MRZ) + yana-çevir yönlendirmesi |
 | `.turkishDrivingLicense` | — | `visionText` | Ehliyet alanları |
@@ -1534,6 +1548,11 @@ await DocumentProfileRegistry.shared.register(sigorta)
 - `regionOfInterest` verilen alanlar yalnızca o bölgedeki OCR metniyle eşleştirilir
   (yanlış alan yakalamayı ciddi azaltır). Bölge yoksa tüm metinde aranır.
 - `isRequired: true` alanların TAMAMI çıkarılamadan otomatik yakalama tetiklenmez.
+- MRZ de aynı mantıkla profilden yönetilir: `mrz: MRZRequirement(format: .td1, isRequired: true,
+  level: .presence)` — `nil` aranmaz, `isRequired: false` okunur ama beklemez, `.parsed`
+  belge no + tarihler ayrışmadan çekmez. Hazır profili değiştirmek için kopya yardımcıları:
+  `DocumentProfile.turkishIDBack.settingRequired(false, for: "fatherName").settingMRZRequired(false)`
+  (`settingMRZ`, `settingField`, `removingFields`, `settingKeywordSet` de var).
 - `keywordSet`: belge üzerinde bulunması beklenen kelimeler; `minimumScore` altında
   kalan kareler "yanlış belge" sayılır ve kilitlenmez.
 

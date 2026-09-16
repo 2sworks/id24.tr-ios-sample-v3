@@ -54,7 +54,12 @@ enum ShowcaseCatalog {
             id: "idCard", title: "Kimlik Kartı (OCR)",
             subtitle: "Kimlik ön/arka tarama + OCR",
             icon: "person.text.rectangle",
-            liveView: { AnyView(SDKIdCardView()) }
+            // "Ekran modu" senaryosu: tek ekran tarama açıksa örnek ekran, değilse SDK ekranı.
+            liveView: {
+                CustomScreens.isIdCardSingleScreenEnabled
+                    ? AnyView(IdCardSingleScreenCustomView())
+                    : AnyView(SDKIdCardView())
+            }
         ),
         .init(
             id: "nfc", title: "NFC Pasaport/Kimlik",

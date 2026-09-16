@@ -83,6 +83,7 @@
 		1AD89A2DAF7F266CD2D13C03 /* LostConnectionCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDB663DB9B990915563D177 /* LostConnectionCustomView.swift */; };
 		BAC594C573AA3A9E5D8E8A13 /* PrepareCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB162C879E109A5BE17AA9 /* PrepareCustomView.swift */; };
 		F0C2A299C6BEB361CA424983 /* IdCardCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C37EA1A9369FD0504EA85B0A /* IdCardCustomView.swift */; };
+		A1D0C0DE5EED100000000001 /* IdCardSingleScreenCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D0C0DE5EED100000000002 /* IdCardSingleScreenCustomView.swift */; };
 		34A30EF9B9E836A5F5186296 /* IdCardOVDCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3540AE4C5CE365E5669071D /* IdCardOVDCustomView.swift */; };
 		1BCFF2663B6273F566ADFA34 /* NfcCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CEF04131D2B241055A51630 /* NfcCustomView.swift */; };
 		6D629AF18783E2293A849F34 /* SpeechCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D895293ABED853A6F9D48A0 /* SpeechCustomView.swift */; };
@@ -91,6 +92,7 @@
 		01420CDFC87949A00FA34E18 /* VideoRecorderCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC15B33D5AD70769A2B037D /* VideoRecorderCustomView.swift */; };
 		28FB67A7A95DC1764B951E86 /* ThankYouCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4592605CC05A5CA129EE5F37 /* ThankYouCustomView.swift */; };
 		A568695C33C1F35F1EC9E1E4 /* CustomScreensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4030C0CB532E4F64A64F0D3B /* CustomScreensView.swift */; };
+		3FBE1ECB9C6288973E073DD9 /* SelfieWithLivenessCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DDCECF90D2EAD9BC2564F9A /* SelfieWithLivenessCustomView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -200,6 +202,7 @@
 		CDDB663DB9B990915563D177 /* LostConnectionCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LostConnectionCustomView.swift; path = LostConnection/LostConnectionCustomView.swift; sourceTree = "<group>"; };
 		CEAB162C879E109A5BE17AA9 /* PrepareCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrepareCustomView.swift; sourceTree = "<group>"; };
 		C37EA1A9369FD0504EA85B0A /* IdCardCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdCardCustomView.swift; sourceTree = "<group>"; };
+		A1D0C0DE5EED100000000002 /* IdCardSingleScreenCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdCardSingleScreenCustomView.swift; sourceTree = "<group>"; };
 		C3540AE4C5CE365E5669071D /* IdCardOVDCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = IdCardOVDCustomView.swift; path = IdCardOVD/IdCardOVDCustomView.swift; sourceTree = "<group>"; };
 		2CEF04131D2B241055A51630 /* NfcCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NfcCustomView.swift; sourceTree = "<group>"; };
 		4D895293ABED853A6F9D48A0 /* SpeechCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechCustomView.swift; sourceTree = "<group>"; };
@@ -208,6 +211,7 @@
 		6AC15B33D5AD70769A2B037D /* VideoRecorderCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VideoRecorderCustomView.swift; sourceTree = "<group>"; };
 		4592605CC05A5CA129EE5F37 /* ThankYouCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThankYouCustomView.swift; sourceTree = "<group>"; };
 		4030C0CB532E4F64A64F0D3B /* CustomScreensView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomScreensView.swift; sourceTree = "<group>"; };
+		6DDCECF90D2EAD9BC2564F9A /* SelfieWithLivenessCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelfieWithLivenessCustomView.swift; path = SelfieWithLiveness/SelfieWithLivenessCustomView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -347,6 +351,7 @@
 			isa = PBXGroup;
 			children = (
 				C37EA1A9369FD0504EA85B0A /* IdCardCustomView.swift */,
+				A1D0C0DE5EED100000000002 /* IdCardSingleScreenCustomView.swift */,
 				244665EDEBB483AC83A5250C /* IdCardExample.swift */,
 				057317BDAFB60877C85A3684 /* IdCardHostViewModel.swift */,
 				229C1F0653291C93F4CF6203 /* IdCard.md */,
@@ -536,6 +541,7 @@
 		A629492FC7CC99257DA1499C /* SelfieWithLiveness */ = {
 			isa = PBXGroup;
 			children = (
+				6DDCECF90D2EAD9BC2564F9A /* SelfieWithLivenessCustomView.swift */,
 				6D33FA61BFD40D861B866C43 /* SwlExample.swift */,
 				E508AA61B5FE4BC3634D1265 /* SelfieWithLiveness.md */,
 			);
@@ -743,6 +749,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FBE1ECB9C6288973E073DD9 /* SelfieWithLivenessCustomView.swift in Sources */,
 				A568695C33C1F35F1EC9E1E4 /* CustomScreensView.swift in Sources */,
 				28FB67A7A95DC1764B951E86 /* ThankYouCustomView.swift in Sources */,
 				01420CDFC87949A00FA34E18 /* VideoRecorderCustomView.swift in Sources */,
@@ -752,6 +759,7 @@
 				1BCFF2663B6273F566ADFA34 /* NfcCustomView.swift in Sources */,
 				34A30EF9B9E836A5F5186296 /* IdCardOVDCustomView.swift in Sources */,
 				F0C2A299C6BEB361CA424983 /* IdCardCustomView.swift in Sources */,
+				A1D0C0DE5EED100000000001 /* IdCardSingleScreenCustomView.swift in Sources */,
 				BAC594C573AA3A9E5D8E8A13 /* PrepareCustomView.swift in Sources */,
 				1AD89A2DAF7F266CD2D13C03 /* LostConnectionCustomView.swift in Sources */,
 				C75945A743509F12E63836A4 /* SignLangCustomView.swift in Sources */,

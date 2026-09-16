@@ -115,8 +115,8 @@ Her VM'de hazır olanlar: `isLoading`, `errorMessage` (`@Published`) ve `manager
 > override, (3) `XxxCustomView` önizlemesi. Kök kurulum ve entegrasyon adımları için
 > [App/RootView.swift](../App/RootView.swift) başındaki rehberi okuyun.
 >
-> İstisna: **Selfie + Canlılık** için SDK 3.1.0 public bir ViewModel sunmaz; bu modül yalnızca
-> hazır ekranla (`SDKSelfieWithLivenessView`) kullanılabilir.
+> **Selfie + Canlılık** için `SDKSelfieWithLivenessViewModel` ve `SelfieWithLivenessCustomView`
+> SDK 3.1.0 ile birlikte gelir.
 
 ```swift
 // A) Ekranı kendi tasarımınla değiştir (başlangıç noktası: SelfieCustomView.swift)
