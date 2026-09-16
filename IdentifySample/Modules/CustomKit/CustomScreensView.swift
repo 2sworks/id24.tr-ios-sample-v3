@@ -32,6 +32,7 @@ struct CustomScreensView: View {
         .init(id: "ovd", title: "Kimlik + OVD", file: "IdCardOVDCustomView.swift", icon: "sparkles.rectangle.stack") { AnyView(IdCardOVDCustomView()) },
         .init(id: "nfc", title: "NFC", file: "NfcCustomView.swift", icon: "wave.3.right") { AnyView(NfcCustomView()) },
         .init(id: "selfie", title: "Selfie", file: "SelfieCustomView.swift", icon: "person.crop.square") { AnyView(SelfieCustomView()) },
+        .init(id: "swl", title: "Canlılıkla Selfie", file: "SelfieWithLivenessCustomView.swift", icon: "faceid") { AnyView(SelfieWithLivenessCustomView()) },
         .init(id: "liveness", title: "Canlılık", file: "LivenessCustomView.swift", icon: "faceid") { AnyView(LivenessCustomView()) },
         .init(id: "speech", title: "Konuşma", file: "SpeechCustomView.swift", icon: "waveform") { AnyView(SpeechCustomView()) },
         .init(id: "address", title: "Adres Onayı", file: "AddressConfirmCustomView.swift", icon: "house") { AnyView(AddressConfirmCustomView()) },

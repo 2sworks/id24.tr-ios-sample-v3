@@ -4,9 +4,9 @@ Selfie çekimi ile canlılık testini **tek ekranda** birleştiren varyant: kull
 oturuşta hem yüz fotoğrafını verir hem canlı olduğunu kanıtlar. Akışı kısaltmak isteyen
 kurumlar için idealdir.
 
-Diğer modüllerden önemli bir farkı var: bu modül **UIKit controller tabanlıdır** ve henüz
-ayrı bir public ViewModel yüzeyi yoktur. Ekran iki yoldan biriyle çalışır — **ARKit** ya da
-**Vision** — seçim [TrueDepth modu](#truedepth-modu) ile yapılır.
+Ekran iki yoldan biriyle çalışır — **ARKit** yüz takibi ya da ön kamera + **Vision** —
+seçim [TrueDepth modu](#truedepth-modu) ile yapılır. İş mantığı `SDKSelfieWithLivenessViewModel`
+içindedir; ekran (SwiftUI) yalnızca kamera/ARKit girdisini ViewModel'e verir ve çizer.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -18,9 +18,9 @@ ayrı bir public ViewModel yüzeyi yoktur. Ekran iki yoldan biriyle çalışır 
 |---|---|
 | Backend key | `SdkModules.selfieWithLiveness` |
 | Rota | `SDKModuleRoute.selfieWithLiveness` |
-| Drop-in view | `SDKSelfieWithLivenessView(trueDepthMode:)` (controller'ı saran SwiftUI) |
-| Controller | `SDKSelfieWithLivenessController` (ARKit) · `SDKSelfieWithLivenessVisionController` (Vision) — ikisi de internal |
-| Dış dünya | Yüz/canlılık (cihazda) + **HTTP** |
+| Drop-in view | `SDKSelfieWithLivenessView(trueDepthMode:)` |
+| ViewModel | `SDKSelfieWithLivenessViewModel(trueDepthMode:config:)` |
+| Dış dünya | Yüz/canlılık (cihazda) + **HTTP** (`uploadIdPhoto`) |
 | Ses anahtarı | `SelfieWithLivenessTts` |
 | Donanım | Moda bağlı — bkz. [TrueDepth modu](#truedepth-modu) |
 
@@ -42,20 +42,67 @@ ayrı bir public ViewModel yüzeyi yoktur. Ekran iki yoldan biriyle çalışır 
 case .selfieWithLiveness: SDKSelfieWithLivenessView()
 ```
 
-İç mantık `SDKSelfieWithLivenessController` (UIKit) içindedir; SwiftUI sarmalayıcı bunu
-köprüler. **Composition deseni bu modülde henüz yok** — diğer modüllerdeki gibi
-`let sdk = SDKXxxViewModel()` sarma yapısı sunulmuyor.
+## Kendi Tasarımınızla (Override)
 
-## Özelleştirme — Dürüst Durum Değerlendirmesi
+> **Çalışan tam örnek:** [SelfieWithLivenessCustomView.swift](SelfieWithLivenessCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.selfieWithLiveness) { SelfieWithLivenessCustomView() }`
+>
+> Vision yolu için kamera denetleyicisi [SelfieCustomView.swift](../Selfie/SelfieCustomView.swift) içindeki `SelfieCameraController`, önizleme [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Tam Özel Ekranlar** ile açılıp kapatılır.
 
-- **Tema** her zaman çalışır: renk/font/ikon değişimi için ekran yazmanıza gerek yok
-  ([Tema rehberi](../../../docs/guides/theming.md)).
-- **Tam override teknik olarak mümkün** (`registry.override(.selfieWithLiveness) {...}`),
-  ama temiz bir public VM yüzeyi olmadığından iş mantığını tetiklemek zordur —
-  **şimdilik önermiyoruz.**
-- **Ekranları gerçekten özelleştirmek istiyorsanız:** backend'de bu birleşik modül yerine
-  ayrık `.selfie` + `.livenessDetection` modüllerini kullanın. İkisinin de tam VM API'si
-  vardır: [Selfie](../Selfie/Selfie.md) · [Liveness](../Liveness/Liveness.md).
+Kamera/ARKit ve çizim sizin; ölçüm, durum makinesi, çekim zamanı, yükleme ve karar ViewModel'in.
+
+### ViewModel'de ne yapılabilir
+
+| Verdiğiniz | Çalışan |
+|---|---|
+| `updatePreviewSize(_:)` + `beginSession()` | Oval geometrisi (`ovalRect`, `ovalScale`), ısınma, durum makinesi |
+| `.arkit`: her takip karesinde `analyzeFace(SDKFaceObservation)` / yüz yokken `analyzeNoFace()` | Işık/eğim/mesafe/konum eşikleri (histerezis), küçük→büyük oval geçişi, tutma süresi → `guidanceText`, `phase`, `holdProgress`, `isFaceAligned` |
+| `.vision`: her kamera karesinde `analyzeFrame(_:cameraPosition:)` | Aynı durum makinesi; ölçüm Vision ile (mesafe = yüz/oval oranı, eğim ölçülmez) |
+| `shouldCapture` → kare alınır → `presentCaptured(image:)` | Titreşimin bitişi, yükleme, `SDKComparisonGate` kararı, deneme sayacı → `onCompleted` / `onSkipRequested` / `onFlowFailed`, `errorMessage` + `pendingAlertAction` |
+| `isSessionActive` / `sessionGeneration` gözlenir | AR/kamera oturumunun ne zaman açılıp duraklatılacağı (çekimden sonra kapanır, hata alert'i kapanınca yeniden açılır) |
+| `SDKSelfieWithLivenessConfig` (init'e) | Süreler (tutma 3 sn, küçük oval 1 sn, çekim gecikmesi 1 sn), oval oranları (0.50 / 0.75), ARKit eşikleri |
+| `trueDepthMode` (init'e) | Ekranın yolu: `path` = `.arkit` / `.vision` / `.unsupported` |
+
+### ViewModel'de ne yapılamaz
+
+- Yükleme atlanamaz, kendi `POST`'unuz yazılamaz; karşılaştırma kararı ve deneme hakkı sunucudan gelir.
+- `phase`, `holdProgress`, `shouldCapture`, `canContinue` dışarıdan yazılamaz (`private(set)`); yalnız girdiyle ilerler.
+- Vision yolunda eşikler `SDKSelfieGuidanceConfig`'in Selfie modülüyle ortak saha değerleridir, ekran bazında değiştirilemez.
+- Çekim anı flaşı, projeksiyon (3B yüz → ekran noktası) ve anlık görüntü ekranındır; ViewModel görüntüyü üretmez, yalnız alır.
+
+```swift
+registry.override(.selfieWithLiveness) { MySwlView() }
+
+struct MySwlView: View {
+    @EnvironmentObject var coordinator: SDKFlowCoordinator
+    @StateObject private var vm = SDKSelfieWithLivenessViewModel()   // mod: global TrueDepth ayarı
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                if vm.path == .arkit { MyARView(onFace: vm.analyzeFace, onNoFace: vm.analyzeNoFace) }
+                else { MyCamera(onFrame: { vm.analyzeFrame($0, cameraPosition: .front) }) }
+                MyOval(rect: vm.ovalRect, progress: vm.holdProgress, verified: vm.phase == .verified)
+                Text(vm.guidanceText)
+            }
+            .onAppear { vm.updatePreviewSize(geo.size); vm.beginSession() }        // ✅ zorunlu
+        }
+        .onChange(of: vm.shouldCapture) { if $0 { myFlashAndSnapshot { vm.presentCaptured(image: $0) } } }
+        .onAppear {
+            vm.onCompleted = { coordinator.advanceToNextModule() }               // ✅
+            vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed = { coordinator.finishFlowAsFailed() }
+        }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })
+    }
+}
+```
+
+`SDKFaceObservation` ARKit yolunun girdisidir: `center` (yüz çıpasının önizlemedeki noktası —
+`sceneView.projectPoint` ile ekran alır), `depthMeters` (`abs(transform.columns.3.z)`),
+`pitch` (`transform.columns.2.y`), `ambientIntensity` (`lightEstimate`). Tam kalıp
+`SelfieWithLivenessCustomView.swift` içindeki `FaceTrackingCameraView`'dadır.
+
+**Tema** ekran yazmadan da çalışır ([Tema rehberi](../../../docs/guides/theming.md)).
 
 ## TrueDepth Modu
 
@@ -69,6 +116,7 @@ IdentifyManager.shared.selfieWithLivenessTrueDepth = .disabled
 
 // Yalnız bu ekran için — override ile ekranı kendiniz kuruyorsanız
 registry.override(.selfieWithLiveness) { SDKSelfieWithLivenessView(trueDepthMode: .disabled) }
+// Özel ekranda: SDKSelfieWithLivenessViewModel(trueDepthMode: .disabled)
 ```
 
 | Mod | Ne yapar |
@@ -162,12 +210,6 @@ Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
 
 Örnek uygulamada hamburger menüsü → **Debug Değerleri** → *Selfie + Canlılık* → TrueDepth modu.
 Seçim bir sonraki bağlantıda geçerli olur; üç yolu aynı cihazda deneyebilirsiniz.
-
-## Yol Haritası
-
-Diğer modüllerle tutarlılık için ileride `SDKSelfieWithLivenessViewModel`
-(`: SDKBaseModuleViewModel`) çıkarılması planlanabilir; o zaman bu rehber de
-Selfie/Liveness ile aynı VM-referans formatına geçer.
 
 ---
 

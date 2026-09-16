@@ -7,6 +7,27 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### 3.1.1 — Selfie + Canlılık ViewModel'i (yayınlanmadı)
+
+**Yeni**
+- **`SDKSelfieWithLivenessViewModel`** (`: SDKBaseModuleViewModel`, public final) — iki fazlı
+  oval durum makinesi, ışık/eğim/mesafe/konum eşikleri (histerezis), tutma süresi, çekim
+  zamanı, yükleme ve `SDKComparisonGate` kararı tek ViewModel'de. Girdi: ARKit yolunda
+  `analyzeFace(SDKFaceObservation)` / `analyzeNoFace()`, Vision yolunda
+  `analyzeFrame(_:cameraPosition:)`. Çıktı: `phase`, `ovalPhase`/`ovalScale`/`ovalRect`,
+  `guidanceText`, `holdProgress`, `isFaceAligned`, `shouldCapture`, `isSessionActive`/`sessionGeneration`,
+  `isFaceMeshHidden`, `canContinue`; `onCompleted` / `onSkipRequested` / `onFlowFailed`.
+- **`SDKSelfieWithLivenessConfig`** — süreler, oval oranları ve ARKit eşikleri (init'e verilir).
+- **`SDKFaceCapturePath`** public — ekranın hangi yolla çalıştığı (`.arkit` / `.vision` / `.unsupported`).
+- `SDKSelfieWithLivenessView(viewModel:)` — kendi ViewModel'ini enjekte etme.
+
+**Değişti**
+- `SDKSelfieWithLivenessView` artık diğer modüller gibi **SwiftUI + ViewModel**: UIKit
+  `SDKSelfieWithLivenessController` / `SDKSelfieWithLivenessVisionController` kaldırıldı
+  (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
+  ekran flaşı, yönerge metinleri, titreşim, yükleme kararı. Hata/yeniden deneme alert'i artık
+  diğer modüllerle ortak `idErrorAlert` stilinde.
+
 ### 3.1.0 — Tema ve özelleştirme paketi
 
 Tamamı eklemeli: hiçbir tema ayarı vermeyen projede ekranlar 3.0.0 ile birebir aynıdır.
@@ -346,11 +367,13 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
 > Not: v3 ile birlikte örnek uygulama sıfırdan numaralandı (`CURRENT_PROJECT_VERSION` 23);
 > aşağıdaki "Build 178" ve öncesi eski numaralandırmaya aittir.
 
-**Tam özel ekran örnekleri (SDK 3.1.0)**
+**Tam özel ekran örnekleri (SDK 3.1.1: Selfie + Canlılık dahil)**
+- `SelfieWithLivenessCustomView.swift` (3.1.1): ARKit yolu (`FaceTrackingCameraView`) ve Vision
+  yolu (`SelfieCameraController`) tek dosyada; "Tam Özel Ekranlar" listesine ve anahtara eklendi.
 - Her modül için `XxxCustomView.swift`: SDK'nın hazır ekranının **yalnızca public API ile**
   yazılmış, çalışan birebir kopyası (14 ekran). Değişiklik yapmadan takıldığında SDK
   ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Selfie + Canlılık
-  hariç (3.1.0'da public ViewModel yok).
+  için SDK 3.1.1 gerekir (3.1.0'da public ViewModel yok).
 - `Modules/CustomKit/`: kamera önizlemesi (iOS 17 `RotationCoordinator` portrait düzeltmesi),
   oval/çerçeve maskeleri ve ortak yardımcılar; `CustomScreens.swift` tüm override'ları toplu
   takar.

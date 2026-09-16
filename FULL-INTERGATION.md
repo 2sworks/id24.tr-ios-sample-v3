@@ -771,7 +771,7 @@ ilgili rehbere bakın.
 |---|---|---|---|---|
 | `.prepare` | `SDKPrepareView` | `SDKPrepareViewModel` | İzinler + hazırlık kontrol listesi + hız testi | `PrepareCustomView.swift` |
 | `.selfie` | `SDKSelfieView` | `SDKSelfieViewModel` | Selfie çekimi + yüz tespiti + upload | `SelfieCustomView.swift` |
-| `.selfieWithLiveness` | `SDKSelfieWithLivenessView` | (controller — public VM yok) | Canlılıklı selfie | — (3.1.0'da yalnızca hazır ekran + tema) |
+| `.selfieWithLiveness` | `SDKSelfieWithLivenessView` | `SDKSelfieWithLivenessViewModel` (3.1.1+) | Canlılıklı selfie (ARKit / Vision) | `SelfieWithLivenessCustomView.swift` (3.1.1+) |
 | `.idCard` | `SDKIdCardView` | `SDKIdCardViewModel` | Belge türü seçimi + OCR tarama (kimlik/pasaport/diğer) | `IdCardCustomView.swift` |
 | `.idCardOVD` | `SDKIdCardOVDView` | `SDKIdCardOVDViewModel` | Hologram (OVD) doğrulamalı kimlik tarama | `IdCardOVDCustomView.swift` |
 | `.nfc` | `SDKNfcView` | `SDKNfcViewModel` | MRZ girişi + NFC çip okuma | `NfcCustomView.swift` |

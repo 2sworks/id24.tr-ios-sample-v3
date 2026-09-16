@@ -73,6 +73,7 @@ Bunların hiçbirini sıfırdan yazmak gerekmez. Örnek uygulamada her modülün
 |---|---|---|
 | `.prepare` | `Modules/Prepare/PrepareCustomView.swift` | — |
 | `.selfie` | `Modules/Selfie/SelfieCustomView.swift` | CustomKit |
+| `.selfieWithLiveness` | `Modules/SelfieWithLiveness/SelfieWithLivenessCustomView.swift` | SDK 3.1.1+; CustomKit + `SelfieCameraController` (Vision yolu) |
 | `.idCard` | `Modules/IdCard/IdCardCustomView.swift` | — (`documentScanner` modifier SDK'da) |
 | `.idCardOVD` | `Modules/IdCardOVD/IdCardOVDCustomView.swift` | CustomKit |
 | `.nfc` | `Modules/NFC/NfcCustomView.swift` | — |
@@ -105,10 +106,10 @@ açıkken akıştaki her ekran `XxxCustomView` ile çizilir (`CustomKit/CustomSc
 `registry.override` çağrılarını toplu yapar); kapalıyken SDK ekranları çalışır. Aynı
 ekrandaki listeden her modülün özel sürümü akışa girmeden tek tek önizlenir.
 
-> **Selfie + Canlılık (`.selfieWithLiveness`) için tam özel ekran yoktur.** SDK 3.1.0 bu
-> modül için public bir ViewModel sunmaz; yalnızca hazır `SDKSelfieWithLivenessView`
-> kullanılır (tema ile görünüm ayarı mümkündür). Public ViewModel bir sonraki sürümde
-> planlanmıştır.
+> **Selfie + Canlılık (`.selfieWithLiveness`)** için `SDKSelfieWithLivenessViewModel` SDK
+> **3.1.1** ile public oldu; 3.1.0'da bu modül yalnızca hazır `SDKSelfieWithLivenessView` ile
+> kullanılır (tema ile görünüm ayarı mümkündür). ViewModel'de neyin yapılıp neyin
+> yapılamadığı: [SelfieWithLiveness.md](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#viewmodelde-ne-yapılabilir).
 
 > **Teşekkür ekranı ve bitiş durumu:** görüşme socket üzerinden bittiğinde SDK'nın kendi
 > görüşme ekranı bitiş durumunu `coordinator.pendingThankYouStatus`'a yazar; bu alanın

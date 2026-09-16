@@ -36,6 +36,7 @@ enum CustomScreens {
     static func register(in registry: SDKViewRegistry) {
         registry.override(.prepare)        { pick(PrepareCustomView(), else: SDKPrepareView()) }
         registry.override(.selfie)         { pick(SelfieCustomView(), else: SDKSelfieView()) }
+        registry.override(.selfieWithLiveness) { pick(SelfieWithLivenessCustomView(), else: SDKSelfieWithLivenessView()) }
         registry.override(.idCard)         { pick(IdCardCustomView(), else: SDKIdCardView()) }
         registry.override(.idCardOVD)      { pick(IdCardOVDCustomView(), else: SDKIdCardOVDView()) }
         registry.override(.nfc)            { pick(NfcCustomView(), else: SDKNfcView()) }
@@ -56,9 +57,6 @@ enum CustomScreens {
             }
         }
 
-        // `.selfieWithLiveness` burada YOK: SDK 3.1.0 bu modül için public bir ViewModel sunmuyor
-        // (yalnızca hazır `SDKSelfieWithLivenessView(trueDepthMode:)` ekranı). Bkz. SwlExample.swift.
-        //
         // Bağlantı Koptu ve İşaret Dili ekranları rota değildir; özel sürümleri
         // CallScreenCustomView içinde kullanılır.
     }
