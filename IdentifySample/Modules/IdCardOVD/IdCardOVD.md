@@ -70,6 +70,11 @@ Hiçbir şey yazmayın; rota gelince `SDKIdCardOVDView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [IdCardOVDCustomView.swift](IdCardOVDCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.idCardOVD) { IdCardOVDCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 OVD, kamerayı SDK'dan en çok isteyen modüldür: VM kararı verir, **kamerayı siz sürersiniz**.
 Aşağıdaki kancaların hepsi bağlanmadan otomatik çekim çalışmaz.
 

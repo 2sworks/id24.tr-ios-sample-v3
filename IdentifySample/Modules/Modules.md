@@ -94,7 +94,8 @@ Tüm `setupSDK` parametreleri için: [Sunucu & API rehberi](../../docs/guides/se
 |---|---|---|
 | `SDKXxxView.swift` | SDK | Drop-in SwiftUI ekranı — hiçbir şey yazmazsanız bu çalışır |
 | `SDKXxxViewModel.swift` | SDK | İş mantığı + state (`public final`, `SDKBaseModuleViewModel` tabanlı) |
-| `XxxHostViewModel.swift` | Sample App (örnek) | SDK VM'ini saran host VM — kopyalanabilir referans |
+| `XxxCustomView.swift` | Sample App (örnek) | SDK ekranının public API ile yazılmış **birebir, çalışan** kopyası — override'a takılıp değiştirilmek için |
+| `XxxHostViewModel.swift` | Sample App (örnek) | SDK VM'ini saran host VM — gözlem/analitik deseni |
 
 Her VM'de hazır olanlar: `isLoading`, `errorMessage` (`@Published`) ve `manager`
 (`IdentifyManager.shared`) erişimi.
@@ -103,9 +104,23 @@ Her VM'de hazır olanlar: `isLoading`, `errorMessage` (`@Published`) ve `manager
 
 ## Ekranları Özelleştirme — Üç Yöntem
 
+> **Nereden başlamalı?** Her modülün klasöründe `XxxCustomView.swift` vardır: SDK ekranının
+> yalnızca public API ile yazılmış, gerçekten çalışan kopyası (kamera, ARKit, WebRTC görünümü
+> dahil). Dosyayı projenize kopyalayıp `registry.override` ile takın — SDK'daki ekranın aynısını
+> görürsünüz; özelleştirme bu dosya üzerinde yapılır. Tüm modüllerin kaydı:
+> [CustomKit/CustomScreens.swift](CustomKit/CustomScreens.swift). Örnek uygulamada hamburger
+> menü → **Özel Ekranlar** anahtarı hepsini birden açar.
+>
+> `XxxExample.swift` dosyaları üç biçimi yan yana gösterir: (1) hazır SDK ekranı, (2) tema
+> override, (3) `XxxCustomView` önizlemesi. Kök kurulum ve entegrasyon adımları için
+> [App/RootView.swift](../App/RootView.swift) başındaki rehberi okuyun.
+>
+> İstisna: **Selfie + Canlılık** için SDK 3.1.0 public bir ViewModel sunmaz; bu modül yalnızca
+> hazır ekranla (`SDKSelfieWithLivenessView`) kullanılabilir.
+
 ```swift
-// A) Ekranı kendi tasarımınla değiştir
-registry.override(.selfie) { MySelfieView() }
+// A) Ekranı kendi tasarımınla değiştir (başlangıç noktası: SelfieCustomView.swift)
+registry.override(.selfie) { SelfieCustomView() }
 
 // B) Araya kendi ekranını sok (pasif: tanıtım, sözleşme, başarı...)
 registry.custom("welcome") { MyIntroView() }

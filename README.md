@@ -154,8 +154,9 @@ Aşağıdakiler ihtiyaca göre alınır. Hedef yollar sizin projenizdeki karşı
 | `IdentifySample/App/RootView.swift` | `<App>/App/RootView.swift` | `SDKFlowHostView` + coordinator + registry kurulumunun çalışan hâli. Kendi kök view'ınıza adım 3'teki kodu yazmak da aynı işi görür. **Opsiyonel** |
 | `IdentifySample/Modules/Login/LoginView.swift`, `LoginViewModel.swift` | `<App>/Modules/Login/` | `prepareForSetup()` → `setupSDK` → `start()` sıralamasının ve hata durumlarının referansı. Kendi giriş ekranınıza uyarlayın. **Referans** |
 | `IdentifySample/SupportingFiles/*.cer` | app target → *Copy Bundle Resources* | `useSslPinning: true` ise sunucu sertifikası bundle'da olmak zorundadır. **Pinning açıksa zorunlu** |
-| `IdentifySample/Modules/<Modül>/<Modül>Example.swift`, `<Modül>HostViewModel.swift`, `<Modül>Config.swift` | `<App>/Modules/<Modül>/` | O ekranı kendi tasarımınızla değiştirecekseniz (`registry.override`). Üçü bir kalıptır: *Example* = view, *HostViewModel* = SDK ViewModel sarmalayıcı, *Config* = dışarıdan verilen ayarlar. **Opsiyonel** |
-| `IdentifySample/Showcase/HostModuleViewModel.swift`, `ShowcaseSupport.swift` | `<App>/Modules/Shared/` | Üstteki üçlüyü kopyaladıysanız **zorunlu**: `HostModuleViewModel` taban sınıfı ile `IDColor` / `showcaseThemed()` yardımcıları buradadır |
+| `IdentifySample/Modules/<Modül>/<Modül>CustomView.swift` | `<App>/Modules/<Modül>/` | O ekranı kendi tasarımınızla değiştirecekseniz (`registry.override`). SDK ekranının public API ile yazılmış **birebir, çalışan** kopyasıdır; değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir, özelleştirme bu dosya üzerinde yapılır. **Opsiyonel** |
+| `IdentifySample/Modules/CustomKit/CustomCameraPreview.swift`, `CustomComponents.swift` | `<App>/Modules/CustomKit/` | Kamera kullanan bir `CustomView` kopyalandıysa **zorunlu**: kamera önizlemesi (portrait açı düzeltmeli), oval/çerçeve maskeleri ve ortak yardımcılar buradadır. `CustomScreens.swift` / `CustomScreensView.swift` örnek uygulamaya özeldir (anahtar + önizleme listesi), kopyalanmaz |
+| `IdentifySample/Modules/<Modül>/<Modül>HostViewModel.swift` + `IdentifySample/Showcase/HostModuleViewModel.swift` | `<App>/Modules/<Modül>/`, `<App>/Modules/Shared/` | SDK ekranını değiştirmeden gözlemlemek (log/analitik) için VM sarmalama deseni. **Opsiyonel** |
 | `IdentifySample/Core/Debug/SDKLogPanel.swift`, `SDKNetworkLogger.swift` | `<App>/Core/Debug/` | Geliştirme sırasında SDK logunu ve ağ trafiğini cihazda görmek için. `SDKLogPanel` netfox ister. **Opsiyonel** |
 | `docs/integration/theme.example.json` | `<App>/Resources/IdentifyTheme.json` | Temayı kod yerine JSON ile vermek isterseniz (`applyTheme(named:)`). **Opsiyonel** |
 
@@ -274,7 +275,15 @@ coordinator.insert(["welcome"], before: .selfie)
 Tek altın kural: custom ekranınız **iş mantığını SDK ViewModel'ine bırakmalı**
 (taramayı `vm.scanFront(image:)`, geçişi `coordinator.advanceToNextModule()` yapar).
 Kendi HTTP isteğinizi atarsanız backend akışı ilerlemez.
-Ayrıntı: [Özelleştirme Rehberi](docs/guides/customization.md).
+
+**B için başlangıç noktası hazır:** her modül klasöründe `XxxCustomView.swift` vardır —
+SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (14 ekran; Selfie +
+Canlılık hariç, bkz. aşağıdaki not). Projeye kopyalanır, `registry.override(...)` ile takılır,
+üzerinde değişiklik yapılır. Örnek uygulamada hamburger menü → **Tam Özel Ekranlar**
+anahtarı bu ekranların tamamını akışta SDK ekranlarının yerine koyar; kapalıyken SDK
+ekranları çalışır. Aynı ekrandan her modülün özel sürümü tek tek de önizlenir.
+Ayrıntı: [Özelleştirme Rehberi](docs/guides/customization.md) ·
+[Modül Rehberleri](IdentifySample/Modules/Modules.md).
 
 ---
 

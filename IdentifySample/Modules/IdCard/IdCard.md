@@ -43,6 +43,11 @@ SDKIdCardView(viewModel: myIdCardVM)  // dışarıdan VM enjeksiyonu (host VM il
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [IdCardCustomView.swift](IdCardCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.idCard) { IdCardCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 Ekranı siz çizersiniz; OCR + yükleme + adım sinyali SDK VM'inde kalır. Görüntüyü nereden
 aldığınıza göre iki yol vardır:
 

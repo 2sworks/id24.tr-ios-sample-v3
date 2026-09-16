@@ -22,6 +22,7 @@ struct LoginView: View {
     @State private var showLangPicker = false
     @State private var showShowcase = false
     @State private var showDebugView = false
+    @State private var showCustomScreens = false
     @State private var pendingNavigation: HamburgerMenuItem? = nil
     @State private var pendingConnect = false
     @FocusState private var focusedField: LoginField?
@@ -187,6 +188,9 @@ struct LoginView: View {
         .sheet(isPresented: $showDebugView) {
             DebugSettingsView()
         }
+        .fullScreenCover(isPresented: $showCustomScreens) {
+            CustomScreensView()
+        }
 
         .fullScreenCover(isPresented: $showShowcase) {
             ShowcaseCatalogView()
@@ -232,6 +236,7 @@ struct LoginView: View {
             case .moduleList: showModuleList = true
             case .showcase: showShowcase = true
             case .debugView: showDebugView = true
+            case .customScreens: showCustomScreens = true
             case nil: break
             }
             pendingNavigation = nil
@@ -799,6 +804,10 @@ private struct HamburgerMenuSheet: View {
                 MenuOptionRow(icon: Image(systemName: "books.vertical.fill"),
                               title: "SDK Modül Rehberi") {
                     onSelect(.showcase)
+                }
+                MenuOptionRow(icon: Image(systemName: "paintbrush.pointed.fill"),
+                              title: "Tam Özel Ekranlar") {
+                    onSelect(.customScreens)
                 }
                 MenuOptionRow(icon: .init(.icCubeFocus), title: "Modül Seçme Ekranı") {
                     onSelect(.moduleList)
@@ -1654,7 +1663,7 @@ private extension View {
 // MARK: - HamburgerMenuItem
 
 private enum HamburgerMenuItem {
-    case serverList, moduleList, showcase, debugView
+    case serverList, moduleList, showcase, debugView, customScreens
 }
 
 // MARK: - LoginMode

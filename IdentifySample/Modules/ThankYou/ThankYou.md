@@ -2,7 +2,7 @@
 
 Akışın son durağı. Kullanıcıya KYC sürecinin sonucunu gösterir: başarıyla tamamlandı,
 reddedildi ya da cevapsız çağrı. **Tamamen pasiftir** — hiçbir soket/HTTP çağrısı yapmaz;
-bu yüzden en güvenle özelleştirilebilen ekrandır.
+bu yüzden özelleştirme riski en düşük ekrandır.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -56,6 +56,11 @@ case .thankYou(let status):
 ```
 
 ## Kendi Tasarımınızla (Override)
+
+> **Çalışan tam örnek:** [ThankYouCustomView.swift](ThankYouCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için dört rota değerinin hepsini kaydedin (`.thankYou(nil)`, `.completed`, `.missedCall`, `.notCompleted`); örnek: [CustomScreens.swift](../CustomKit/CustomScreens.swift)
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
 
 ```swift
 registry.override(.thankYou(.completed)) {

@@ -35,6 +35,11 @@ Hiçbir şey yazmayın; rota gelince `SDKSignatureView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [SignatureCustomView.swift](SignatureCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.signature) { SignatureCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 Kendi tuvalinizi bile kullanabilirsiniz — tek şart, görselin SDK üzerinden yüklenmesi:
 
 ```swift

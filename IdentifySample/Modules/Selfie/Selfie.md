@@ -38,6 +38,11 @@ Hiçbir şey yazmayın; rota gelince `SDKSelfieView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [SelfieCustomView.swift](SelfieCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.selfie) { SelfieCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 Kamera ve UI sizin. Kameranızın karelerini VM'e verirseniz **canlı yönlendirme ve otomatik
 çekim de çalışır** — yalnız fotoğrafı verirseniz yalnız yüz tespiti + yükleme çalışır.
 

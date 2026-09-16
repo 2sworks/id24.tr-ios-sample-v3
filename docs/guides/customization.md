@@ -60,6 +60,63 @@ struct MyCustomSelfieView: View {
 Her modülün VM API'si (state / metotlar / closure'lar) kendi rehberinde tablo halinde
 verilir — [Modül Kataloğu](../../README.md#modül-kataloğu)ndan ilgili modüle gidin.
 
+### Sıfırdan yazmak yerine: `XxxCustomView.swift`
+
+Yukarıdaki kısa örnek yöntemi gösterir; gerçek bir ekran çok daha fazlasını içerir (kamera
+önizlemesi, oval maske, deneme sayacı, hata alert'i, sesli okuma, ilerleme çubuğu…).
+Bunların hiçbirini sıfırdan yazmak gerekmez. Örnek uygulamada her modülün klasöründe
+`XxxCustomView.swift` vardır: SDK'nın hazır ekranının **yalnızca public API ile** yazılmış,
+çalışan birebir kopyası. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir;
+özelleştirme bu dosya üzerinde yapılır.
+
+| Rota | Dosya | Ek bağımlılık |
+|---|---|---|
+| `.prepare` | `Modules/Prepare/PrepareCustomView.swift` | — |
+| `.selfie` | `Modules/Selfie/SelfieCustomView.swift` | CustomKit |
+| `.idCard` | `Modules/IdCard/IdCardCustomView.swift` | — (`documentScanner` modifier SDK'da) |
+| `.idCardOVD` | `Modules/IdCardOVD/IdCardOVDCustomView.swift` | CustomKit |
+| `.nfc` | `Modules/NFC/NfcCustomView.swift` | — |
+| `.liveness` | `Modules/Liveness/LivenessCustomView.swift` | CustomKit (ARKit) |
+| `.speech` | `Modules/Speech/SpeechCustomView.swift` | — |
+| `.addressConfirm` | `Modules/AddressConfirm/AddressConfirmCustomView.swift` | — |
+| `.signature` | `Modules/Signature/SignatureCustomView.swift` | — (PencilKit) |
+| `.videoRecorder` | `Modules/VideoRecorder/VideoRecorderCustomView.swift` | CustomKit |
+| `.callScreen` | `Modules/CallScreen/CallScreenCustomView.swift` | `SignLangCustomView`, `LostConnectionCustomView` |
+| `.thankYou(_)` | `Modules/ThankYou/ThankYouCustomView.swift` | — |
+| (görüşme içi) | `Modules/SignLang/SignLangCustomView.swift` | — |
+| (katman) | `Modules/LostConnection/LostConnectionCustomView.swift` | — |
+
+**CustomKit** (`Modules/CustomKit/CustomCameraPreview.swift`, `CustomComponents.swift`):
+kamera kullanan ekranların paylaştığı önizleme katmanı (iOS 17 `RotationCoordinator` ile
+portrait açı düzeltmesi), oval/çerçeve maskeleri ve ortak yardımcılar. Kamera kullanan bir
+`CustomView` kopyalandığında bu iki dosya da kopyalanır.
+
+Kullanım:
+
+```swift
+registry.override(.selfie) { SelfieCustomView() }     // dosya olduğu gibi projeye alınır
+```
+
+Her `XxxCustomView.swift` dosyasının başında görev dağılımı (hangi iş VM'de, hangisi
+dosyada), ViewModel kullanımı ve kopyalanacak dosyalar listelenir.
+
+**Çalışırken görmek:** örnek uygulamada hamburger menü → **Tam Özel Ekranlar**. Anahtar
+açıkken akıştaki her ekran `XxxCustomView` ile çizilir (`CustomKit/CustomScreens.swift`
+`registry.override` çağrılarını toplu yapar); kapalıyken SDK ekranları çalışır. Aynı
+ekrandaki listeden her modülün özel sürümü akışa girmeden tek tek önizlenir.
+
+> **Selfie + Canlılık (`.selfieWithLiveness`) için tam özel ekran yoktur.** SDK 3.1.0 bu
+> modül için public bir ViewModel sunmaz; yalnızca hazır `SDKSelfieWithLivenessView`
+> kullanılır (tema ile görünüm ayarı mümkündür). Public ViewModel bir sonraki sürümde
+> planlanmıştır.
+
+> **Teşekkür ekranı ve bitiş durumu:** görüşme socket üzerinden bittiğinde SDK'nın kendi
+> görüşme ekranı bitiş durumunu `coordinator.pendingThankYouStatus`'a yazar; bu alanın
+> setter'ı 3.1.0'da public değildir. Özel görüşme ekranı durumu kendi tarafında tutar
+> (`CustomScreens.pendingThankYouStatus`) ve `.thankYou(nil)` rotasındaki özel teşekkür
+> ekranı oradan okur. Kalıp `CallScreenCustomView.swift` / `ThankYouCustomView.swift`
+> içindedir.
+
 ---
 
 ## B) Araya Custom Ekran Ekleme
@@ -160,6 +217,7 @@ Pasif ekranlar (B yöntemi) bu kuralın dışındadır — zaten hiçbir VM meto
 
 ## Kontrol Listesi — Custom Ekran Yayına Çıkmadan Önce
 
+- [ ] Başlangıç noktası ilgili `XxxCustomView.swift` (sıfırdan yazılmadı); dosya başındaki "Kopyalanacak dosyalar" listesi eksiksiz
 - [ ] Ekran, iş eylemlerinde yalnızca SDK VM metotlarını çağırıyor
 - [ ] Geçişler `coordinator` üzerinden (`advanceToNextModule` / `advanceExternal` / `skipCurrentModule`)
 - [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya yansıtılıyor

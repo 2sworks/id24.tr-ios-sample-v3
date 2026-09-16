@@ -56,7 +56,7 @@ Köprü dosyaları dışında örnekten alınacak bir şey yoktur; ekranlar XCFr
 | Kaynak | Hedef | Ne zaman |
 |---|---|---|
 | `IdentifySample/SupportingFiles/*.cer` | `ios/Runner/` + *Copy Bundle Resources* | `useSslPinning: true` ise zorunlu |
-| `IdentifySample/Modules/<Modül>/<Modül>Example.swift` + `<Modül>HostViewModel.swift` ve `IdentifySample/Showcase/HostModuleViewModel.swift` + `ShowcaseSupport.swift` | `ios/Runner/Modules/` | bir SDK ekranını **native tarafta** kendi tasarımınızla değiştirecekseniz (`registry.override`); Dart'tan ekran override edilemez |
+| `IdentifySample/Modules/<Modül>/<Modül>CustomView.swift` (kamera kullananlar için ek olarak `IdentifySample/Modules/CustomKit/CustomCameraPreview.swift` + `CustomComponents.swift`) | `ios/Runner/Modules/` | bir SDK ekranını **native tarafta** kendi tasarımınızla değiştirecekseniz (`registry.override`): SDK ekranının public API ile yazılmış birebir, çalışan kopyası; özelleştirme bu dosya üzerinde yapılır. Dart'tan ekran override edilemez |
 
 `IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift` kopyalanmaz ama
 referans olarak okunmalıdır: `prepareForSetup()` → `setupSDK` → `start()` sıralaması ve akışın

@@ -61,6 +61,11 @@ continueAction(onFinish:)
 
 ## Kendi Tasarımınızla
 
+> **Çalışan tam örnek:** [SignLangCustomView.swift](SignLangCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Bu ekran bir rota değildir; özel görüşme ekranı ([CallScreenCustomView.swift](../CallScreen/CallScreenCustomView.swift)) içinden açılır.
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 Toggle'ınız nasıl görünürse görünsün, tercih **mutlaka** `continueAction`'dan geçmeli:
 
 ```swift
