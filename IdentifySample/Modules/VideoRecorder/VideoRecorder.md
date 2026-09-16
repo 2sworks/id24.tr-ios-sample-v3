@@ -34,6 +34,11 @@ Hiçbir şey yazmayın; rota gelince `SDKVideoRecorderView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [VideoRecorderCustomView.swift](VideoRecorderCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.videoRecorder) { VideoRecorderCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 Kamera/kayıt UI'ı sizin; transkripsiyon, boyut kontrolü ve yükleme SDK'da kalır:
 
 ```swift

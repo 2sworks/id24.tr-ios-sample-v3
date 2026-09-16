@@ -36,6 +36,11 @@ Hiçbir şey yazmayın; rota gelince `SDKLivenessView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [LivenessCustomView.swift](LivenessCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.liveness) { LivenessCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 > **Önce okuyun:** İfade algılama (göz kırpma, gülümseme, baş/göz yönü) **VM'de değil,
 > SDK'nın hazır ekranındadır.** Override ederseniz ARKit yüz takibini ve her adımın algılama
 > kuralını **siz yazarsınız**. Yalnız görünümü değiştirmek istiyorsanız

@@ -41,6 +41,11 @@ değiştirmek için tema anahtarları: `nfcFront`, `nfcBack` ([Tema](../../../do
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [NfcCustomView.swift](NfcCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.nfc) { NfcCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 ```swift
 registry.override(.nfc) { MyNfcView() }
 

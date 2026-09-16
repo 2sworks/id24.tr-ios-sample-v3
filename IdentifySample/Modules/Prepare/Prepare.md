@@ -40,6 +40,11 @@ Görünümü markanıza uydurmak için [Tema rehberi](../../../docs/guides/themi
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [PrepareCustomView.swift](PrepareCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.prepare) { PrepareCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 UI tamamen sizin; izin isteme, hız testi ve "hazırım" sinyali SDK VM'inde kalır:
 
 ```swift

@@ -6,7 +6,7 @@
 //
 //  Amaç: Bu uygulama bir ENTEGRASYON REHBERİDİR. Geliştirici, SDK'nın her
 //  modülünü (1) varsayılan haliyle, (2) tema ile özelleştirilmiş, (3) tamamen
-//  kendi view'ı ile değiştirilmiş olarak görür; ayrıca her ekran Xcode #Preview'da
+//  kendi view'ı ile (XxxCustomView) değiştirilmiş olarak görür; ayrıca her ekran Xcode #Preview'da
 //  canlı görünür.
 //
 //  SDK modül ekranları (SDKSelfieView vb.) `@EnvironmentObject SDKFlowCoordinator`
@@ -33,80 +33,6 @@ private struct ShowcaseHostModifier: ViewModifier {
     @StateObject private var coordinator = SDKFlowCoordinator()
     func body(content: Content) -> some View {
         content.environmentObject(coordinator)
-    }
-}
-
-// MARK: - Örnek girdi (kamera/tarayıcı gerektiren metotlar için)
-
-/// Gerçek bir uygulamada kamera/tarayıcıdan gelen görsel/veriyi SDK ViewModel'ine
-/// verirsiniz. Rehber/Preview ortamında gerçek yakalama olmadığından, metot
-/// çağrılarını göstermek için yer tutucu bir görsel/veri üretiriz.
-enum ShowcaseSample {
-    static var image: UIImage {
-        UIGraphicsImageRenderer(size: CGSize(width: 240, height: 240)).image { ctx in
-            UIColor.systemGray5.setFill()
-            ctx.fill(CGRect(x: 0, y: 0, width: 240, height: 240))
-        }
-    }
-    static var videoData: Data { Data() }
-}
-
-// MARK: - Özel ekran için ortak satır bileşenleri
-
-/// Replace örneklerinde VM state'ini göstermek için basit etiket/durum satırı.
-struct ShowcaseStatusRow: View {
-    let label: String
-    let value: String
-    var ok: Bool? = nil
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        HStack {
-            if let ok {
-                Image(systemName: ok ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(ok ? .green : IDColor.inkLight)
-            }
-            Text(label)
-                .font(IDFont.bodyRegular())
-                .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
-            Spacer()
-            Text(value)
-                .font(IDFont.bodySmall())
-                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-// MARK: - Event log (host VM'in dışarıdan eklediği analytics/olay kaydı)
-
-/// Host ViewModel'in topladığı olay/analytics kaydını gösterir.
-/// "Dışarıdan neler eklenebilir" örneklerinde kullanılır.
-struct ShowcaseEventLog: View {
-    let events: [String]
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Host event log (dışarıdan eklendi)")
-                .font(IDFont.bodySmall(.semibold))
-                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
-            if events.isEmpty {
-                Text("— henüz olay yok —")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(IDColor.inkLight)
-            } else {
-                ForEach(Array(events.enumerated()), id: \.offset) { _, e in
-                    Text("• \(e)")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(IDSpacing.md)
-        .background(RoundedRectangle(cornerRadius: IDRadius.md).fill(IDColor.adaptiveSurface(for: colorScheme)))
-        .overlay(RoundedRectangle(cornerRadius: IDRadius.md).stroke(IDColor.inkBorder, lineWidth: 1))
     }
 }
 
@@ -139,42 +65,6 @@ private struct ShowcaseThemeOverride: ViewModifier {
             .onDisappear {
                 if let original { SDKTheme.shared.colors.primary = original }
             }
-    }
-}
-
-// MARK: - "Kendi tasarımın" iskeleti (tam view-replace örneği)
-
-/// Bir SDK ekranını TAMAMEN kendi view'ınla değiştirdiğinde nasıl görünebileceğini
-/// temsil eden örnek iskelet. Gerçekte burada kendi UI'ını yazar, iş mantığını
-/// SDK'nın ilgili ViewModel'i ile yürütürsün.
-struct ShowcaseCustomScaffold: View {
-    let title: String
-    let systemIcon: String
-    var note: String = "Kendi tasarımın burada. İş mantığını SDK'nın ViewModel'i ile yürüt."
-    @Environment(\.colorScheme) private var colorScheme
-
-    var body: some View {
-        VStack(spacing: IDSpacing.xl) {
-            Spacer()
-            Image(systemName: systemIcon)
-                .font(.system(size: 56, weight: .light))
-                .foregroundColor(IDColor.primary)
-            Text("Özel \(title) Ekranı")
-                .font(IDFont.bodyLarge(.semibold))
-                .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
-            Text(note)
-                .font(IDFont.bodySmall())
-                .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, IDSpacing.xl)
-            Spacer()
-            Text("registry.override(...) { ... }")
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundColor(IDColor.inkLight)
-                .padding(.bottom, IDSpacing.xl)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
     }
 }
 

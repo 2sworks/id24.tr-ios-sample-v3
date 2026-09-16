@@ -49,7 +49,12 @@ sıkı bağlıdır — yeniden yazmaya değmez. Marka uyumu için önce [Tema](.
 
 ## Kendi Tasarımınızla (Override) — Dikkatli İlerleyin
 
-Yine de tasarımı değiştirmek isterseniz iki kesin kural vardır:
+> **Çalışan tam örnek:** [CallScreenCustomView.swift](CallScreenCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.callScreen) { CallScreenCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
+Tasarım değiştirilecekse iki kesin kural vardır:
 **(1)** video katmanlarını VM'den alın, **(2)** tüm çağrı eylemleri VM'den geçsin.
 
 ```swift

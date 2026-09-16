@@ -33,6 +33,11 @@ Hiçbir şey yazmayın; rota gelince `SDKAddressConfirmView` çizilir.
 
 ## Kendi Tasarımınızla (Override)
 
+> **Çalışan tam örnek:** [AddressConfirmCustomView.swift](AddressConfirmCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.addressConfirm) { AddressConfirmCustomView() }`
+>
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+
+
 Sample App'te bu modülün canlı bir override örneği zaten vardır
 (`AddressConfirmExample`, kayıt yeri: `RootView.configureIfNeeded`):
 
