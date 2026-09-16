@@ -277,8 +277,8 @@ Tek altın kural: custom ekranınız **iş mantığını SDK ViewModel'ine bıra
 Kendi HTTP isteğinizi atarsanız backend akışı ilerlemez.
 
 **B için başlangıç noktası hazır:** her modül klasöründe `XxxCustomView.swift` vardır —
-SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (14 ekran; Selfie +
-Canlılık hariç, bkz. aşağıdaki not). Projeye kopyalanır, `registry.override(...)` ile takılır,
+SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (15 ekran; Selfie +
+Canlılık için SDK 3.1.1 gerekir). Projeye kopyalanır, `registry.override(...)` ile takılır,
 üzerinde değişiklik yapılır. Örnek uygulamada hamburger menü → **Tam Özel Ekranlar**
 anahtarı bu ekranların tamamını akışta SDK ekranlarının yerine koyar; kapalıyken SDK
 ekranları çalışır. Aynı ekrandan her modülün özel sürümü tek tek de önizlenir.

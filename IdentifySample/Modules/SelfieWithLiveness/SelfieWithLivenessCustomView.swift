@@ -240,13 +240,13 @@ private extension SelfieWithLivenessCustomView {
         let verified = viewModel.phase == .verified
         let ringColor: Color = verified ? .green : .white
         return ZStack {
-            Ellipse()
+            CustomTopStartOval()
                 .trim(from: 0, to: viewModel.holdProgress)
                 .stroke(ringColor, style: StrokeStyle(lineWidth: 4, lineCap: .round, dash: [30, 40]))
                 .frame(width: oval.width, height: oval.height)
                 .position(x: oval.midX, y: oval.midY)
                 .animation(verified ? .easeInOut(duration: 0.3) : nil, value: viewModel.holdProgress)
-            Ellipse()
+            CustomTopStartOval()
                 .stroke(verified ? Color.green : Color.white.opacity(0.6),
                         style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: [12, 20], dashPhase: spinnerDashPhase))
                 .frame(width: oval.width + 20, height: oval.height + 20)
@@ -277,6 +277,33 @@ private extension SelfieWithLivenessCustomView {
                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 .scaleEffect(1.4)
         }
+    }
+}
+
+// MARK: - Üstten başlayan oval
+
+/// Başlangıç noktası ovalin TEPESİNDE olan, saat yönünde ilerleyen oval yolu. SwiftUI `Ellipse`
+/// sağ ortadan başladığı için tutma ilerlemesi ve dönen halka orada başlayıp biterdi; UIKit
+/// ekranındaki (`makeBezierOval`) gibi tepeden başlar.
+struct CustomTopStartOval: Shape {
+    func path(in rect: CGRect) -> Path {
+        let cx = rect.midX, cy = rect.midY, rx = rect.width / 2, ry = rect.height / 2
+        var p = Path()
+        p.move(to: CGPoint(x: cx, y: cy - ry))
+        p.addCurve(to: CGPoint(x: cx + rx, y: cy),
+                   control1: CGPoint(x: cx + rx * 0.55, y: cy - ry),
+                   control2: CGPoint(x: cx + rx, y: cy - ry * 0.55))
+        p.addCurve(to: CGPoint(x: cx, y: cy + ry),
+                   control1: CGPoint(x: cx + rx, y: cy + ry * 0.55),
+                   control2: CGPoint(x: cx + rx * 0.55, y: cy + ry))
+        p.addCurve(to: CGPoint(x: cx - rx, y: cy),
+                   control1: CGPoint(x: cx - rx * 0.55, y: cy + ry),
+                   control2: CGPoint(x: cx - rx, y: cy + ry * 0.55))
+        p.addCurve(to: CGPoint(x: cx, y: cy - ry),
+                   control1: CGPoint(x: cx - rx, y: cy - ry * 0.55),
+                   control2: CGPoint(x: cx - rx * 0.55, y: cy - ry))
+        p.closeSubpath()
+        return p
     }
 }
 

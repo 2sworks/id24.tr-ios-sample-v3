@@ -371,7 +371,7 @@ SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.
 - `SelfieWithLivenessCustomView.swift` (3.1.1): ARKit yolu (`FaceTrackingCameraView`) ve Vision
   yolu (`SelfieCameraController`) tek dosyada; "Tam Özel Ekranlar" listesine ve anahtara eklendi.
 - Her modül için `XxxCustomView.swift`: SDK'nın hazır ekranının **yalnızca public API ile**
-  yazılmış, çalışan birebir kopyası (14 ekran). Değişiklik yapmadan takıldığında SDK
+  yazılmış, çalışan birebir kopyası (15 ekran). Değişiklik yapmadan takıldığında SDK
   ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Selfie + Canlılık
   için SDK 3.1.1 gerekir (3.1.0'da public ViewModel yok).
 - `Modules/CustomKit/`: kamera önizlemesi (iOS 17 `RotationCoordinator` portrait düzeltmesi),
