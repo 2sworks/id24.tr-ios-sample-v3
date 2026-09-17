@@ -1,0 +1,99 @@
+/* Ust cubuk sayfa arka planiyla ayni renkte; ince alt cizgi ile ayrilir. */
+.md-header,
+.md-tabs {
+  background-color: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  box-shadow: none;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-header__button.md-logo {
+  display: flex;
+  align-items: center;
+  padding-right: 0;
+}
+.md-header__button.md-logo img {
+  height: 1.5rem;
+  width: auto;
+}
+.md-header__title {
+  margin-left: 0;
+}
+.md-header__topic,
+.md-header__button,
+.md-tabs__link {
+  color: var(--md-default-fg-color);
+}
+.md-search__form {
+  background-color: var(--md-default-fg-color--lightest);
+}
+.md-search__input::placeholder,
+.md-search__icon {
+  color: var(--md-default-fg-color--light);
+}
+.md-search__input {
+  color: var(--md-default-fg-color);
+}
+/* Logo tek renk koyu; koyu temada beyaza cevrilir. */
+[data-md-color-scheme="slate"] .md-header__button.md-logo img {
+  filter: invert(1);
+}
+
+/* Baslik metni yerine "identify" yazi logosu. */
+.md-header__topic:first-child {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.md-header__topic:first-child .md-ellipsis {
+  font-size: 0;
+  display: block;
+  width: 4.3rem;
+  height: 1.25rem;
+  margin-top: 0.15rem; /* yazi logosunun optik merkezi ikona hizalanir */
+  background: url("identify-wordmark.png") no-repeat left center / contain;
+}
+
+
+/* ---- Sol menu ---- */
+/* Menunun basindaki site adi ustteki logoyla tekrarlaniyor; gizle. */
+.md-nav--primary > .md-nav__title {
+  display: none;
+}
+.md-sidebar--primary .md-nav {
+  font-size: 0.7rem;
+}
+/* Bolum basliklari: kucuk, harf araliklı, soluk. */
+.md-nav__item--section > .md-nav__link {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+  margin: 1.4rem 0 0.4rem;
+  padding-left: 0.6rem;
+}
+.md-nav__item--section:first-child > .md-nav__link {
+  margin-top: 0.6rem;
+}
+/* Baglantilar: yuvarlatilmis satirlar, hover'da hafif zemin. */
+.md-nav__item--section .md-nav__list .md-nav__link {
+  margin: 0.1rem 0;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3rem;
+  color: var(--md-default-fg-color--light);
+  transition: background-color 0.12s, color 0.12s;
+}
+.md-nav__item--section .md-nav__list .md-nav__link:hover {
+  background-color: var(--md-default-fg-color--lightest);
+  color: var(--md-default-fg-color);
+}
+.md-nav__item--section .md-nav__list .md-nav__link--active,
+.md-nav__item--section .md-nav__list .md-nav__link--active:hover {
+  background-color: var(--md-accent-fg-color--transparent);
+  color: var(--md-accent-fg-color);
+  font-weight: 600;
+}
+/* Sol kenar cizgisi yerine temiz blok gorunumu. */
+.md-sidebar--primary .md-nav__list .md-nav__list {
+  padding-left: 0;
+}
