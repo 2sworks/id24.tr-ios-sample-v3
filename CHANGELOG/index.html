@@ -1,0 +1,3201 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/CHANGELOG/">
+      
+      
+        <link rel="prev" href="../docs/integration/flutter/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Sürüm Geçmişi - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sürüm-geçmişi" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href=".." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sürüm Geçmişi
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/guides/identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs/integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#identifysdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IdentifySDK
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IdentifySDK">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#310--tema-ve-özelleştirme-paketi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.0 — Tema ve özelleştirme paketi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yayınlanmamış-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yayınlanmamış (v3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#259" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#258" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#257" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#256" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#255" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#254" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#253" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#252" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#251" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#250" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2315" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.15
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2314" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.14
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#239" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#231" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#230" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#206" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#205" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#204" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#203" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#201" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#198" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#197" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample App
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#yayınlanmamış-v3--build-44" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yayınlanmamış (v3 · build 44)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-178" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 178
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-166" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 166
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-165" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 165
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-162" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 162
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 160
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-141" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 141
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-126" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 126
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-107" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 107
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-106" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 106
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-103" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 103
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 101
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 100
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-97" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 97
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-89" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 89
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-84" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 84
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-80" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 80
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-75" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 75
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-73" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 73
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#identifysdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IdentifySDK
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IdentifySDK">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#310--tema-ve-özelleştirme-paketi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.0 — Tema ve özelleştirme paketi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yayınlanmamış-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yayınlanmamış (v3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#259" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#258" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#257" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#256" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#255" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#254" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#253" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#252" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#251" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#250" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2315" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.15
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2314" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.14
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#239" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.9
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#231" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#230" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#220" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#210" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#206" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.6
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#205" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.5
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#204" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#203" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#201" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.0.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#198" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.8
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#197" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9.7
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample App
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#yayınlanmamış-v3--build-44" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yayınlanmamış (v3 · build 44)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-178" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 178
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-166" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 166
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-165" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 165
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-162" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 162
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 160
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-141" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 141
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-126" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 126
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-107" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 107
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-106" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 106
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-103" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 103
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 101
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 100
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-97" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 97
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-89" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 89
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-84" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 84
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-80" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 80
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-75" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 75
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-73" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build 73
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sürüm-geçmişi">Sürüm Geçmişi<a class="headerlink" href="#sürüm-geçmişi" title="Permanent link">&para;</a></h1>
+<p>Bu dosya, <strong>IdentifySDK</strong> ve <strong>Sample App</strong> sürüm notlarını içerir.
+Güncel kurulum ve dökümantasyon için <a href="../">README</a>'ye dönebilirsiniz.</p>
+<hr />
+<h2 id="identifysdk">IdentifySDK<a class="headerlink" href="#identifysdk" title="Permanent link">&para;</a></h2>
+<h3 id="310--tema-ve-özelleştirme-paketi">3.1.0 — Tema ve özelleştirme paketi<a class="headerlink" href="#310--tema-ve-özelleştirme-paketi" title="Permanent link">&para;</a></h3>
+<p>Tamamı eklemeli: hiçbir tema ayarı vermeyen projede ekranlar 3.0.0 ile birebir aynıdır.
+Ayrıntı ve geçiş adımları: <a href="../docs/guides/migration-3.1.0/">3.1.0 Değişiklik Rehberi</a>.</p>
+<p><strong>Selfie + Canlılık ViewModel'i</strong>
+- <strong><code>SDKSelfieWithLivenessViewModel</code></strong> (<code>: SDKBaseModuleViewModel</code>, public final) — iki fazlı
+  oval durum makinesi, ışık/eğim/mesafe/konum eşikleri (histerezis), tutma süresi, çekim
+  zamanı, yükleme ve <code>SDKComparisonGate</code> kararı tek ViewModel'de. Girdi: ARKit yolunda
+  <code>analyzeFace(SDKFaceObservation)</code> / <code>analyzeNoFace()</code>, Vision yolunda
+  <code>analyzeFrame(_:cameraPosition:)</code>. Çıktı: <code>phase</code>, <code>ovalPhase</code>/<code>ovalScale</code>/<code>ovalRect</code>,
+  <code>guidanceText</code>, <code>holdProgress</code>, <code>isFaceAligned</code>, <code>shouldCapture</code>, <code>isSessionActive</code>/<code>sessionGeneration</code>,
+  <code>isFaceMeshHidden</code>, <code>canContinue</code>; <code>onCompleted</code> / <code>onSkipRequested</code> / <code>onFlowFailed</code>.
+- <strong><code>SDKSelfieWithLivenessConfig</code></strong> — süreler, oval oranları ve ARKit eşikleri (init'e verilir).
+- <strong><code>SDKFaceCapturePath</code></strong> public — ekranın hangi yolla çalıştığı (<code>.arkit</code> / <code>.vision</code> / <code>.unsupported</code>).
+- <code>SDKSelfieWithLivenessView(viewModel:)</code> — kendi ViewModel'ini enjekte etme.</p>
+<p><strong>Değişti</strong>
+- <code>SDKSelfieWithLivenessView</code> artık diğer modüller gibi <strong>SwiftUI + ViewModel</strong>: UIKit
+  <code>SDKSelfieWithLivenessController</code> / <code>SDKSelfieWithLivenessVisionController</code> kaldırıldı
+  (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
+  ekran flaşı, yönerge metinleri, titreşim, yükleme kararı. Hata/yeniden deneme alert'i artık
+  diğer modüllerle ortak <code>idErrorAlert</code> stilinde.</p>
+<p><strong>Kimlik tarayıcı (IdentityScanner)</strong>
+- <strong><code>DocumentProfile.mrz: MRZRequirement?</code></strong> — MRZ artık profilin kuralı: <code>format</code> (<code>.td1</code> kimlik /
+  <code>.td3</code> pasaport), <code>isRequired</code> ve <code>level</code> (<code>.presence</code> = bölge görünüyor / <code>.parsed</code> = belge no +
+  tarihler ayrıştı). Basılı alanlar <code>FieldDescriptor.isRequired</code>, MRZ <code>mrz.isRequired</code> ile zorunlu
+  olur; koda gömülü "MRZ ayrışmadan çekme" kuralı kaldırıldı. <code>mrz</code> verilmeyen <code>.mrzTurkishID</code>
+  profili eski kuralla (<code>MRZRequirement.legacyTurkishID</code>) çalışır.
+- <strong>Profil kopya yardımcıları</strong> — <code>settingRequired(_:for:)</code>, <code>settingMRZ(_:)</code>,
+  <code>settingMRZRequired(_:)</code>, <code>settingField(_:)</code>, <code>removingFields(_:)</code>, <code>settingKeywordSet(_:)</code>;
+  hazır profiller sabittir, her yardımcı kopya döner.
+- <code>turkishIDBack</code>: anne adı / baba adı / veren makam sabit ROI yerine basılı <strong>etiketine</strong> göre
+  bulunur (<code>labelAnchor</code>); MRZ kuralı <code>.td1</code> zorunlu <code>.presence</code>. Kart çerçeveyi tam
+  doldurmadığında bölgeler kayıp arka yüz elle çekime düşüyordu.
+- MRZ okuması: <code>«</code>/<code>‹</code> → <code>&lt;</code>, satırlar konuma göre sıralanıp parçaları birleştirilir, TD1
+  satırları yapılarına göre tanınır (yanlış satır seçimi ve kısa satır elemesi giderildi).
+- <strong><code>IdentityScannerView</code></strong>: <code>dismissesOnResult</code> (varsayılan <code>true</code>), <code>keepsCameraRunning</code>
+  (varsayılan <code>false</code>) ve <code>scanSession</code> — tarayıcıyı bir ekranın parçası olarak gömüp aynı
+  kamera oturumunda ön → arka yüz geçişi yapmak için.</p>
+<p><strong>Yeni</strong>
+- <strong>Buton görünümü</strong> — <code>SDKTheme.shared.buttons</code>: köşe (<code>.capsule</code> / <code>.radius(x)</code>), yükseklik,
+  padding, font, arka plan/metin rengi, kenarlık, gölge, disabled opaklığı, basılı ölçek,
+  haptik; stil bazlı override (<code>buttons[.secondary]</code>). Kendi ekranlarınız için
+  <code>SDKButtonShape.themed()</code>.
+- <strong>Başlık çubuğu tasarımları</strong> — <code>navBar.preset</code>: <code>.classic</code> · <code>.centered</code> · <code>.minimal</code> ·
+  <code>.prominent</code>; yükseklik, logo/ikon ölçüleri, ilerleme çubuğu ve ayırıcı token'ları.
+- <strong>Rol renkleri</strong> — <code>SDKAdaptiveColor</code> (light/dark ayrı) ile 18 rol: <code>pageBackground</code>,
+  <code>moduleBackground</code>, <code>surface</code>, <code>title</code>, <code>subtitle</code>, <code>border</code>, <code>header*</code>, <code>progress*</code>,
+  <code>selectedItem*</code>, <code>unselectedItem*</code>. Ayrıca <code>colors.accentWarning</code>.
+- <strong>Bileşen görünüm kapları</strong> — <code>selection</code>, <code>alerts</code>, <code>banners</code>, <code>fields</code>, <code>sheets</code>,
+  <code>capture</code>, <code>controls</code>, <code>call</code>, <code>motion</code>.
+- <strong>Tek sözlükle tema</strong> — <code>SDKTheme.shared.apply(_:)</code>, <code>apply(json:)</code>,
+  <code>applyTheme(named:in:)</code>, <code>resetAppearance()</code>; tanınmayan anahtarların listesini döndürür.
+- <strong>React Native / Flutter <code>setTheme</code></strong> — tema JS/Dart tarafından uygulanır, renk-logo
+  denemesi için <strong>native derleme gerekmez</strong>. Örnek: <code>docs/integration/theme.example.json</code>.
+- <strong><code>IDFont.custom(size:weight:)</code></strong> — ölçek dışı boyutlar da tema fontunu kullanır.</p>
+<p><strong>Yeni</strong>
+- <strong>Canlılık adımlarında onay titreşimi geri geldi:</strong> her adım onaylandığında çok kısa tek
+  darbe çalınır. <code>SDKHapticConfig.shared.stepFeedbackEnabled</code> ile kapatılabilir,
+  <code>stepFeedbackIntensity</code> ile şiddeti ayarlanır (varsayılan açık, 0.6).</p>
+<p><strong>iPad desteği</strong>
+- SDK ve örnek uygulama artık <strong>iPad'de çalışır</strong> (<code>TARGETED_DEVICE_FAMILY = "1,2"</code>);
+  yönelim iPad'de de portrait'e kilitlidir. Ayrıntı:
+  <a href="../docs/guides/ipad-support/">iPad Desteği rehberi</a>.
+- <strong>Yetenek tabanlı modül ikamesi:</strong> cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth'siz A11 ve öncesi:
+  iPhone 8, iPad 7…) <code>livenessDetection</code> ve <code>selfieWithLiveness</code> yerine <strong>normal selfie
+  modülü</strong> ile doğrulama yapılır; akışta selfie zaten varsa desteklenmeyen modül yalnızca
+  çıkarılır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen ekranı görmez.
+  Face ID'li cihazlarda ve A12+ Touch ID'li iPad'lerde her iki modül de çalışır.
+- <strong><code>IdentifyManager.shared.faceTrackingFallback</code></strong> — yedek davranışı entegrasyon belirler:
+  <code>.selfie</code> (varsayılan) veya <code>.skip</code> (modülü tamamen çıkar). <code>setupSDK</code>'dan önce ayarlanır,
+  son kullanıcıya sorulmaz. <code>.livenessDetection</code> değeri kabul edilir ancak canlılık ekranı da
+  aynı donanımı istediğinden <code>.selfie</code> gibi davranır ve log'a yazılır.
+- <strong>NFC'siz cihazlarda</strong> modül akıştan çıkarılırken panele <code>NFCStatus = notAvailable</code>
+  bildirilir (önceden yalnız log yazılıyordu).
+- Canlılık ekranı desteklenmeyen cihazda artık sessizce donmuyor: uyarı gösterilip modül
+  atlanıyor.
+- <strong>Ölçüler ekran yerine pencere tabanlı</strong> (<code>SDKLayout.bounds</code>): Split View / Stage Manager
+  altında kamera kırpma alanı ve canlılık ekran kaydı doğru boyutlanır.
+- Metin ve form sütunları geniş ekranda okunabilir genişlikte ortalanır
+  (<code>.sdkReadableWidth()</code>); kimlik kılavuz çerçevesi (<code>SDKLayout.maxGuideWidth</code>) ve selfie /
+  canlılık ekranlarındaki yüz ovali (<code>SDKLayout.maxFaceGuideWidth</code>) tablette üst sınırla
+  kesilir.</p>
+<p><strong>Başlık çubuğunda marka adı</strong>
+- <code>navBar.brandTitle</code> / <code>brandSubtitle</code> / <code>titleMode</code> (<code>.module</code> · <code>.brand</code> ·
+  <code>.brandWithModule</code>): çubuk adım adı yerine markanızı yazabilir; kamera üstü ekranlarda
+  logonun yanına gelir. JSON anahtarları aynı adla. <code>.prominent</code> yüksekliği 92 pt oldu
+  (56'da iki satırlı başlık alttaki bileşene biniyordu).</p>
+<p><strong>Çekim kalitesi — bulanık ve parlamalı kare yüklenmez</strong>
+- <strong>Sabitlik kapısı</strong> (kimlik tarayıcı + OVD): çekim, ardışık kareler arası fark ve cihaz
+  IMU'su birlikte sakin okuyana kadar bekler; koşul tutunca 0.5 sn ertelenir. Amaç hareket
+  yasağı değil, hareket bulanıklığını engellemektir — daha önce sabit çerçeve modu sabitliği
+  koşulsuz "var" sayıyordu.
+- <strong>Parlama kapısı</strong> (tarayıcı, yeni): belgede patlamış piksel oranı eşiği aşınca çekim
+  bekletilir; HUD metni <code>ScannerGuidanceTexts.glare</code>. OVD'de alan ortalaması yerine aynı
+  oran ölçülür — yerel parlama artık kaçmıyor.
+- <strong>OVD still netlik tabanı</strong>: çekilen kare bulanıksa kullanıcıya gösterilmeden en fazla
+  iki kez yeniden çekilir (daha önce OVD'de netlik kontrolü yoktu).
+- <strong>Hologram adımında belge kapısı</strong>: gökkuşağı efekti yalnız ön yüzde onaylanan belge
+  çerçevede kaldığı sürece sayılır; kart çekilir ya da renkli başka bir yüzey girerse adım
+  sıfırlanır. Çekim kör zamanlayıcı yerine sakinlik penceresinde alınır (0.75–2.5 sn).
+- <strong>Sabit çerçeve üst genişliği</strong>: <code>ScannerFixedFrame.maxWidth</code> ve OVD
+  <code>SDKLayout.maxCaptureGuideWidth</code> (varsayılan 630 pt). iPad'de yan boşluk kuralı ~790 pt
+  çerçeve çiziyor, belge lensin yakın odak sınırına girmeden çerçeveyi dolduramıyor ve
+  otomatik çekim tetiklenmiyordu. Mesafe kararı boyut/konum ayrımı ve histerezisle
+  "yaklaştır / uzaklaştır" arasında titremiyor.
+- <strong>Otomatik netleme</strong>: sabit çerçevede belge oturunca tek atış odak dürtmesi (aynı noktaya
+  ikinci yazım sürekli AF'te hiçbir şey yapmıyordu); lens yakın sınırda ve netlik yoksa
+  "uzaklaştırın" yönergesi. OVD odak ayarları tarayıcıyla hizalandı (yumuşak AF kapalı,
+  yakın aralık, sahne değişimi izleme). <code>SDKIdCardOVDViewModel.debugLive</code> kapı değerlerini
+  tanılama için yayınlar.
+- <strong><code>SDKIdCardOVDViewModel.motionFeed</code></strong>: kendi kamerasıyla OVD ekranı yazan entegrasyon
+  hareket ölçerini buradan besler. Beslenmezse görüntü sabitlik kapısı atlanır ve yalnız IMU
+  kullanılır (log uyarısı yazılır) — önceden bu durumda otomatik çekim hiç tetiklenmiyordu.
+- <strong><code>SDKSpeechRecViewModel.confirmSpeech()</code></strong> artık ifade doğrulanmadan bildirim yapmıyor;
+  özel ekranda onay düğmesi başarıya bağlanmasa bile söylenmeyen ifade tamamlandı sayılmaz.</p>
+<p><strong>Selfie + canlılık: TrueDepth modu</strong>
+- <strong><code>IdentifyManager.shared.selfieWithLivenessTrueDepth</code></strong> (<code>SDKTrueDepthMode</code>) ve ekran bazında
+  <strong><code>SDKSelfieWithLivenessView(trueDepthMode:)</code></strong>:
+  <code>.automatic</code> (varsayılan, önceki davranış) · <code>.required</code> (yalnız gerçek TrueDepth kamerasında ARKit;
+  TrueDepth'siz A12+ cihazda yedek modül) · <code>.disabled</code> (ARKit yok; ön kamera + Vision ile her cihazda).
+- Vision yolu aynı deneyimi sunar: iki fazlı oval, 3 sn tutma, ekran flaşı, aynı metinler ve
+  karşılaştırma kuralı. Derinlik tabanlı sahtecilik koruması yoktur; baş eğimi ölçülmez.
+- Kullanılan yol <code>sdk_logs</code>'a yazılır (<code>arkit-truedepth</code> / <code>arkit-rgb</code> / <code>vision</code>).
+- Düzeltme: dokümanlar TrueDepth'siz A12+ cihazları (iPhone SE 2/3, A12+ Touch ID'li iPad'ler)
+  "desteklenmiyor" sayıyordu; bu cihazlarda ARKit derinliksiz çalışır.</p>
+<p><strong>Akış sonucu — oturum nasıl biterse bitsin tek yerden</strong>
+- <strong><code>setupSDK(onFinished:)</code></strong>, <strong><code>IdentifyManager.shared.onFlowFinished</code></strong> ve
+  <strong><code>flowResultDelegate</code></strong> (<code>IdentifyFlowResultListener</code>): oturum başına tam bir kez, karar
+  anında <code>SDKFlowOutcome</code> gelir — <code>result</code> (<code>approved</code> · <code>rejected</code> · <code>neutral</code> ·
+  <code>notCompleted</code> · <code>cancelled</code> · <code>error</code>), <code>reason</code> (<code>SDKFlowEndReason</code>), <code>lastModule</code>,
+  panelin <code>terminateReason</code>'ı ve <code>statusSummary</code>'si birebir, <code>closeCode</code>, <code>toDictionary()</code>.
+- <strong><code>SDKFlowOutcome.skippedModules</code></strong>: doğrulanmadan geçilen modüller (atlandı, cihazda/belgede
+  bulunamadı, NFC okuma hata sınırı, manuel MRZ düzeltmesinin tükenmesi). Akış <code>approved</code>
+  bitse bile burada modül olabilir.
+- Yeni rehber: <a href="../docs/guides/session-exit/">Oturum Çıkışları</a> — tüm çıkış yolları, kapanış
+  verileri, tek modüllü / üç modüllü / görüntülü görüşmeli akış senaryoları, modül bazında çıkış
+  kataloğu (12 modül), SwiftUI/UIKit/RN-Flutter yönlendirme kalıpları.
+- Olay akışına <strong><code>session.finished</code></strong> eklendi (metadata: <code>result</code>, <code>endReason</code>,
+  <code>terminateReason</code>, <code>statusSummary</code>, <code>lastModule</code>…).
+- <strong><code>showThankYouPage: false</code></strong> artık her yolda geçerli: sonuç ekranı hiç açılmaz, SDK
+  bulunduğu ekrandan (ör. görüntülü görüşme) aşağı kayarak kapanır.
+- <code>terminateCall</code> karar kuralı <code>SDKTerminateClassifier</code>'da tek yerde; varsayılan görüşme ekranı
+  ve sonuç bildirimi aynı kuralı kullanır.</p>
+<p><strong>Dokümantasyon — override sözleşmeleri netleştirildi</strong>
+- OVD, Liveness, Selfie, Görüşme, Adres, NFC, Konuşma ve Kimlik rehberlerinde "override
+  ederseniz sizde kalanlar" açıkça yazıldı: zorunlu kancalar, iş parçacığı kuralları,
+  değiştirilemeyen parçalar (tarayıcı HUD'u, iOS NFC sayfası, canlılık algılaması).</p>
+<p><strong>Değişti</strong>
+- <strong>Header'daki marka işaretinin anahtarı <code>.headerLogo</code></strong> oldu; önceki <code>.langButton</code> adı
+  yanlıştı ve <code>.logo</code>'yu ezmek header'ı değiştirmiyordu. Eski override'lar çalışmaya
+  devam eder.
+- <strong>İngilizce dil kodu <code>.eng</code> → <code>.en</code>.</strong> <code>.eng</code> deprecated alias olarak derlenir,
+  <code>SDKLang(rawValue: "eng")</code> kabul edilir, ses kliplerinde <code>_eng</code> eki yedek olarak denenir.
+  Tek kırılma: host kodunda <code>switch</code> içindeki <code>case .eng:</code> deseni derlenmez.
+- <strong>Sayfa arka planları override edilebilir</strong> — açık temadaki sabit beyaz ve modül
+  ekranlarının <code>primary</code> zemini rol token'ına bağlandı.
+- <strong>Seçim satırları</strong> (izin listesi, belge türü) artık <code>selectedItem*</code> / <code>unselectedItem*</code>
+  rollerinden beslenir; <code>primary</code> ile zorunlu olarak birlikte değişmez.
+- Sabit ölçüler token'landı: seçim satırı, form alanları, uyarı kartı, sheet tutamağı,
+  kamera maskesi ve kılavuz renkleri, kayıt butonu.
+- <strong><code>setupSDK(showThankYouPage:)</code> varsayılanı <code>true</code>.</strong> 3.0.0'da varsayılan <code>false</code> idi ama
+  görüşme sonu yolları bayrağa bakmadığı için sonuç ekranı yine açılıyordu; görünür davranış
+  korunur. Kendi UIKit akışında <code>getNextModule</code> kullanıp parametreyi vermeyen host'a son
+  adımda boş controller yerine <code>thankYouViewController</code> döner.
+- <strong><code>session.completed</code> / <code>session.failed</code></strong> yalnızca gerçek bir bitişte yayınlanır.
+  3.0.0'da her <code>terminateCall</code>'da gidiyor ve başarıyı <code>success</code>/<code>approve</code> içeren statüde
+  arıyordu (panel <code>positive</code> gönderdiğinden onaylanan oturumlar <code>failed</code> görünüyordu);
+  karar içermeyen, yeniden bağlanmaya düşen sonlandırmalarda da <code>failed</code> gidiyordu.</p>
+<h3 id="yayınlanmamış-v3">Yayınlanmamış (v3)<a class="headerlink" href="#yayınlanmamış-v3" title="Permanent link">&para;</a></h3>
+<p>Sürüm numarası yayın anında verilir. v3, SDK'yı "başsız" (headless) bir çekirdek + hazır
+SwiftUI ekranları olan bir yapıya taşıyan kapsamlı bir revizyondur.</p>
+<p><strong>Yeni</strong>
+- <strong>DefaultUI</strong> — tüm modül ekranları SDK'nın içine taşındı. Her modül için drop-in
+  <code>View</code> + <code>ViewModel</code> çifti; host uygulama isterse yalnızca temayı ezer, isterse kendi
+  ekranını yazıp aynı ViewModel'i kullanır.
+- <strong>Pasaport desteği</strong> — TD3 MRZ ayrıştırma, tek sayfa yükleme (<code>doc_type=passport</code>),
+  yandan çekim yönlendirmesi, MRZ doğrulamalı oryantasyon düzeltmesi.
+- <strong>IdentityScanner</strong> — kimliği gerçek zamanlı yakalayan tarayıcı katmanı; düşük ışık ve
+  düşük kontrast desteği, kare seçimi (en hemfikir dörtgen).
+- <strong>Sesli okuma (TTS)</strong> — modül bazında <code>SDKSpeechConfig</code>; native <code>AVSpeech</code> ya da kendi
+  ses paketiniz (<code>.customAudio</code>).
+- <strong>Kısa videoda sesli doğrulama</strong> — kullanıcının okuduğu metin sunucuda çözümlenip
+  eşleştirilir (<code>speech_expected_sentence</code>, benzerlik eşiği).
+- <strong>Birleşik <code>SDKLog</code> facade'i</strong> — severity + kategori etiketleri, Base64 redaksiyonu,
+  <code>silent</code> bayrağı; ayrıntı için <a href="../docs/guides/logging/">Loglama rehberi</a>.
+- <strong><code>SDKEvent</code> katmanı</strong> — modül/oturum olaylarının tek akışta yayınlanması.
+- <strong><code>SDKKeyDiagnostics</code></strong> — anahtarların (log, TURN, WS) sunucu yanıtına dayalı doğrulama
+  raporu; <code>sdk_logs</code> 401 gibi sessiz hataları başlangıçta yakalar.
+- <strong>Global bağlantı kopması katmanı</strong> — kullanıcı hangi modülde olursa olsun devreye giren
+  "Bağlantı Koptu" overlay'i + kaldığı yerden devam.
+- <strong>Çift yönlü PING/PONG heartbeat</strong> — varsayılan açık; oturum yalnızca PONG gelmediğinde
+  düşer (kuyruk zaman aşımı kaldırıldı).</p>
+<p><strong>Değişti</strong>
+- <strong>Kısa videoda sesli doğrulamayı artık metin açar:</strong> <code>video_record_read_text</code> (yoksa
+  <code>speech_expected_sentence</code>) doluysa doğrulama açılır ve metin ekranda gösterilir; boşsa
+  kapalıdır. <code>video_record_speech</code> bayrağı belirleyici değildir — panel metni doldurduğu
+  hâlde bayrağı <code>0</code>/eksik gönderdiğinde metin ekranda hiç görünmüyordu.
+- <strong><code>video_record_duration</code> milisaniye kabul edilir</strong> (6000 → 6 sn); saniye gönderen eski
+  projeler için birim değere göre ayırt edilir, sonuç 3–120 sn aralığına sıkıştırılır.
+- <strong>Askı / toparlanma penceresi kaldırıldı.</strong> Görüşme sırasında sinyal ya da ICE koparsa
+  toparlanma beklenmez: görüşme biter, bağlantılar kapatılır, "Bağlantı Koptu" ekranı
+  çıkar. Bekleme yapısı sunucu askıdaki oturumu canlı saydığı için <code>subRejected</code>
+  üretiyordu. <code>SDKCallScreenViewModel.isCallSuspended</code> ve
+  <code>IdentifyManager.callSuspensionHandler</code> <strong>kaldırıldı</strong>.
+- <strong>Karşılaştırma sonucu tek kapıda toplandı</strong> (<code>SDKComparisonGate</code>) — uyuşmazlıkta modül
+  sessizce geçilmiyor; hak bitince atlama/<code>notCompleted</code> kuralı tek yerden işletiliyor.
+- <strong>Birleşik socket kapanma kodları 4100+</strong> — 4105 arka plan zaman aşımı, 4106 heartbeat
+  zaman aşımı dahil.
+- <strong>Bağlantı logları tekrarsız</strong> — ağ durumu yalnızca değişimde yazılır; "İnternet erişimi
+  geri geldi" satırı yalnızca gerçekten kopma bildirilmişken basılır.
+- <strong>Log gönderim hatası</strong> ham <code>print</code> yerine <code>SDKLog.console</code> ile diğer loglarla aynı
+  biçimde basılır; bu satırlar online kuyruğa girmez (sonsuz döngü koruması).</p>
+<p><strong>Düzeltildi</strong>
+- OCR ön yüzde doğum ↔ geçerlilik tarihi karışması (kronolojik atama) ve "no-data" durumu.
+- Selfie onaylanmadan panele yükleniyordu (ITR-2015).
+- OVD hata ekranı açıkken çekim döngüsü dönmeye devam ediyordu (ITR-1881).
+- Buton sesi ile yönerge sesi ayrımı, OVD seçim ekranında TTS (ITR-1903).
+- Canlılık video kaydında ARKit kare havuzu tükenince yaşanan donma.
+- Kamera, bekleme odasında açılıyordu; capture artık yalnızca çağrı kabul edilince başlar.</p>
+<h3 id="259">2.5.9<a class="headerlink" href="#259" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Gelen aramada <strong>sistem zil sesi ve titreşim</strong>; sessiz modda titreşim desteklenir.</li>
+<li>Bekleme ekranındaki PING sayacı görüşmeyi kesiyordu; sezgisel kaldırıldı.</li>
+<li>Çalma zaman aşımı (4108) ve 4xxx kapanış kodları eklendi.</li>
+<li>Sinyal kopunca WebRTC oturumu tamamen kapatılıyor, medya susturuluyor.</li>
+<li>Reconnect zaman aşımı 10 sn'ye çekildi; başarısız deneme host'a bildiriliyor.</li>
+<li><strong>Görüşme sağlık raporu</strong> eklendi (socket kopma sayısı, ICE kesinti/başarısızlık/
+  toparlanma, ağ geçişleri, en uzun sunucu sessizliği).</li>
+<li>Canlılıkla selfie: iki fazlı oval (küçük→büyük), çekim anı flaşı, mesh gizleme, oval dış
+  karartma koyulaştırıldı.</li>
+<li>Görüşme ekranında canlılık kaydı popup'ı düzeltildi.</li>
+<li>Minimum iOS sürümü 15'e güncellendi.</li>
+</ul>
+<h3 id="258">2.5.8<a class="headerlink" href="#258" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Birleşik socket kapanma kodları (4100+)</strong> ve arka plan oturum zaman aşımı eklendi.</li>
+<li>Socket kapanma loglarına kategori bazlı belirteçler eklendi; yalnızca 41xx kodları
+  raporlanıyor (RFC 1000'li referanslar kaldırıldı).</li>
+<li>Bağlantı logları herkesin anlayacağı dile çevrildi.</li>
+<li>Reconnect akışında birden çok düzeltme (<code>sendStep</code> döngüsü, yeniden bağlanma sonrası
+  takılmalar).</li>
+<li><code>hideCallAnswerScreen</code> mantık hatası giderildi.</li>
+<li>Kimlikte doğum tarihi ↔ geçerlilik tarihi karışması düzeltildi.</li>
+</ul>
+<h3 id="257">2.5.7<a class="headerlink" href="#257" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Görüşmede yerel/gelen video akışı düzeltmeleri.</li>
+<li><code>queueStats</code> gecikmesi giderildi.</li>
+<li><code>selfieWithLiveness</code> modülündeki debug etiketi kaldırıldı.</li>
+</ul>
+<h3 id="256">2.5.6<a class="headerlink" href="#256" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>selfieWithLiveness</code> modülü</strong> eklendi: doğrulama akışı, <code>withLiveness</code> parametresi ve
+  karşılaştırma için yeniden deneme hakkı.</li>
+<li>Gözlüklü kullanıcıların canlılıkla selfie'yi geçememesi sorunu giderildi.</li>
+<li>Görüşme içi canlılık için eşik değerleri ve kamera alanı güncellendi.</li>
+<li><code>currentVersion</code> dinamik hale getirildi.</li>
+<li>Xcode Cloud için workspace ve CI script eklendi.</li>
+<li>WebRTC tarafında hata düzeltmesi.</li>
+</ul>
+<h3 id="255">2.5.5<a class="headerlink" href="#255" title="Permanent link">&para;</a></h3>
+<ul>
+<li>MRZ OCR iyileştirmeleri yapıldı.</li>
+<li>NFC okuma anahtarı hatası giderildi.</li>
+<li>NFC alanlarının sunucuya gönderimi güncellendi.</li>
+<li>Log ve genel hata düzeltmeleri.</li>
+</ul>
+<h3 id="254">2.5.4<a class="headerlink" href="#254" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>iceTransportPolicy</code> relay'den <code>.all</code>'a çekildi.</li>
+<li><code>sdkLogApiUrl</code> hatası giderildi.</li>
+<li>NFC iyileştirmesi yapıldı; algılama seviyeleri değiştirilip stabilizasyon sağlandı.</li>
+<li><code>SendIdentStatusInfo</code> ile görüntülü görüşme kopması esnasında sunucudan gönderilen verinin tanımlanması sağlandı.</li>
+<li><code>uploadAddressInfo</code>'da sıkıştırma ayarları güncellendi.</li>
+<li><code>socket_auth</code> ile token'lı bağlantı sürece dahil edildi; artık müşteri ile agent arasında token ile görüntülü görüşme sağlanabiliyor.</li>
+<li><code>liveStreamModuleController</code> ismi <code>callWaitModuleController</code> olarak değiştirildi.</li>
+<li>Socket mesajında gönderilen "Live Stream" ismi "Call Wait Screen" ile değiştirildi.</li>
+</ul>
+<h3 id="253">2.5.3<a class="headerlink" href="#253" title="Permanent link">&para;</a></h3>
+<ul>
+<li>SDK log API URL eklendi.</li>
+</ul>
+<h3 id="252">2.5.2<a class="headerlink" href="#252" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Kimlik OCR — Ad Soyad alanında özel karakterlerin algılanması engellendi.</li>
+</ul>
+<h3 id="251">2.5.1<a class="headerlink" href="#251" title="Permanent link">&para;</a></h3>
+<ul>
+<li>TURN şifrelemeyi destekleme bilgisi backend'e gönderildi.</li>
+<li><code>enableDebugPrint</code> ile print loglarını açıp kapatabilme opsiyonu eklendi.</li>
+</ul>
+<h3 id="250">2.5.0<a class="headerlink" href="#250" title="Permanent link">&para;</a></h3>
+<ul>
+<li>OCR kimlik ön yüz ve arka yüz iyileştirmeleri yapıldı.</li>
+<li>TURN için <code>encryptedTurnCredential</code> ve <code>shortTermUsage</code> parametreleri eklendi.</li>
+<li><code>terminateCall</code> fonksiyonuna <code>terminateReason</code> ve <code>statusSummaryType</code> eklendi.</li>
+<li>Response messages düzenlemeleri yapıldı.</li>
+<li>SDK online log iyileştirmeleri yapıldı.</li>
+</ul>
+<h3 id="2315">2.3.15<a class="headerlink" href="#2315" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Selfie modülünde sadece tek yüz algılandığında ilerlenmesi sağlandı.</li>
+</ul>
+<h3 id="2314">2.3.14<a class="headerlink" href="#2314" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>disableEndCallButton</code> socket aksiyonu eklendi.</li>
+<li><code>enableAutoRotateOCR</code> SDK parametresi eklendi.</li>
+<li><code>active_comparison_result_skip_module</code> eklendi.</li>
+</ul>
+<h3 id="239">2.3.9<a class="headerlink" href="#239" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>appVersion</code>, <code>appBuild</code>, <code>sdkVersion</code> bilgilerinin gönderilmesi sağlandı.</li>
+<li><code>agentViewScale</code> desteği eklendi.</li>
+<li><code>ident_id</code> trim eklendi.</li>
+<li><code>doc_type</code> desteği eklendi.</li>
+</ul>
+<h3 id="231">2.3.1<a class="headerlink" href="#231" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Sunucudan maksimum dosya yükleme boyutunu alma eklendi.</li>
+</ul>
+<h3 id="230">2.3.0<a class="headerlink" href="#230" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Adres modülüne PDF yükleme seçeneği eklendi.</li>
+<li>Canlılık modülüne ekran kaydı desteği eklendi.</li>
+</ul>
+<h3 id="220">2.2.0<a class="headerlink" href="#220" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>IdentifyTrackingListener</code> tarafına <code>HTTP_RESPONSE_TRACKING_EVENT</code> ve <code>HTTP_REQUEST_TRACKING_EVENT</code> eklendi.</li>
+<li>TURN sunucu için short-term auth servisi eklendi.</li>
+</ul>
+<h3 id="210">2.1.0<a class="headerlink" href="#210" title="Permanent link">&para;</a></h3>
+<ul>
+<li>SDK tarafına yeni bir <code>IdentifyTrackingListener</code> eklendi; örnek kullanım için <code>SDKBaseViewController</code> dosyasını inceleyebilirsiniz.</li>
+</ul>
+<h3 id="206">2.0.6<a class="headerlink" href="#206" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Network sınıfında SSL pinning için ekstra log eklendi.</li>
+</ul>
+<h3 id="205">2.0.5<a class="headerlink" href="#205" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Yeni dil desteği eklendi.</li>
+</ul>
+<h3 id="204">2.0.4<a class="headerlink" href="#204" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>closeSDK</code> metodu güncellendi.</li>
+<li><code>endReconnectSubscribe</code> eklendi.</li>
+</ul>
+<h3 id="203">2.0.3<a class="headerlink" href="#203" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>Xcode 15.3 sürümü ayrıca eklenmiştir, dökümantasyonu mutlaka kontrol edin.
+- Network sınıfı güncellendi.
+- SSL pinning desteği eklendi.</p>
+</blockquote>
+<h3 id="202">2.0.2<a class="headerlink" href="#202" title="Permanent link">&para;</a></h3>
+<ul>
+<li>WS credential web servisten gelecek hale getirildi, dökümanlar güncellendi.</li>
+</ul>
+<h3 id="201">2.0.1<a class="headerlink" href="#201" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Active result desteği eklendi.</li>
+<li>OCR alanında güncellemeler yapıldı.</li>
+</ul>
+<h3 id="198">1.9.8<a class="headerlink" href="#198" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Bağlantı hızına bağlı olarak kamera güncellemesi düzenlendi.</li>
+<li>Prepare modülünün panele attığı istek eklendi.</li>
+</ul>
+<h3 id="197">1.9.7<a class="headerlink" href="#197" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Prepare modülü eklendi.</li>
+<li><code>forceQuitSDK</code> eklendi.</li>
+<li>Socket disconnect olunca socket listener için metot eklendi (<code>.connectionErr</code>).</li>
+<li>OCR tarafında güncelleme yapıldı.</li>
+</ul>
+<hr />
+<h2 id="sample-app">Sample App<a class="headerlink" href="#sample-app" title="Permanent link">&para;</a></h2>
+<h3 id="yayınlanmamış-v3--build-44">Yayınlanmamış (v3 · build 44)<a class="headerlink" href="#yayınlanmamış-v3--build-44" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>Not: v3 ile birlikte örnek uygulama sıfırdan numaralandı (<code>CURRENT_PROJECT_VERSION</code> 23);
+aşağıdaki "Build 178" ve öncesi eski numaralandırmaya aittir.</p>
+</blockquote>
+<p><strong>Tam özel ekran örnekleri</strong>
+- <code>SelfieWithLivenessCustomView.swift</code>: ARKit yolu (<code>FaceTrackingCameraView</code>) ve Vision
+  yolu (<code>SelfieCameraController</code>) tek dosyada; "Tam Özel Ekranlar" listesine ve anahtara eklendi.
+- Her modül için <code>XxxCustomView.swift</code>: SDK'nın hazır ekranının <strong>yalnızca public API ile</strong>
+  yazılmış, çalışan birebir kopyası (15 ekran). Değişiklik yapmadan takıldığında SDK
+  ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır.
+- <code>IdCardSingleScreenCustomView.swift</code>: kimlik ön + arka yüzü <strong>tek tam ekranda</strong> sırayla
+  çeken örnek (<code>keepsCameraRunning</code> + <code>scanSession</code>, sunucu onayı, retta 2 sn sonra otomatik
+  tekrar çekim, oturum yokken dummy onay). "Tam Özel Ekranlar" ve Modül Rehberi → Senaryo →
+  "Ekran modu" anahtarıyla açılır.
+- <code>Modules/CustomKit/</code>: kamera önizlemesi (iOS 17 <code>RotationCoordinator</code> portrait düzeltmesi),
+  oval/çerçeve maskeleri ve ortak yardımcılar; <code>CustomScreens.swift</code> tüm override'ları toplu
+  takar.
+- Hamburger menü → <strong>Tam Özel Ekranlar</strong>: anahtar açıkken akıştaki her ekran özel sürümüyle
+  çizilir, kapalıyken SDK ekranları; aynı ekrandan her modül tek tek önizlenir.
+- <code>XxxExample.swift</code> dosyaları sadeleşti: (1) SDK ekranı, (2) tema, (3) <code>XxxCustomView</code>
+  önizlemesi. <code>XxxConfig.swift</code> dosyaları ve "Replaced" örnekleri kaldırıldı (eski
+  "özelleştirme" örnekleri SDK ekranıyla aynı sonucu vermiyordu; bu kaldırmanın nedenidir).
+- <code>RootView.swift</code> başında entegrasyon rehberi: üç yapı taşı, akış sırası, özelleştirme
+  katmanları A–D, özel ekran kuralları.
+- <code>main</code> dalı IdentifySDK'yı uzak SPM paketinden (<code>id24.tr-ios-sdk-spm</code>, <strong>exact 3.1.0</strong>)
+  bağlar; kaynağa bağlı derleme yalnızca geliştirme dallarındadır.
+- Dokümanlar: README kopyalama tablosu, <code>customization.md</code> (CustomView tablosu + CustomKit +
+  bitiş durumu notu), <code>FULL-INTERGATION.md</code> bölüm 7/8, <code>Modules.md</code> ve 14 modül rehberi.</p>
+<p><strong>Build 24–44</strong>
+- Hamburger menüsü: <strong>SDK Modül Rehberi</strong> (showcase: tasarım kataloğu, nav bar marka/ikon
+  örnekleri, tema JSON köprüsü, senaryolu dummy API) ve <strong>Debug Değerleri</strong> ekranı
+  (<code>SDKDebugSettings</code>, tümü varsayılan kapalı; OVD kapı paneli dahil).
+- Birleşik log paneli: netfox forku ile Requests / Console / Socket sekmeleri; netfox ve TTS
+  tercihleri kalıcı. Panel kapatılırken oluşan <code>deinit</code> çökmesi giderildi.
+- iPad: ikon seti ve <code>UIRequiresFullScreen = YES</code> (SDK portrait kilitli; App Store çoklu
+  görev şartı bu anahtarla karşılanır).
+- Proje adı <code>NewTest</code> → <code>IdentifySample</code>; 2sworks TestFlight imzası. (Geliştirme dallarında
+  SDK kaynağına bağlanıp arşiv <code>-workspace</code> ile alınır; <code>main</code> daima uzak SPM paketi.)
+- Dokümanlar: README'ye SPM <code>Exact Version</code> uyarısı, tema/metin API tablosu ve
+  "örnekten hangi dosyalar kopyalanır" bölümü; RN/Flutter rehberlerinde kopyalama hedefleri.</p>
+<p><strong>Build 23</strong>
+- Örnek uygulama <strong>SDK tüketen bir geliştirici rehberine</strong> dönüştürüldü: her ekran için
+  Preview + View + ViewModel, SDK yeteneklerinin showcase'i.
+- Her modül için entegrasyon rehberi (<code>IdentifySample/Modules/&lt;Module&gt;/&lt;Module&gt;.md</code>) ve
+  <code>docs/guides/</code> altında 10 konu rehberi (soket, TURN/WebRTC, loglama, event, sunucu &amp;
+  API, yerelleştirme, tema…).
+- Tek referans doküman: kökte <code>FULL-INTERGATION.md</code>.
+- Event örgüsü ekranı + React Native / Flutter köprü iskeletleri (<code>docs/integration</code>).
+- Sesli okuma (TTS) showcase'i ve giriş ekranında TTS anahtarı.
+- Ağ trafiğini incelemek için netfox entegrasyonu.</p>
+<h3 id="build-178">Build 178<a class="headerlink" href="#build-178" title="Permanent link">&para;</a></h3>
+<ul>
+<li>NFC'de iyileştirmeler yapıldı.</li>
+<li>Adres modülündeki görselin sunucuya gönderilirken kalitesinin düşmesine sebep olan ayarlar yükseltildi.</li>
+<li>Bağlantı koptuğunda durum seçilmediyse bekleme odasına yönlendirme geliştirmesi yapıldı ("-3" durum kodu ile).</li>
+<li><code>liveStreamModuleController</code> ismi <code>callWaitModuleController</code> olarak değiştirildi.</li>
+<li>WebSocket secret key geliştirmesi yapıldı; isteğe göre görüntülü görüşme token ile peer-to-peer güvenlik seviyesine çıkarıldı.</li>
+<li>WS token generate hatası giderildi.</li>
+</ul>
+<h3 id="build-166">Build 166<a class="headerlink" href="#build-166" title="Permanent link">&para;</a></h3>
+<ul>
+<li>OVD modülünde iyileştirmeler yapıldı.</li>
+</ul>
+<h3 id="build-165">Build 165<a class="headerlink" href="#build-165" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Adres fotoğraflarının daha kaliteli gönderilmesi sağlandı.</li>
+</ul>
+<h3 id="build-162">Build 162<a class="headerlink" href="#build-162" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>enableDebugPrint</code> eklendi.</li>
+</ul>
+<h3 id="build-160">Build 160<a class="headerlink" href="#build-160" title="Permanent link">&para;</a></h3>
+<ul>
+<li>TURN için şifreli kullanım opsiyonu eklendi.</li>
+<li>Görüntülü görüşme sonlandırma senaryoları için sebep ve durum bilgileri eklendi.</li>
+<li>Sunucudan gelen hata mesajlarının gösteriminde düzenlemeler yapıldı.</li>
+<li>Kimlik çekim ekranındaki flaş çalışmama hatası düzeltildi.</li>
+<li>OVD (beta) ekranı eklendi.</li>
+</ul>
+<h3 id="build-141">Build 141<a class="headerlink" href="#build-141" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Kimlik çekimlerinde otomatik yön düzeltme seçeneği eklendi.</li>
+<li>Aktif karşılaştırmada modül atlama kontrolü eklendi.</li>
+<li>Agent durum seçtiğinde arama butonunun devre dışı bırakılması sağlandı.</li>
+<li>OCR, NFC ve Selfie adımlarında tekrar deneme sayısı kontrolleri eklendi.</li>
+</ul>
+<h3 id="build-126">Build 126<a class="headerlink" href="#build-126" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Kimlik çekimlerinde yeni cihazlardaki yakınlaştırma modu uyumu sağlandı.</li>
+<li>İşaret dili seçimi ekranında görüntülü görüşme kuyruğuna düşmemesi sağlandı.</li>
+<li>Agent görüntüsünün dikey ölçüde gösterilebilmesi sağlandı.</li>
+<li>Süresi geçmiş ident için hata mesajı gösterimi eklendi.</li>
+<li>İlgili ekranlara kamera, mikrofon ve konuşma izni kontrolleri eklendi.</li>
+<li>"Tekrar Bağlan" butonuna internet bağlantısı kontrolü eklendi.</li>
+</ul>
+<h3 id="build-107">Build 107<a class="headerlink" href="#build-107" title="Permanent link">&para;</a></h3>
+<ul>
+<li>SDK'yı işlemler tamamlanmadan kapatabilme özelliği eklendi.</li>
+<li>Müşterinin çağrıyı sonlandırabilmesi eklendi.</li>
+</ul>
+<h3 id="build-106">Build 106<a class="headerlink" href="#build-106" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Sunucudan maksimum dosya yükleme boyutunu alma eklendi.</li>
+</ul>
+<h3 id="build-103">Build 103<a class="headerlink" href="#build-103" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Canlılık modülünü kaydetme seçeneği eklendi.</li>
+</ul>
+<h3 id="build-101">Build 101<a class="headerlink" href="#build-101" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Adres modülüne PDF yükleme seçeneği eklendi.</li>
+</ul>
+<h3 id="build-100">Build 100<a class="headerlink" href="#build-100" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>IdentifyTrackingListener</code> kullanımı eklendi (yalnızca 2.1.0 ve üstü sürümler için geçerli).</li>
+</ul>
+<h3 id="build-97">Build 97<a class="headerlink" href="#build-97" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Yeni dil desteği eklendi.</li>
+</ul>
+<h3 id="build-89">Build 89<a class="headerlink" href="#build-89" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Yeni canlılık testi kodları eklendi.</li>
+<li>SSL pinning örnek sertifikası eklendi.</li>
+<li>Privacy info dosyası eklendi.</li>
+</ul>
+<h3 id="build-84">Build 84<a class="headerlink" href="#build-84" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Scanner ekranında kimliğin yatay olma zorunluluğu iptal edildi.</li>
+<li>Login ekranı yeni SDK kurulumuna göre düzenlendi.</li>
+<li>Login ekranında socket hata vermesi durumunda ekstra durum bildirimi eklendi.</li>
+</ul>
+<h3 id="build-80">Build 80<a class="headerlink" href="#build-80" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Scanner ekranında daha hızlı fotoğraf çekimi sağlandı.</li>
+<li>Active result için <code>NfcViewController</code>, <code>CardreaderViewController</code> ve <code>ThankYouViewController</code> güncellendi.</li>
+<li>Scanner için yatay fotoğraf çekilmesi zorunluluğu eklendi.</li>
+<li>Dil dosyaları güncellendi.</li>
+</ul>
+<h3 id="build-75">Build 75<a class="headerlink" href="#build-75" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Scanner ve onu çağıran ekranlar güncellendi.</li>
+<li>Prepare modülü için örnek ekran eklendi.</li>
+<li>Missed Call için yeni status eklendi.</li>
+<li>Teşekkür ekranı güncellendi.</li>
+</ul>
+<h3 id="build-73">Build 73<a class="headerlink" href="#build-73" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Prepare modülünün örnek tasarımı eklendi.</li>
+<li><code>socketListener</code> tarafına <code>connectionErr</code> eklendi.</li>
+<li>Buton tiplerine loader eklendi.</li>
+<li>Socket bağlantısı kopması durumunda çıkan ekran güncellendi.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../docs/integration/flutter/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: Flutter">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                Flutter
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

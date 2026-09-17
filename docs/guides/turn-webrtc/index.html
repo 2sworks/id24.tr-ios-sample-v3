@@ -1,0 +1,2017 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/turn-webrtc/">
+      
+      
+        <link rel="prev" href="../websocket/">
+      
+      
+        <link rel="next" href="../logging/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>TURN & WebRTC - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#turn--webrtc--görüntülü-görüşme-altyapısı" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              TURN & WebRTC
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#parçalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parçalar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#turn-kimlikleri--üç-mod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TURN Kimlikleri — Üç Mod
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TURN Kimlikleri — Üç Mod">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-düz-kimlik-varsayılan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Düz kimlik (varsayılan)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-şifreli-kimlik--encrypted_turn_credential--1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Şifreli kimlik — encrypted_turn_credential == "1"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-kısa-ömürlü-kimlik--short_term_usage--1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Kısa ömürlü kimlik — short_term_usage == "1"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görüşme-akışı--uçtan-uca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görüşme Akışı — Uçtan Uca
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görüşme-deneyimini-etkileyen-ayarlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görüşme Deneyimini Etkileyen Ayarlar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kopma-durumunda-webrtc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kopma Durumunda WebRTC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Kopma Durumunda WebRTC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sinyal-websocket-koptuğunda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sinyal (WebSocket) koptuğunda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neden-toparlanma-penceresi-yok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neden toparlanma penceresi YOK?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sorun-giderme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorun Giderme
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#parçalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parçalar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#turn-kimlikleri--üç-mod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TURN Kimlikleri — Üç Mod
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TURN Kimlikleri — Üç Mod">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-düz-kimlik-varsayılan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Düz kimlik (varsayılan)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-şifreli-kimlik--encrypted_turn_credential--1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Şifreli kimlik — encrypted_turn_credential == "1"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-kısa-ömürlü-kimlik--short_term_usage--1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Kısa ömürlü kimlik — short_term_usage == "1"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görüşme-akışı--uçtan-uca" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görüşme Akışı — Uçtan Uca
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görüşme-deneyimini-etkileyen-ayarlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görüşme Deneyimini Etkileyen Ayarlar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kopma-durumunda-webrtc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kopma Durumunda WebRTC
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Kopma Durumunda WebRTC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sinyal-websocket-koptuğunda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sinyal (WebSocket) koptuğunda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neden-toparlanma-penceresi-yok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neden toparlanma penceresi YOK?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sorun-giderme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorun Giderme
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="turn--webrtc--görüntülü-görüşme-altyapısı">TURN &amp; WebRTC — Görüntülü Görüşme Altyapısı<a class="headerlink" href="#turn--webrtc--görüntülü-görüşme-altyapısı" title="Permanent link">&para;</a></h1>
+<p>Görüntülü görüşme modülü (<a href="../../../IdentifySample/Modules/CallScreen/CallScreen/">CallScreen</a>) altta
+<a href="https://github.com/stasel/WebRTC">stasel/WebRTC</a> kullanır. Bu rehber, görüşmenin kurulum
+zincirini ve TURN kimlik (credential) modlarını anlatır — <code>turnKey</code> parametresinin ne işe
+yaradığı burada netleşir.</p>
+<p>← <a href="../../../">README'ye dön</a> · İlgili: <a href="../websocket/">WebSocket</a> · <a href="../server-api/">Sunucu &amp; API</a></p>
+<hr />
+<h2 id="parçalar">Parçalar<a class="headerlink" href="#parçalar" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Parça</th>
+<th>Görev</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WebRTCClient</code></td>
+<td>Peer connection, yerel/uzak video track'leri, data channel, ICE adayları</td>
+</tr>
+<tr>
+<td>STUN/TURN sunucuları</td>
+<td>NAT arkasından medya akışını mümkün kılar; adresleri backend'den gelir</td>
+</tr>
+<tr>
+<td>WebSocket</td>
+<td>Sinyalleşme kanalı: SDP offer/answer ve ICE adayları buradan taşınır</td>
+</tr>
+</tbody>
+</table>
+<p><code>WebRTCClient</code>'ın sahibi <code>IdentifyManager</code>'dır; ekranlardan bağımsız yaşar.
+<code>iceTransportPolicy = .all</code>'dır (hem doğrudan hem TURN üzerinden bağlantı denenir).</p>
+<hr />
+<h2 id="turn-kimlikleri--üç-mod">TURN Kimlikleri — Üç Mod<a class="headerlink" href="#turn-kimlikleri--üç-mod" title="Permanent link">&para;</a></h2>
+<p>STUN/TURN adresleri ve kimlikleri, soket kurulumundan hemen önce <code>getWSCredential</code>
+servisiyle alınır (anahtarı <code>RoomResponse.ws_secret_key</code>'dir). Kimliklerin nasıl
+yorumlanacağını backend'in iki bayrağı belirler:</p>
+<h3 id="1-düz-kimlik-varsayılan">1. Düz kimlik (varsayılan)<a class="headerlink" href="#1-düz-kimlik-varsayılan" title="Permanent link">&para;</a></h3>
+<p><code>encrypted_turn_credential ≠ "1"</code> ise servis cevabındaki <code>username</code>/<code>credential</code>
+olduğu gibi kullanılır. <code>turnKey</code> bu modda devreye girmez.</p>
+<h3 id="2-şifreli-kimlik--encrypted_turn_credential--1">2. Şifreli kimlik — <code>encrypted_turn_credential == "1"</code><a class="headerlink" href="#2-şifreli-kimlik--encrypted_turn_credential--1" title="Permanent link">&para;</a></h3>
+<p>Servis, kimlikleri <strong>AES-256-CBC şifreli</strong> gönderir; SDK bunları sizin <code>turnKey</code>'inizle çözer.</p>
+<blockquote>
+<p>⚠️ Bu mod aktifken <code>turnKey</code> boşsa görüşme kurulamaz; konsolda <code>⚠️ turn key gerekli</code> görürsünüz.</p>
+</blockquote>
+<h3 id="3-kısa-ömürlü-kimlik--short_term_usage--1">3. Kısa ömürlü kimlik — <code>short_term_usage == "1"</code><a class="headerlink" href="#3-kısa-ömürlü-kimlik--short_term_usage--1" title="Permanent link">&para;</a></h3>
+<p>Çağrı <strong>cevaplanırken</strong> (<code>acceptCall</code>) SDK, kimliği yerel olarak üretir:</p>
+<div class="highlight"><pre><span></span><code>username = "&lt;şimdi + 15 dk unix zaman&gt;:&lt;identId&gt;"
+password = base64( HMAC-SHA1(username, turnKey) )
+</code></pre></div>
+<p>Her çağrıda taze kimlik üretildiği için sızan bir kimlik 15 dakika sonra işe yaramaz olur.</p>
+<hr />
+<h2 id="görüşme-akışı--uçtan-uca">Görüşme Akışı — Uçtan Uca<a class="headerlink" href="#görüşme-akışı--uçtan-uca" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>Müşteri CallScreen'e girer
+  └─ bekleme odası: updateQueue(sıra, toplam) soketten akar
+Agent aramayı başlatır
+  └─ soket: incomingCall ──► çağrı ekranı
+Müşteri kabul eder → acceptCall()
+  ├─ (short_term_usage) taze TURN kimliği üret
+  ├─ WebRTCClient.connect() → SDP offer oluştur
+  ├─ soket: "startCall" + SDP offer gönder
+  ├─ karşı taraf answer + ICE adayları ──► medya akışı başlar
+  └─ data channel açılır (agent komutları: fotoğraf çek, çember aç...)
+Görüşme biter
+  ├─ agent bitirirse: terminateCall(reason, statusSummary) — karar tablosu: websocket.md → Görüşmenin Kapanışı
+  ├─ müşteri bitirebilir (disableEndCallButton ile kilitlenebilir)
+  └─ sonuç → ThankYou ekranı (pushThankYouDirectly)
+</code></pre></div>
+<p>Görüşme sırasında agent'ın gönderebildiği tüm komutlar için
+<a href="../websocket/#aksiyon-kataloğu--sdkcallactions">WebSocket → Aksiyon Kataloğu</a>'na bakın.</p>
+<hr />
+<h2 id="görüşme-deneyimini-etkileyen-ayarlar">Görüşme Deneyimini Etkileyen Ayarlar<a class="headerlink" href="#görüşme-deneyimini-etkileyen-ayarlar" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ayar</th>
+<th>Kaynak</th>
+<th>Etki</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bigCustomerCam</code></td>
+<td><code>setupSDK</code> parametresi</td>
+<td>Müşteri kamerası büyük pencerede</td>
+</tr>
+<tr>
+<td><code>agent_view_scale</code></td>
+<td><code>RoomResponse</code></td>
+<td>Agent görüntüsünün ölçeği (dikey gösterim dahil)</td>
+</tr>
+<tr>
+<td><code>hide_call_answer_screen</code></td>
+<td><code>RoomResponse</code></td>
+<td>Çağrı cevaplama ekranını atla</td>
+</tr>
+<tr>
+<td><code>signLangSupport</code></td>
+<td><code>setupSDK</code> parametresi</td>
+<td>Görüşme öncesi işaret dili tercihi (<a href="../../../IdentifySample/Modules/SignLang/SignLang/">SignLang</a>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="kopma-durumunda-webrtc">Kopma Durumunda WebRTC<a class="headerlink" href="#kopma-durumunda-webrtc" title="Permanent link">&para;</a></h2>
+<p>Görüşme sırasında ICE bağlantısı <code>.disconnected</code> veya <code>.failed</code> duruma düşerse görüşme
+<strong>anında sonlandırılır</strong>: <code>terminateCall("TURN_DISCONNECTED")</code> yayınlanır ve
+LostConnection/reconnect akışı devreye girer. <code>.closed</code> yalnızca loglanır. Üç durum da
+birleşik kapanma kodlarıyla etiketlenir: 4140 <code>turnDisconnected</code> · 4141 <code>turnFailed</code> ·
+4142 <code>turnClosed</code>
+(<a href="../websocket/#birleşik-kapanma-kodları--sdksocketclosecode-4100">WebSocket → Birleşik Kapanma Kodları</a>).</p>
+<h3 id="sinyal-websocket-koptuğunda">Sinyal (WebSocket) koptuğunda<a class="headerlink" href="#sinyal-websocket-koptuğunda" title="Permanent link">&para;</a></h3>
+<p>Görüşme sürsün sürmesin davranış aynıdır: medya oturumu <strong>tamamen</strong> kapatılır (peer
+connection kapanır, kamera capture durur, mikrofon susar), socket kapatılır ve kullanıcıya
+"Bağlantı Koptu" ekranı gösterilir.</p>
+<h3 id="neden-toparlanma-penceresi-yok">Neden toparlanma penceresi YOK?<a class="headerlink" href="#neden-toparlanma-penceresi-yok" title="Permanent link">&para;</a></h3>
+<p>Bir dönem hem ICE hem WebSocket için "toparlanma penceresi" (askı + sessiz yeniden
+bağlanma) vardı: kopma anında görüşme askıya alınıyor, medya susturuluyor ama peer
+connection ayakta bırakılıyor, SDK arka planda sessizce yeniden bağlanmayı deniyordu.
+<strong>Bu yapı kaldırıldı</strong> — sunucu ve panel tarafında karşılığı yoktu:</p>
+<ul>
+<li>Sunucu askıdaki oturumu hâlâ canlı saydığı için sessiz yeniden abonelik <code>subRejected</code>
+  ("Oda dolu") ile reddediliyordu.</li>
+<li>Panel çağrı oturumunu kapatmıyor, sayaç işlemeye devam ediyordu.</li>
+<li>Cihaz testinde ident statüsü bu yolla <code>Reddedildi</code>ye düştü.</li>
+</ul>
+<p>Artık tek bir davranış var: <strong>bağlantı koptu → her şey yıkılır → "Bağlantı Koptu" ekranı →
+kullanıcı yeniden bağlanır → tam prosedür.</strong> Yeniden bağlanma <code>imOnline</code> +
+<code>getIdentStatus</code> + <code>subscribe</code> + <code>stepChanged</code> gönderir. Panel bir karar vermemişse
+(statü id <code>&lt; 0</code>) müşteri <strong>bekleme odasına</strong> döner ve temsilci yeniden arayabilir; karar
+vermişse başarılı/başarısız ThankYou ekranı açılır.</p>
+<p>Bağlantı kopup kullanıcı yeniden bağlandığında (<code>reconnectToSocket</code>), WebRTC oturumu
+<strong>yalnızca kullanıcı görüşme ekranındaysa</strong> yeniden kurulur (video+audio+data channel) ve
+<code>sendStep()</code> ile konum bildirilir. Diğer modüllerdeyken kopma, WebRTC'yi hiç ilgilendirmez.
+Ayrıntı: <a href="../websocket/#bağlantı-kopması-ve-toparlanma">WebSocket → Bağlantı Kopması</a>.</p>
+<hr />
+<h2 id="sorun-giderme">Sorun Giderme<a class="headerlink" href="#sorun-giderme" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Görüşme hiç kurulmuyor</strong> → <code>turnKey</code> doğru mu? <code>encrypted_turn_credential</code> modunda boş
+  <code>turnKey</code> sessizce medyasız bırakmaz, loglara <code>turn key gerekli</code> düşer (<a href="../logging/">Loglama</a>).</li>
+<li><strong>Tek yönlü ses/görüntü</strong> → Genellikle TURN kimliği geçersizdir (mod uyuşmazlığı);
+  <code>webrtc</code> kategorisindeki logları inceleyin.</li>
+<li><strong>Simülatörde test</strong> → Kamera olmadığı için görüşme ancak gerçek cihazda uçtan uca test edilir.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../websocket/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: WebSocket">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                WebSocket
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../logging/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: Loglama">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                Loglama
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

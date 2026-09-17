@@ -1,0 +1,2382 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/identity-scanner/">
+      
+      
+        <link rel="prev" href="../customization/">
+      
+      
+        <link rel="next" href="../../../IdentifySample/Modules/Modules/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>IdentityScanner - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#identityscanner--gerçek-zamanlı-belge-tarama-motoru" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              IdentityScanner
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kurulum--tek-satır" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kurulum — Tek Satır
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hızlı-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hızlı Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hazır-profiller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hazır Profiller
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kendi-profiliniz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kendi Profiliniz
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Kendi Profiliniz">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#neyin-çekimi-beklettiğine-profil-karar-verir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neyin çekimi beklettiğine profil karar verir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hazır-profili-değiştirmek--kopya-yardımcıları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hazır profili değiştirmek — kopya yardımcıları
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#doğrulayıcılar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Doğrulayıcılar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sonuç-modeli--recognizeddocument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sonuç Modeli — RecognizedDocument
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görünüm-ve-davranış-ayarları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görünüm ve Davranış Ayarları
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Görünüm ve Davranış Ayarları">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hud-metinleri-ve-zamanlama--scannerconfiguration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HUD Metinleri ve Zamanlama — ScannerConfiguration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#çerçeve-modu--scannerframemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Çerçeve Modu — ScannerFrameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesafe-kapısı--çerçeveye-oturmadan-çekmez" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mesafe kapısı — "çerçeveye oturmadan çekmez"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#akıllı-davranışlar-kutudan-çıkar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Akıllı Davranışlar (kutudan çıkar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-kyc-akışı-içinde-kullanmayın-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ KYC Akışı İçinde Kullanmayın (Bypass)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kurulum--tek-satır" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kurulum — Tek Satır
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hızlı-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hızlı Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hazır-profiller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hazır Profiller
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kendi-profiliniz" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kendi Profiliniz
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Kendi Profiliniz">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#neyin-çekimi-beklettiğine-profil-karar-verir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neyin çekimi beklettiğine profil karar verir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hazır-profili-değiştirmek--kopya-yardımcıları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hazır profili değiştirmek — kopya yardımcıları
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#doğrulayıcılar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Doğrulayıcılar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sonuç-modeli--recognizeddocument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sonuç Modeli — RecognizedDocument
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görünüm-ve-davranış-ayarları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görünüm ve Davranış Ayarları
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Görünüm ve Davranış Ayarları">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hud-metinleri-ve-zamanlama--scannerconfiguration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HUD Metinleri ve Zamanlama — ScannerConfiguration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#çerçeve-modu--scannerframemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Çerçeve Modu — ScannerFrameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mesafe-kapısı--çerçeveye-oturmadan-çekmez" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mesafe kapısı — "çerçeveye oturmadan çekmez"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#akıllı-davranışlar-kutudan-çıkar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Akıllı Davranışlar (kutudan çıkar)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-kyc-akışı-içinde-kullanmayın-bypass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ KYC Akışı İçinde Kullanmayın (Bypass)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="identityscanner--gerçek-zamanlı-belge-tarama-motoru">IdentityScanner — Gerçek Zamanlı Belge Tarama Motoru<a class="headerlink" href="#identityscanner--gerçek-zamanlı-belge-tarama-motoru" title="Permanent link">&para;</a></h1>
+<p>SDK'nın içindeki kamera tabanlı <strong>belge tarama motoru</strong>. Kimlik ekranında gördüğünüz o akıllı
+davranışların hepsi buradan gelir: belge dörtgenini canlı yakalama, alan alan OCR (TCKN,
+ad-soyad, doğum tarihi...), MRZ okuma, perspektif düzeltme ve TCKN/MRZ doğrulaması —
+<strong>tamamı cihaz üzerinde.</strong></p>
+<p>İki şekilde karşınıza çıkar:</p>
+<ol>
+<li><strong>Dolaylı</strong> — <a href="../../../IdentifySample/Modules/IdCard/IdCard/">IdCard</a> ve
+   <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/">AddressConfirm</a> modüllerinin hazır
+   ekranları bu motoru zaten kullanır; hiçbir şey yapmanız gerekmez.</li>
+<li><strong>Doğrudan</strong> — <code>IdentityScannerView</code>'ı kendi ekranlarınızda <strong>bağımsız bileşen</strong> olarak
+   kullanabilirsiniz (KYC akışı dışındaki senaryolar için: form ön-doldurma, belge arşivleme...).</li>
+</ol>
+<p>Gereksinim: <strong>iOS 15+</strong>.</p>
+<p>← <a href="../../../">README'ye dön</a> · İlgili: <a href="../customization/">Özelleştirme</a> · <a href="../theming/">Tema</a></p>
+<hr />
+<h2 id="kurulum--tek-satır">Kurulum — Tek Satır<a class="headerlink" href="#kurulum--tek-satır" title="Permanent link">&para;</a></h2>
+<p>Uygulama açılışında profil ve doğrulayıcı kayıtlarını yapın:</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentityScanner</span><span class="p">.</span><span class="n">setup</span><span class="p">()</span><span class="w">   </span><span class="c1">// built-in profiller + TCKN/MRZ doğrulayıcıları kaydedilir</span>
+</code></pre></div>
+<h2 id="hızlı-başlangıç">Hızlı Başlangıç<a class="headerlink" href="#hızlı-başlangıç" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">IdentityScannerView</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">turkishIDFront</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nv">doc</span><span class="p">):</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">tckn</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="n">fields</span><span class="p">[</span><span class="s">"tckn"</span><span class="p">]?.</span><span class="n">value</span><span class="w">          </span><span class="c1">// alan bazlı erişim</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">cropped</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="n">croppedImage</span><span class="w">                 </span><span class="c1">// perspektif düzeltilmiş görsel</span>
+<span class="w">        </span><span class="bp">print</span><span class="p">(</span><span class="s">"Geçerli mi:"</span><span class="p">,</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="n">isValid</span><span class="p">)</span><span class="w">              </span><span class="c1">// TCKN checksum vb. doğrulamalar</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">failure</span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nv">error</span><span class="p">):</span>
+<span class="w">        </span><span class="c1">// ScanningError.cancelled dahil hata durumları</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Kullanıcı belgeyi çerçeveye tutar; motor kareler stabilize olunca <strong>otomatik yakalar</strong>
+(gerekirse manuel yakalama butonu belirir), alanları okur, doğrular ve sonucu döndürür.</p>
+<hr />
+<h2 id="hazır-profiller">Hazır Profiller<a class="headerlink" href="#hazır-profiller" title="Permanent link">&para;</a></h2>
+<p>Profil = "bu belge nasıl taranır" tarifi (strateji + alan bölgeleri + anahtar kelime kapısı):</p>
+<table>
+<thead>
+<tr>
+<th>Profil</th>
+<th>Strateji</th>
+<th>Ne yapar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.turkishIDFront</code></td>
+<td><code>visionText</code></td>
+<td>TC kimlik ön yüz: TCKN, soyad, ad, doğum tarihi, belge no — <strong>bölgesel OCR</strong> ile</td>
+</tr>
+<tr>
+<td><code>.turkishIDBack</code></td>
+<td><code>mrzTurkishID</code></td>
+<td>TC kimlik arka yüz: anne adı / baba adı / veren makam basılı <strong>etiketine göre</strong> (<code>labelAnchor</code>), MRZ kuralı <code>.td1</code> zorunlu <code>.presence</code></td>
+</tr>
+<tr>
+<td><code>.turkishID</code></td>
+<td>—</td>
+<td>Ön/arka birleşik anahtar kelime kümesi</td>
+</tr>
+<tr>
+<td><code>.passport</code></td>
+<td><code>mrzPassport</code></td>
+<td>Pasaport veri sayfası (TD3 MRZ); dik tutulursa "yana çevirin" yönergesi</td>
+</tr>
+<tr>
+<td><code>.turkishDrivingLicense</code></td>
+<td><code>visionText</code></td>
+<td>TR ehliyet</td>
+</tr>
+<tr>
+<td><code>.bankCard</code></td>
+<td><code>visionText</code></td>
+<td>Banka kartı</td>
+</tr>
+<tr>
+<td><code>.a4Document</code> / <code>.generic</code></td>
+<td><code>imageOnly</code></td>
+<td>Serbest belge — alan çıkarmadan düzgün kırpılmış görsel (AddressConfirm bunu kullanır)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Anahtar kelime kapısı (keyword gating):</strong> Profildeki <code>keywordSet</code>, "TÜRKİYE CUMHURİYETİ /
+KİMLİK KARTI" gibi ibareler görünmeden yakalamayı tetiklemez — masadaki rastgele bir dikdörtgen
+kimlik sanılmaz.</p>
+<h2 id="kendi-profiliniz">Kendi Profiliniz<a class="headerlink" href="#kendi-profiliniz" title="Permanent link">&para;</a></h2>
+<p><code>DocumentProfile</code> <code>Codable</code>'dır — profili <strong>JSON'dan bile yükleyebilirsiniz</strong> (sunucudan
+indirilen profille yeni belge tipi desteği, uygulama güncellemeden):</p>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nv">profile</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">DocumentProfile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="p">:</span><span class="w"> </span><span class="s">"my.company.badge"</span><span class="p">,</span>
+<span class="w">    </span><span class="n">displayName</span><span class="p">:</span><span class="w"> </span><span class="s">"Personel Kartı"</span><span class="p">,</span>
+<span class="w">    </span><span class="n">strategy</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">visionText</span><span class="p">,</span>
+<span class="w">    </span><span class="n">fields</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="n">FieldDescriptor</span><span class="p">(</span><span class="n">key</span><span class="p">:</span><span class="w"> </span><span class="s">"sicilNo"</span><span class="p">,</span>
+<span class="w">                        </span><span class="n">pattern</span><span class="p">:</span><span class="w"> </span><span class="p">#</span><span class="s">"\b[A-Z]{2}\d{6}\b"</span><span class="p">#,</span>
+<span class="w">                        </span><span class="n">valueType</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">number</span><span class="p">,</span>
+<span class="w">                        </span><span class="n">isRequired</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">                        </span><span class="n">regionOfInterest</span><span class="p">:</span><span class="w"> </span><span class="n">FieldRegion</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">:</span><span class="w"> </span><span class="mf">0.60</span><span class="p">,</span><span class="w"> </span><span class="n">width</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="p">:</span><span class="w"> </span><span class="mf">0.15</span><span class="p">))</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="n">keywordSet</span><span class="p">:</span><span class="w"> </span><span class="n">DocumentKeywordSet</span><span class="p">(</span><span class="n">keywords</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="n">DocumentKeyword</span><span class="p">(</span><span class="n">text</span><span class="p">:</span><span class="w"> </span><span class="s">"PERSONEL"</span><span class="p">)])</span>
+<span class="p">)</span>
+<span class="c1">// veya: try DocumentProfile(decoding: jsonData)</span>
+</code></pre></div>
+<p><code>FieldRegion</code> normalize koordinattır (0–1); alan yalnızca belgedeki o bölgede aranır — bu,
+hem hızı hem isabeti ciddi artırır. Sabit bölge yerine basılı etikete göre bulmak için
+<code>labelAnchor: LabelAnchor(variants: ["ANNE ADI", "MOTHER'S NAME"], direction: .below)</code> verin;
+belge çerçeveyi tam doldurmadığında bölge kaymaz.</p>
+<h3 id="neyin-çekimi-beklettiğine-profil-karar-verir">Neyin çekimi beklettiğine profil karar verir<a class="headerlink" href="#neyin-çekimi-beklettiğine-profil-karar-verir" title="Permanent link">&para;</a></h3>
+<p>Otomatik çekim iki şeye bakar ve ikisi de profilden okunur:</p>
+<table>
+<thead>
+<tr>
+<th>Ne</th>
+<th>Nasıl ayarlanır</th>
+<th>Etkisi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basılı alan</td>
+<td><code>FieldDescriptor.isRequired</code></td>
+<td><code>true</code> → alan okunmadan çekmez; <code>false</code> → okunursa döner, beklemez</td>
+</tr>
+<tr>
+<td>MRZ</td>
+<td><code>DocumentProfile.mrz: MRZRequirement?</code></td>
+<td><code>nil</code> → aranmaz; <code>isRequired: false</code> → okunur ama beklemez; <code>true</code> → <code>level</code>'a göre bekler</td>
+</tr>
+</tbody>
+</table>
+<p><code>MRZRequirement(format:isRequired:level:)</code>: <code>format</code> <code>.td1</code> (kimlik, 3×30) / <code>.td3</code> (pasaport,
+2×44); <code>level</code> <code>.presence</code> (bölge görünüyor — en az iki MRZ yapılı satır, uzunluk/kontrol hanesi
+aranmaz) / <code>.parsed</code> (belge no + doğum + geçerlilik ayrıştı). Kesin MRZ okuması çekim
+<strong>sonrası</strong> yapılır; canlı kural yalnızca "ne zaman çekilsin" sorusunu yanıtlar.</p>
+<p><code>.mrzTurkishID</code> profili <code>mrz</code> vermezse eski kural (<code>MRZRequirement.legacyTurkishID</code>: <code>.td1</code>,
+zorunlu, <code>.parsed</code>) uygulanır; JSON profillerde <code>mrz</code> anahtarı yoksa da aynı.</p>
+<h3 id="hazır-profili-değiştirmek--kopya-yardımcıları">Hazır profili değiştirmek — kopya yardımcıları<a class="headerlink" href="#hazır-profili-değiştirmek--kopya-yardımcıları" title="Permanent link">&para;</a></h3>
+<p>Hazır profiller sabittir; her yardımcı değiştirilmiş bir <strong>kopya</strong> döner:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nv">back</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">DocumentProfile</span><span class="p">.</span><span class="n">turkishIDBack</span>
+<span class="w">    </span><span class="p">.</span><span class="n">settingRequired</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="p">:</span><span class="w"> </span><span class="s">"fatherName"</span><span class="p">)</span><span class="w">          </span><span class="c1">// bir/birden çok alanı zorunlu ↔ zorunsuz</span>
+<span class="w">    </span><span class="p">.</span><span class="n">settingMRZRequired</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span><span class="w">                           </span><span class="c1">// MRZ okunsun ama çekimi beklemesin</span>
+<span class="w">    </span><span class="c1">// .settingMRZ(MRZRequirement(format: .td1, isRequired: true, level: .parsed))</span>
+<span class="w">    </span><span class="c1">// .settingField(FieldDescriptor(key: "issuedBy", isRequired: true))   // alanı değiştir / ekle</span>
+<span class="w">    </span><span class="c1">// .removingFields("documentType")                                       // hiç arama</span>
+<span class="w">    </span><span class="c1">// .settingKeywordSet(nil)                                               // anahtar kelime kapısını kapat</span>
+
+<span class="n">IdentityScannerView</span><span class="p">(</span><span class="n">profile</span><span class="p">:</span><span class="w"> </span><span class="n">back</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="err">…</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Kopya kendi ekranınızda (<code>IdentityScannerView(profile:)</code>) ya da aynı <code>id</code> ile
+<code>DocumentProfileRegistry.shared.register(_:)</code> sonrası <code>DocumentScanner</code>'da geçerlidir;
+SDK'nın hazır kimlik ekranı (<code>SDKIdCardView</code>) hazır profili doğrudan kullanır.</p>
+<h2 id="doğrulayıcılar">Doğrulayıcılar<a class="headerlink" href="#doğrulayıcılar" title="Permanent link">&para;</a></h2>
+<p>Kayıtlı doğrulayıcılar sonucu <code>validationResults</code>'a işler; <code>doc.isValid</code> hepsinin özetidir:</p>
+<ul>
+<li><code>TCKNValidator</code> — TC kimlik numarası checksum kontrolü</li>
+<li><code>MRZValidator</code> — MRZ satır check-digit kontrolü</li>
+</ul>
+<p>Kendi kuralınız için <code>DocumentValidator</code> protokolünü uygulayın:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">struct</span><span class="w"> </span><span class="nc">AgeValidator</span><span class="p">:</span><span class="w"> </span><span class="n">DocumentValidator</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"birthDate"</span>
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="kc">_</span><span class="w"> </span><span class="n">document</span><span class="p">:</span><span class="w"> </span><span class="kr">inout</span><span class="w"> </span><span class="n">RecognizedDocument</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="n">ValidationResult</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// doc.fields["birthDate"] üzerinden 18+ kontrolü...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="n">Task</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="n">DocumentValidatorRegistry</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">AgeValidator</span><span class="p">())</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="sonuç-modeli--recognizeddocument">Sonuç Modeli — <code>RecognizedDocument</code><a class="headerlink" href="#sonuç-modeli--recognizeddocument" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Anlam</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>croppedImage</code></td>
+<td>Kırpılmış, perspektifi düzeltilmiş belge görseli</td>
+</tr>
+<tr>
+<td><code>fields</code></td>
+<td>Alan sözlüğü (<code>FieldDescriptor.key</code> → <code>DocumentField</code>)</td>
+</tr>
+<tr>
+<td><code>rawText</code></td>
+<td>Belgeden okunan tüm ham metin</td>
+</tr>
+<tr>
+<td><code>validationResults</code></td>
+<td>Alan bazlı doğrulama sonuçları</td>
+</tr>
+<tr>
+<td><code>isValid</code></td>
+<td>Tüm zorunlu doğrulamalar geçti mi</td>
+</tr>
+<tr>
+<td><code>profileID</code></td>
+<td>Sonucu üreten profil</td>
+</tr>
+</tbody>
+</table>
+<h2 id="görünüm-ve-davranış-ayarları">Görünüm ve Davranış Ayarları<a class="headerlink" href="#görünüm-ve-davranış-ayarları" title="Permanent link">&para;</a></h2>
+<p><code>IdentityScannerView</code>'ın tüm init parametreleri:</p>
+<table>
+<thead>
+<tr>
+<th>Parametre</th>
+<th>Ne işe yarar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>profile</code></td>
+<td>Hangi belge, nasıl taranır (yukarıda)</td>
+</tr>
+<tr>
+<td><code>style: QuadrilateralStyle</code></td>
+<td>Dörtgen overlay'in görünümü (köşe stili, renkler)</td>
+</tr>
+<tr>
+<td><code>configuration: ScannerConfiguration</code></td>
+<td>HUD metinleri + zamanlama + çerçeve modu (aşağıda)</td>
+</tr>
+<tr>
+<td><code>frameMode: ScannerFrameMode?</code></td>
+<td>Çerçeve modunu tek çağrı için ezer (<code>nil</code> → configuration'ınki)</td>
+</tr>
+<tr>
+<td><code>debugROI</code></td>
+<td>Alan bölgelerini ekranda çizer (geliştirme)</td>
+</tr>
+<tr>
+<td><code>externalTorchOn</code></td>
+<td>El feneri kontrolünü dışarıdan bağlama (<code>Binding&lt;Bool&gt;</code>)</td>
+</tr>
+<tr>
+<td><code>onTorchAvailability</code></td>
+<td>Cihazda fener var/yok bildirimi</td>
+</tr>
+<tr>
+<td><code>speechKey</code> / <code>speechModule</code></td>
+<td>Açılışta sesli yönerge (<a href="../../../IdentifySample/Modules/ReadAloud/">ReadAloud</a> sistemiyle)</td>
+</tr>
+<tr>
+<td><code>dismissesOnResult</code></td>
+<td>Sonuçtan sonra ortamın <code>dismiss</code>'ini çağırsın mı (varsayılan <code>true</code>). Tarayıcıyı bir ekranın parçası olarak gömüyorsanız <code>false</code> — yoksa ekranın kendisi kapanır</td>
+</tr>
+<tr>
+<td><code>keepsCameraRunning</code></td>
+<td>Başarılı çekimden sonra kamera açık kalsın mı (varsayılan <code>false</code>); <code>true</code> ile yalnız kare işleme durur, önizleme canlı kalır</td>
+</tr>
+<tr>
+<td><code>scanSession</code></td>
+<td>Değeri değişince tarayıcı kamerayı yeniden kurmadan güncel <code>profile</code>/<code>configuration</code> ile yeni çekime hazırlanır (ön → arka yüz); <code>keepsCameraRunning</code> ile anlamlı</td>
+</tr>
+<tr>
+<td><code>onResult</code></td>
+<td><code>Result&lt;RecognizedDocument, Error&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Değiştirilemeyenler (şu an):</strong> tarayıcının kendi HUD'u — talimat metninin konumu ve yazı
+stili, manuel çekim ve iptal düğmeleri — gizlenemez; yalnız metinleri değişir. Çerçevenin
+<strong>içine</strong> host içeriği (ör. kart çizimi) konamaz. Fener, kapat, adım göstergesi gibi öğeleri
+tarayıcının üstüne <code>ZStack</code> ile kendiniz çizebilirsiniz.</p>
+<p>Tarayıcı varsayılan olarak sonucu teslim edince kendini <code>dismiss()</code> eder: <code>fullScreenCover</code> /
+<code>sheet</code> içinde sunun. En kısa yol <code>.documentScanner(isPresented:…)</code> modifier'ıdır — sunumu ve
+kapanışı kendisi yapar, <code>navOverlay</code> ile üstüne katman koyarsınız. Tarayıcıyı bir ekranın
+gövdesine gömmek istiyorsanız <code>dismissesOnResult: false</code> verin; ön ve arka yüzü aynı kamera
+oturumunda çekmek için <code>keepsCameraRunning: true</code> + her yüzde artan <code>scanSession</code> kullanın —
+çalışan örnek: <a href="https://github.com/2sworks/id24.tr-ios-sample-v3/blob/main/IdentifySample/Modules/IdCard/IdCardSingleScreenCustomView.swift">IdCardSingleScreenCustomView.swift</a>.</p>
+<h3 id="hud-metinleri-ve-zamanlama--scannerconfiguration">HUD Metinleri ve Zamanlama — <code>ScannerConfiguration</code><a class="headerlink" href="#hud-metinleri-ve-zamanlama--scannerconfiguration" title="Permanent link">&para;</a></h3>
+<p>Tarayıcının tüm rehber metinleri (<code>idle</code>, <code>focusing</code>, <code>reading</code>, <code>locked</code>, <code>tooClose</code>,
+<code>tooFar</code>, <code>centreDocument</code>, <code>align</code>, <code>glare</code>, <code>manualCapture</code>, <code>orientation</code>...) aktif SDK
+diline göre hazır gelir ve tek tek değiştirilebilir. <code>glare</code> boş verilirse yalnız metin
+kapanır, kapı çalışmaya devam eder. Üç hazır kompozisyon vardır ve <strong>global override kancaları</strong> sunar:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ScannerConfiguration</span><span class="p">.</span><span class="k">default</span><span class="w">    </span><span class="c1">// kimlik kartı (override: .overrideDefault)</span>
+<span class="n">ScannerConfiguration</span><span class="p">.</span><span class="n">passport</span><span class="w">   </span><span class="c1">// pasaport      (override: .overridePassport)</span>
+<span class="n">ScannerConfiguration</span><span class="p">.</span><span class="n">document</span><span class="w">   </span><span class="c1">// serbest belge (override: .overrideDocument)</span>
+
+<span class="c1">// Örnek: tüm kimlik taramalarında bekleme metnini değiştir</span>
+<span class="kd">var</span><span class="w"> </span><span class="nv">cfg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">ScannerConfiguration</span><span class="p">.</span><span class="k">default</span>
+<span class="n">cfg</span><span class="p">.</span><span class="n">texts</span><span class="p">.</span><span class="n">idle</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Kimliğinizi çerçeveye yerleştirin"</span>
+<span class="n">ScannerConfiguration</span><span class="p">.</span><span class="n">overrideDefault</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">cfg</span>
+</code></pre></div>
+<p><code>timing</code> tarafında yakalama hızı, odak davranışı ve manuel yakalama gecikmesi ayarlanır
+(<code>ScannerTimingConfig</code>).</p>
+<h3 id="çerçeve-modu--scannerframemode">Çerçeve Modu — <code>ScannerFrameMode</code><a class="headerlink" href="#çerçeve-modu--scannerframemode" title="Permanent link">&para;</a></h3>
+<p>Tarayıcı, belgenin karede nerede olduğuna iki yoldan birinden karar verir:</p>
+<table>
+<thead>
+<tr>
+<th>Mod</th>
+<th>Nasıl çalışır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.fixedFrame(ScannerFixedFrame)</code></td>
+<td>Ekranda <strong>sabit</strong> bir çerçeve çizilir; kullanıcı belgeyi ona hizalar. OCR yalnız çerçevenin içini okur. <strong>Varsayılan.</strong></td>
+</tr>
+<tr>
+<td><code>.dynamicQuad</code></td>
+<td>Belge canlı dikdörtgen tespitiyle <strong>takip edilir</strong>, perspektifi düzeltilir.</td>
+</tr>
+</tbody>
+</table>
+<p>Seçim belge türü başına yapılır — <code>ScannerConfiguration</code> presetleri zaten türe göre ayrık:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Varsayılanlar — üçü de sabit çerçeve</span>
+<span class="n">ScannerFrameMode</span><span class="p">.</span><span class="n">idCardDefault</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">fixedFrame</span><span class="p">(.</span><span class="n">idCard</span><span class="p">)</span><span class="w">     </span><span class="c1">// kimlik</span>
+<span class="n">ScannerFrameMode</span><span class="p">.</span><span class="n">passportDefault</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">fixedFrame</span><span class="p">(.</span><span class="n">passport</span><span class="p">)</span><span class="w">   </span><span class="c1">// pasaport</span>
+<span class="n">ScannerFrameMode</span><span class="p">.</span><span class="n">documentDefault</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">fixedFrame</span><span class="p">(.</span><span class="n">document</span><span class="p">)</span><span class="w">   </span><span class="c1">// serbest belge</span>
+
+<span class="c1">// Takip moduna dönmek: tek satır</span>
+<span class="n">ScannerFrameMode</span><span class="p">.</span><span class="n">idCardDefault</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">dynamicQuad</span>
+
+<span class="c1">// Çerçevenin ölçüsü de ayarlanabilir — ölçüler EKRAN NOKTASI cinsinden</span>
+<span class="n">ScannerFrameMode</span><span class="p">.</span><span class="n">idCardDefault</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">fixedFrame</span><span class="p">(</span>
+<span class="w">    </span><span class="n">ScannerFixedFrame</span><span class="p">(</span><span class="n">aspect</span><span class="p">:</span><span class="w"> </span><span class="mf">1.585</span><span class="p">,</span><span class="w">          </span><span class="c1">// belgenin en/boy oranı</span>
+<span class="w">                      </span><span class="n">horizontalPadding</span><span class="p">:</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w">  </span><span class="c1">// iki yandan boşluk (pt)</span>
+<span class="w">                      </span><span class="n">verticalOffset</span><span class="p">:</span><span class="w"> </span><span class="o">-</span><span class="mi">24</span><span class="p">,</span><span class="w">    </span><span class="c1">// merkezden kaydırma (pt, negatif = yukarı)</span>
+<span class="w">                      </span><span class="n">cornerRadius</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w">       </span><span class="c1">// köşe yarıçapı (pt)</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Hazır geometriler: <code>.idCard</code> (ID-1, 1.585), <code>.passport</code> (TD3 veri sayfası, 1.42),
+<code>.document</code> (A4 dikey, 0.707) — üçü de 15pt yan boşluk + 16pt köşe yarıçapı +
+<code>maxWidth: 630</code>.</p>
+<p><code>maxWidth</code> çerçevenin nokta cinsinden üst genişliğidir; telefonda devreye girmez, tablette
+belirleyicidir. Yan boşluk kuralı iPad'de ~790 pt'lik bir çerçeve çizer ve kullanıcıdan
+85 mm'lik kartı lensin yakın odak sınırının içine sokmasını ister — belge çerçeveyi asla
+dolduramaz, otomatik çekim tetiklenmez. Değeri düşürmek de bedelsiz değildir: çerçeve
+kırpılıp gönderilen bölgedir, yarıya indirmek OCR'a giden pikseli dörtte bire düşürür.</p>
+<blockquote>
+<p>Çerçeve <strong>ekran noktasında</strong> ölçülür, sonra kamera koordinatına çevrilir. Tersi
+(kamera tamponuna göre ölçmek) sezgisel ama yanlıştır: önizleme tamponu kırparak
+ekranı doldurur, dolayısıyla tampon genişliğinin %90'ı görünür genişliğin %90'ı
+<strong>değildir</strong> — çerçeve ekran dışına taşar ve kırpılan bölge belgeden çok daha geniş
+kalır. Ekranda ölçmek, gördüğünüz çerçeve ile kırpılan bölgeyi tanım gereği eşitler.</p>
+</blockquote>
+<p>Sabit modda <strong>lens/kamera geçişi kapalıdır</strong> — geçişin tek amacı tespiti kurtarmaktı,
+sabit çerçevede kurtarılacak tespit yok ama kadrajın kayma bedeli aynen sürüyor. Otomatik
+çekim mekanizması iki modda da aynıdır: alanlar eşleşince tarama çizgisi başlar, iki aday
+görüntüden en keskini teslim edilir.</p>
+<p><strong>Teslim edilen görüntü çerçeveye değil, belgeye kırpılır.</strong> Sabit çerçeve kullanıcı
+yönlendirmesi ve OCR bölgesidir; çekim anında çerçevenin içinde belgenin gerçek kenarları
+aranır ve kırpma ona göre yapılır — dinamik moddaki davranışın aynısı. Bulunamazsa ya da
+bulunan şey belgeye benzemiyorsa çerçeve kırpması teslim edilir; yani deneme hiçbir şeyi
+kötüleştiremez.</p>
+<h3 id="mesafe-kapısı--çerçeveye-oturmadan-çekmez">Mesafe kapısı — "çerçeveye oturmadan çekmez"<a class="headerlink" href="#mesafe-kapısı--çerçeveye-oturmadan-çekmez" title="Permanent link">&para;</a></h3>
+<p>Sabit modda çekim, belge çerçeveye oturana kadar onaylanmaz; bu sırada ne yapılması
+gerektiği HUD'da yazar:</p>
+<table>
+<thead>
+<tr>
+<th>Durum</th>
+<th>Yönerge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Belge çerçeveyi taşıyor</td>
+<td>"Kimliği biraz uzaklaştırın"</td>
+</tr>
+<tr>
+<td>Belge çerçevenin epey içinde (uzaktan çekim)</td>
+<td>"Kimliği biraz yaklaştırın"</td>
+</tr>
+<tr>
+<td>Boyut doğru ama bir yana kaymış</td>
+<td>"Kimliği çerçeveye ortalayın"</td>
+</tr>
+<tr>
+<td>Netlik gelmiyor ve lens yakın sınırda</td>
+<td>"Kimliği biraz uzaklaştırın" — belge asgari odak mesafesinin içinde</td>
+</tr>
+<tr>
+<td>Belgede parlama var</td>
+<td><code>texts.glare</code> — patlamış piksel oranı eşiği aşınca çekim bekletilir</td>
+</tr>
+</tbody>
+</table>
+<p>Oturduktan sonra da çekim hemen değil, <strong>görüntü sabitlenince</strong> alınır: ardışık kareler
+arası fark (kamera ya da belge hareketi) ve cihaz IMU'su birlikte sakin okunmalı, ardından
+0.5 sn beklenir. Amaç hareket yasağı değil, bulanık kare yüklenmesini engellemektir. Mesafe
+kararında histerezis vardır; belge bir kez oturduktan sonra sınırda "yaklaştır / uzaklaştır"
+arasında titremez.</p>
+<p>Ölçü <code>ScannerFixedFrame</code> üzerinden ayarlanır:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ScannerFixedFrame</span><span class="p">(</span><span class="n">aspect</span><span class="p">:</span><span class="w"> </span><span class="mf">1.585</span><span class="p">,</span>
+<span class="w">                  </span><span class="n">captureFitTolerance</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w">   </span><span class="c1">// pt — kenar başına izin verilen boşluk</span>
+<span class="w">                  </span><span class="n">overflowTolerance</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w">      </span><span class="c1">// pt — çerçeveyi taşma payı</span>
+</code></pre></div>
+<p><code>captureFitTolerance</code> varsayılan 30pt: 360pt genişliğindeki bir çerçevede belgenin en az
+~%83'ünü doldurması gerekir. 10'a çekmek neredeyse tam oturma ister; yükseltmek gevşetir.</p>
+<p>Boyut ve konum <strong>ayrı</strong> ölçülür: boyut, karşılıklı kenarların toplam boşluğuna bakar
+(belgenin nerede durduğu bunu değiştirmez), kaymışlık ise bu boşluğun iki yana ne kadar
+dengesiz dağıldığına. Aksi hâlde doğru boyutta ama sola kaymış bir kimliğe "yaklaştırın"
+denirdi.</p>
+<blockquote>
+<p>Kapı yalnız <strong>kanıt varken</strong> kısıtlar: belgenin kenarları bulunamıyorsa (koyu kart +
+koyu zemin, düşük ışık) karar üretilmez ve çekim eskisi gibi serbest kalır. Aksi hâlde
+tarayıcı hiç tetiklenmeyen bir ekrana dönüşebilirdi. Elle çekim düğmesi her hâlükârda
+kapıdan muaftır.</p>
+</blockquote>
+<p>Tüm profiller dener, ama başarı oranı profile göre değişir: dikdörtgen tespitinin en-boy
+ve güven eşikleri profile özeldir. Kimlik/ehliyet en çok kazanan taraftır — alan ROI'leri
+karta göre tanımlı olduğundan kırpmanın kayması bölgesel OCR'ı da kaydırır. Tanınmayan
+belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşendir.</p>
+<h3 id="akıllı-davranışlar-kutudan-çıkar">Akıllı Davranışlar (kutudan çıkar)<a class="headerlink" href="#akıllı-davranışlar-kutudan-çıkar" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Belge sensöre çok yaklaşınca <strong>ultra-geniş lense otomatik geçiş</strong> (+ "uzaklaştırın" metni) — yalnız <code>.dynamicQuad</code> modunda</li>
+<li>Dokunarak odaklama (sarı odak göstergesi); sabit çerçevede belge oturunca <strong>tek atış odak
+  dürtmesi</strong> — nokta değişmediği için sürekli AF'e ikinci kez yazmak hiçbir şey yapmıyordu</li>
+<li>Otomatik yakalama üst üste başarısız olursa <strong>manuel yakalama</strong> teklifi</li>
+<li>Pasaport dik tutulursa <strong>"yana çevirin"</strong> yönlendirmesi</li>
+<li>Işık yetersizse fener önerisi (torch API'siyle)</li>
+</ul>
+<hr />
+<h2 id="-kyc-akışı-içinde-kullanmayın-bypass">⚠️ KYC Akışı İçinde Kullanmayın (Bypass)<a class="headerlink" href="#-kyc-akışı-içinde-kullanmayın-bypass" title="Permanent link">&para;</a></h2>
+<p>Kural tarayıcıyı kullanmak değil, <strong>sonucu kendiniz yüklemek</strong> üzerinedir. KYC akışında:</p>
+<table>
+<thead>
+<tr>
+<th>Yapılış</th>
+<th>Sonuç</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Override ekranında <code>IdentityScannerView</code> → <code>doc.croppedImage</code> → <code>vm.scanFront(image:)</code> / <code>vm.scanBack(image:)</code></td>
+<td>✅ Doğru. SDK'nın kendi kimlik ekranı da tam olarak bunu yapar.</td>
+</tr>
+<tr>
+<td><code>RecognizedDocument</code>'i kendi HTTP isteğinizle göndermek</td>
+<td>❌ <code>upload</code> / <code>sendStep</code> gitmez, akış sunucuda ilerlemez.</td>
+</tr>
+</tbody>
+</table>
+<p><code>vm.scanFront(image:)</code> tarayıcıyı çalıştırmaz; verilen görüntüye OCR yapıp yükler. Görüntünün
+tarayıcıdan mı kendi kameranızdan mı geldiğini bilmez — kalite farkı buradan doğar.
+Örnek ve iki yolun karşılaştırması: <a href="../../../IdentifySample/Modules/IdCard/IdCard/#kendi-tasarımınızla-override">IdCard rehberi</a>.</p>
+<p>Akış dışında (form ön-doldurma, belge arşivleme, şube içi araçlar) tarayıcı tek başına da kullanılır.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../customization/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: Özelleştirme">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                Özelleştirme
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../../IdentifySample/Modules/Modules/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: Genel Bakış">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                Genel Bakış
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

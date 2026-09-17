@@ -1,0 +1,2115 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/ipad-support/">
+      
+      
+        <link rel="prev" href="../migration-3.1.0/">
+      
+      
+        <link rel="next" href="../localization/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>iPad Desteği - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ipad-desteği-ve-cihaz-yetenekleri" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              iPad Desteği
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#özet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Özet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yönelim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yönelim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#donanım-yetenekleri-ve-modül-davranışı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Donanım yetenekleri ve modül davranışı
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Donanım yetenekleri ve modül davranışı">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nfc--hiçbir-ipadde-yok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NFC — hiçbir iPad'de yok
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arkit-yüz-takibi--truedepth-kamera-ya-da-a12-çip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ARKit yüz takibi — TrueDepth kamera ya da A12+ çip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diğer-donanımlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diğer donanımlar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app-store-doğrulaması--ipad-hedefi-eklendiğinde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        App Store doğrulaması — iPad hedefi eklendiğinde
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yerleşim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yerleşim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modül-ekranlarını-tablette-gözden-geçirme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modül ekranlarını tablette gözden geçirme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-matrisi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test matrisi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#özet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Özet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yönelim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yönelim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#donanım-yetenekleri-ve-modül-davranışı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Donanım yetenekleri ve modül davranışı
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Donanım yetenekleri ve modül davranışı">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nfc--hiçbir-ipadde-yok" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NFC — hiçbir iPad'de yok
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arkit-yüz-takibi--truedepth-kamera-ya-da-a12-çip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ARKit yüz takibi — TrueDepth kamera ya da A12+ çip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#diğer-donanımlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diğer donanımlar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app-store-doğrulaması--ipad-hedefi-eklendiğinde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        App Store doğrulaması — iPad hedefi eklendiğinde
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yerleşim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yerleşim
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modül-ekranlarını-tablette-gözden-geçirme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modül ekranlarını tablette gözden geçirme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-matrisi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test matrisi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ipad-desteği-ve-cihaz-yetenekleri">iPad Desteği ve Cihaz Yetenekleri<a class="headerlink" href="#ipad-desteği-ve-cihaz-yetenekleri" title="Permanent link">&para;</a></h1>
+<p>SDK 3.1.0'den itibaren iPad'de çalışır. Bu rehber neyin değiştiğini, hangi modülün hangi
+donanımı istediğini ve cihaz o donanıma sahip değilse akışın nasıl ilerlediğini anlatır.</p>
+<hr />
+<h2 id="özet">Özet<a class="headerlink" href="#özet" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Konu</th>
+<th>Davranış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cihaz ailesi</td>
+<td>iPhone + iPad (<code>TARGETED_DEVICE_FAMILY = "1,2"</code>)</td>
+</tr>
+<tr>
+<td>Yönelim</td>
+<td><strong>Portrait</strong> — iPad'de de dik kilitli</td>
+</tr>
+<tr>
+<td>NFC</td>
+<td>Hiçbir iPad'de yok → NFC modülü akıştan çıkarılır, panel bilgilendirilir</td>
+</tr>
+<tr>
+<td>Canlılık (ARKit)</td>
+<td>Face ID'li iPad Pro'da derinlikli; A12+ Touch ID'li iPad'de derinliksiz (RGB); daha eskilerde yedek modül (<code>faceTrackingFallback</code>). Selfie + canlılık için derinlik şartı <code>selfieWithLivenessTrueDepth</code> ile seçilir</td>
+</tr>
+<tr>
+<td>Yerleşim</td>
+<td>Metin ve form sütunları okunabilir genişlikte ortalanır; kamera ekranları tam ekran</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="yönelim">Yönelim<a class="headerlink" href="#yönelim" title="Permanent link">&para;</a></h2>
+<p>SDK ekranları portrait'e kilitlidir ve yakalama bağlantıları dik varsayımıyla kurulur.
+iPad'de de aynı kural geçerlidir; host uygulamanın Info.plist'inde iPad için de yalnız
+portrait tanımlanmalıdır:</p>
+<div class="highlight"><pre><span></span><code>UISupportedInterfaceOrientations~ipad = UIInterfaceOrientationPortrait
+</code></pre></div>
+<p>Kullanıcı cihazı yan tutarsa arayüz dik kalır ama sensör görüntüsü döner; SDK bunu
+yerçekiminden ölçüp "dik tutun" uyarısı gösterir (<code>SDKDeviceOrientationMonitor</code>). Bu uyarı
+tablette de geçerlidir — iPad genelde masaya yatık kullanıldığından eşikler toleranslıdır ve
+düz duran cihaz uyarı üretmez.</p>
+<hr />
+<h2 id="donanım-yetenekleri-ve-modül-davranışı">Donanım yetenekleri ve modül davranışı<a class="headerlink" href="#donanım-yetenekleri-ve-modül-davranışı" title="Permanent link">&para;</a></h2>
+<h3 id="nfc--hiçbir-ipadde-yok">NFC — hiçbir iPad'de yok<a class="headerlink" href="#nfc--hiçbir-ipadde-yok" title="Permanent link">&para;</a></h3>
+<p>Akış kurulurken cihazın NFC donanımı yoksa <strong>NFC modülü modül listesine hiç eklenmez</strong> ve
+panele <code>NFCStatus = notAvailable</code> bildirilir; kullanıcı geçemeyeceği bir adımda beklemez.</p>
+<p>Ekranın yine de gösterilmesini isteyen entegrasyonlar için:</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setupSDK</span><span class="p">(...,</span><span class="w"> </span><span class="n">showNFCNotFoundPage</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+</code></pre></div>
+<h3 id="arkit-yüz-takibi--truedepth-kamera-ya-da-a12-çip">ARKit yüz takibi — TrueDepth kamera ya da A12+ çip<a class="headerlink" href="#arkit-yüz-takibi--truedepth-kamera-ya-da-a12-çip" title="Permanent link">&para;</a></h3>
+<p>TrueDepth kamera Face ID'li iPhone'larda ve <strong>yalnız iPad Pro'da</strong> (2018 ve sonrası) bulunur;
+hiçbir iPad Air, iPad mini ya da temel iPad'de yoktur. ARKit yüz takibi ise TrueDepth <strong>ya da</strong>
+A12+ çip ister: A12+ Touch ID'li iPad'lerde (iPad 8+, mini 5+, Air 3+) derinliksiz (RGB) çalışır,
+daha eski iPad'lerde çalışmaz. Model listesi:
+<a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/#cihaz-modelleri">SelfieWithLiveness → Cihaz modelleri</a>.</p>
+<p>Destekleyen cihazlarda <code>livenessDetection</code> ve <code>selfieWithLiveness</code> <strong>olduğu gibi çalışır</strong> —
+ikame devreye girmez. Kontrol tek yerde yapılır
+(<code>ARFaceTrackingConfiguration.isSupported</code>) ve akış kurulurken okunur.</p>
+<p>Desteklemeyen cihazlarda:</p>
+<table>
+<thead>
+<tr>
+<th>Sunucudan gelen modül</th>
+<th>Cihazda TrueDepth yoksa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>livenessDetection</code></td>
+<td>Akışta selfie modülü zaten varsa canlılık adımı çıkarılır; yoksa yerine <strong>selfie modülü</strong> eklenir</td>
+</tr>
+<tr>
+<td><code>selfieWithLiveness</code></td>
+<td>Yerine <strong>selfie modülü</strong> konur (akışta selfie varsa yalnız çıkarılır)</td>
+</tr>
+</tbody>
+</table>
+<p>Yani doğrulama yine yüz üzerinden yapılır: selfie modülü çekilen kareyi kimlik fotoğrafıyla
+karşılaştırır. Karar akış kurulurken verilir, kullanıcı desteklenmeyen bir ekranı hiç görmez;
+<code>sdk_logs</code>'a hangi modülün neyle değiştirildiği yazılır ve ilgili <code>TrackingEventType</code>
+(<code>livelinessModuleSkipped</code> / <code>selfieWithLivenessModuleSkipped</code>) yayınlanır.</p>
+<blockquote>
+<p>Emniyet supabı: canlılık ekranı elle akışa eklenirse ve cihaz desteklemiyorsa, kullanıcı
+uyarı görüp modül atlanır — donmuş ekranda kalınmaz.</p>
+</blockquote>
+<h4 id="yerine-ne-geleceğini-siz-seçersiniz">Yerine ne geleceğini siz seçersiniz<a class="headerlink" href="#yerine-ne-geleceğini-siz-seçersiniz" title="Permanent link">&para;</a></h4>
+<p>Yedek davranış koda gömülü değildir; <code>setupSDK</code> çağrısından <strong>önce</strong> belirlenir. Seçim son
+kullanıcıya sorulmaz:</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">faceTrackingFallback</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">selfie</span><span class="w">   </span><span class="c1">// varsayılan</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">faceTrackingFallback</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">skip</span><span class="w">     </span><span class="c1">// modülü tamamen çıkar</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Değer</th>
+<th>Davranış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.selfie</code></td>
+<td><strong>Varsayılan.</strong> Normal selfie modülü ile doğrulanır; akışta selfie zaten varsa modül yalnızca çıkarılır</td>
+</tr>
+<tr>
+<td><code>.skip</code></td>
+<td>Yerine bir şey konmaz, modül akıştan çıkarılır. Yüz doğrulaması akışın başka bir adımıyla veya operatör görüşmesiyle yapılıyorsa uygundur</td>
+</tr>
+<tr>
+<td><code>.livenessDetection</code></td>
+<td><strong>Uygulanamaz, <code>.selfie</code> gibi davranır.</strong> Canlılık ekranı da ARKit yüz takibine dayanır (göz kırpma / gülümseme blend shape'lerden, baş açısı yüz dönüşümünden okunur); TrueDepth yokken o da çalışamaz. Seçenek, ileride donanım istemeyen bir canlılık akışı eklenirse entegrasyonu değiştirmek gerekmesin diye kabul edilir ve <code>sdk_logs</code>'a bir satır yazılır</td>
+</tr>
+</tbody>
+</table>
+<p>Yani "ARKit yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü
+de aynı donanımı ister. Gerçek seçim <strong>selfie ile doğrula</strong> ya da <strong>adımı çıkar</strong> arasındadır.</p>
+<h4 id="selfie--canlılık-truedepth-modu">Selfie + canlılık: TrueDepth modu<a class="headerlink" href="#selfie--canlılık-truedepth-modu" title="Permanent link">&para;</a></h4>
+<p>ARKit yüz takibi TrueDepth kamera <strong>ya da</strong> A12+ çip ister; A12+ Touch ID'li iPad'lerde (ör. iPad
+Air 5) ekran derinliksiz çalışır. Bunu entegrasyon seçer:</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">selfieWithLivenessTrueDepth</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="kr">required</span><span class="w">   </span><span class="c1">// yalnız TrueDepth'li cihazda ARKit</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">selfieWithLivenessTrueDepth</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">disabled</span><span class="w">   </span><span class="c1">// ARKit yok, Vision ile her iPad'de</span>
+</code></pre></div>
+<p>Cihaz tablosu, güvenlik notu ve ekran parametresi:
+<a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/#truedepth-modu">SelfieWithLiveness → TrueDepth modu</a>.</p>
+<h3 id="diğer-donanımlar">Diğer donanımlar<a class="headerlink" href="#diğer-donanımlar" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Yetenek</th>
+<th>iPad durumu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ön/arka kamera</td>
+<td>Var — kimlik, selfie, video ve görüşme modülleri çalışır</td>
+</tr>
+<tr>
+<td>Mikrofon</td>
+<td>Var</td>
+</tr>
+<tr>
+<td>Konuşma tanıma</td>
+<td>Var</td>
+</tr>
+<tr>
+<td>Apple Pencil</td>
+<td>İmza modülünde kullanılabilir (ek ayar gerekmez)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="app-store-doğrulaması--ipad-hedefi-eklendiğinde">App Store doğrulaması — iPad hedefi eklendiğinde<a class="headerlink" href="#app-store-doğrulaması--ipad-hedefi-eklendiğinde" title="Permanent link">&para;</a></h2>
+<p><code>TARGETED_DEVICE_FAMILY</code> içine iPad eklenince App Store Connect yüklemesi üç şart koşar;
+üçü de SDK'dan değil host uygulamanın paketinden kaynaklanır:</p>
+<table>
+<thead>
+<tr>
+<th>Şart</th>
+<th>Çözüm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iPad uygulama ikonları (20/29/40/76 pt @1x-2x, 83.5 @2x)</td>
+<td>AppIcon setine <code>idiom: ipad</code> girişleri ekleyin; tek 1024 px kaynaktan üretilebilir</td>
+</tr>
+<tr>
+<td>Çoklu görev için 4 yön + Launch Storyboard</td>
+<td>SDK portrait kilitli olduğundan çoklu görevden çıkın: <code>UIRequiresFullScreen = YES</code> (<code>INFOPLIST_KEY_UIRequiresFullScreen</code>)</td>
+</tr>
+<tr>
+<td>Launch Storyboard (çoklu görev şartı)</td>
+<td><code>UIRequiresFullScreen = YES</code> ile birlikte düşer; storyboard zaten varsa dokunmayın</td>
+</tr>
+</tbody>
+</table>
+<p><code>UIRequiresFullScreen</code> olmadan portrait-only bir iPad paketi yükleme aşamasında reddedilir
+("you need to include all of the … orientations to support iPad multitasking").</p>
+<h2 id="yerleşim">Yerleşim<a class="headerlink" href="#yerleşim" title="Permanent link">&para;</a></h2>
+<p>Geniş ekranda metin ve form sütunlarının uçtan uca yayılmaması için SDK içerik genişliğini
+sınırlar. Kendi ekranlarınızda aynı davranışı almak için:</p>
+<div class="highlight"><pre><span></span><code><span class="n">VStack</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">.</span><span class="n">sdkReadableWidth</span><span class="p">()</span><span class="w">          </span><span class="c1">// varsayılan 600 pt</span>
+<span class="w">    </span><span class="p">.</span><span class="n">sdkReadableWidth</span><span class="p">(</span><span class="mi">720</span><span class="p">)</span><span class="w">       </span><span class="c1">// kendi sınırınız</span>
+</code></pre></div>
+<p>Telefonda bu değişikliğin görünür etkisi yoktur (pencere zaten dar).</p>
+<p>Ölçüler artık <strong>ekran değil pencere</strong> tabanlıdır:</p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKLayout</span><span class="p">.</span><span class="n">bounds</span><span class="w">          </span><span class="c1">// etkin pencerenin sınırları (UIScreen yerine)</span>
+<span class="n">SDKLayout</span><span class="p">.</span><span class="n">isPad</span><span class="w">           </span><span class="c1">// cihaz türü</span>
+<span class="n">SDKLayout</span><span class="p">.</span><span class="n">readableWidth</span><span class="w">   </span><span class="c1">// metin sütunu üst sınırı (varsayılan 600)</span>
+<span class="n">SDKLayout</span><span class="p">.</span><span class="n">maxGuideWidth</span><span class="w">   </span><span class="c1">// kimlik/pasaport kılavuz çerçevesi üst sınırı (varsayılan 420)</span>
+<span class="n">SDKLayout</span><span class="p">.</span><span class="n">maxCaptureGuideWidth</span><span class="w"> </span><span class="c1">// OVD çekim kılavuzu üst sınırı (varsayılan 630) — kırpılıp yüklenen bölge</span>
+<span class="n">SDKLayout</span><span class="p">.</span><span class="n">maxFaceGuideWidth</span><span class="w"> </span><span class="c1">// yüz ovali referans genişliği üst sınırı (varsayılan 560)</span>
+</code></pre></div>
+<p><code>UIScreen.main.bounds</code> iPad'de yanıltıcıdır: uygulama ekranın yalnız bir bölümünü
+kaplayabilir. Kamera kırpma alanı (ROI), kılavuz çerçevesi ve canlılık ekran kaydı bu yüzden
+pencereyi referans alır. Kendi kamera ekranlarınızı yazarken aynı kuralı izleyin.</p>
+<p>Kimlik/pasaport kılavuz çerçevesi tablette belgeye göre absürt büyümesin diye üst sınırla
+kesilir; sınırı temadan değiştirebilirsiniz:</p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKLayout</span><span class="p">.</span><span class="n">maxGuideWidth</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">480</span>
+</code></pre></div>
+<p><strong>Çekim kılavuzları ayrı ve daha geniştir.</strong> OVD kılavuzu (<code>SDKLayout.maxCaptureGuideWidth</code>)
+ve tarayıcının sabit çerçevesi (<code>ScannerFixedFrame.maxWidth</code>) varsayılan 630 pt'tir: bu
+dikdörtgen yalnız yönlendirme değil, <strong>kırpılıp sunucuya giden görüntüdür</strong>. Daraltmak
+sensörün küçük bir bölümünü kullanır ve OCR/sunucu kalitesini düşürür; genişletmek belgeyi
+lensin yakın odak sınırının içine iter ve otomatik çekim tetiklenmez. Telefonda etkisi
+yoktur (ekran zaten dar).</p>
+<p>Selfie ve canlılık ekranlarındaki <strong>yüz ovali</strong> de aynı nedenle sınırlıdır. Oval, pencere
+genişliğinin değil <code>maxFaceGuideWidth</code> ile kesilmiş referans genişliğin bir oranı kadar
+çizilir; sınır olmasa tablette oval ekranla birlikte büyür ve kullanıcının kameraya
+gerçekçi olmayan bir yakınlıkta durması gerekirdi. Kılavuz ile analiz aynı dikdörtgeni
+paylaştığı için "çok uzak / çok yakın" değerlendirmesi de bu sınırla birlikte kayar:</p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKLayout</span><span class="p">.</span><span class="n">maxFaceGuideWidth</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">620</span><span class="w">   </span><span class="c1">// tablette daha büyük oval</span>
+</code></pre></div>
+<hr />
+<h2 id="modül-ekranlarını-tablette-gözden-geçirme">Modül ekranlarını tablette gözden geçirme<a class="headerlink" href="#modül-ekranlarını-tablette-gözden-geçirme" title="Permanent link">&para;</a></h2>
+<p>Backend oturumu açmadan, her modülün <strong>tam ekran</strong> hâli simülatörde açılabilir. Örnek uygulama
+iki test kancası taşır:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">SIM</span><span class="o">=</span><span class="s2">"iPad Pro 11-inch (M5)"</span>
+<span class="nv">BID</span><span class="o">=</span>com.2sworks.identifytr.v3
+
+<span class="nv">SIMCTL_CHILD_SHOWCASE_ITEM</span><span class="o">=</span>addressConfirm<span class="w"> </span><span class="se">\</span>
+<span class="nv">SIMCTL_CHILD_SHOWCASE_FULLSCREEN</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+xcrun<span class="w"> </span>simctl<span class="w"> </span>launch<span class="w"> </span><span class="s2">"</span><span class="nv">$SIM</span><span class="s2">"</span><span class="w"> </span><span class="nv">$BID</span><span class="w"> </span>-showShowcase
+
+xcrun<span class="w"> </span>simctl<span class="w"> </span>io<span class="w"> </span><span class="s2">"</span><span class="nv">$SIM</span><span class="s2">"</span><span class="w"> </span>screenshot<span class="w"> </span>addressConfirm.png
+</code></pre></div>
+<ul>
+<li><code>-showShowcase</code> — açılışta modül rehberini açar.</li>
+<li><code>SHOWCASE_ITEM</code> — o modülün detayını doğrudan açar.</li>
+<li><code>SHOWCASE_FULLSCREEN=1</code> — modülü rehber kartı yerine <strong>tam ekran</strong> çizer; kart 540 pt'a
+  sabit olduğu için tablet yerleşimi ancak bu modda değerlendirilebilir.</li>
+</ul>
+<p>Modül id'leri <code>Showcase/ShowcaseCatalog.swift</code> içindedir (<code>prepare</code>, <code>idCard</code>, <code>nfc</code>,
+<code>addressConfirm</code>, <code>signature</code>, <code>speech</code>, <code>thankYou</code>, …).</p>
+<p>Kamera, NFC ve ARKit simülatörde çalışmadığından bu modlarda <strong>yerleşim</strong> doğrulanır; yakalama
+davranışı gerçek cihaz ister.</p>
+<h2 id="test-matrisi">Test matrisi<a class="headerlink" href="#test-matrisi" title="Permanent link">&para;</a></h2>
+<p>Yayına çıkmadan önce en az şu üç cihaz sınıfında tam akış koşulmalıdır:</p>
+<table>
+<thead>
+<tr>
+<th>Cihaz</th>
+<th>Beklenen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Face ID'li iPad Pro</td>
+<td><code>livenessDetection</code> ve <code>selfieWithLiveness</code> normal çalışır (yüz ovali ekranla büyümez); NFC adımı akışta yoktur</td>
+</tr>
+<tr>
+<td>A12+ Touch ID'li iPad Air / mini</td>
+<td>Canlılık modülleri ARKit ile derinliksiz çalışır; <code>selfieWithLivenessTrueDepth = .required</code> iken selfie + canlılık yedeğe düşer, <code>.disabled</code> iken Vision ile çalışır. NFC adımı akışta yoktur</td>
+</tr>
+<tr>
+<td>Face ID'siz iPhone (SE 2/3)</td>
+<td>iPad Air / mini ile aynı (A12+); SE 1 ve iPhone 8 gibi A11 ve öncesinde <code>faceTrackingFallback</code> devreye girer</td>
+</tr>
+</tbody>
+</table>
+<p>Kontrol edilecekler:</p>
+<ul>
+<li>Kamera kılavuzları (kimlik çerçevesi, yüz ovali) ekranla birlikte absürt büyümüyor.</li>
+<li>Metin ve form sütunları ortalanmış, satırlar ekranın tamamına yayılmıyor.</li>
+<li>Canlılık adımı geçince kısa titreşim alınıyor (<code>stepFeedbackEnabled</code>); iPad'de dokunsal
+  donanım yoktur — darbe sessizce atlanır, akış etkilenmez.</li>
+<li>Atlanan modüller için <code>status == .skipped</code> olayı host'a ulaşıyor ve <code>sdk_logs</code>'ta hangi
+  modülün neyle değiştirildiği görünüyor.</li>
+<li>Split View / Stage Manager'da kamera önizlemesi ve kırpma alanı kaymıyor.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../migration-3.1.0/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: 3.1.0 Değişiklikleri">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                3.1.0 Değişiklikleri
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../localization/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: Lokalizasyon">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                Lokalizasyon
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

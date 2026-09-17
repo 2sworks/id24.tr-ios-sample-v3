@@ -1,0 +1,2556 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/theming/">
+      
+      
+        <link rel="prev" href="../session-exit/">
+      
+      
+        <link rel="next" href="../migration-3.1.0/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Tema - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tema--sdk-ekranlarını-markanıza-boyamak" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tema
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#iki-seviye-özelleştirme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İki Seviye Özelleştirme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hızlı-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hızlı Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-sistemi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Sistemi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Token Sistemi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#renk-paleti--sdkcolors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Renk Paleti — SDKColors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fontlar--sdkfonts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fontlar — SDKFonts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrikler--sdkmetrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrikler — SDKMetrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#butonlar--sdkbuttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Butonlar — SDKButtons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ikonlar-ve-illüstrasyonlar--sdkiconkey" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İkonlar ve İllüstrasyonlar — SDKIconKey
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rol-renkleri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rol Renkleri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#başlık-çubuğu--hazır-tasarımlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Başlık Çubuğu — Hazır Tasarımlar
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Başlık Çubuğu — Hazır Tasarımlar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#başlık-metni--marka-adı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Başlık Metni — Marka Adı
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bileşen-görünümleri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bileşen Görünümleri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#titreşim-haptik" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Titreşim (Haptik)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tek-sözlükle-tema-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tek Sözlükle Tema (JSON)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tek Sözlükle Tema (JSON)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#react-native--flutter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        React Native / Flutter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görsel-kontrol-showcase-kataloğu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görsel Kontrol: Showcase Kataloğu
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#iki-seviye-özelleştirme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İki Seviye Özelleştirme
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hızlı-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hızlı Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-sistemi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Sistemi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Token Sistemi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#renk-paleti--sdkcolors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Renk Paleti — SDKColors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fontlar--sdkfonts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fontlar — SDKFonts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrikler--sdkmetrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrikler — SDKMetrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#butonlar--sdkbuttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Butonlar — SDKButtons
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ikonlar-ve-illüstrasyonlar--sdkiconkey" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İkonlar ve İllüstrasyonlar — SDKIconKey
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rol-renkleri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rol Renkleri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#başlık-çubuğu--hazır-tasarımlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Başlık Çubuğu — Hazır Tasarımlar
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Başlık Çubuğu — Hazır Tasarımlar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#başlık-metni--marka-adı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Başlık Metni — Marka Adı
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bileşen-görünümleri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bileşen Görünümleri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#titreşim-haptik" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Titreşim (Haptik)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tek-sözlükle-tema-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tek Sözlükle Tema (JSON)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tek Sözlükle Tema (JSON)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#react-native--flutter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        React Native / Flutter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görsel-kontrol-showcase-kataloğu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görsel Kontrol: Showcase Kataloğu
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="tema--sdk-ekranlarını-markanıza-boyamak">Tema — SDK Ekranlarını Markanıza Boyamak<a class="headerlink" href="#tema--sdk-ekranlarını-markanıza-boyamak" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>3.1.0 ile gelen yenilikler ve geçiş adımları: <a href="../migration-3.1.0/">3.1.0 Değişiklik Rehberi</a></p>
+</blockquote>
+<p>SDK'nın hazır ekranları tek bir tema kaynağından beslenir: <strong><code>SDKTheme.shared</code></strong>.
+Renkleri, fontu, ikonları ve boşluk/köşe metriklerini <code>setupSDK</code>'dan önce bir kez ayarlarsınız;
+tüm drop-in ekranlar otomatik olarak markanıza bürünür — <strong>hiçbir ekranı yeniden yazmadan.</strong></p>
+<p>← <a href="../../../">README'ye dön</a> · İlgili: <a href="../customization/">Özelleştirme</a> (ekranın tamamını değiştirmek için)</p>
+<hr />
+<h2 id="iki-seviye-özelleştirme">İki Seviye Özelleştirme<a class="headerlink" href="#iki-seviye-özelleştirme" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Tema (bu rehber)</strong> — SDK ekranları kalır, görünümleri değişir. Çoğu marka uyumu için yeterli.</li>
+<li><strong>Ekran override</strong> — ekranın tamamını kendi tasarımınızla değiştirirsiniz.
+   → <a href="../customization/">Özelleştirme Rehberi</a></li>
+</ol>
+<hr />
+<h2 id="hızlı-başlangıç">Hızlı Başlangıç<a class="headerlink" href="#hızlı-başlangıç" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1">// Uygulama açılışında, setupSDK'dan ÖNCE — bir kez.</span>
+<span class="kd">let</span><span class="w"> </span><span class="nv">theme</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span>
+
+<span class="c1">// Renkler</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">primary</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="n">Color</span><span class="p">(</span><span class="n">hex</span><span class="p">:</span><span class="w"> </span><span class="s">"#E4002B"</span><span class="p">)</span><span class="w">     </span><span class="c1">// marka ana rengi</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">primaryDark</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="n">Color</span><span class="p">(</span><span class="n">hex</span><span class="p">:</span><span class="w"> </span><span class="s">"#B80023"</span><span class="p">)</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">success</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="n">Color</span><span class="p">(</span><span class="n">hex</span><span class="p">:</span><span class="w"> </span><span class="s">"#0BA34E"</span><span class="p">)</span>
+
+<span class="c1">// Font ailesi (uygulamada kayıtlı bir custom font)</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">fonts</span><span class="p">.</span><span class="n">familyName</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Sofia Pro"</span>
+
+<span class="c1">// İkon/illüstrasyon değişimi</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">setIcon</span><span class="p">(.</span><span class="n">logo</span><span class="p">,</span><span class="w"> </span><span class="n">Image</span><span class="p">(</span><span class="s">"my_bank_logo"</span><span class="p">))</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">setIcons</span><span class="p">([</span>
+<span class="w">    </span><span class="p">.</span><span class="n">thankYouSuccess</span><span class="p">:</span><span class="w"> </span><span class="n">Image</span><span class="p">(</span><span class="s">"my_success_hero"</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">lostConnection</span><span class="p">:</span><span class="w">  </span><span class="n">Image</span><span class="p">(</span><span class="s">"my_offline_hero"</span><span class="p">),</span>
+<span class="p">])</span>
+</code></pre></div>
+<hr />
+<h2 id="token-sistemi">Token Sistemi<a class="headerlink" href="#token-sistemi" title="Permanent link">&para;</a></h2>
+<p>SDK ekranları renk/font/boşluk değerlerini asla elle yazmaz; her şey token üzerinden okunur.
+Token'lar <code>SDKTheme.shared</code>'a bakar — siz temayı değiştirince tüm ekranlar değişir.</p>
+<table>
+<thead>
+<tr>
+<th>Token ailesi</th>
+<th>Örnek</th>
+<th>Kaynağı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IDColor</code></td>
+<td><code>IDColor.primary</code>, <code>IDColor.error</code></td>
+<td><code>theme.colors</code> (<code>SDKColors</code>)</td>
+</tr>
+<tr>
+<td><code>IDFont</code></td>
+<td><code>IDFont.font(size:weight:)</code></td>
+<td><code>theme.fonts</code> (<code>SDKFonts</code>)</td>
+</tr>
+<tr>
+<td><code>IDSpacing</code></td>
+<td><code>IDSpacing.md</code> (12pt)</td>
+<td><code>theme.metrics</code> (<code>SDKMetrics</code>)</td>
+</tr>
+<tr>
+<td><code>IDRadius</code></td>
+<td><code>IDRadius.card</code> (36pt)</td>
+<td><code>theme.metrics</code></td>
+</tr>
+<tr>
+<td><code>SDKButtonShape</code></td>
+<td><code>SDKButtonShape.themed()</code></td>
+<td><code>theme.buttons</code> (<code>SDKButtons</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Kendi custom ekranlarınızda da bu token'ları kullanabilirsiniz — böylece override ettiğiniz
+ekran, SDK'nın geri kalanıyla otomatik uyumlu kalır.</p>
+<h3 id="renk-paleti--sdkcolors">Renk Paleti — <code>SDKColors</code><a class="headerlink" href="#renk-paleti--sdkcolors" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Grup</th>
+<th>Üyeler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Marka</td>
+<td><code>primary</code> · <code>primaryDark</code> · <code>primaryLight</code></td>
+</tr>
+<tr>
+<td>Başarı</td>
+<td><code>success</code> · <code>successAlt</code> · <code>successBright</code></td>
+</tr>
+<tr>
+<td>Hata</td>
+<td><code>error</code></td>
+</tr>
+<tr>
+<td>Metin/yüzey (ink)</td>
+<td><code>inkDarkest</code> · <code>inkDark</code> · <code>inkMid</code> · <code>inkLight</code> · <code>inkBorder</code> · <code>inkBackground</code> · <code>inkSurface</code> · <code>inkSubtitle</code></td>
+</tr>
+<tr>
+<td>Koyu yüzeyler</td>
+<td><code>darkBg</code> · <code>darkBgSecondary</code> · <code>darkMuted</code></td>
+</tr>
+<tr>
+<td>Diğer</td>
+<td><code>divider</code> · <code>accentPurple</code> · <code>accentTeal</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="fontlar--sdkfonts">Fontlar — <code>SDKFonts</code><a class="headerlink" href="#fontlar--sdkfonts" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>familyName</code> — tek satırla tüm SDK tipografisini değiştirir (varsayılan: <strong>Inter</strong>).</li>
+<li>Font uygulamanızda kayıtlı değilse çalışma zamanında yükleyebilirsiniz:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">registerFont</span><span class="p">(</span><span class="n">at</span><span class="p">:</span><span class="w"> </span><span class="n">fontFileURL</span><span class="p">)</span><span class="w">     </span><span class="c1">// ya da</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">registerFont</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="n">fontData</span><span class="p">)</span><span class="w">      </span><span class="c1">// bundle'a gömülü veri</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">fonts</span><span class="p">.</span><span class="n">familyName</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Sofia Pro"</span>
+</code></pre></div>
+<h3 id="metrikler--sdkmetrics">Metrikler — <code>SDKMetrics</code><a class="headerlink" href="#metrikler--sdkmetrics" title="Permanent link">&para;</a></h3>
+<p>Boşluklar (<code>spacingXS</code> 4 → <code>spacingXXL</code> 32) ve köşe yarıçapları (<code>radiusSM</code> 8 →
+<code>radiusCard</code> 36). Daha keskin köşeli bir görünüm için örneğin:</p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">metrics</span><span class="p">.</span><span class="n">radiusCard</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">12</span>
+</code></pre></div>
+<h3 id="butonlar--sdkbuttons">Butonlar — <code>SDKButtons</code><a class="headerlink" href="#butonlar--sdkbuttons" title="Permanent link">&para;</a></h3>
+<p>SDK'nın aksiyon butonlarının tüm görünümü <code>SDKTheme.shared.buttons</code> üzerinden ayarlanır.
+Her alan opsiyoneldir: dokunmadığınız her şey SDK varsayılanında kalır.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Tüm butonlar — köşe:</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">corner</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">radius</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="w">   </span><span class="c1">// .capsule (varsayılan) | .radius(0) = köşeli</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setButtonCorner</span><span class="p">(.</span><span class="n">capsule</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">cancel</span><span class="p">)</span><span class="w">   </span><span class="c1">// yalnızca tek stil</span>
+
+<span class="c1">// Tüm butonlar — ölçü, tipografi, geri bildirim:</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">height</span><span class="w">          </span><span class="p">=</span><span class="w"> </span><span class="mi">56</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">verticalPadding</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">18</span><span class="w">      </span><span class="c1">// height verilmediğinde geçerli</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">font</span><span class="w">            </span><span class="p">=</span><span class="w"> </span><span class="n">IDFont</span><span class="p">.</span><span class="n">bodyLarge</span><span class="p">(.</span><span class="n">bold</span><span class="p">)</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">shadowColor</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">black</span><span class="p">.</span><span class="n">opacity</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">shadowRadius</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="mi">12</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">shadowOffsetY</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="mi">6</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">pressedScale</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="mf">0.94</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">disabledOpacity</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.30</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">base</span><span class="p">.</span><span class="n">hapticsEnabled</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="c1">// Stile özel — outline buton:</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">[.</span><span class="n">secondary</span><span class="p">].</span><span class="n">background</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">clear</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">[.</span><span class="n">secondary</span><span class="p">].</span><span class="n">borderWidth</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">[.</span><span class="n">secondary</span><span class="p">].</span><span class="n">borderColor</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">IDColor</span><span class="p">.</span><span class="n">divider</span>
+
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">buttons</span><span class="p">.</span><span class="n">reset</span><span class="p">()</span><span class="w">   </span><span class="c1">// her şeyi varsayılana döndür</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Varsayılan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>corner</code></td>
+<td><code>.capsule</code></td>
+</tr>
+<tr>
+<td><code>height</code></td>
+<td><code>nil</code> (dikey padding'e göre)</td>
+</tr>
+<tr>
+<td><code>verticalPadding</code> / <code>horizontalPadding</code></td>
+<td><code>IDSpacing.lg</code> / <code>0</code></td>
+</tr>
+<tr>
+<td><code>font</code></td>
+<td><code>IDFont.bodyMedium(.semibold)</code></td>
+</tr>
+<tr>
+<td><code>background</code> / <code>foreground</code></td>
+<td>stilin tema rengi</td>
+</tr>
+<tr>
+<td><code>borderWidth</code> / <code>borderColor</code></td>
+<td><code>0</code> / metin rengi</td>
+</tr>
+<tr>
+<td><code>shadowColor</code> / <code>shadowRadius</code> / <code>shadowOffsetY</code></td>
+<td>gölge yok</td>
+</tr>
+<tr>
+<td><code>disabledOpacity</code></td>
+<td><code>0.45</code></td>
+</tr>
+<tr>
+<td><code>pressedScale</code></td>
+<td><code>0.97</code></td>
+</tr>
+<tr>
+<td><code>hapticsEnabled</code></td>
+<td><code>true</code></td>
+</tr>
+<tr>
+<td><code>fullWidth</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>Köşe ayarı yalnızca <code>SDKButton</code>'ı değil, hazır ekranlardaki tüm aksiyon butonlarını kapsar
+(görüşme ekranı, ThankYou, bağlantı koptu, kimlik kartı, uyarı diyalogları). Kendi custom
+ekranınızda aynı biçimi yakalamak için <code>SDKButtonShape</code> kullanın:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Text</span><span class="p">(</span><span class="s">"Devam"</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">padding</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="n">background</span><span class="p">(</span><span class="n">IDColor</span><span class="p">.</span><span class="n">primary</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">clipShape</span><span class="p">(</span><span class="n">SDKButtonShape</span><span class="p">.</span><span class="n">themed</span><span class="p">())</span><span class="w">          </span><span class="c1">// aktif temanın köşesi</span>
+</code></pre></div>
+<hr />
+<h2 id="ikonlar-ve-illüstrasyonlar--sdkiconkey">İkonlar ve İllüstrasyonlar — <code>SDKIconKey</code><a class="headerlink" href="#ikonlar-ve-illüstrasyonlar--sdkiconkey" title="Permanent link">&para;</a></h2>
+<p>Her görsel öğe bir anahtarla değiştirilebilir; anahtarların tam listesi <code>SDKIconKey</code>
+(<code>CaseIterable</code>) enum'ındadır. Önemli gruplar:</p>
+<table>
+<thead>
+<tr>
+<th>Grup</th>
+<th>Anahtarlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nav / chrome</td>
+<td><code>logo</code> · <strong><code>headerLogo</code></strong> · <code>hamburger</code> · <code>back</code> · <code>help</code> · <code>close</code> · <code>langButton</code> (eski ad)</td>
+</tr>
+<tr>
+<td>Aksiyonlar</td>
+<td><code>retry</code> · <code>checkmark</code> · <code>camera</code> · <code>trash</code> · <code>video</code> · <code>chat</code> · <code>calendar</code> · <code>chevronRight</code> · <code>signLang</code> ...</td>
+</tr>
+<tr>
+<td>İzin satırları (Prepare)</td>
+<td><code>permCamera</code> · <code>permMic</code> · <code>permSpeech</code> · <code>permIdCard</code> · <code>permAlone</code> · <code>permConditions</code></td>
+</tr>
+<tr>
+<td>İllüstrasyonlar</td>
+<td><code>incomingCall</code> · <code>nfcFront</code> · <code>nfcBack</code> · <code>thankYouSuccess</code> · <code>thankYouFail</code> · <code>uploadFile</code> · <code>lostConnection</code> · <code>idCardFront</code> · <code>idCardBack</code></td>
+</tr>
+<tr>
+<td>Durum/kontrol</td>
+<td><code>successCircle</code> · <code>failCircle</code> · <code>play</code> · <code>pause</code> · <code>mic</code> · <code>stopRecord</code> · <code>torchOn</code> · <code>torchOff</code> · <code>wifiGood</code> · <code>wifiBad</code></td>
+</tr>
+<tr>
+<td>Belge türü seçimi</td>
+<td><code>idTypeChip</code> · <code>idTypePassport</code> · <code>idTypeOther</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="n">theme</span><span class="p">.</span><span class="n">setIcon</span><span class="p">(.</span><span class="n">nfcFront</span><span class="p">,</span><span class="w"> </span><span class="n">Image</span><span class="p">(</span><span class="s">"my_nfc_illustration"</span><span class="p">))</span>
+<span class="n">theme</span><span class="p">.</span><span class="n">resetIcon</span><span class="p">(.</span><span class="n">nfcFront</span><span class="p">)</span><span class="w">      </span><span class="c1">// SDK varsayılanına dön</span>
+</code></pre></div>
+<blockquote>
+<p><strong>Header'daki marka işareti <code>.logo</code> değil, <code>.headerLogo</code>'dur.</strong> <code>.logo</code> giriş ekranı ve
+kamera üstü başlıkta, <code>.headerLogo</code> ise modül/ilerleme başlığındaki yuvarlak işarette
+kullanılır. Eski entegrasyonlar bu işareti <code>.langButton</code> ile override ediyordu; o ad
+hâlâ çalışır ama yeni kod <code>.headerLogo</code> kullanmalıdır.</p>
+<div class="highlight"><pre><span></span><code><span class="n">theme</span><span class="p">.</span><span class="n">setIcon</span><span class="p">(.</span><span class="n">headerLogo</span><span class="p">,</span><span class="w"> </span><span class="n">Image</span><span class="p">(</span><span class="s">"my_mark"</span><span class="p">))</span>
+</code></pre></div>
+</blockquote>
+<p>Override etmediğiniz her anahtar SDK'nın kendi görselini kullanır.</p>
+<hr />
+<h2 id="rol-renkleri">Rol Renkleri<a class="headerlink" href="#rol-renkleri" title="Permanent link">&para;</a></h2>
+<p>Marka renkleriyle (<code>primary</code>, <code>success</code>, <code>error</code>) <strong>yüzey rolleri</strong> ayrıdır. Rol vermezseniz
+SDK bugünkü davranışını sürdürür; verdiğinizde yalnız o yüzey değişir — örneğin <code>primary</code>'yi
+değiştirmeden seçili satırın rengini ayarlayabilirsiniz.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Tek renk (iki temada da aynı):</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">selectedItemBackground</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKAdaptiveColor</span><span class="p">(</span><span class="n">Color</span><span class="p">.</span><span class="n">black</span><span class="p">)</span>
+<span class="c1">// Açık/koyu ayrı:</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="n">pageBackground</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKAdaptiveColor</span><span class="p">(</span><span class="n">light</span><span class="p">:</span><span class="w"> </span><span class="n">Color</span><span class="p">(</span><span class="n">hex</span><span class="p">:</span><span class="w"> </span><span class="s">"#F8FAFC"</span><span class="p">),</span>
+<span class="w">                                                         </span><span class="n">dark</span><span class="p">:</span><span class="w">  </span><span class="n">Color</span><span class="p">(</span><span class="n">hex</span><span class="p">:</span><span class="w"> </span><span class="s">"#0B1120"</span><span class="p">))</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Rol</th>
+<th>Nerede</th>
+<th>Varsayılan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pageBackground</code></td>
+<td>bilgi/form ekranlarının zemini</td>
+<td>light: beyaz · dark: <code>darkBg</code></td>
+</tr>
+<tr>
+<td><code>moduleBackground</code></td>
+<td>kamera/modül ekranlarının marka zemini</td>
+<td>light: <code>primary</code> · dark: <code>darkBg</code></td>
+</tr>
+<tr>
+<td><code>surface</code></td>
+<td>kart, sheet, yükseltilmiş yüzey</td>
+<td><code>inkSurface</code> / <code>darkBgSecondary</code></td>
+</tr>
+<tr>
+<td><code>title</code> · <code>subtitle</code> · <code>border</code></td>
+<td>metin ve ayırıcılar</td>
+<td><code>inkDarkest</code>/beyaz · <code>inkLight</code>/<code>darkMuted</code> · <code>inkBorder</code>/beyaz %8</td>
+</tr>
+<tr>
+<td><code>headerBackground</code></td>
+<td>başlık çubuğu zemini</td>
+<td>şeffaf (sayfa zemini görünür)</td>
+</tr>
+<tr>
+<td><code>headerTitle</code> · <code>headerSubtitle</code> · <code>headerIcon</code></td>
+<td>başlık metinleri ve glifleri</td>
+<td><code>title</code> / <code>subtitle</code> / <code>inkDark</code>-beyaz</td>
+</tr>
+<tr>
+<td><code>headerIconBackground</code> · <code>headerIconBorder</code></td>
+<td>geri/yardım daire butonları</td>
+<td>systemGray6 / systemGray4</td>
+</tr>
+<tr>
+<td><code>progressActive</code> · <code>progressInactive</code></td>
+<td>ilerleme çubuğu</td>
+<td><code>primary</code> / <code>inkBorder</code></td>
+</tr>
+<tr>
+<td><code>selectedItemBackground</code> · <code>selectedItemText</code></td>
+<td>seçili satır/kutu</td>
+<td><code>primary</code> / <code>primaryLight</code></td>
+</tr>
+<tr>
+<td><code>unselectedItemBackground</code> · <code>unselectedItemText</code></td>
+<td>seçili olmayan satır</td>
+<td><code>divider</code> %20 / <code>darkMuted</code></td>
+</tr>
+</tbody>
+</table>
+<p>Kamera üstüne çizilen katmanlarda (kılavuz çerçevesi, maske, uyarı yazıları) beyaz/siyah
+seçimleri <strong>okunabilirlik</strong> gereğidir; <code>capture</code> token'larıyla değiştirilebilir ama kontrast
+testini kendi görsellerinizle yapın.</p>
+<hr />
+<h2 id="başlık-çubuğu--hazır-tasarımlar">Başlık Çubuğu — Hazır Tasarımlar<a class="headerlink" href="#başlık-çubuğu--hazır-tasarımlar" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">navBar</span><span class="p">.</span><span class="n">preset</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">centered</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Preset</th>
+<th>Yerleşim</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.classic</code></td>
+<td>Solda geri, yanında marka işareti + başlık (SDK varsayılanı)</td>
+</tr>
+<tr>
+<td><code>.centered</code></td>
+<td>Başlık ve marka işareti ortada, geri solda</td>
+</tr>
+<tr>
+<td><code>.minimal</code></td>
+<td>Marka işareti yok, ince çubuk (48pt)</td>
+</tr>
+<tr>
+<td><code>.prominent</code></td>
+<td>İki satır: üstte kontroller, altta büyük başlık</td>
+</tr>
+</tbody>
+</table>
+<p>İnce ayar (<code>SDKTheme.shared.navBar</code>): <code>height</code>, <code>showsLogo</code>, <code>logoSize</code>, <code>circleButtonSize</code>,
+<code>iconSize</code>, <code>titleFont</code>, <code>subtitleFont</code>, <code>progressHeight</code>, <code>progressSpacing</code>, <code>progressCorner</code>,
+<code>overlayGradientOpacity</code>, <code>showsDivider</code>.</p>
+<h3 id="başlık-metni--marka-adı">Başlık Metni — Marka Adı<a class="headerlink" href="#başlık-metni--marka-adı" title="Permanent link">&para;</a></h3>
+<p>Varsayılanda çubuk her adımın adını yazar ("Kimlik Doğrulama", "Adres Doğrulama"…). Çubuğa
+kendi markanızı koymak için:</p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">navBar</span><span class="p">.</span><span class="n">brandTitle</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Acme Bank"</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">navBar</span><span class="p">.</span><span class="n">titleMode</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">brandWithModule</span><span class="w">   </span><span class="c1">// varsayılan: marka verilince bu</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><code>titleMode</code></th>
+<th>Üst satır</th>
+<th>Alt satır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.module</code></td>
+<td>adım adı</td>
+<td>ekranın alt başlığı (SDK varsayılanı)</td>
+</tr>
+<tr>
+<td><code>.brandWithModule</code></td>
+<td><code>brandTitle</code></td>
+<td>adım adı</td>
+</tr>
+<tr>
+<td><code>.brand</code></td>
+<td><code>brandTitle</code></td>
+<td><code>brandSubtitle</code> (verilmişse)</td>
+</tr>
+</tbody>
+</table>
+<p><code>brandTitle</code> verilip <code>titleMode</code> <code>.module</code> bırakılırsa <code>.brandWithModule</code> uygulanır. Kamera üstü
+ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır. <code>.prominent</code> preset'i iki
+satırlı olduğundan marka + adım adı için en uygun yerleşimdir.</p>
+<p>Adım adlarının <strong>kendisini</strong> değiştirmek için metin override'ı kullanın — bkz. <code>SDKLocalization</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKLocalization</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setOverride</span><span class="p">(</span><span class="n">key</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">idVerifyTitle</span><span class="p">,</span><span class="w"> </span><span class="n">language</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">tr</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">:</span><span class="w"> </span><span class="s">"Kimlik Kontrolü"</span><span class="p">)</span>
+</code></pre></div>
+<p>JSON temada: <code>"navBar": { "brandTitle": "Acme Bank", "titleMode": "brandWithModule" }</code>.</p>
+<hr />
+<h2 id="bileşen-görünümleri">Bileşen Görünümleri<a class="headerlink" href="#bileşen-görünümleri" title="Permanent link">&para;</a></h2>
+<p>Buton (<code>buttons</code>) ile aynı kalıp: her alan opsiyonel, <code>nil</code> → SDK varsayılanı.</p>
+<table>
+<thead>
+<tr>
+<th>Kap</th>
+<th>Alanlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SDKTheme.shared.selection</code></td>
+<td><code>cornerRadius</code> · <code>rowMinHeight</code> · <code>checkboxSize</code> · <code>checkboxCornerRadius</code> · <code>radioDotSize</code> · <code>checkmarkColor</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.alerts</code></td>
+<td><code>cornerRadius</code> · <code>maxWidth</code> · <code>shadowRadius</code> · <code>shadowOffsetY</code> · <code>scrimOpacity</code> · <code>iconCircleSize</code> · <code>iconCircleOpacity</code> · <code>showsDivider</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.banners</code></td>
+<td><code>cornerRadius</code> · <code>shadowRadius</code> · <code>shadowOffsetY</code> · <code>iconCircleSize</code> · <code>iconCircleOpacity</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.fields</code></td>
+<td><code>cornerRadius</code> · <code>background</code> · <code>borderColor</code> · <code>borderWidth</code> · <code>placeholderColor</code> · <code>minHeight</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.sheets</code></td>
+<td><code>cornerRadius</code> · <code>handleWidth</code> · <code>handleHeight</code> · <code>handleColor</code> · <code>background</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.capture</code></td>
+<td><code>maskOpacity</code> · <code>guideStrokeColor</code> · <code>guideLockedColor</code> · <code>guideLineWidth</code> · <code>faceAlignedColor</code> · <code>faceIdleColor</code> · <code>overlayButtonFill</code> · <code>overlayButtonBorder</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.controls</code></td>
+<td><code>shutterSize</code> · <code>shutterRingWidth</code> · <code>shutterFill</code> · <code>shutterRingColor</code> · <code>recordingColor</code> · <code>progressRingWidth</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.call</code></td>
+<td><code>panelCornerRadius</code> · <code>panelBackground</code> · <code>handleColor</code> · <code>controlSize</code> · <code>remoteVideoBackground</code> · <code>localPreviewCornerRadius</code></td>
+</tr>
+<tr>
+<td><code>SDKTheme.shared.motion</code></td>
+<td><code>transitionDuration</code> · <code>overlayDuration</code> · <code>disabled</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">resetAppearance</span><span class="p">()</span><span class="w">   </span><span class="c1">// renk/font/metrik/bileşen override'larının tümünü sil</span>
+</code></pre></div>
+<hr />
+<h2 id="titreşim-haptik">Titreşim (Haptik)<a class="headerlink" href="#titreşim-haptik" title="Permanent link">&para;</a></h2>
+<p>SDK iki yerde titreşim kullanır ve ikisi de host tarafından kapatılabilir:</p>
+<table>
+<thead>
+<tr>
+<th>Nerede</th>
+<th>Ne yapar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Otomatik çekim yapan modüller</td>
+<td>Çekim yaklaştıkça hızlanan darbeler (ramp): kullanıcı çekimin geldiğini hisseder</td>
+</tr>
+<tr>
+<td><strong>Canlılık adımları</strong></td>
+<td>Adım (göz kırpma, gülümseme, başı çevirme…) onaylandığında <strong>çok kısa tek darbe</strong> — kullanıcı ekrana bakmadan adımı geçtiğini anlar</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="c1">// Adım onay darbesi — canlılık testindeki "geçtim" hissi:</span>
+<span class="n">SDKHapticConfig</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">stepFeedbackEnabled</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w">     </span><span class="c1">// yalnız bu darbeyi kapat</span>
+<span class="n">SDKHapticConfig</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">stepFeedbackIntensity</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.4</span><span class="w">     </span><span class="c1">// daha hafif (0…1, varsayılan 0.6)</span>
+
+<span class="c1">// Çekim rampası + adım darbesi birlikte:</span>
+<span class="n">SDKHapticConfig</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">isEnabled</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w">                          </span><span class="c1">// tüm modüllerde kapat</span>
+<span class="n">SDKHapticConfig</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="p">:</span><span class="w"> </span><span class="p">.</span><span class="n">livenessDetection</span><span class="p">)</span><span class="w"> </span><span class="c1">// tek modül</span>
+<span class="n">SDKHapticConfig</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="k">for</span><span class="p">:</span><span class="w"> </span><span class="p">[.</span><span class="n">selfie</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">idCard</span><span class="p">])</span>
+</code></pre></div>
+<p>Modül anahtarı (<code>setEnabled(_:for:)</code>) hem rampayı hem adım darbesini kapsar;
+<code>stepFeedbackEnabled</code> yalnız adım darbesini hedefler. İkisi de varsayılan <strong>açıktır</strong>.</p>
+<p>Dokunsallık donanımı olmayan cihazlarda darbe <code>UIImpactFeedbackGenerator</code> ile çalınır;
+hiç desteklenmiyorsa sessizce atlanır — <strong>iPad'lerde Taptic Engine yoktur</strong>, titreşim
+hissedilmez ama akış etkilenmez.</p>
+<p>Adım darbesi <code>livenessDetection</code> modülüne özgüdür; birleşik <code>selfieWithLiveness</code> ekranında
+adım kavramı farklı olduğu için çalmaz (orada çekim rampası vardır).</p>
+<hr />
+<h2 id="tek-sözlükle-tema-json">Tek Sözlükle Tema (JSON)<a class="headerlink" href="#tek-sözlükle-tema-json" title="Permanent link">&para;</a></h2>
+<p>Tüm bölümler tek bir sözlükten uygulanabilir. React Native ve Flutter köprüleri de bunu
+kullanır: <strong>renk/logo denemesi için native derleme gerekmez.</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">apply</span><span class="p">([</span>
+<span class="w">    </span><span class="s">"colors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s">"primary"</span><span class="p">:</span><span class="w"> </span><span class="s">"#0F172A"</span><span class="p">,</span>
+<span class="w">        </span><span class="s">"pageBackground"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">"light"</span><span class="p">:</span><span class="w"> </span><span class="s">"#F8FAFC"</span><span class="p">,</span><span class="w"> </span><span class="s">"dark"</span><span class="p">:</span><span class="w"> </span><span class="s">"#0B1120"</span><span class="p">],</span>
+<span class="w">        </span><span class="s">"selectedItemBackground"</span><span class="p">:</span><span class="w"> </span><span class="s">"#1D4ED8"</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="s">"navBar"</span><span class="p">:</span><span class="w">  </span><span class="p">[</span><span class="s">"preset"</span><span class="p">:</span><span class="w"> </span><span class="s">"centered"</span><span class="p">,</span><span class="w"> </span><span class="s">"showsDivider"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="s">"brandTitle"</span><span class="p">:</span><span class="w"> </span><span class="s">"Acme Bank"</span><span class="p">],</span>
+<span class="w">    </span><span class="s">"buttons"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">"corner"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="s">"height"</span><span class="p">:</span><span class="w"> </span><span class="mi">54</span><span class="p">,</span>
+<span class="w">                </span><span class="s">"styles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">"secondary"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s">"borderWidth"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">]]],</span>
+<span class="w">    </span><span class="s">"icons"</span><span class="p">:</span><span class="w">   </span><span class="p">[</span><span class="s">"headerLogo"</span><span class="p">:</span><span class="w"> </span><span class="s">"my_mark"</span><span class="p">]</span><span class="w">        </span><span class="c1">// HOST asset adı</span>
+<span class="p">])</span>
+
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">applyTheme</span><span class="p">(</span><span class="n">named</span><span class="p">:</span><span class="w"> </span><span class="s">"theme"</span><span class="p">)</span><span class="w">      </span><span class="c1">// Bundle'daki theme.json</span>
+<span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">apply</span><span class="p">(</span><span class="n">json</span><span class="p">:</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w">               </span><span class="c1">// ham JSON</span>
+</code></pre></div>
+<p>Değer biçimleri:</p>
+<table>
+<thead>
+<tr>
+<th>Tip</th>
+<th>Yazım</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Renk</td>
+<td><code>"#RRGGBB"</code> ya da <code>{"light": "#…", "dark": "#…"}</code></td>
+</tr>
+<tr>
+<td>Köşe</td>
+<td><code>"capsule"</code> ya da sayı (<code>0</code> = tamamen köşeli)</td>
+</tr>
+<tr>
+<td>Font</td>
+<td><code>{"size": 16, "weight": "semibold"}</code></td>
+</tr>
+<tr>
+<td>İkon</td>
+<td>host uygulamasının asset adı</td>
+</tr>
+</tbody>
+</table>
+<p><code>apply(...)</code> tanınmayan anahtarların listesini döner — entegrasyonda loglayın, yazım hatası
+sessizce kaybolmaz:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nv">unknown</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKTheme</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">unknown</span><span class="p">.</span><span class="bp">isEmpty</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="bp">print</span><span class="p">(</span><span class="s">"Tema: tanınmayan anahtar"</span><span class="p">,</span><span class="w"> </span><span class="n">unknown</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="react-native--flutter">React Native / Flutter<a class="headerlink" href="#react-native--flutter" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">await</span><span class="w"> </span><span class="nx">IdentifySdk</span><span class="p">.</span><span class="nx">setTheme</span><span class="p">({</span><span class="w"> </span><span class="nx">colors</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">primary</span><span class="o">:</span><span class="w"> </span><span class="s2">"#0F172A"</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">navBar</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">preset</span><span class="o">:</span><span class="w"> </span><span class="s2">"centered"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">});</span>
+<span class="nx">IdentifySdk</span><span class="p">.</span><span class="nx">resetTheme</span><span class="p">();</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kd">await</span><span class="w"> </span><span class="n">IdentifySdk</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="n">setTheme</span><span class="p">({</span><span class="s1">'colors'</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s1">'primary'</span><span class="o">:</span><span class="w"> </span><span class="s1">'#0F172A'</span><span class="p">}});</span>
+</code></pre></div>
+<hr />
+<h2 id="görsel-kontrol-showcase-kataloğu">Görsel Kontrol: Showcase Kataloğu<a class="headerlink" href="#görsel-kontrol-showcase-kataloğu" title="Permanent link">&para;</a></h2>
+<p>Sample App'teki <strong>Showcase</strong> bölümü (<code>Showcase/ShowcaseCatalogView.swift</code>), tüm ekranları ve
+tasarım sistemini tek yerden gezmenizi sağlar. Temanızı ayarladıktan sonra kataloğu açıp
+markanızın her ekranda nasıl durduğunu hızlıca kontrol edin — akışı baştan sona koşturmanıza
+gerek kalmaz.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../session-exit/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: Oturum Çıkışları">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                Oturum Çıkışları
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../migration-3.1.0/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: 3.1.0 Değişiklikleri">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                3.1.0 Değişiklikleri
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

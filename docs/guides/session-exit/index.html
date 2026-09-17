@@ -1,0 +1,5023 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/session-exit/">
+      
+      
+        <link rel="prev" href="../events/">
+      
+      
+        <link rel="next" href="../theming/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Oturum Çıkışları - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#oturum-çıkışları--sdk-nasıl-kapandı-nereye-yönlendireyim" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Oturum Çıkışları
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#içindekiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İçindekiler
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-tek-kural-sonucu-onfinishedtan-okuyun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) Tek kural: sonucu onFinished'tan okuyun
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-sonucu-nerede-görürüm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) Sonucu nerede görürüm?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sdkflowoutcome--kapanış-verileri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3) SDKFlowOutcome — kapanış verileri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-tüm-çıkış-yolları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4) Tüm çıkış yolları
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4) Tüm çıkış yolları">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-akış-tamamlandı--panel-karar-verdi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Akış tamamlandı / panel karar verdi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-akış-tamamlanamadı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Akış tamamlanamadı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-bilinçli-çıkış" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Bilinçli çıkış
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-oturum-kurulamadı--sürdürülemedi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Oturum kurulamadı / sürdürülemedi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-sonuç-üretmeyenler-oturum-sürer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Sonuç ÜRETMEYENLER (oturum sürer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-senaryo-1--tek-modüllü-akış-müşteri-adımı-tamamladı-sdk-işini-bitirdi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5) Senaryo 1 — Tek modüllü akış: müşteri adımı tamamladı, SDK işini bitirdi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5) Senaryo 1 — Tek modüllü akış: müşteri adımı tamamladı, SDK işini bitirdi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-müşteri-nfcyi-taratıyor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Müşteri NFC'yi taratıyor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-sdk-işini-bitiriyor--çıkış-nasıl-oluyor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 SDK işini bitiriyor — çıkış nasıl oluyor?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-developer-çıkışı-nerede-görüyor-hangi-verilerle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Developer çıkışı nerede görüyor, hangi verilerle?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-developer-çıkışı-nasıl-yakalıyor-ve-nereye-yönlendiriyor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Developer çıkışı nasıl yakalıyor ve nereye yönlendiriyor?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-aynı-senaryo-başka-bir-modülle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Aynı senaryo başka bir modülle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-nfcde-işler-farklı-giderse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 NFC'de işler farklı giderse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-senaryo-2--üç-modüllü-akış-kimlik--nfc--selfie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6) Senaryo 2 — Üç modüllü akış (Kimlik → NFC → Selfie)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6) Senaryo 2 — Üç modüllü akış (Kimlik → NFC → Selfie)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-akış-ilerlerken-ne-olur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Akış ilerlerken ne olur?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-mutlu-yol--üç-adım-da-tamamlandı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Mutlu yol — üç adım da tamamlandı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-akış-ortada-bitti--nfcde-hak-tükendi-atlama-kapalı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Akış ortada bitti — NFC'de hak tükendi, atlama kapalı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-adım-atlandı-akış-devam-etti--nfcde-hak-tükendi-atlama-izinli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Adım atlandı, akış devam etti — NFC'de hak tükendi, atlama izinli
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#66-kullanıcı-geri-butonuna-bastı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.6 Kullanıcı geri butonuna bastı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#67-bağlantı-koptu-ya-da-uygulama-arka-plana-gitti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.7 Bağlantı koptu ya da uygulama arka plana gitti
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#68-nfcsi-olmayan-cihaz-ipad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.8 NFC'si olmayan cihaz (iPad)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#69-özet--üç-modüllü-akışın-tüm-çıkışları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.9 Özet — üç modüllü akışın tüm çıkışları
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-senaryo-3--görüntülü-görüşmeli-üç-modüllü-akış-kimlik--selfie--görüşme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7) Senaryo 3 — Görüntülü görüşmeli üç modüllü akış (Kimlik → Selfie → Görüşme)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7) Senaryo 3 — Görüntülü görüşmeli üç modüllü akış (Kimlik → Selfie → Görüşme)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-başlangıç-ve-ilk-iki-adım" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Başlangıç ve ilk iki adım
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-görüşme-adımı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Görüşme adımı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-temsilci-onayladı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Temsilci onayladı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-görüşmenin-diğer-sonları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Görüşmenin diğer sonları
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-görüşme-akışın-ortasındaysa-kimlik--görüşme--imza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 Görüşme akışın ortasındaysa (Kimlik → Görüşme → İmza)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#76-host-kodu--görüşmeli-akış" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.6 Host kodu — görüşmeli akış
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-modül-bazında-çıkış-kataloğu--her-modül-için-ne-olur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8) Modül bazında çıkış kataloğu — her modül için ne olur?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8) Modül bazında çıkış kataloğu — her modül için ne olur?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#80-tüm-modüllerde-ortak-olan-çıkışlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.0 Tüm modüllerde ortak olan çıkışlar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#81-kimlik-idcard--log-adı-id-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 Kimlik (idCard) — log adı Id Card
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-kimlik-ovd-idcard_w_ovd--log-adı-id-card-ovd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Kimlik OVD (idcard_w_ovd) — log adı Id Card OVD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-nfc-nfc--log-adı-mrz--nfc-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 NFC (nfc) — log adı Mrz &amp; Nfc Screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-selfie-selfie--log-adı-selfie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Selfie (selfie) — log adı Selfie
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#85-canlılık-livenessdetection--log-adı-liveness-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.5 Canlılık (livenessDetection) — log adı Liveness Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#86-selfie--canlılık-selfiewithliveness--log-adı-selfie-with-liveness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.6 Selfie + Canlılık (selfieWithLiveness) — log adı Selfie With Liveness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#87-hazırlık-prepare--log-adı-prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.7 Hazırlık (prepare) — log adı Prepare
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#88-video-kayıt-videorecord--log-adı-video-recorder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.8 Video kayıt (videoRecord) — log adı Video Recorder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#89-imza-signature--log-adı-signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.9 İmza (signature) — log adı Signature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#810-konuşma-speech--log-adı-speech-recognition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.10 Konuşma (speech) — log adı Speech Recognition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#811-adres-addressconf--log-adı-address-confirm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.11 Adres (addressConf) — log adı Address Confirm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#812-görüntülü-görüşme-waitscreen--log-adı-call-wait-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.12 Görüntülü görüşme (waitScreen) — log adı Call Wait Screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-kapanıştan-sonra-yönlendirme--kodu-nereye-yazacağım" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9) Kapanıştan sonra yönlendirme — kodu nereye yazacağım?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9) Kapanıştan sonra yönlendirme — kodu nereye yazacağım?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-swiftui--sdk-uygulamanın-kökünde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 SwiftUI — SDK uygulamanın kökünde
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-swiftui--sdk-bir-fullscreencover-içinde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 SwiftUI — SDK bir fullScreenCover içinde
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-uikit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 UIKit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#94-sonuç-ekranı-görünsün-ardından-yönlendir-showthankyoupage-true" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.4 Sonuç ekranı görünsün, ardından yönlendir (showThankYouPage: true)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#95-react-native--flutter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.5 React Native / Flutter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-kurallar-ve-tuzaklar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10) Kurallar ve tuzaklar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-doğrulama-listesi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11) Doğrulama listesi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#içindekiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İçindekiler
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-tek-kural-sonucu-onfinishedtan-okuyun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) Tek kural: sonucu onFinished'tan okuyun
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-sonucu-nerede-görürüm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2) Sonucu nerede görürüm?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-sdkflowoutcome--kapanış-verileri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3) SDKFlowOutcome — kapanış verileri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-tüm-çıkış-yolları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4) Tüm çıkış yolları
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4) Tüm çıkış yolları">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-akış-tamamlandı--panel-karar-verdi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Akış tamamlandı / panel karar verdi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-akış-tamamlanamadı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Akış tamamlanamadı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-bilinçli-çıkış" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 Bilinçli çıkış
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-oturum-kurulamadı--sürdürülemedi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 Oturum kurulamadı / sürdürülemedi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#45-sonuç-üretmeyenler-oturum-sürer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.5 Sonuç ÜRETMEYENLER (oturum sürer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-senaryo-1--tek-modüllü-akış-müşteri-adımı-tamamladı-sdk-işini-bitirdi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5) Senaryo 1 — Tek modüllü akış: müşteri adımı tamamladı, SDK işini bitirdi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5) Senaryo 1 — Tek modüllü akış: müşteri adımı tamamladı, SDK işini bitirdi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-müşteri-nfcyi-taratıyor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Müşteri NFC'yi taratıyor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-sdk-işini-bitiriyor--çıkış-nasıl-oluyor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 SDK işini bitiriyor — çıkış nasıl oluyor?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-developer-çıkışı-nerede-görüyor-hangi-verilerle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Developer çıkışı nerede görüyor, hangi verilerle?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-developer-çıkışı-nasıl-yakalıyor-ve-nereye-yönlendiriyor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 Developer çıkışı nasıl yakalıyor ve nereye yönlendiriyor?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-aynı-senaryo-başka-bir-modülle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 Aynı senaryo başka bir modülle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#57-nfcde-işler-farklı-giderse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.7 NFC'de işler farklı giderse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-senaryo-2--üç-modüllü-akış-kimlik--nfc--selfie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6) Senaryo 2 — Üç modüllü akış (Kimlik → NFC → Selfie)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6) Senaryo 2 — Üç modüllü akış (Kimlik → NFC → Selfie)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-akış-ilerlerken-ne-olur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Akış ilerlerken ne olur?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-mutlu-yol--üç-adım-da-tamamlandı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Mutlu yol — üç adım da tamamlandı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-akış-ortada-bitti--nfcde-hak-tükendi-atlama-kapalı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Akış ortada bitti — NFC'de hak tükendi, atlama kapalı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-adım-atlandı-akış-devam-etti--nfcde-hak-tükendi-atlama-izinli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Adım atlandı, akış devam etti — NFC'de hak tükendi, atlama izinli
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#66-kullanıcı-geri-butonuna-bastı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.6 Kullanıcı geri butonuna bastı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#67-bağlantı-koptu-ya-da-uygulama-arka-plana-gitti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.7 Bağlantı koptu ya da uygulama arka plana gitti
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#68-nfcsi-olmayan-cihaz-ipad" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.8 NFC'si olmayan cihaz (iPad)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#69-özet--üç-modüllü-akışın-tüm-çıkışları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.9 Özet — üç modüllü akışın tüm çıkışları
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-senaryo-3--görüntülü-görüşmeli-üç-modüllü-akış-kimlik--selfie--görüşme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7) Senaryo 3 — Görüntülü görüşmeli üç modüllü akış (Kimlik → Selfie → Görüşme)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7) Senaryo 3 — Görüntülü görüşmeli üç modüllü akış (Kimlik → Selfie → Görüşme)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-başlangıç-ve-ilk-iki-adım" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Başlangıç ve ilk iki adım
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-görüşme-adımı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Görüşme adımı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-temsilci-onayladı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 Temsilci onayladı
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-görüşmenin-diğer-sonları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Görüşmenin diğer sonları
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#75-görüşme-akışın-ortasındaysa-kimlik--görüşme--imza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.5 Görüşme akışın ortasındaysa (Kimlik → Görüşme → İmza)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#76-host-kodu--görüşmeli-akış" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.6 Host kodu — görüşmeli akış
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-modül-bazında-çıkış-kataloğu--her-modül-için-ne-olur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8) Modül bazında çıkış kataloğu — her modül için ne olur?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8) Modül bazında çıkış kataloğu — her modül için ne olur?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#80-tüm-modüllerde-ortak-olan-çıkışlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.0 Tüm modüllerde ortak olan çıkışlar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#81-kimlik-idcard--log-adı-id-card" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 Kimlik (idCard) — log adı Id Card
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-kimlik-ovd-idcard_w_ovd--log-adı-id-card-ovd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 Kimlik OVD (idcard_w_ovd) — log adı Id Card OVD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-nfc-nfc--log-adı-mrz--nfc-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 NFC (nfc) — log adı Mrz &amp; Nfc Screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-selfie-selfie--log-adı-selfie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Selfie (selfie) — log adı Selfie
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#85-canlılık-livenessdetection--log-adı-liveness-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.5 Canlılık (livenessDetection) — log adı Liveness Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#86-selfie--canlılık-selfiewithliveness--log-adı-selfie-with-liveness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.6 Selfie + Canlılık (selfieWithLiveness) — log adı Selfie With Liveness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#87-hazırlık-prepare--log-adı-prepare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.7 Hazırlık (prepare) — log adı Prepare
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#88-video-kayıt-videorecord--log-adı-video-recorder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.8 Video kayıt (videoRecord) — log adı Video Recorder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#89-imza-signature--log-adı-signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.9 İmza (signature) — log adı Signature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#810-konuşma-speech--log-adı-speech-recognition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.10 Konuşma (speech) — log adı Speech Recognition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#811-adres-addressconf--log-adı-address-confirm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.11 Adres (addressConf) — log adı Address Confirm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#812-görüntülü-görüşme-waitscreen--log-adı-call-wait-screen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.12 Görüntülü görüşme (waitScreen) — log adı Call Wait Screen
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-kapanıştan-sonra-yönlendirme--kodu-nereye-yazacağım" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9) Kapanıştan sonra yönlendirme — kodu nereye yazacağım?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9) Kapanıştan sonra yönlendirme — kodu nereye yazacağım?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-swiftui--sdk-uygulamanın-kökünde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 SwiftUI — SDK uygulamanın kökünde
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-swiftui--sdk-bir-fullscreencover-içinde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 SwiftUI — SDK bir fullScreenCover içinde
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-uikit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 UIKit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#94-sonuç-ekranı-görünsün-ardından-yönlendir-showthankyoupage-true" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.4 Sonuç ekranı görünsün, ardından yönlendir (showThankYouPage: true)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#95-react-native--flutter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.5 React Native / Flutter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-kurallar-ve-tuzaklar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10) Kurallar ve tuzaklar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-doğrulama-listesi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11) Doğrulama listesi
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="oturum-çıkışları--sdk-nasıl-kapandı-nereye-yönlendireyim">Oturum Çıkışları — SDK Nasıl Kapandı, Nereye Yönlendireyim?<a class="headerlink" href="#oturum-çıkışları--sdk-nasıl-kapandı-nereye-yönlendireyim" title="Permanent link">&para;</a></h1>
+<p>SDK bir oturumu birçok yoldan bitirebilir: temsilci karar verir, modüller biter, kullanıcı geri
+çıkar, bir modülün deneme hakkı tükenir, bağlantı kurulamaz, uygulama kapatılır… Bu rehber
+<strong>her çıkış yolunu tek yerde</strong> anlatır: hangi yoldan çıkıldığını nerede görürsünüz, sonuç hangi
+verilerle gelir, kapanıştan sonra kendi uygulamanızda nereye ve nasıl yönlendirirsiniz.</p>
+<blockquote>
+<p>3.1.0 ile gelir. Görüşme kapanışındaki <code>terminateReason</code> / statü karar tablosu:
+<a href="../websocket/#görüşmenin-kapanışı--terminatecall">WebSocket → Görüşmenin Kapanışı</a>.</p>
+</blockquote>
+<hr />
+<h2 id="içindekiler">İçindekiler<a class="headerlink" href="#içindekiler" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Tek kural: sonucu <code>onFinished</code>'tan okuyun</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Sonucu nerede görürüm?</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/"><code>SDKFlowOutcome</code> — kapanış verileri</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Tüm çıkış yolları</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Senaryo 1 — Tek modüllü akış (X modülü, örnek: NFC)</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Senaryo 2 — Üç modüllü akış (Kimlik → NFC → Selfie)</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Senaryo 3 — Görüntülü görüşmeli üç modüllü akış (Kimlik → Selfie → Görüşme)</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Modül bazında çıkış kataloğu — her modül için ne olur?</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Kapanıştan sonra yönlendirme — kodu nereye yazacağım?</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Kurallar ve tuzaklar</a></li>
+<li><a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Doğrulama listesi</a></li>
+</ol>
+<hr />
+<h2 id="1-tek-kural-sonucu-onfinishedtan-okuyun">1) Tek kural: sonucu <code>onFinished</code>'tan okuyun<a class="headerlink" href="#1-tek-kural-sonucu-onfinishedtan-okuyun" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setupSDK</span><span class="p">(</span>
+<span class="w">    </span><span class="p">...,</span>
+<span class="w">    </span><span class="n">showThankYouPage</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">          </span><span class="c1">// sonuç ekranını siz göstereceksiniz</span>
+<span class="w">    </span><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span><span class="w">          </span><span class="c1">// oturum nasıl biterse bitsin TAM BİR KEZ</span>
+<span class="w">        </span><span class="n">AppRouter</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">handleKyc</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><strong>Her çıkışta</strong> çağrılır — kurulum hatası dahil. Oturum başına <strong>bir kez</strong>.</li>
+<li><strong>Main thread</strong>'de, <strong>karar anında</strong> gelir (ör. temsilci kapattığı an); sonuç ekranının
+  kapatılmasını beklemez.</li>
+<li>Oturumu <strong>bitirmeyen</strong> olaylarda çağrılmaz: bağlantı kopması ve yeniden bağlanma, arka plana
+  geçiş, cevapsız çağrı, karar içermeyen <code>terminateCall</code>. Bu durumlarda kullanıcı akışta kalır.</li>
+</ul>
+<hr />
+<h2 id="2-sonucu-nerede-görürüm">2) Sonucu nerede görürüm?<a class="headerlink" href="#2-sonucu-nerede-görürüm" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Nerede</th>
+<th>Ne zaman kullanılır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>setupSDK(onFinished:)</code></td>
+<td><strong>Önerilen.</strong> Oturumu başlattığınız yerde sonucu da yakalarsınız</td>
+</tr>
+<tr>
+<td><code>IdentifyManager.shared.onFlowFinished</code></td>
+<td>Sonucu <code>setupSDK</code>'dan farklı bir katmanda (ör. uygulama router'ı) dinleyecekseniz</td>
+</tr>
+<tr>
+<td><code>IdentifyManager.shared.flowResultDelegate</code></td>
+<td>UIKit / delegate tarzı mimari (<code>IdentifyFlowResultListener</code>, <strong>weak</strong> — referansı saklayın)</td>
+</tr>
+<tr>
+<td><code>eventDelegate</code> → <code>session.finished</code></td>
+<td>Analitik, React Native / Flutter köprüleri (metadata ile)</td>
+</tr>
+<tr>
+<td><code>IdentifyManager.shared.lastFlowOutcome</code></td>
+<td>Sonradan okumak için (ör. sonuç ekranı override'ında, bir sonraki <code>setupSDK</code>'ya kadar)</td>
+</tr>
+<tr>
+<td><code>sdk_logs</code> → <code>Akış sonucu — …</code> satırı</td>
+<td>Sunucu tarafında destek/inceleme; host'un dinleyici bağlamasına gerek yok</td>
+</tr>
+</tbody>
+</table>
+<p>Üç kanal (<code>onFinished</code>, <code>onFlowFinished</code>, <code>flowResultDelegate</code>) aynı <code>SDKFlowOutcome</code>'u alır;
+birlikte kullanılabilir.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Delegate ile</span>
+<span class="kr">final</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">KycResultHandler</span><span class="p">:</span><span class="w"> </span><span class="n">IdentifyFlowResultListener</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">identifyFlowDidFinish</span><span class="p">(</span><span class="kc">_</span><span class="w"> </span><span class="n">outcome</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowOutcome</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">AppRouter</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">handleKyc</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="kd">let</span><span class="w"> </span><span class="nv">resultHandler</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">KycResultHandler</span><span class="p">()</span><span class="w">                       </span><span class="c1">// güçlü referans sizde</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">flowResultDelegate</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">resultHandler</span><span class="w">    </span><span class="c1">// setupSDK'dan ÖNCE</span>
+</code></pre></div>
+<p>Sunucu logunda aynı sonuç şöyle görünür:</p>
+<div class="highlight"><pre><span></span><code>Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz &amp; Nfc Screen, adım: 1/1.
+Oturum sonlandı — son modül: Mrz &amp; Nfc Screen, akış tamamlandı, sebep: 4100 (flowCompleted): Akış tamamlandı — bağlantı normal kapatıldı
+</code></pre></div>
+<hr />
+<h2 id="3-sdkflowoutcome--kapanış-verileri">3) <code>SDKFlowOutcome</code> — kapanış verileri<a class="headerlink" href="#3-sdkflowoutcome--kapanış-verileri" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Tip</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code></td>
+<td><code>SDKFlowResult</code></td>
+<td><strong>Kararınızı buna göre verin:</strong> <code>approved</code> · <code>rejected</code> · <code>neutral</code> · <code>notCompleted</code> · <code>cancelled</code> · <code>error</code></td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td><code>SDKFlowEndReason</code></td>
+<td>Hangi yoldan çıkıldı (bkz. <a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Tüm çıkış yolları</a>)</td>
+</tr>
+<tr>
+<td><code>lastModule</code></td>
+<td><code>SdkModules?</code></td>
+<td>Oturumun bittiği modül (henüz modül açılmadıysa <code>nil</code>)</td>
+</tr>
+<tr>
+<td><code>modules</code></td>
+<td><code>[SdkModules]</code></td>
+<td>Bu oturumda akışa alınan modüller (cihazda çalışamayanlar hariç)</td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td><code>[SdkModules]</code></td>
+<td><strong>Doğrulanmadan geçilen</strong> modüller — atlandı, cihazda/belgede bulunamadı, NFC hata sınırı</td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>Int</code></td>
+<td>Adım sayacı</td>
+</tr>
+<tr>
+<td><code>terminateReason</code></td>
+<td><code>String?</code></td>
+<td>Panel kapattıysa sebep, birebir</td>
+</tr>
+<tr>
+<td><code>statusSummary</code></td>
+<td><code>StatusSummary?</code></td>
+<td>Panel kararı: <code>id</code>, <code>type</code>, <code>name_tr</code> / <code>name_en</code> / <code>name_de</code></td>
+</tr>
+<tr>
+<td><code>closeCode</code></td>
+<td><code>SDKSocketCloseCode?</code></td>
+<td>Sonuç anında kayıtlı son socket kapanış kodu. Karar anında bildirilen yollarda genellikle boştur; kesin kapanış kodu <code>IdentifyManager.shared.lastSocketCloseCode</code> ve <code>sdk_logs</code>'taki <code>Oturum sonlandı</code> satırındadır</td>
+</tr>
+<tr>
+<td><code>errorMessage</code></td>
+<td><code>String?</code></td>
+<td><code>setupFailed</code> için hata metni</td>
+</tr>
+<tr>
+<td><code>sessionId</code> / <code>timestampMs</code></td>
+<td></td>
+<td>Oturum kimliği ve zaman</td>
+</tr>
+<tr>
+<td><code>isSuccess</code></td>
+<td><code>Bool</code></td>
+<td>Yalnızca <code>.approved</code> için <code>true</code></td>
+</tr>
+<tr>
+<td><code>toDictionary()</code></td>
+<td></td>
+<td>RN/Flutter için sözlük</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong><code>approved</code> + <code>skippedModules</code>:</strong> Görüşmesiz bir akışta modüllerin hepsi geçildiğinde
+sonuç <code>approved / allModulesCompleted</code> olur — bir modül <strong>atlanmış</strong> olsa bile (backend atlamaya
+izin veriyorsa). Her adımın doğrulanmış olması gerekiyorsa <code>skippedModules</code>'ın boş olduğunu
+ayrıca kontrol edin. Nihai onay her durumda sunucudadır.</p>
+</blockquote>
+<hr />
+<h2 id="4-tüm-çıkış-yolları">4) Tüm çıkış yolları<a class="headerlink" href="#4-tüm-çıkış-yolları" title="Permanent link">&para;</a></h2>
+<p>Sütunlar: <strong>Ekran</strong> = <code>showThankYouPage: true</code> iken kullanıcının gördüğü (<code>false</code> iken hiçbir
+yolda sonuç ekranı açılmaz, SDK bulunduğu ekrandan aşağı kayarak kapanır). <strong>Kapanış</strong> =
+<code>sdk_logs</code> / <code>lastSocketCloseCode</code>'daki socket kodu.</p>
+<h3 id="41-akış-tamamlandı--panel-karar-verdi">4.1 Akış tamamlandı / panel karar verdi<a class="headerlink" href="#41-akış-tamamlandı--panel-karar-verdi" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th><code>reason</code></th>
+<th><code>result</code></th>
+<th>Tetikleyen</th>
+<th>Ekran</th>
+<th>Kapanış</th>
+<th>Dolu gelen alanlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>allModulesCompleted</code></td>
+<td><code>approved</code></td>
+<td>Son modül bitti, sıradaki adım yok (görüşmesiz akış; ya da modüller görüşmeden sonra da devam ediyor)</td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+<td><code>lastModule</code>, <code>skippedModules</code></td>
+</tr>
+<tr>
+<td><code>agentDecision</code></td>
+<td><code>approved</code></td>
+<td>Panel <code>terminateCall</code> + <code>positive</code> statü</td>
+<td>ThankYou — başarılı</td>
+<td>4103</td>
+<td><code>terminateReason</code>, <code>statusSummary</code></td>
+</tr>
+<tr>
+<td><code>agentDecision</code></td>
+<td><code>rejected</code></td>
+<td>Panel <code>terminateCall</code> + <code>negative</code> statü</td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4103</td>
+<td><code>terminateReason</code>, <code>statusSummary</code></td>
+</tr>
+<tr>
+<td><code>agentDecision</code></td>
+<td><code>neutral</code></td>
+<td>Panel <code>terminateCall</code> + <code>neutral</code> statü</td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4103</td>
+<td><code>terminateReason</code>, <code>statusSummary</code></td>
+</tr>
+<tr>
+<td><code>agentDecision</code></td>
+<td><code>approved</code></td>
+<td>Bağlantı koptu → yeniden bağlanıldı → panelin kayıtlı statüsü <code>positive</code></td>
+<td>ThankYou — başarılı</td>
+<td>4103</td>
+<td><code>statusSummary</code> (<code>terminateReason</code> yok)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-akış-tamamlanamadı">4.2 Akış tamamlanamadı<a class="headerlink" href="#42-akış-tamamlanamadı" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th><code>reason</code></th>
+<th><code>result</code></th>
+<th>Tetikleyen</th>
+<th>Ekran</th>
+<th>Kapanış</th>
+<th>Dolu gelen alanlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>moduleFailed</code></td>
+<td><code>notCompleted</code></td>
+<td>Bir modülün (Selfie, Kimlik, OVD, NFC, Canlılık, Selfie+Canlılık) karşılaştırma hakkı bitti, backend atlamaya <strong>izin vermiyor</strong></td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+<td><code>lastModule</code> = başarısız modül</td>
+</tr>
+<tr>
+<td><code>userEndedCall</code></td>
+<td><code>notCompleted</code></td>
+<td>Kullanıcı "Görüşmeyi bitir"e bastı</td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+<td><code>lastModule</code></td>
+</tr>
+<tr>
+<td><code>userEndedCall</code></td>
+<td><code>notCompleted</code></td>
+<td>Görüşme <code>terminateCall</code> gelmeden kapandı (<code>endCall</code>) ve akış sona ulaştı</td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4100</td>
+<td><code>lastModule</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-bilinçli-çıkış">4.3 Bilinçli çıkış<a class="headerlink" href="#43-bilinçli-çıkış" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th><code>reason</code></th>
+<th><code>result</code></th>
+<th>Tetikleyen</th>
+<th>Ekran</th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>userExited</code></td>
+<td><code>cancelled</code></td>
+<td>İlk ekranda geri butonu (<code>coordinator.popBack()</code>)</td>
+<td>Host'un kök ekranı</td>
+<td>4102</td>
+</tr>
+<tr>
+<td><code>userExited</code></td>
+<td><code>cancelled</code></td>
+<td><code>IdentifyManager.shared.killSDKByUser</code> (panele <code>quitSDKOnMobile</code> gider)</td>
+<td>—</td>
+<td>4101</td>
+</tr>
+<tr>
+<td><code>hostQuit</code></td>
+<td><code>cancelled</code></td>
+<td>Host <code>quitSDK(callback:)</code> çağırdı (önceden sonuç yoksa)</td>
+<td>callback'teki controller</td>
+<td>4101</td>
+</tr>
+<tr>
+<td><code>hostExit</code></td>
+<td><code>cancelled</code></td>
+<td>Host <code>exitSDK()</code> çağırdı</td>
+<td>—</td>
+<td>4102</td>
+</tr>
+<tr>
+<td><code>hostForceQuit</code></td>
+<td><code>cancelled</code></td>
+<td>Host <code>forceQuitSDK()</code> çağırdı</td>
+<td>—</td>
+<td>4103</td>
+</tr>
+<tr>
+<td><code>appTerminated</code></td>
+<td><code>cancelled</code></td>
+<td>Oturum açıkken uygulama kapatıldı (sistem izin verdiği sürece; log bir sonraki oturumda gönderilir)</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-oturum-kurulamadı--sürdürülemedi">4.4 Oturum kurulamadı / sürdürülemedi<a class="headerlink" href="#44-oturum-kurulamadı--sürdürülemedi" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th><code>reason</code></th>
+<th><code>result</code></th>
+<th>Tetikleyen</th>
+<th>Ekran</th>
+<th>Kapanış</th>
+<th>Dolu gelen alanlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>setupFailed</code></td>
+<td><code>error</code></td>
+<td><code>setupSDK</code> hata döndü (geçersiz <code>identId</code>, sunucuya ulaşılamadı, WS anahtarı reddedildi)</td>
+<td>Host'un giriş ekranı (akış hiç başlamadı)</td>
+<td>—</td>
+<td><code>errorMessage</code></td>
+</tr>
+<tr>
+<td><code>roomOccupied</code></td>
+<td><code>error</code></td>
+<td>Oda başka bir oturumda (yeniden denemeler de reddedildi)</td>
+<td>"Oturum meşgul" uyarısı → onayla kök ekran</td>
+<td>4120</td>
+<td><code>closeCode</code> = 4120</td>
+</tr>
+<tr>
+<td><code>connectionLost</code></td>
+<td><code>error</code></td>
+<td>Bağlantı kopmuşken akışın sonuna gelindi ya da oturum başka bir kodla kapandı</td>
+<td>ThankYou</td>
+<td>4104–4142</td>
+<td><code>closeCode</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="45-sonuç-üretmeyenler-oturum-sürer">4.5 Sonuç ÜRETMEYENLER (oturum sürer)<a class="headerlink" href="#45-sonuç-üretmeyenler-oturum-sürer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Olay</th>
+<th>Kullanıcı ne görür</th>
+<th>Ne olur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bağlantı kopması (ağ, heartbeat 4109, ping 4107, TURN 4140–4142)</td>
+<td>Bağlantı Koptu</td>
+<td>Yeniden bağlanınca modül baştan başlar</td>
+</tr>
+<tr>
+<td>Uygulama 30 sn'den uzun arka planda (4105)</td>
+<td>Dönüşte Bağlantı Koptu</td>
+<td>Aynı</td>
+</tr>
+<tr>
+<td>Çağrı yanıtlanmadı (4108) / <code>missedCall</code></td>
+<td>Bekleme odası</td>
+<td>Sıraya devam</td>
+</tr>
+<tr>
+<td>Karar içermeyen <code>terminateCall</code> (statü yok, id <code>-3</code>, sorunlu kapanış sebepleri)</td>
+<td>Bağlantı Koptu → bekleme odası</td>
+<td>Temsilci yeniden arayabilir</td>
+</tr>
+<tr>
+<td>Modül atlandı (hak tükendi, atlama izinli)</td>
+<td>Sıradaki modül</td>
+<td><code>skippedModules</code>'a eklenir</td>
+</tr>
+</tbody>
+</table>
+<p>Kullanıcı bu durumlardan hiç dönmezse sonuç, host'un sonraki <code>exitSDK</code> / <code>forceQuitSDK</code>
+çağrısında ya da uygulama kapanışında üretilir.</p>
+<hr />
+<h2 id="5-senaryo-1--tek-modüllü-akış-müşteri-adımı-tamamladı-sdk-işini-bitirdi">5) Senaryo 1 — Tek modüllü akış: müşteri adımı tamamladı, SDK işini bitirdi<a class="headerlink" href="#5-senaryo-1--tek-modüllü-akış-müşteri-adımı-tamamladı-sdk-işini-bitirdi" title="Permanent link">&para;</a></h2>
+<p>Bu bölüm tek bir senaryoyu <strong>baştan sona</strong> izler: panelde akışa yalnızca bir modül eklenmiş,
+müşteri o adımı yapmış ve SDK işini bitirmiştir. Bundan sonra çıkış nasıl olur, developer bunu
+nerede görür, nasıl yakalar ve kendi uygulamasında nereye yönlendirir?</p>
+<p>Örnek modül <strong>NFC</strong>; NFC yerine akıştaki herhangi bir modülü ("X modülü") koyabilirsiniz —
+kapanış aynı yoldan işler. Her modülün kendine özgü çıkışları:
+<a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">8) Modül bazında çıkış kataloğu</a>.</p>
+<h3 id="51-başlangıç">5.1 Başlangıç<a class="headerlink" href="#51-başlangıç" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Panelde akışa yalnızca <strong>NFC</strong> eklendi (<code>RoomResponse.modules = ["nfc"]</code>).</li>
+<li>Host uygulama <code>setupSDK</code>'yı <code>showThankYouPage: false</code> ve <code>onFinished</code> ile çağırıyor; sonuç
+  ekranını kendisi gösterecek.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">coordinator</span><span class="p">.</span><span class="n">prepareForSetup</span><span class="p">()</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setupSDK</span><span class="p">(</span>
+<span class="w">    </span><span class="n">identId</span><span class="p">:</span><span class="w"> </span><span class="n">identId</span><span class="p">,</span>
+<span class="w">    </span><span class="p">...,</span>
+<span class="w">    </span><span class="n">showThankYouPage</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span><span class="n">KycRouter</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span><span class="w">            </span><span class="c1">// ← çıkışın yakalandığı tek yer</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">socket</span><span class="p">?.</span><span class="n">isConnected</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">coordinator</span><span class="p">.</span><span class="n">start</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="52-müşteri-nfcyi-taratıyor">5.2 Müşteri NFC'yi taratıyor<a class="headerlink" href="#52-müşteri-nfcyi-taratıyor" title="Permanent link">&para;</a></h3>
+<ol>
+<li><code>coordinator.start()</code> ilk (ve tek) modülü açar: <strong>NFC ekranı</strong>.
+   Olay: <code>module.Mrz &amp; Nfc Screen.presented</code>.</li>
+<li>Müşteri kimliği telefonun arkasına tutar; çip okunur ve sunucuda karşılaştırılır.</li>
+<li>Karşılaştırma geçer. Panele NFC sonucu gider.
+   Olay: <code>module.Mrz &amp; Nfc Screen.completed</code> · log: <code>Modül sonucu — Mrz &amp; Nfc Screen: tamamlandı.</code></li>
+</ol>
+<h3 id="53-sdk-işini-bitiriyor--çıkış-nasıl-oluyor">5.3 SDK işini bitiriyor — çıkış nasıl oluyor?<a class="headerlink" href="#53-sdk-işini-bitiriyor--çıkış-nasıl-oluyor" title="Permanent link">&para;</a></h3>
+<p>NFC ekranı başarıyı bildirir (<code>onCompleted</code>) ve coordinator sıradaki modülü ister. Sırada
+modül yoktur; SDK oturumu kapatır. Sıra şöyledir:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ne olur</th>
+<th>Nerede görünür</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Akışın sonuna gelindi: sonuç üretilir → <code>approved / allModulesCompleted</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Sonuç sunucu loguna yazılır</td>
+<td><code>sdk_logs</code>: <code>Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz &amp; Nfc Screen, adım: 1/1.</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>session.finished</code> ve <code>session.completed</code> olayları yayınlanır</td>
+<td><code>eventDelegate</code>, RN/Flutter köprüsü</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>onFinished(outcome)</code> çağrılır</strong> (main thread), ardından <code>onFlowFinished</code> ve <code>flowResultDelegate</code></td>
+<td>Sizin kodunuz</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Socket <strong>4100</strong> (<code>flowCompleted</code>) ile kapatılır; panel oturumun normal bittiğini görür</td>
+<td><code>lastSocketCloseCode</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Sonuç ekranı açılmaz: NFC ekranı <strong>aşağı kayarak</strong> kalkar, altta <code>SDKFlowHostView</code>'e verdiğiniz kök ekran görünür</td>
+<td>Ekran</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Oturum kaynakları bırakılır (socket, görüşme bağlantısı, dinleyiciler, log kuyruğu)</td>
+<td><code>sdk_logs</code>: <code>Oturum sonlandı — son modül: Mrz &amp; Nfc Screen, akış tamamlandı, sebep: 4100 (flowCompleted)…</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Akış durumu sıfırlanır; yeni oturum için tekrar <code>setupSDK</code> gerekir</td>
+<td><code>IdentifyManager.shared.isSessionClosed == true</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>showThankYouPage: true</code> olsaydı 6. adımda ThankYou "başarılı" açılırdı; kullanıcı butona
+basınca akış kök ekrana dönerdi. <code>onFinished</code> yine 2. adımda, ThankYou açılırken gelirdi.</p>
+<h3 id="54-developer-çıkışı-nerede-görüyor-hangi-verilerle">5.4 Developer çıkışı nerede görüyor, hangi verilerle?<a class="headerlink" href="#54-developer-çıkışı-nerede-görüyor-hangi-verilerle" title="Permanent link">&para;</a></h3>
+<p><code>onFinished</code>'a gelen <code>SDKFlowOutcome</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code></td>
+<td><code>.approved</code></td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td><code>.allModulesCompleted</code></td>
+</tr>
+<tr>
+<td><code>lastModule</code></td>
+<td><code>.nfc</code></td>
+</tr>
+<tr>
+<td><code>modules</code></td>
+<td><code>[.nfc]</code></td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td><code>[]</code> — NFC gerçekten doğrulandı</td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>1</code> / <code>1</code></td>
+</tr>
+<tr>
+<td><code>terminateReason</code> / <code>statusSummary</code></td>
+<td><code>nil</code> — görüşme yok, panel kararı yok</td>
+</tr>
+<tr>
+<td><code>closeCode</code></td>
+<td><code>nil</code> — sonuç socket kapanmadan hemen önce üretilir; kod sonrasında <code>lastSocketCloseCode</code>'da <code>.flowCompleted</code> olur</td>
+</tr>
+<tr>
+<td><code>sessionId</code></td>
+<td><code>setupSDK</code> ile üretilen oturum kimliği</td>
+</tr>
+</tbody>
+</table>
+<p>Aynı bilgi başka yerlerden de okunabilir:</p>
+<ul>
+<li><code>IdentifyManager.shared.lastFlowOutcome</code> — bir sonraki <code>setupSDK</code>'ya kadar.</li>
+<li><code>eventDelegate</code> → <code>session.finished</code>, metadata: <code>result=approved</code>, <code>endReason=allModulesCompleted</code>,
+  <code>lastModule=Mrz &amp; Nfc Screen</code>, <code>stepIndex=1</code>, <code>totalSteps=1</code>.</li>
+<li>Sunucuda <code>sdk_logs</code> — 5.3'teki satırlar.</li>
+</ul>
+<h3 id="55-developer-çıkışı-nasıl-yakalıyor-ve-nereye-yönlendiriyor">5.5 Developer çıkışı nasıl yakalıyor ve nereye yönlendiriyor?<a class="headerlink" href="#55-developer-çıkışı-nasıl-yakalıyor-ve-nereye-yönlendiriyor" title="Permanent link">&para;</a></h3>
+<p>Yönlendirme <code>onFinished</code>'ta başlar. Kapanış animasyonu ile aynı anda çalışır: SDK kendi ekranını
+kaldırırken siz kök ekranınızın state'ini değiştirirsiniz.</p>
+<div class="highlight"><pre><span></span><code><span class="p">@</span><span class="n">MainActor</span>
+<span class="kr">final</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">KycRouter</span><span class="p">:</span><span class="w"> </span><span class="n">ObservableObject</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">shared</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">KycRouter</span><span class="p">()</span>
+<span class="w">    </span><span class="p">@</span><span class="n">Published</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">destination</span><span class="p">:</span><span class="w"> </span><span class="n">Destination</span><span class="p">?</span>
+
+<span class="w">    </span><span class="kd">enum</span><span class="w"> </span><span class="nc">Destination</span><span class="p">:</span><span class="w"> </span><span class="n">Identifiable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">identityVerified</span><span class="w">            </span><span class="c1">// çip okundu ve doğrulandı</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">identityNotVerified</span><span class="w">         </span><span class="c1">// akış bitti ama NFC doğrulanmadı</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">verificationFailed</span><span class="w">          </span><span class="c1">// hak bitti, atlama kapalı</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="nb">String</span><span class="p">?)</span>
+<span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="n">describing</span><span class="p">:</span><span class="w"> </span><span class="kc">self</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="kc">_</span><span class="w"> </span><span class="n">outcome</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowOutcome</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">skippedModules</span><span class="p">.</span><span class="bp">isEmpty</span><span class="p">:</span>
+<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">identityVerified</span><span class="w">                 </span><span class="c1">// ← bu senaryo</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="p">:</span>
+<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">identityNotVerified</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">notCompleted</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">neutral</span><span class="p">:</span>
+<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">verificationFailed</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">error</span><span class="p">:</span>
+<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">errorMessage</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">cancelled</span><span class="p">:</span>
+<span class="w">            </span><span class="n">destination</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">nil</span><span class="w">                                </span><span class="c1">// kullanıcı vazgeçti, kök ekranda kalır</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// SDKFlowHostView'e kök olarak verdiğiniz ekran:</span>
+<span class="kd">struct</span><span class="w"> </span><span class="nc">HomeView</span><span class="p">:</span><span class="w"> </span><span class="n">View</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">@</span><span class="n">ObservedObject</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">router</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">KycRouter</span><span class="p">.</span><span class="n">shared</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nv">body</span><span class="p">:</span><span class="w"> </span><span class="n">some</span><span class="w"> </span><span class="n">View</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">content</span>
+<span class="w">            </span><span class="p">.</span><span class="n">fullScreenCover</span><span class="p">(</span><span class="n">item</span><span class="p">:</span><span class="w"> </span><span class="err">$</span><span class="n">router</span><span class="p">.</span><span class="n">destination</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">destination</span><span class="w"> </span><span class="k">in</span>
+<span class="w">                </span><span class="k">switch</span><span class="w"> </span><span class="n">destination</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">identityVerified</span><span class="p">:</span><span class="w">    </span><span class="n">AccountOpeningView</span><span class="p">()</span><span class="w">        </span><span class="c1">// kendi uygulamanızda devam</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">identityNotVerified</span><span class="p">:</span><span class="w"> </span><span class="n">ManualReviewInfoView</span><span class="p">()</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">verificationFailed</span><span class="p">:</span><span class="w">  </span><span class="n">RetryLaterView</span><span class="p">()</span>
+<span class="w">                </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nv">message</span><span class="p">):</span><span class="w">  </span><span class="n">ErrorView</span><span class="p">(</span><span class="n">message</span><span class="p">:</span><span class="w"> </span><span class="n">message</span><span class="p">)</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>SDK'yı bir modal / <code>fullScreenCover</code> / <code>UIHostingController</code> içinde sunuyorsanız önce kabı
+kapatın, kapanınca yönlendirin: <a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">9.2</a> ·
+<a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">9.3</a>. React Native / Flutter: <a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">9.5</a>.</p>
+<h3 id="56-aynı-senaryo-başka-bir-modülle">5.6 Aynı senaryo başka bir modülle<a class="headerlink" href="#56-aynı-senaryo-başka-bir-modülle" title="Permanent link">&para;</a></h3>
+<p>Özet tablo aşağıda; her modülün tüm çıkışları, özel durumları ve log örnekleri:
+<a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">8) Modül bazında çıkış kataloğu</a>.</p>
+<p>Panelde tek modül açık ve müşteri adımı tamamladığında akış her modülde aynı yoldan kapanır:
+<code>approved / allModulesCompleted</code>, socket 4100, <code>lastModule</code> = o modül. Yalnızca modüle özgü
+"işler farklı giderse" dalları değişir:</p>
+<table>
+<thead>
+<tr>
+<th>Tek açık modül</th>
+<th>Müşteri adımı tamamladı</th>
+<th>Hak bitti, atlama kapalı</th>
+<th>Hak bitti, atlama izinli</th>
+<th>Cihaz desteklemiyor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFC (<code>nfc</code>)</td>
+<td><code>approved</code></td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>approved</code> + <code>skippedModules [nfc]</code></td>
+<td><code>approved</code> + <code>skippedModules [nfc]</code>, <code>modules []</code></td>
+</tr>
+<tr>
+<td>Selfie (<code>selfie</code>)</td>
+<td><code>approved</code></td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>approved</code> + <code>skippedModules [selfie]</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Kimlik (<code>idCard</code>) / OVD (<code>idcard_w_ovd</code>)</td>
+<td><code>approved</code></td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>approved</code> + <code>skippedModules</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Canlılık (<code>livenessDetection</code>) / Selfie + Canlılık</td>
+<td><code>approved</code></td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>approved</code> + <code>skippedModules</code></td>
+<td><code>faceTrackingFallback</code> ile selfie gelir ya da modül çıkar</td>
+</tr>
+<tr>
+<td>Video kayıt · İmza · Konuşma · Adres</td>
+<td><code>approved</code></td>
+<td>— (karşılaştırma yok)</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Görüntülü görüşme (<code>waitScreen</code>)</td>
+<td>Sonucu <strong>panel</strong> verir: <code>agentDecision</code> + <code>terminateReason</code> / <code>statusSummary</code> — <a href="../websocket/#görüşmenin-kapanışı--terminatecall">WebSocket → Görüşmenin Kapanışı</a></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Her modülde ortak olan çıkışlar: ilk ekranda geri → <code>cancelled / userExited</code>, uygulama
+kapatıldı → <code>cancelled / appTerminated</code>, bağlantı kopması → sonuç yok (yeniden bağlanma).</p>
+<h3 id="57-nfcde-işler-farklı-giderse">5.7 NFC'de işler farklı giderse<a class="headerlink" href="#57-nfcde-işler-farklı-giderse" title="Permanent link">&para;</a></h3>
+<p>Aynı başlangıçla, müşteri NFC'yi <strong>başarıyla</strong> tamamlayamazsa:</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th><code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Çip ile belge verisi uyuşmadı, hak var</td>
+<td>çağrılmaz — uyarı, NFC ekranında tekrar denenir</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Karşılaştırma hakkı bitti, atlama <strong>izinli</strong></td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Karşılaştırma hakkı bitti, atlama <strong>kapalı</strong></td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>4101</td>
+</tr>
+<tr>
+<td>Çip okunamadı, <code>nfcMaxErrorCount</code> sınırı</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Manuel MRZ düzeltmesi üst üste başarısız</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Cihazda NFC yok (<code>showNFCNotFoundPage: false</code>)</td>
+<td><code>approved / allModulesCompleted</code>, <code>modules = []</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>NFC ekranında geri butonu</td>
+<td><code>cancelled / userExited</code></td>
+<td><code>[]</code></td>
+<td>4102</td>
+</tr>
+<tr>
+<td>Uygulama kapatıldı</td>
+<td><code>cancelled / appTerminated</code></td>
+<td><code>[]</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Bağlantı koptu / 30 sn'den uzun arka plan</td>
+<td>çağrılmaz — Bağlantı Koptu, dönüşte NFC baştan</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Atlama izinli yoldaki log:</p>
+<div class="highlight"><pre><span></span><code>Modül sonucu — Mrz &amp; Nfc Screen: atlandı.
+Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz &amp; Nfc Screen, adım: 1/1, atlanan modüller: Mrz &amp; Nfc Screen.
+</code></pre></div>
+<hr />
+<h2 id="6-senaryo-2--üç-modüllü-akış-kimlik--nfc--selfie">6) Senaryo 2 — Üç modüllü akış (Kimlik → NFC → Selfie)<a class="headerlink" href="#6-senaryo-2--üç-modüllü-akış-kimlik--nfc--selfie" title="Permanent link">&para;</a></h2>
+<p>Çok modüllü akışta temel kural değişmez: <strong>modüller arasında <code>onFinished</code> çağrılmaz</strong>, sonuç
+yalnızca oturum bittiğinde bir kez gelir. Fark şudur: oturum <strong>herhangi bir adımda</strong> bitebilir;
+hangi adımda bittiğini <code>lastModule</code> ve <code>stepIndex / totalSteps</code> söyler, hangi adımların
+doğrulanmadan geçildiğini <code>skippedModules</code>.</p>
+<h3 id="61-başlangıç">6.1 Başlangıç<a class="headerlink" href="#61-başlangıç" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Panelde akış sırası: <strong>Kimlik</strong> (<code>idCard</code>) → <strong>NFC</strong> (<code>nfc</code>) → <strong>Selfie</strong> (<code>selfie</code>).
+  Sırayı panel belirler; SDK <code>RoomResponse.modules</code> sırasını izler.</li>
+<li>Host kodu Senaryo 1 ile <strong>aynıdır</strong> — modül sayısı entegrasyonu değiştirmez:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">coordinator</span><span class="p">.</span><span class="n">prepareForSetup</span><span class="p">()</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setupSDK</span><span class="p">(</span>
+<span class="w">    </span><span class="n">identId</span><span class="p">:</span><span class="w"> </span><span class="n">identId</span><span class="p">,</span>
+<span class="w">    </span><span class="p">...,</span>
+<span class="w">    </span><span class="n">showThankYouPage</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">KycRouter</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">socket</span><span class="p">?.</span><span class="n">isConnected</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">coordinator</span><span class="p">.</span><span class="n">start</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="62-akış-ilerlerken-ne-olur">6.2 Akış ilerlerken ne olur?<a class="headerlink" href="#62-akış-ilerlerken-ne-olur" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Adım</th>
+<th>Ekran</th>
+<th>Müşteri</th>
+<th>SDK</th>
+<th>Host'a gelen</th>
+<th><code>onFinished</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1/3</td>
+<td>Kimlik</td>
+<td>Ön ve arka yüzü çeker</td>
+<td>OCR + yükleme; panele ekran bilgisi gider</td>
+<td><code>module.Id Card.presented</code> → <code>module.Id Card.completed</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>2/3</td>
+<td>NFC</td>
+<td>Çipi okutur</td>
+<td>Çip okunur, sunucuda karşılaştırılır</td>
+<td><code>module.Mrz &amp; Nfc Screen.presented</code> → <code>….completed</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>3/3</td>
+<td>Selfie</td>
+<td>Yüzünü çeker</td>
+<td>Yükleme + yüz karşılaştırması</td>
+<td><code>module.Selfie.presented</code> → <code>module.Selfie.completed</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>son</td>
+<td>—</td>
+<td>—</td>
+<td>Sıradaki modül yok → oturum kapanır</td>
+<td><code>session.finished</code>, <code>session.completed</code></td>
+<td><strong>çağrılır</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Akış sürerken ilerlemeyi göstermek isterseniz <code>coordinator.progressStep</code> /
+<code>coordinator.progressTotal</code> ya da <code>module.*</code> olaylarını kullanın; <code>onFinished</code> bunun için değildir.</p>
+<h3 id="63-mutlu-yol--üç-adım-da-tamamlandı">6.3 Mutlu yol — üç adım da tamamlandı<a class="headerlink" href="#63-mutlu-yol--üç-adım-da-tamamlandı" title="Permanent link">&para;</a></h3>
+<p>Selfie tamamlanınca coordinator sıradaki modülü ister, sırada modül yoktur. Kapanış Senaryo 1'deki
+8 adımın <strong>aynısıdır</strong> (<a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">5.3</a>): sonuç üretilir →
+log → olaylar → <code>onFinished</code> → socket 4100 → Selfie ekranı aşağı kayar → kaynaklar bırakılır.</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code> / <code>reason</code></td>
+<td><code>.approved</code> / <code>.allModulesCompleted</code></td>
+</tr>
+<tr>
+<td><code>lastModule</code></td>
+<td><code>.selfie</code></td>
+</tr>
+<tr>
+<td><code>modules</code></td>
+<td><code>[.idCard, .nfc, .selfie]</code></td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>3</code> / <code>3</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Selfie, adım: 3/3.
+Oturum sonlandı — son modül: Selfie, akış tamamlandı, sebep: 4100 (flowCompleted): Akış tamamlandı — bağlantı normal kapatıldı
+</code></pre></div>
+<h3 id="64-akış-ortada-bitti--nfcde-hak-tükendi-atlama-kapalı">6.4 Akış ortada bitti — NFC'de hak tükendi, atlama kapalı<a class="headerlink" href="#64-akış-ortada-bitti--nfcde-hak-tükendi-atlama-kapalı" title="Permanent link">&para;</a></h3>
+<p>Müşteri Kimlik adımını tamamladı. NFC'de çip verisi belgeyle uyuşmadı ve karşılaştırma hakkı bitti;
+panelde "sonuca rağmen modülü atla" <strong>kapalı</strong>.</p>
+<ol>
+<li>NFC ekranında hata mesajı gösterilir; müşteri "Tamam"a basar.</li>
+<li>SDK oturumu <strong>başarısız</strong> olarak kapatır — <strong>Selfie adımı hiç açılmaz</strong>.</li>
+<li><code>onFinished</code> çağrılır, socket <strong>4101</strong> ile kapanır.</li>
+<li><code>showThankYouPage: false</code> → NFC ekranı aşağı kayarak kalkar. (<code>true</code> → ThankYou "tamamlanamadı".)</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code> / <code>reason</code></td>
+<td><code>.notCompleted</code> / <code>.moduleFailed</code></td>
+</tr>
+<tr>
+<td><code>lastModule</code></td>
+<td><code>.nfc</code> — başarısız olan adım</td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>2</code> / <code>3</code> — akış 2. adımda bitti</td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td><code>[]</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>Akış sonucu — sonuç: notCompleted, sebep: moduleFailed, son modül: Mrz &amp; Nfc Screen, adım: 2/3.
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">notCompleted</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">reason</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="p">.</span><span class="n">moduleFailed</span><span class="p">:</span>
+<span class="w">    </span><span class="c1">// Hangi adımda takıldığını kullanıcıya söyleyebilirsiniz</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">verificationFailed</span><span class="p">(</span><span class="n">step</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">lastModule</span><span class="p">))</span><span class="w">    </span><span class="c1">// .nfc</span>
+</code></pre></div>
+<h3 id="65-adım-atlandı-akış-devam-etti--nfcde-hak-tükendi-atlama-izinli">6.5 Adım atlandı, akış devam etti — NFC'de hak tükendi, atlama izinli<a class="headerlink" href="#65-adım-atlandı-akış-devam-etti--nfcde-hak-tükendi-atlama-izinli" title="Permanent link">&para;</a></h3>
+<p>Aynı durum, ama panelde atlama <strong>açık</strong>:</p>
+<ol>
+<li>NFC atlanır (<code>module.Mrz &amp; Nfc Screen.skipped</code>), akış <strong>Selfie'ye geçer</strong>. <code>onFinished</code> çağrılmaz.</li>
+<li>Müşteri Selfie'yi tamamlar, oturum normal kapanır.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code> / <code>reason</code></td>
+<td><code>.approved</code> / <code>.allModulesCompleted</code></td>
+</tr>
+<tr>
+<td><code>lastModule</code></td>
+<td><code>.selfie</code></td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td><code>[.nfc]</code> — <strong>NFC doğrulanmadı</strong></td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>3</code> / <code>3</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">skippedModules</span><span class="p">.</span><span class="bp">isEmpty</span><span class="p">:</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">verified</span><span class="p">)</span>
+<span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="p">:</span>
+<span class="w">    </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">pendingManualReview</span><span class="p">(</span><span class="n">missing</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">skippedModules</span><span class="p">))</span><span class="w">   </span><span class="c1">// [.nfc]</span>
+</code></pre></div>
+<h3 id="66-kullanıcı-geri-butonuna-bastı">6.6 Kullanıcı geri butonuna bastı<a class="headerlink" href="#66-kullanıcı-geri-butonuna-bastı" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Nerede</th>
+<th>Ne olur</th>
+<th><code>onFinished</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3. adım (Selfie) ya da 2. adım (NFC)</td>
+<td><strong>Bir önceki modüle döner</strong>; panele konum güncellemesi gider, oturum sürer</td>
+<td>çağrılmaz</td>
+</tr>
+<tr>
+<td>1. adım (Kimlik) — akışın ilk ekranı</td>
+<td>Oturumdan çıkılır, socket <strong>4102</strong>, host'un kök ekranı görünür</td>
+<td><code>cancelled / userExited</code>, <code>lastModule = .idCard</code>, <code>stepIndex = 1</code></td>
+</tr>
+</tbody>
+</table>
+<p>Yani çok modüllü akışta kullanıcı geri geri giderek ilk ekrana gelip oradan çıkabilir; ara
+adımlardaki geri butonu oturumu bitirmez.</p>
+<h3 id="67-bağlantı-koptu-ya-da-uygulama-arka-plana-gitti">6.7 Bağlantı koptu ya da uygulama arka plana gitti<a class="headerlink" href="#67-bağlantı-koptu-ya-da-uygulama-arka-plana-gitti" title="Permanent link">&para;</a></h3>
+<p>Müşteri 3. adımda (Selfie) iken bağlantı koptu:</p>
+<ol>
+<li><strong>Bağlantı Koptu</strong> ekranı açılır. <code>onFinished</code> <strong>çağrılmaz</strong>.</li>
+<li>Müşteri yeniden bağlanırsa <strong>Selfie baştan başlar</strong> (Kimlik ve NFC tekrarlanmaz).</li>
+<li>Müşteri bu ekrandayken uygulamayı kapatırsa: <code>cancelled / appTerminated</code>, <code>lastModule = .selfie</code>,
+   <code>stepIndex = 3</code>.</li>
+</ol>
+<p>Uygulama 30 saniyeden kısa arka planda kalırsa hiçbir şey olmaz; daha uzun kalırsa dönüşte aynı
+Bağlantı Koptu ekranı gelir (4105).</p>
+<h3 id="68-nfcsi-olmayan-cihaz-ipad">6.8 NFC'si olmayan cihaz (iPad)<a class="headerlink" href="#68-nfcsi-olmayan-cihaz-ipad" title="Permanent link">&para;</a></h3>
+<p>Akış kurulurken NFC modülü <strong>akışa alınmaz</strong>, panele <code>NFCStatus = notAvailable</code> gider. Akış
+Kimlik → Selfie olarak iki adım sürer:</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code> / <code>reason</code></td>
+<td><code>.approved</code> / <code>.allModulesCompleted</code></td>
+</tr>
+<tr>
+<td><code>modules</code></td>
+<td><code>[.idCard, .selfie]</code></td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td><code>[.nfc]</code></td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>2</code> / <code>2</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="69-özet--üç-modüllü-akışın-tüm-çıkışları">6.9 Özet — üç modüllü akışın tüm çıkışları<a class="headerlink" href="#69-özet--üç-modüllü-akışın-tüm-çıkışları" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th><code>result / reason</code></th>
+<th><code>lastModule</code></th>
+<th><code>stepIndex</code></th>
+<th><code>skippedModules</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Üç adım tamamlandı</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>.selfie</code></td>
+<td>3/3</td>
+<td><code>[]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Bir adım atlandı (izinli), akış bitti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>.selfie</code></td>
+<td>3/3</td>
+<td><code>[atlanan]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Kimlik'te hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>.idCard</code></td>
+<td>1/3</td>
+<td><code>[]</code></td>
+<td>4101</td>
+</tr>
+<tr>
+<td>NFC'de hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>.nfc</code></td>
+<td>2/3</td>
+<td><code>[]</code></td>
+<td>4101</td>
+</tr>
+<tr>
+<td>Selfie'de hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>.selfie</code></td>
+<td>3/3</td>
+<td><code>[]</code></td>
+<td>4101</td>
+</tr>
+<tr>
+<td>İlk ekranda geri</td>
+<td><code>cancelled / userExited</code></td>
+<td><code>.idCard</code></td>
+<td>1/3</td>
+<td><code>[]</code></td>
+<td>4102</td>
+</tr>
+<tr>
+<td>Uygulama kapatıldı</td>
+<td><code>cancelled / appTerminated</code></td>
+<td>o anki adım</td>
+<td>o anki</td>
+<td>o ana kadar atlananlar</td>
+<td>—</td>
+</tr>
+<tr>
+<td>NFC'siz cihaz, akış bitti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>.selfie</code></td>
+<td>2/2</td>
+<td><code>[.nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Ara adımda geri / bağlantı kopması / kısa arka plan</td>
+<td><strong>sonuç yok</strong> — oturum sürer</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-senaryo-3--görüntülü-görüşmeli-üç-modüllü-akış-kimlik--selfie--görüşme">7) Senaryo 3 — Görüntülü görüşmeli üç modüllü akış (Kimlik → Selfie → Görüşme)<a class="headerlink" href="#7-senaryo-3--görüntülü-görüşmeli-üç-modüllü-akış-kimlik--selfie--görüşme" title="Permanent link">&para;</a></h2>
+<p>Görüntülü görüşme (<code>waitScreen</code>) akıştaki diğer modüllerden farklıdır: görüşmenin sonucunu
+<strong>temsilci</strong> verir. Görüşme adımına kadar her şey Senaryo 2 ile aynıdır; görüşmede oturum
+panelin kararıyla biter ve sonuç panelin sebep/statü bilgisini taşır.</p>
+<h3 id="71-başlangıç-ve-ilk-iki-adım">7.1 Başlangıç ve ilk iki adım<a class="headerlink" href="#71-başlangıç-ve-ilk-iki-adım" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Panelde akış sırası: <strong>Kimlik</strong> → <strong>Selfie</strong> → <strong>Görüntülü görüşme</strong>.</li>
+<li>Host kodu Senaryo 1–2 ile aynıdır.</li>
+<li>Kimlik ve Selfie Senaryo 2'deki gibi ilerler; bu adımlarda hak tükenirse oturum aynı şekilde
+  <code>moduleFailed</code> ile biter ve görüşme adımına hiç gelinmez.</li>
+</ul>
+<h3 id="72-görüşme-adımı">7.2 Görüşme adımı<a class="headerlink" href="#72-görüşme-adımı" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aşama</th>
+<th>Müşteri ne görür</th>
+<th>Host'a gelen</th>
+<th><code>onFinished</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bekleme odası</td>
+<td>Sıra bilgisi</td>
+<td><code>module.Call Wait Screen.presented</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Çağrı geliyor</td>
+<td>Zil + "Cevapla"</td>
+<td><code>call.connected</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Görüşme</td>
+<td>Temsilci ile görüntülü görüşme</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Temsilci kapatmaya hazırlanıyor</td>
+<td>"Görüşmeyi bitir" butonu kilitlenir</td>
+<td><code>delegate.disableEndCallButton()</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Temsilci karar verip kapatır</td>
+<td>—</td>
+<td><code>call.ended</code> (metadata: <code>reason</code>, <code>statusSummary</code>)</td>
+<td><strong>çağrılır</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="73-temsilci-onayladı">7.3 Temsilci onayladı<a class="headerlink" href="#73-temsilci-onayladı" title="Permanent link">&para;</a></h3>
+<p>Temsilci panelde olumlu statüyü seçip görüşmeyi kapatır. Soketten gelen:
+<code>terminateCall</code> · <code>terminateReason = NORMAL_CLOSE_BY_AGENT</code> · <code>statusSummary.type = positive</code>.</p>
+<ol>
+<li>SDK kararı sınıflandırır → oturumu bitiren bir karar.</li>
+<li><code>onFinished</code> <strong>karar anında</strong> çağrılır.</li>
+<li>Oturum kapatılır (socket <strong>4103</strong>), görüşme medyası bırakılır.</li>
+<li><code>showThankYouPage: false</code> → görüşme ekranı aşağı kayarak kalkar. (<code>true</code> → ThankYou "başarılı".)</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code> / <code>reason</code></td>
+<td><code>.approved</code> / <code>.agentDecision</code></td>
+</tr>
+<tr>
+<td><code>lastModule</code></td>
+<td><code>.waitScreen</code></td>
+</tr>
+<tr>
+<td><code>stepIndex</code> / <code>totalSteps</code></td>
+<td><code>3</code> / <code>3</code></td>
+</tr>
+<tr>
+<td><code>terminateReason</code></td>
+<td><code>"NORMAL_CLOSE_BY_AGENT"</code></td>
+</tr>
+<tr>
+<td><code>statusSummary</code></td>
+<td><code>id</code>, <code>type = "positive"</code>, <code>name_tr</code> … (panelde seçilen statü)</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>Akış sonucu — sonuç: approved, sebep: agentDecision, son modül: Call Wait Screen, adım: 3/3, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: positive (id …).
+Görüşme sonlandırma bildirimi alındı — sebep: NORMAL_CLOSE_BY_AGENT, panel statüsü: positive (id …)
+Sonlandırma sonucu: temsilci normal kapattı, oturum panelin statüsüyle bitiriliyor (positive)
+</code></pre></div>
+<h3 id="74-görüşmenin-diğer-sonları">7.4 Görüşmenin diğer sonları<a class="headerlink" href="#74-görüşmenin-diğer-sonları" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th><code>result / reason</code></th>
+<th><code>terminateReason</code> / <code>statusSummary</code></th>
+<th>Kapanış</th>
+<th>Ekran (<code>true</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temsilci reddetti (<code>negative</code>)</td>
+<td><code>rejected / agentDecision</code></td>
+<td>dolu</td>
+<td>4103</td>
+<td>ThankYou — tamamlanamadı</td>
+</tr>
+<tr>
+<td>Temsilci nötr statüyle kapattı (<code>neutral</code>)</td>
+<td><code>neutral / agentDecision</code></td>
+<td>dolu</td>
+<td>4103</td>
+<td>ThankYou — tamamlanamadı</td>
+</tr>
+<tr>
+<td>Temsilci şüpheli bir durum için tanımlı olumsuz statüyü seçti</td>
+<td><code>rejected / agentDecision</code></td>
+<td>dolu — <code>statusSummary.id</code> ile ayırın</td>
+<td>4103</td>
+<td>ThankYou — tamamlanamadı (sebep gösterilmez)</td>
+</tr>
+<tr>
+<td>Müşteri "Görüşmeyi bitir"e bastı</td>
+<td><code>notCompleted / userEndedCall</code></td>
+<td><code>nil</code></td>
+<td>4101</td>
+<td>ThankYou — tamamlanamadı</td>
+</tr>
+<tr>
+<td>Temsilci statü seçmeden kapattı / bağlantı sorunu</td>
+<td><strong>sonuç yok</strong> — Bağlantı Koptu → bekleme odası</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Çağrı cevaplanmadı / cevapsız çağrı</td>
+<td><strong>sonuç yok</strong> — bekleme odasında kalır</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Görüşme sırasında bağlantı koptu, yeniden bağlanıldı, panelin kayıtlı statüsü <code>positive</code></td>
+<td><code>approved / agentDecision</code></td>
+<td><code>statusSummary</code> dolu, <code>terminateReason</code> <code>nil</code></td>
+<td>4103</td>
+<td>ThankYou — başarılı</td>
+</tr>
+</tbody>
+</table>
+<p>Tüm <code>terminateReason</code> değerleri ve şüpheli kapanış örneği:
+<a href="../websocket/#görüşmenin-kapanışı--terminatecall">WebSocket → Görüşmenin Kapanışı</a>.</p>
+<h3 id="75-görüşme-akışın-ortasındaysa-kimlik--görüşme--imza">7.5 Görüşme akışın ortasındaysa (Kimlik → Görüşme → İmza)<a class="headerlink" href="#75-görüşme-akışın-ortasındaysa-kimlik--görüşme--imza" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Sonraki adım (İmza)</th>
+<th><code>onFinished</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temsilci karar verip kapattı (<code>terminateCall</code>)</td>
+<td><strong>Açılmaz</strong> — oturum görüşmede biter</td>
+<td><code>approved</code> / <code>rejected</code> / <code>neutral</code> · <code>agentDecision</code>, <code>lastModule = .waitScreen</code>, <code>stepIndex = 2/3</code></td>
+</tr>
+<tr>
+<td>Müşteri "Görüşmeyi bitir"e bastı</td>
+<td><strong>Açılmaz</strong></td>
+<td><code>notCompleted / userEndedCall</code>, <code>stepIndex = 2/3</code></td>
+</tr>
+<tr>
+<td>Görüşme <code>terminateCall</code> gelmeden kapandı (<code>endCall</code>)</td>
+<td><strong>Açılır</strong>, müşteri İmza'yı tamamlar</td>
+<td>akış sonunda <code>notCompleted / userEndedCall</code>, <code>lastModule = .signature</code>, <code>stepIndex = 3/3</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="76-host-kodu--görüşmeli-akış">7.6 Host kodu — görüşmeli akış<a class="headerlink" href="#76-host-kodu--görüşmeli-akış" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">reason</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(.</span><span class="n">approved</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">agentDecision</span><span class="p">):</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">approvedByAgent</span><span class="p">)</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(.</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">agentDecision</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">suspiciousStatusIds</span><span class="p">.</span><span class="bp">contains</span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">statusSummary</span><span class="p">?.</span><span class="n">id</span><span class="w"> </span><span class="p">??</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="n">fraud</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">sessionId</span><span class="p">,</span><span class="w"> </span><span class="n">statusId</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">statusSummary</span><span class="p">?.</span><span class="n">id</span><span class="p">)</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">failedGeneric</span><span class="p">)</span><span class="w">                         </span><span class="c1">// sebep müşteriye gösterilmez</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(.</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="kc">_</span><span class="p">),</span><span class="w"> </span><span class="p">(.</span><span class="n">neutral</span><span class="p">,</span><span class="w"> </span><span class="kc">_</span><span class="p">):</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">rejected</span><span class="p">(</span><span class="n">status</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">statusSummary</span><span class="p">?.</span><span class="n">name_tr</span><span class="p">))</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(.</span><span class="n">notCompleted</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">userEndedCall</span><span class="p">):</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">callEndedByUser</span><span class="p">)</span><span class="w">                       </span><span class="c1">// tekrar denemeyi önerin</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(.</span><span class="n">notCompleted</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">moduleFailed</span><span class="p">):</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">failedAt</span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">lastModule</span><span class="p">))</span><span class="w">          </span><span class="c1">// görüşmeye gelinmeden bitti</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">(.</span><span class="n">cancelled</span><span class="p">,</span><span class="w"> </span><span class="kc">_</span><span class="p">):</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">popToHome</span><span class="p">()</span>
+<span class="w">    </span><span class="k">default</span><span class="p">:</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">error</span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">errorMessage</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="8-modül-bazında-çıkış-kataloğu--her-modül-için-ne-olur">8) Modül bazında çıkış kataloğu — her modül için ne olur?<a class="headerlink" href="#8-modül-bazında-çıkış-kataloğu--her-modül-için-ne-olur" title="Permanent link">&para;</a></h2>
+<p>Senaryo 1'deki NFC örneğinin aynısı, <strong>her modül için</strong> ayrı ayrı. Bir modülü "X modülü" olarak
+düşünün: tablolar X'in akışta <strong>tek (ya da son) modül</strong> olduğu durumu anlatır. X akışın ortasındaysa
+"tamamlandı" ve "atlandı" satırlarında <code>onFinished</code> çağrılmaz, akış sıradaki modüle geçer; oturumu
+bitiren satırlar (hak bitti + atlama kapalı, ilk ekranda geri, uygulama kapatıldı) her konumda
+aynı sonucu verir, yalnızca <code>stepIndex</code> değişir.</p>
+<h3 id="80-tüm-modüllerde-ortak-olan-çıkışlar">8.0 Tüm modüllerde ortak olan çıkışlar<a class="headerlink" href="#80-tüm-modüllerde-ortak-olan-çıkışlar" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th><code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Müşteri adımı tamamladı ve sırada modül yok</td>
+<td><code>approved / allModulesCompleted</code>, <code>lastModule = X</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Akışın <strong>ilk</strong> ekranında geri butonu</td>
+<td><code>cancelled / userExited</code>, <code>lastModule = X</code></td>
+<td>4102</td>
+</tr>
+<tr>
+<td>Ara ekranda geri butonu</td>
+<td><strong>çağrılmaz</strong> — bir önceki modüle dönülür</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Uygulama kapatıldı</td>
+<td><code>cancelled / appTerminated</code>, <code>lastModule = X</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Bağlantı koptu / 30 sn'den uzun arka plan</td>
+<td><strong>çağrılmaz</strong> — Bağlantı Koptu, yeniden bağlanınca X baştan başlar</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Host <code>exitSDK()</code> / <code>forceQuitSDK()</code> çağırdı</td>
+<td><code>cancelled / hostExit</code> · <code>hostForceQuit</code></td>
+<td>4102 · 4103</td>
+</tr>
+</tbody>
+</table>
+<p>Modüller iki gruba ayrılır:</p>
+<ul>
+<li><strong>Karşılaştırmalı modüller</strong> — Kimlik, OVD, NFC, Selfie, Canlılık, Selfie + Canlılık. Sunucu
+  sonucu belgeyle ya da önceki verilerle karşılaştırır. Karşılaştırma hakkı vardır; hak biterse
+  panelde <strong>"sonuca rağmen modülü atla"</strong> ayarına göre modül atlanır ya da oturum <code>moduleFailed</code>
+  ile biter.</li>
+<li><strong>Karşılaştırmasız modüller</strong> — Hazırlık, Video kayıt, İmza, Konuşma, Adres. Hata olursa
+  kullanıcıya mesaj gösterilir ve <strong>aynı ekranda tekrar denenir</strong>; bu modüller oturumu kendiliğinden
+  bitirmez.</li>
+</ul>
+<p>Tüm modüllerde host'un yazacağı kod aynıdır; modüle göre ayrım <code>lastModule</code> ve <code>skippedModules</code>
+ile yapılır:</p>
+<div class="highlight"><pre><span></span><code><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">skippedModules</span><span class="p">.</span><span class="bp">isEmpty</span><span class="p">:</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">verified</span><span class="p">)</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="p">:</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">pendingReview</span><span class="p">(</span><span class="n">unverified</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">skippedModules</span><span class="p">))</span><span class="w">   </span><span class="c1">// hangi adımlar doğrulanmadı</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">notCompleted</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">neutral</span><span class="p">:</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">failed</span><span class="p">(</span><span class="n">at</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">lastModule</span><span class="p">))</span><span class="w">                      </span><span class="c1">// hangi adımda takıldı</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">cancelled</span><span class="p">:</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">popToHome</span><span class="p">()</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">error</span><span class="p">:</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">error</span><span class="p">(</span><span class="n">outcome</span><span class="p">.</span><span class="n">errorMessage</span><span class="p">))</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Loglardaki modül adları <code>SdkModules</code> ham değerleridir (<code>lastModule.rawValue</code>).</p>
+<hr />
+<h3 id="81-kimlik-idcard--log-adı-id-card">8.1 Kimlik (<code>idCard</code>) — log adı <code>Id Card</code><a class="headerlink" href="#81-kimlik-idcard--log-adı-id-card" title="Permanent link">&para;</a></h3>
+<p>Müşteri belge türünü seçer (kimlik / pasaport / diğer), ön ve arka yüzü çeker; OCR sonucu sunucuda
+karşılaştırılır.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Ekran (<code>showThankYouPage: true</code>)</th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Çekim ve karşılaştırma geçti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Veri uyuşmadı, hak var</td>
+<td>çağrılmaz — uyarı, tekrar çekim</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hak bitti, atlama izinli</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[idCard]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+</tr>
+<tr>
+<td>İlk ekranda (belge türü seçimi) geri</td>
+<td><code>cancelled / userExited</code></td>
+<td><code>[]</code></td>
+<td>Kök ekran</td>
+<td>4102</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>Akış sonucu — sonuç: notCompleted, sebep: moduleFailed, son modül: Id Card, adım: 1/1.
+</code></pre></div>
+<h3 id="82-kimlik-ovd-idcard_w_ovd--log-adı-id-card-ovd">8.2 Kimlik OVD (<code>idcard_w_ovd</code>) — log adı <code>Id Card OVD</code><a class="headerlink" href="#82-kimlik-ovd-idcard_w_ovd--log-adı-id-card-ovd" title="Permanent link">&para;</a></h3>
+<p>Ön yüz, hologram (ışık altında kartı çevirme) ve arka yüz adımlarıyla kimlik doğrulaması. Pasaport
+seçilirse panelde adım <code>Passport OVD</code> olarak görünür; <code>lastModule</code> yine <code>.idcard_w_ovd</code>'dir.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Ekran</th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tüm OVD adımları ve karşılaştırma geçti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Çekim koşulu sağlanmıyor (hareket, parlama, netlik)</td>
+<td>çağrılmaz — ekranda yönerge, çekim bekler</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Veri uyuşmadı, hak var</td>
+<td>çağrılmaz — uyarı, tekrar</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hak bitti, atlama izinli</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[idcard_w_ovd]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-nfc-nfc--log-adı-mrz--nfc-screen">8.3 NFC (<code>nfc</code>) — log adı <code>Mrz &amp; Nfc Screen</code><a class="headerlink" href="#83-nfc-nfc--log-adı-mrz--nfc-screen" title="Permanent link">&para;</a></h3>
+<p>Ayrıntılı anlatım Senaryo 1'dedir: <a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">5.7 NFC'de işler farklı giderse</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Çip okundu ve doğrulandı</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Veri uyuşmadı, hak var</td>
+<td>çağrılmaz — önceki adıma dönülür (NFC ilk ekransa ekranda kalınır)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hak bitti, atlama izinli</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>4101</td>
+</tr>
+<tr>
+<td>Çip okunamadı, <code>nfcMaxErrorCount</code> sınırı</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Manuel MRZ düzeltmesi üst üste başarısız</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td><strong>Cihazda NFC yok</strong></td>
+<td>Modül akışa alınmaz; akışta başka modül yoksa <code>approved</code>, <code>modules = []</code></td>
+<td><code>[nfc]</code></td>
+<td>4100</td>
+</tr>
+</tbody>
+</table>
+<h3 id="84-selfie-selfie--log-adı-selfie">8.4 Selfie (<code>selfie</code>) — log adı <code>Selfie</code><a class="headerlink" href="#84-selfie-selfie--log-adı-selfie" title="Permanent link">&para;</a></h3>
+<p>Müşteri yüzünü çeker; yüz, belgedeki vesikalıkla karşılaştırılır.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Ekran</th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Çekim ve yüz karşılaştırması geçti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Yüz uyuşmadı, hak var</td>
+<td>çağrılmaz — ipuçlarıyla tekrar çekim</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hak bitti, atlama izinli</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[selfie]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+</tr>
+<tr>
+<td>Kamera izni yok</td>
+<td>çağrılmaz — izin uyarısı; müşteri geri çıkabilir</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>Modül sonucu — Selfie: atlandı.
+Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Selfie, adım: 1/1, atlanan modüller: Selfie.
+</code></pre></div>
+<h3 id="85-canlılık-livenessdetection--log-adı-liveness-detection">8.5 Canlılık (<code>livenessDetection</code>) — log adı <code>Liveness Detection</code><a class="headerlink" href="#85-canlılık-livenessdetection--log-adı-liveness-detection" title="Permanent link">&para;</a></h3>
+<p>Müşteri ekrandaki yönergeleri (göz kırp, gülümse, başını çevir…) uygular; ekran kaydı yüklenir ve
+yüz karşılaştırması yapılır. ARKit yüz takibi ister.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Ekran</th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adımlar, kayıt ve karşılaştırma geçti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Kayıt izni yok / kayıt başlamadı / kesildi / yüklenemedi</td>
+<td>çağrılmaz — uyarı, test baştan</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Yüz uyuşmadı, hak var</td>
+<td>çağrılmaz — tekrar</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hak bitti, atlama izinli</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[livenessDetection]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+</tr>
+<tr>
+<td><strong>Cihaz yüz takibini desteklemiyor</strong>, <code>faceTrackingFallback = .selfie</code> (varsayılan)</td>
+<td>Canlılık yerine <strong>Selfie</strong> akışa girer; sonuç Selfie'ye göre üretilir</td>
+<td><code>[livenessDetection]</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Aynısı, <code>faceTrackingFallback = .skip</code></td>
+<td>Modül akıştan çıkarılır</td>
+<td><code>[livenessDetection]</code></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Canlılık kaydı panelde kapalıysa yükleme atlanır; adım yine tamamlanmış sayılır ve
+<code>skippedModules</code>'a eklenmez.</p>
+<h3 id="86-selfie--canlılık-selfiewithliveness--log-adı-selfie-with-liveness">8.6 Selfie + Canlılık (<code>selfieWithLiveness</code>) — log adı <code>Selfie With Liveness</code><a class="headerlink" href="#86-selfie--canlılık-selfiewithliveness--log-adı-selfie-with-liveness" title="Permanent link">&para;</a></h3>
+<p>Yüz ovale oturtulur, kısa canlılık kontrolü yapılır, selfie çekilip karşılaştırılır. Derinlik
+kullanımı <code>selfieWithLivenessTrueDepth</code> ile seçilir (<code>.automatic</code> · <code>.required</code> · <code>.disabled</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th><code>skippedModules</code></th>
+<th>Ekran</th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Çekim ve karşılaştırma geçti</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Yüz uyuşmadı, hak var</td>
+<td>çağrılmaz — ipuçlarıyla tekrar</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Hak bitti, atlama izinli</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td><code>[selfieWithLiveness]</code></td>
+<td>ThankYou — başarılı</td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Hak bitti, atlama kapalı</td>
+<td><code>notCompleted / moduleFailed</code></td>
+<td><code>[]</code></td>
+<td>ThankYou — tamamlanamadı</td>
+<td>4101</td>
+</tr>
+<tr>
+<td><strong>Cihaz seçilen modu desteklemiyor</strong> (akış kurulurken)</td>
+<td><code>faceTrackingFallback</code>'e göre Selfie gelir ya da modül çıkar</td>
+<td><code>[selfieWithLiveness]</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Cihazın desteklemediği ekranın içinde anlaşıldı</td>
+<td>Uyarıdan sonra ekran kapanır: ilk ekransa <code>cancelled / userExited</code>, değilse önceki modüle dönülür</td>
+<td><code>[]</code></td>
+<td></td>
+<td>4102</td>
+</tr>
+</tbody>
+</table>
+<h3 id="87-hazırlık-prepare--log-adı-prepare">8.7 Hazırlık (<code>prepare</code>) — log adı <code>Prepare</code><a class="headerlink" href="#87-hazırlık-prepare--log-adı-prepare" title="Permanent link">&para;</a></h3>
+<p>İzinlerin (kamera, mikrofon…) istendiği bilgilendirme adımı. Karşılaştırma yoktur.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Müşteri "Devam"a bastı</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>İlk ekranda geri</td>
+<td><code>cancelled / userExited</code></td>
+<td>4102</td>
+</tr>
+</tbody>
+</table>
+<p>Hazırlık çoğunlukla akışın ilk ekranıdır; müşteri daha başlamadan vazgeçtiğinde
+<code>cancelled / userExited</code> + <code>lastModule = .prepare</code> gelir.</p>
+<h3 id="88-video-kayıt-videorecord--log-adı-video-recorder">8.8 Video kayıt (<code>videoRecord</code>) — log adı <code>Video Recorder</code><a class="headerlink" href="#88-video-kayıt-videorecord--log-adı-video-recorder" title="Permanent link">&para;</a></h3>
+<p>Müşteri kısa bir video çeker; panelde okuma metni tanımlıysa metni sesli okur ve konuşma doğrulanır.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Video yüklendi (ve okuma doğrulandı)</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Okuma doğrulanamadı / konuşma algılanmadı</td>
+<td>çağrılmaz — mesaj, tekrar kayıt</td>
+<td></td>
+</tr>
+<tr>
+<td>Yükleme hatası</td>
+<td>çağrılmaz — mesaj, tekrar</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="89-imza-signature--log-adı-signature">8.9 İmza (<code>signature</code>) — log adı <code>Signature</code><a class="headerlink" href="#89-imza-signature--log-adı-signature" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>İmza yüklendi</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Yükleme hatası</td>
+<td>çağrılmaz — mesaj, tekrar</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="810-konuşma-speech--log-adı-speech-recognition">8.10 Konuşma (<code>speech</code>) — log adı <code>Speech Recognition</code><a class="headerlink" href="#810-konuşma-speech--log-adı-speech-recognition" title="Permanent link">&para;</a></h3>
+<p>Müşteri ekrandaki ifadeyi sesli söyler.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>İfade doğrulandı</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>İfade söylenmedi / tanınmadı</td>
+<td>çağrılmaz — mesaj, tekrar</td>
+<td></td>
+</tr>
+<tr>
+<td>Mikrofon izni yok</td>
+<td>çağrılmaz — izin uyarısı; müşteri geri çıkabilir</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="811-adres-addressconf--log-adı-address-confirm">8.11 Adres (<code>addressConf</code>) — log adı <code>Address Confirm</code><a class="headerlink" href="#811-adres-addressconf--log-adı-address-confirm" title="Permanent link">&para;</a></h3>
+<p>Müşteri adresini girer ve belge (PDF / fotoğraf) yükler.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th>Tek/son modülse <code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adres ve belge gönderildi</td>
+<td><code>approved / allModulesCompleted</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Dosya okunamadı / PDF boyut sınırını aştı / yükleme hatası</td>
+<td>çağrılmaz — mesaj, tekrar</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="812-görüntülü-görüşme-waitscreen--log-adı-call-wait-screen">8.12 Görüntülü görüşme (<code>waitScreen</code>) — log adı <code>Call Wait Screen</code><a class="headerlink" href="#812-görüntülü-görüşme-waitscreen--log-adı-call-wait-screen" title="Permanent link">&para;</a></h3>
+<p>Sonucu temsilci verir; ayrıntı <a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">7) Senaryo 3</a>
+ve <a href="../websocket/#görüşmenin-kapanışı--terminatecall">WebSocket → Görüşmenin Kapanışı</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Ne oldu</th>
+<th><code>onFinished</code></th>
+<th>Kapanış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temsilci onayladı / reddetti / nötr kapattı</td>
+<td><code>approved</code> · <code>rejected</code> · <code>neutral</code> / <code>agentDecision</code> + <code>terminateReason</code>, <code>statusSummary</code></td>
+<td>4103</td>
+</tr>
+<tr>
+<td>Müşteri "Görüşmeyi bitir"e bastı</td>
+<td><code>notCompleted / userEndedCall</code></td>
+<td>4101</td>
+</tr>
+<tr>
+<td>Görüşme <code>terminateCall</code> gelmeden kapandı, akış bitti</td>
+<td><code>notCompleted / userEndedCall</code></td>
+<td>4100</td>
+</tr>
+<tr>
+<td>Temsilci statü seçmeden / bağlantı sorunuyla kapattı</td>
+<td>çağrılmaz — Bağlantı Koptu → bekleme odası</td>
+<td></td>
+</tr>
+<tr>
+<td>Çağrı cevaplanmadı / cevapsız çağrı</td>
+<td>çağrılmaz — bekleme odasında kalır</td>
+<td></td>
+</tr>
+<tr>
+<td>Oda başka bir oturumda</td>
+<td><code>error / roomOccupied</code></td>
+<td>4120</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-kapanıştan-sonra-yönlendirme--kodu-nereye-yazacağım">9) Kapanıştan sonra yönlendirme — kodu nereye yazacağım?<a class="headerlink" href="#9-kapanıştan-sonra-yönlendirme--kodu-nereye-yazacağım" title="Permanent link">&para;</a></h2>
+<p>Kural: <strong>yönlendirmeyi <code>onFinished</code> içinde başlatın.</strong> Nasıl yapacağınız SDK'yı nasıl
+sunduğunuza ve sonuç ekranını isteyip istemediğinize bağlıdır.</p>
+<table>
+<thead>
+<tr>
+<th>Sunum</th>
+<th><code>showThankYouPage</code></th>
+<th>Yönlendirme nerede</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SDKFlowHostView</code> uygulamanın kökünde (örnek uygulamadaki gibi)</td>
+<td><code>false</code></td>
+<td><code>onFinished</code> → kök ekranınızın state'i</td>
+</tr>
+<tr>
+<td><code>SDKFlowHostView</code> bir <code>fullScreenCover</code> / modal içinde</td>
+<td><code>false</code></td>
+<td><code>onFinished</code> → kabı kapat + yönlendir</td>
+</tr>
+<tr>
+<td>UIKit <code>UIHostingController</code> ile sunulmuş</td>
+<td><code>false</code></td>
+<td><code>onFinished</code> → <code>dismiss(animated:)</code> tamamlanınca yönlendir</td>
+</tr>
+<tr>
+<td>Herhangi biri</td>
+<td><code>true</code> (sonuç ekranı görünsün)</td>
+<td><code>onFinished</code>'ta sonucu <strong>saklayın</strong>; kullanıcı ThankYou'daki butona basıp akış köke dönünce yönlendirin</td>
+</tr>
+<tr>
+<td>React Native / Flutter</td>
+<td>ikisi de</td>
+<td><code>session.finished</code> olayında</td>
+</tr>
+</tbody>
+</table>
+<h3 id="91-swiftui--sdk-uygulamanın-kökünde">9.1 SwiftUI — SDK uygulamanın kökünde<a class="headerlink" href="#91-swiftui--sdk-uygulamanın-kökünde" title="Permanent link">&para;</a></h3>
+<p><code>SDKFlowHostView</code> yığın boşken sizin kök view'ınızı (ör. giriş ekranı) çizer. <code>showThankYouPage: false</code>
+iken SDK son ekranı aşağı kaydırıp kaldırır ve kök view'ınız görünür; yönlendirme o view'ın
+state'idir:</p>
+<div class="highlight"><pre><span></span><code><span class="p">@</span><span class="n">MainActor</span>
+<span class="kr">final</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">KycLauncherViewModel</span><span class="p">:</span><span class="w"> </span><span class="n">ObservableObject</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">@</span><span class="n">Published</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">destination</span><span class="p">:</span><span class="w"> </span><span class="n">KycDestination</span><span class="p">?</span><span class="w">          </span><span class="c1">// kök view bunu gözler</span>
+
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="n">coordinator</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowCoordinator</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">coordinator</span><span class="p">.</span><span class="n">prepareForSetup</span><span class="p">()</span>
+<span class="w">        </span><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setupSDK</span><span class="p">(</span>
+<span class="w">            </span><span class="p">...,</span>
+<span class="w">            </span><span class="n">showThankYouPage</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">            </span><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="kr">weak</span><span class="w"> </span><span class="kc">self</span><span class="p">]</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span>
+<span class="w">                </span><span class="kc">self</span><span class="p">?.</span><span class="n">destination</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">KycDestination</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span><span class="w">   </span><span class="c1">// aşağı kayma animasyonuyla aynı anda</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="k">in</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">message</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">error</span><span class="p">?.</span><span class="n">errorMessages</span><span class="p">,</span><span class="w"> </span><span class="o">!</span><span class="n">message</span><span class="p">.</span><span class="bp">isEmpty</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// setupFailed ayrıca onFinished'a da gelir</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">socket</span><span class="p">?.</span><span class="n">isConnected</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">coordinator</span><span class="p">.</span><span class="n">start</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">struct</span><span class="w"> </span><span class="nc">LoginView</span><span class="p">:</span><span class="w"> </span><span class="n">View</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">@</span><span class="n">StateObject</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">vm</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">KycLauncherViewModel</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nv">body</span><span class="p">:</span><span class="w"> </span><span class="n">some</span><span class="w"> </span><span class="n">View</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">content</span>
+<span class="w">            </span><span class="p">.</span><span class="n">fullScreenCover</span><span class="p">(</span><span class="n">item</span><span class="p">:</span><span class="w"> </span><span class="err">$</span><span class="n">vm</span><span class="p">.</span><span class="n">destination</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">KycResultView</span><span class="p">(</span><span class="n">destination</span><span class="p">:</span><span class="w"> </span><span class="nv">$0</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">            </span><span class="c1">// ya da NavigationStack path'inize ekleyin</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="92-swiftui--sdk-bir-fullscreencover-içinde">9.2 SwiftUI — SDK bir <code>fullScreenCover</code> içinde<a class="headerlink" href="#92-swiftui--sdk-bir-fullscreencover-içinde" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="p">@</span><span class="n">State</span><span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">showKyc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">@</span><span class="n">State</span><span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">kycOutcome</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowOutcome</span><span class="p">?</span>
+
+<span class="p">.</span><span class="n">fullScreenCover</span><span class="p">(</span><span class="n">isPresented</span><span class="p">:</span><span class="w"> </span><span class="err">$</span><span class="n">showKyc</span><span class="p">,</span><span class="w"> </span><span class="n">onDismiss</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">outcome</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">kycOutcome</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">router</span><span class="p">.</span><span class="n">handleKyc</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w">   </span><span class="c1">// kap kapandıktan SONRA yönlendir</span>
+<span class="p">})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">KycFlowRoot</span><span class="p">()</span><span class="w">        </span><span class="c1">// içinde SDKFlowHostView; setupSDK(onFinished:) oradan çağrılır</span>
+<span class="p">}</span>
+
+<span class="c1">// setupSDK içinde:</span>
+<span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span>
+<span class="w">    </span><span class="n">kycOutcome</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outcome</span>
+<span class="w">    </span><span class="n">showKyc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">false</span><span class="w">      </span><span class="c1">// kabı kapat</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="93-uikit">9.3 UIKit<a class="headerlink" href="#93-uikit" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kr">final</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">KycCoordinator</span><span class="p">:</span><span class="w"> </span><span class="n">IdentifyFlowResultListener</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kr">weak</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">presenter</span><span class="p">:</span><span class="w"> </span><span class="bp">UIViewController</span><span class="p">?</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">host</span><span class="p">:</span><span class="w"> </span><span class="bp">UIViewController</span><span class="p">?</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">coordinator</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKFlowCoordinator</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">registry</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKViewRegistry</span><span class="p">()</span>
+
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="n">from</span><span class="w"> </span><span class="n">presenter</span><span class="p">:</span><span class="w"> </span><span class="bp">UIViewController</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kc">self</span><span class="p">.</span><span class="n">presenter</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">presenter</span>
+<span class="w">        </span><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">flowResultDelegate</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">self</span><span class="w">          </span><span class="c1">// setupSDK'dan ÖNCE</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">flow</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">SDKFlowHostView</span><span class="p">(</span><span class="n">coordinator</span><span class="p">:</span><span class="w"> </span><span class="n">coordinator</span><span class="p">,</span><span class="w"> </span><span class="n">registry</span><span class="p">:</span><span class="w"> </span><span class="n">registry</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">EmptyView</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">host</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">UIHostingController</span><span class="p">(</span><span class="n">rootView</span><span class="p">:</span><span class="w"> </span><span class="n">flow</span><span class="p">)</span>
+<span class="w">        </span><span class="n">host</span><span class="p">.</span><span class="n">modalPresentationStyle</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">.</span><span class="n">fullScreen</span>
+<span class="w">        </span><span class="n">presenter</span><span class="p">.</span><span class="n">present</span><span class="p">(</span><span class="n">host</span><span class="p">,</span><span class="w"> </span><span class="n">animated</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="kc">self</span><span class="p">.</span><span class="n">host</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">host</span>
+<span class="w">        </span><span class="c1">// setupSDK(..., showThankYouPage: false) ...</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">identifyFlowDidFinish</span><span class="p">(</span><span class="kc">_</span><span class="w"> </span><span class="n">outcome</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowOutcome</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">host</span><span class="p">?.</span><span class="n">dismiss</span><span class="p">(</span><span class="n">animated</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="kr">weak</span><span class="w"> </span><span class="kc">self</span><span class="p">]</span><span class="w"> </span><span class="k">in</span>
+<span class="w">            </span><span class="kc">self</span><span class="p">?.</span><span class="n">route</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span><span class="w">                                   </span><span class="c1">// kap kapandıktan sonra</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">func</span><span class="w"> </span><span class="nf">route</span><span class="p">(</span><span class="kc">_</span><span class="w"> </span><span class="n">outcome</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowOutcome</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">skippedModules</span><span class="p">.</span><span class="bp">isEmpty</span><span class="p">:</span>
+<span class="w">            </span><span class="n">presenter</span><span class="p">?.</span><span class="n">navigationController</span><span class="p">?.</span><span class="n">pushViewController</span><span class="p">(</span><span class="n">SuccessViewController</span><span class="p">(),</span><span class="w"> </span><span class="n">animated</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">neutral</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">notCompleted</span><span class="p">:</span>
+<span class="w">            </span><span class="n">presenter</span><span class="p">?.</span><span class="n">navigationController</span><span class="p">?.</span><span class="n">pushViewController</span><span class="p">(</span><span class="n">ReviewViewController</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">),</span><span class="w"> </span><span class="n">animated</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">cancelled</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">error</span><span class="p">:</span>
+<span class="w">            </span><span class="k">break</span><span class="w">                                                  </span><span class="c1">// kullanıcı bulunduğu ekranda kalır</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="94-sonuç-ekranı-görünsün-ardından-yönlendir-showthankyoupage-true">9.4 Sonuç ekranı görünsün, ardından yönlendir (<code>showThankYouPage: true</code>)<a class="headerlink" href="#94-sonuç-ekranı-görünsün-ardından-yönlendir-showthankyoupage-true" title="Permanent link">&para;</a></h3>
+<p><code>onFinished</code> sonuç ekranı <strong>açılırken</strong> gelir. Kabı o anda kapatırsanız kullanıcı ThankYou'yu
+görmez. Sonucu saklayın ve kullanıcı ThankYou'daki butona basıp akış köke döndüğünde
+yönlendirin:</p>
+<div class="highlight"><pre><span></span><code><span class="p">@</span><span class="n">State</span><span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="kd">var</span><span class="w"> </span><span class="nv">pendingOutcome</span><span class="p">:</span><span class="w"> </span><span class="n">SDKFlowOutcome</span><span class="p">?</span>
+
+<span class="n">SDKFlowHostView</span><span class="p">(</span><span class="n">coordinator</span><span class="p">:</span><span class="w"> </span><span class="n">coordinator</span><span class="p">,</span><span class="w"> </span><span class="n">registry</span><span class="p">:</span><span class="w"> </span><span class="n">registry</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">LoginView</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">.</span><span class="n">onChange</span><span class="p">(</span><span class="n">of</span><span class="p">:</span><span class="w"> </span><span class="n">coordinator</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="bp">isEmpty</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="bp">isEmpty</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span><span class="k">guard</span><span class="w"> </span><span class="bp">isEmpty</span><span class="p">,</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nv">outcome</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">pendingOutcome</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="n">pendingOutcome</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">        </span><span class="n">router</span><span class="p">.</span><span class="n">handleKyc</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="c1">// setupSDK içinde:</span>
+<span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">pendingOutcome</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="95-react-native--flutter">9.5 React Native / Flutter<a class="headerlink" href="#95-react-native--flutter" title="Permanent link">&para;</a></h3>
+<p>Köprüler <code>eventDelegate</code>'i dinler; sonuç <code>session.finished</code> olayında gelir:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">IdentifySdk</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">((</span><span class="nx">event</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">name</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">'session.finished'</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">endReason</span><span class="p">,</span><span class="w"> </span><span class="nx">skippedModules</span><span class="p">,</span><span class="w"> </span><span class="nx">terminateReason</span><span class="p">,</span><span class="w"> </span><span class="nx">statusId</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">event</span><span class="p">.</span><span class="nx">metadata</span><span class="p">;</span>
+<span class="w">  </span><span class="nx">navigation</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">result</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'approved'</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="nx">skippedModules</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">'KycSuccess'</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">'KycReview'</span><span class="p">,</span>
+<span class="w">                     </span><span class="p">{</span><span class="w"> </span><span class="nx">result</span><span class="p">,</span><span class="w"> </span><span class="nx">endReason</span><span class="p">,</span><span class="w"> </span><span class="nx">terminateReason</span><span class="p">,</span><span class="w"> </span><span class="nx">statusId</span><span class="w"> </span><span class="p">});</span>
+<span class="p">});</span>
+</code></pre></div>
+<p><code>skippedModules</code> metadata'da virgülle ayrılmış metin olarak gelir (boşsa anahtar yoktur).
+Kabı <code>&lt;Modal&gt;</code> ile sunuyorsanız <code>showThankYouPage: false</code> verip bu olayda <code>Modal</code>'ı kapatın.</p>
+<hr />
+<h2 id="10-kurallar-ve-tuzaklar">10) Kurallar ve tuzaklar<a class="headerlink" href="#10-kurallar-ve-tuzaklar" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Oturumun sonucu tektir.</strong> Aynı oturumda ikinci bir çağrı gelmez; <code>quitSDK</code> / <code>exitSDK</code> gibi
+  kapanış çağrıları sonuç zaten üretildiyse yeni bir sonuç üretmez.</li>
+<li><strong><code>onFinished</code> içinde <code>setupSDK</code> çağırmayın.</strong> Yeni oturumu yönlendirme tamamlandıktan sonra,
+  kullanıcı eylemiyle başlatın.</li>
+<li><strong><code>onFinished</code> içinde <code>exitSDK</code> / <code>forceQuitSDK</code> gerekmez</strong> — oturum kapanmış ya da kapanmaktadır.</li>
+<li><strong>Sonuç ekranını kendiniz gösterecekseniz <code>showThankYouPage: false</code> verin.</strong> Parametre
+  verilmezse varsayılan <code>true</code>'dur ve ThankYou açılır.</li>
+<li><strong>Karar sunucudadır.</strong> <code>approved</code> SDK tarafında akışın başarıyla bittiğini söyler; kritik iş
+  kararlarını (limit artırımı, hesap açma) sunucunuzdaki doğrulama sonucuna bağlayın.</li>
+<li><strong>Şüpheli/ret ayrımını statü id'siyle yapın</strong>, statü adıyla değil:
+  <a href="../websocket/#örnek-temsilci-şüpheli-bir-durum-görüp-görüşmeyi-sonlandırdı">WebSocket → Şüpheli kapanış örneği</a>.</li>
+<li><strong>Delegate weak tutulur.</strong> <code>flowResultDelegate</code>'e verdiğiniz nesneyi siz saklayın.</li>
+</ul>
+<hr />
+<h2 id="11-doğrulama-listesi">11) Doğrulama listesi<a class="headerlink" href="#11-doğrulama-listesi" title="Permanent link">&para;</a></h2>
+<p>Yayına çıkmadan önce en az şu çıkışları gerçek cihazda deneyin ve <code>onFinished</code> değerini
+loglayın:</p>
+<table>
+<thead>
+<tr>
+<th>Deneme</th>
+<th>Beklenen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Akışı sonuna kadar tamamla</td>
+<td><code>approved / allModulesCompleted</code>, <code>skippedModules</code> boş</td>
+</tr>
+<tr>
+<td>Görüşmede temsilci onaylasın / reddetsin</td>
+<td><code>approved</code> / <code>rejected</code> + <code>terminateReason</code>, <code>statusSummary</code></td>
+</tr>
+<tr>
+<td>Kullanıcı görüşmeyi bitirsin</td>
+<td><code>notCompleted / userEndedCall</code></td>
+</tr>
+<tr>
+<td>Bir modülde hakları bitir (atlama kapalı)</td>
+<td><code>notCompleted / moduleFailed</code>, <code>lastModule</code> doğru</td>
+</tr>
+<tr>
+<td>Bir modülde hakları bitir (atlama açık)</td>
+<td><code>approved</code>, <code>skippedModules</code> o modülü içerir</td>
+</tr>
+<tr>
+<td>İlk ekranda geri çık</td>
+<td><code>cancelled / userExited</code></td>
+</tr>
+<tr>
+<td>Geçersiz <code>identId</code></td>
+<td><code>error / setupFailed</code> + <code>errorMessage</code></td>
+</tr>
+<tr>
+<td><code>showThankYouPage: false</code></td>
+<td>Sonuç ekranı yok, SDK aşağı kayarak kapanır, yönlendirmeniz çalışır</td>
+</tr>
+<tr>
+<td>Uçak modu açıp kapat</td>
+<td><code>onFinished</code> <strong>çağrılmaz</strong>, Bağlantı Koptu ekranı gelir</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../events/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: Event Sistemi">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                Event Sistemi
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../theming/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: Tema">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                Tema
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

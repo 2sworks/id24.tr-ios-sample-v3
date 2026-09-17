@@ -1,0 +1,2081 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/events/">
+      
+      
+        <link rel="prev" href="../logging/">
+      
+      
+        <link rel="next" href="../session-exit/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Event Sistemi - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#event-sistemi--akışı-veriyle-izlemek" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Event Sistemi
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#iki-api-tek-akış" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İki API, Tek Akış
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hızlı-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hızlı Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdkevent--olayın-anatomisi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDKEvent — Olayın Anatomisi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SDKEvent — Olayın Anatomisi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tipik-olay-örüntüsü--modül-yaşam-döngüsü" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tipik Olay Örüntüsü — Modül Yaşam Döngüsü
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bağlantı--yaşam-döngüsü-olayları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bağlantı &amp; Yaşam Döngüsü Olayları
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oturum-sonucu-olayları-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Oturum Sonucu Olayları (3.1.0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eski-api--identifytrackinglistener" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eski API — IdentifyTrackingListener
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#canlı-görmek-için-sample-app-showcase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Canlı Görmek İçin: Sample App Showcase
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-mi-log-mu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event mi Log mu?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#iki-api-tek-akış" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        İki API, Tek Akış
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hızlı-başlangıç" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hızlı Başlangıç
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sdkevent--olayın-anatomisi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDKEvent — Olayın Anatomisi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SDKEvent — Olayın Anatomisi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tipik-olay-örüntüsü--modül-yaşam-döngüsü" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tipik Olay Örüntüsü — Modül Yaşam Döngüsü
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bağlantı--yaşam-döngüsü-olayları" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bağlantı &amp; Yaşam Döngüsü Olayları
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oturum-sonucu-olayları-310" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Oturum Sonucu Olayları (3.1.0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eski-api--identifytrackinglistener" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eski API — IdentifyTrackingListener
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#canlı-görmek-için-sample-app-showcase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Canlı Görmek İçin: Sample App Showcase
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event-mi-log-mu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event mi Log mu?
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="event-sistemi--akışı-veriyle-izlemek">Event Sistemi — Akışı Veriyle İzlemek<a class="headerlink" href="#event-sistemi--akışı-veriyle-izlemek" title="Permanent link">&para;</a></h1>
+<p>Kullanıcı hangi adımda? Selfie kaç kez başarısız oldu? Görüşme kuruldu mu? Bu soruların cevabı
+SDK'nın <strong>olay (event) akışındadır</strong>. Host uygulama bu akışa abone olup kendi analitik
+altyapısına (Firebase, Adjust, kendi paneliniz...) besleyebilir.</p>
+<p>← <a href="../../../">README'ye dön</a> · İlgili: <a href="../logging/">Loglama</a></p>
+<hr />
+<h2 id="iki-api-tek-akış">İki API, Tek Akış<a class="headerlink" href="#iki-api-tek-akış" title="Permanent link">&para;</a></h2>
+<p>Tarihsel olarak iki dinleyici vardır; ikisi de çalışır, <strong>yenisini öneririz</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Model</th>
+<th>Durum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SDKEventListener</code> (yeni)</td>
+<td>Zengin <code>SDKEvent</code> nesnesi</td>
+<td>✅ Önerilen</td>
+</tr>
+<tr>
+<td><code>IdentifyTrackingListener</code> (eski)</td>
+<td><code>TrackingEventType</code> enum'ı</td>
+<td>Korunuyor (geriye uyum)</td>
+</tr>
+</tbody>
+</table>
+<p>Eski <code>TrackingEventType</code> olayları, SDK içinde otomatik olarak yeni <code>SDKEvent</code> modeline
+köprülenir — yani yeni API'ye abone olduğunuzda <strong>eski enstrümantasyonun tamamını</strong> da alırsınız.</p>
+<hr />
+<h2 id="hızlı-başlangıç">Hızlı Başlangıç<a class="headerlink" href="#hızlı-başlangıç" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kr">final</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">MyAnalytics</span><span class="p">:</span><span class="w"> </span><span class="n">SDKEventListener</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">onSDKEvent</span><span class="p">(</span><span class="kc">_</span><span class="w"> </span><span class="n">event</span><span class="p">:</span><span class="w"> </span><span class="n">SDKEvent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Örnek: Firebase'e ilet</span>
+<span class="w">        </span><span class="n">Analytics</span><span class="p">.</span><span class="n">logEvent</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parameters</span><span class="p">:</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">toDictionary</span><span class="p">())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="nv">analytics</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">MyAnalytics</span><span class="p">()</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">eventDelegate</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">analytics</span><span class="w">   </span><span class="c1">// weak tutulur — referansı siz saklayın</span>
+</code></pre></div>
+<blockquote>
+<p><code>eventDelegate</code> <strong>weak</strong>'tir; dinleyicinizi kendi tarafınızda güçlü referansla yaşatın,
+yoksa sessizce serbest bırakılır ve olay gelmez.</p>
+</blockquote>
+<hr />
+<h2 id="sdkevent--olayın-anatomisi">SDKEvent — Olayın Anatomisi<a class="headerlink" href="#sdkevent--olayın-anatomisi" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Tip</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td><code>String</code></td>
+<td>Olay adı — <code>module.&lt;modül&gt;.&lt;durum&gt;</code> / <code>session.&lt;durum&gt;</code> (ör. <code>module.Selfie.completed</code>)</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td><code>SDKEventCategory</code></td>
+<td><code>session</code> · <code>module</code> · <code>call</code> · <code>network</code> · <code>error</code> · <code>navigation</code></td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td><code>SDKEventStatus</code></td>
+<td><code>info</code> · <code>presented</code> · <code>completed</code> · <code>failed</code> · <code>skipped</code> · <code>success</code> · <code>abandoned</code> · <code>notFound</code></td>
+</tr>
+<tr>
+<td><code>module</code></td>
+<td><code>String?</code></td>
+<td>İlgili modül</td>
+</tr>
+<tr>
+<td><code>screen</code></td>
+<td><code>String?</code></td>
+<td>İlgili ekran</td>
+</tr>
+<tr>
+<td><code>sessionId</code></td>
+<td><code>String</code></td>
+<td>Oturum kimliği — tüm olayları tek oturumda gruplamak için</td>
+</tr>
+<tr>
+<td><code>timestampMs</code></td>
+<td><code>Int64</code></td>
+<td>Olay zamanı (ms)</td>
+</tr>
+<tr>
+<td><code>message</code></td>
+<td><code>String?</code></td>
+<td>Açıklama</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>[String: String]</code></td>
+<td>Ek bağlam</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tipik-olay-örüntüsü--modül-yaşam-döngüsü">Tipik Olay Örüntüsü — Modül Yaşam Döngüsü<a class="headerlink" href="#tipik-olay-örüntüsü--modül-yaşam-döngüsü" title="Permanent link">&para;</a></h3>
+<p>Her modül dört temel durumdan geçer; funnel analizi doğrudan bunlarla kurulur:</p>
+<div class="highlight"><pre><span></span><code>presented ──► completed        (Happy path)
+          ├─► failed           (deneme başarısız — tekrar deneyebilir)
+          └─► skipped          (hak tükendi / modül atlandı)
+</code></pre></div>
+<p>NFC için ek bir durum vardır: <code>notFound</code> (çipsiz belge).
+Oturum düzeyinde ise <code>success</code> (akış bitti) ve <code>abandoned</code> (yarıda bırakıldı) görürsünüz.</p>
+<h3 id="bağlantı--yaşam-döngüsü-olayları">Bağlantı &amp; Yaşam Döngüsü Olayları<a class="headerlink" href="#bağlantı--yaşam-döngüsü-olayları" title="Permanent link">&para;</a></h3>
+<p>Soket/TURN kapanmaları ve ön/arka plan geçişleri de olay üretir:</p>
+<table>
+<thead>
+<tr>
+<th>Olay</th>
+<th>Kategori</th>
+<th>Ne zaman</th>
+<th>Önemli metadata</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>socket.closed</code></td>
+<td><code>network</code></td>
+<td>Her soket kapanışında (bilinçli ya da kopma)</td>
+<td><code>code</code> (4100+), <code>case</code>, <code>category</code>, <code>deliberate</code>, <code>reason</code></td>
+</tr>
+<tr>
+<td><code>turn.dropped</code></td>
+<td><code>call</code></td>
+<td>TURN/ICE düşmesinde (4140–4142)</td>
+<td>aynı alanlar</td>
+</tr>
+<tr>
+<td><code>session.background</code></td>
+<td><code>session</code></td>
+<td>Uygulama arka plana geçtiğinde</td>
+<td><code>timeoutSeconds</code>, <code>socketConnected</code></td>
+</tr>
+<tr>
+<td><code>session.foreground</code></td>
+<td><code>session</code></td>
+<td>Ön plana dönüşte</td>
+<td><code>elapsedSeconds</code>, <code>socketConnected</code></td>
+</tr>
+<tr>
+<td><code>app.background</code></td>
+<td><code>navigation</code></td>
+<td>(DefaultUI) arka plana geçiş — modül bilgisiyle</td>
+<td><code>state</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="oturum-sonucu-olayları-310">Oturum Sonucu Olayları (3.1.0)<a class="headerlink" href="#oturum-sonucu-olayları-310" title="Permanent link">&para;</a></h3>
+<p>Oturum nasıl biterse bitsin <strong>tam bir kez</strong> iki olay yayınlanır: sonucu taşıyan
+<code>session.finished</code> ve sonuca göre <code>session.completed</code> / <code>session.failed</code> / <code>session.abandoned</code>.
+Aynı sonuç <code>setupSDK(onFinished:)</code>, <code>IdentifyManager.shared.onFlowFinished</code> ve
+<code>flowResultDelegate</code> ile tipli (<code>SDKFlowOutcome</code>) olarak da alınır —
+<a href="../../../FULL-INTERGATION/#akış-sonucu--onfinished-310">FULL-INTERGATION → Akış Sonucu</a> ·
+tüm çıkış yolları ve yönlendirme: <a href="../session-exit/">Oturum Çıkışları</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Olay</th>
+<th><code>status</code></th>
+<th>Ne zaman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session.finished</code></td>
+<td>sonuca göre</td>
+<td>Her bitişte</td>
+</tr>
+<tr>
+<td><code>session.completed</code></td>
+<td><code>success</code></td>
+<td><code>result == approved</code></td>
+</tr>
+<tr>
+<td><code>session.failed</code></td>
+<td><code>failed</code></td>
+<td><code>rejected</code> · <code>neutral</code> · <code>notCompleted</code> · <code>error</code></td>
+</tr>
+<tr>
+<td><code>session.abandoned</code></td>
+<td><code>abandoned</code></td>
+<td><code>cancelled</code> (kullanıcı/host çıkışı, uygulama kapatıldı)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Metadata</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>result</code></td>
+<td><code>approved</code> · <code>rejected</code> · <code>neutral</code> · <code>notCompleted</code> · <code>cancelled</code> · <code>error</code></td>
+</tr>
+<tr>
+<td><code>endReason</code></td>
+<td><code>agentDecision</code> · <code>allModulesCompleted</code> · <code>userEndedCall</code> · <code>moduleFailed</code> · <code>userExited</code> · <code>hostQuit</code> · <code>hostExit</code> · <code>hostForceQuit</code> · <code>appTerminated</code> · <code>roomOccupied</code> · <code>connectionLost</code> · <code>setupFailed</code></td>
+</tr>
+<tr>
+<td><code>reason</code></td>
+<td>Panelin <code>terminateReason</code>'ı; yoksa <code>endReason</code> (3.0.0 uyumu)</td>
+</tr>
+<tr>
+<td><code>terminateReason</code>, <code>statusSummary</code>, <code>statusId</code></td>
+<td>Panel kapattıysa birebir</td>
+</tr>
+<tr>
+<td><code>lastScreen</code>, <code>lastModule</code>, <code>stepIndex</code>, <code>totalSteps</code></td>
+<td>Oturumun bittiği yer</td>
+</tr>
+<tr>
+<td><code>skippedModules</code></td>
+<td>Doğrulanmadan geçilen modüller, virgülle ayrılmış (boşsa anahtar yok)</td>
+</tr>
+<tr>
+<td><code>closeCode</code>, <code>errorMessage</code></td>
+<td>Son kapanış kodu / setup hatası</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>3.0.0'dan fark:</strong> <code>session.completed</code> / <code>session.failed</code> eskiden her <code>terminateCall</code>'da
+gönderiliyordu ve başarıyı <code>success</code>/<code>approve</code> içeren statüde arıyordu — panel <code>positive</code>
+gönderdiği için onaylanan oturumlar da <code>failed</code> görünüyordu. Artık yalnızca gerçek bir karar
+(ya da başka bir bitiş) gönderilir; karar içermeyen sonlandırmalar olay üretmez.</p>
+</blockquote>
+<p><code>status</code> alanı bilinçli kapanışlarda <code>info</code>, kopmalarda <code>failed</code> gelir. Kod
+tablosunun tamamı: <a href="../websocket/#birleşik-kapanma-kodları--sdksocketclosecode-4100">WebSocket rehberi → Birleşik Kapanma Kodları</a>.</p>
+<hr />
+<h2 id="eski-api--identifytrackinglistener">Eski API — IdentifyTrackingListener<a class="headerlink" href="#eski-api--identifytrackinglistener" title="Permanent link">&para;</a></h2>
+<p>Mevcut entegrasyonunuz varsa dokunmanıza gerek yok:</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">trackingDelegate</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">self</span><span class="w">   </span><span class="c1">// IdentifyTrackingListener</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nf">eventReceived</span><span class="p">(</span><span class="n">event</span><span class="p">:</span><span class="w"> </span><span class="n">TrackingEvent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p><code>TrackingEventType</code>, modül başına <code>...ModulePresented / Failed / Completed / Skipped</code>
+case'leri ile HTTP izleme olaylarını (<code>HTTP_REQUEST_TRACKING_EVENT</code>,
+<code>HTTP_RESPONSE_TRACKING_EVENT</code>) içerir. Yeni projede bunun yerine <code>SDKEventListener</code> kullanabilirisiniz.</p>
+<hr />
+<h2 id="canlı-görmek-için-sample-app-showcase">Canlı Görmek İçin: Sample App Showcase<a class="headerlink" href="#canlı-görmek-için-sample-app-showcase" title="Permanent link">&para;</a></h2>
+<p>Sample App'teki <strong>Event Journey</strong> ekranı (<code>Showcase/EventJourney/</code>), akış boyunca üretilen
+tüm olayları kronolojik bir zaman çizelgesinde gösterir. SDK'yı ilk kez tanıyorsanız bir
+oturumu baştan sona koşturup bu ekranı izlemek, olay modelini öğrenmenin en hızlı yoludur.
+<code>SDKEventRecorder</code>, <code>SDKEventListener</code>'ın örnek bir implementasyonudur — kopyalayıp
+kendi analitik köprünüze dönüştürebilirsiniz.</p>
+<hr />
+<h2 id="event-mi-log-mu">Event mi Log mu?<a class="headerlink" href="#event-mi-log-mu" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Ürün/analitik sorusu ("kaç kullanıcı NFC'de takıldı?") → <strong>Event</strong></li>
+<li>Teknik sorun ("NFC neden takıldı?") → <strong><a href="../logging/">Log</a></strong> (<code>nfc</code> kategorisi)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../logging/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: Loglama">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                Loglama
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../session-exit/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: Oturum Çıkışları">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                Oturum Çıkışları
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

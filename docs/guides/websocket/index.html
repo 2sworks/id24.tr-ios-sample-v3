@@ -1,0 +1,2723 @@
+
+<!doctype html>
+<html lang="tr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://2sworks.github.io/id24.tr-ios-sample-v3/docs/guides/websocket/">
+      
+      
+        <link rel="prev" href="../server-api/">
+      
+      
+        <link rel="next" href="../turn-webrtc/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>WebSocket - IdentifySDK iOS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#websocket--canlı-sinyal-kanalı" class="md-skip">
+          Ana içeriğe geç
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Başlık">
+    <a href="../../.." title="IdentifySDK iOS" class="md-header__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            IdentifySDK iOS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              WebSocket
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Koyu tema"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Koyu tema" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Acik tema"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Acik tema" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Ara" placeholder="Ara" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Ara">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Temizle" aria-label="Temizle" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Arama başlatılıyor
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigasyon" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="IdentifySDK iOS" class="md-nav__button md-logo" aria-label="IdentifySDK iOS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    IdentifySDK iOS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/2sworks/id24.tr-ios-sample-v3" title="Depoya git" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    id24.tr-ios-sample-v3
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Başlangıç
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../FULL-INTERGATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Full Integration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rehberler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Rehberler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mimari
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sunucu & API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WebSocket
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bağlantının-kurulması" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bağlantının Kurulması
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bağlantının Kurulması">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#socket_auth--tokenlı-bağlantı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        socket_auth — Token'lı Bağlantı
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aksiyon-kataloğu--sdkcallactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aksiyon Kataloğu — SDKCallActions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aksiyon Kataloğu — SDKCallActions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dinleme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dinleme
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modül--sunucu-sinyalleri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modül → Sunucu Sinyalleri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bağlantı-kopması-ve-toparlanma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bağlantı Kopması ve Toparlanma
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görüşmenin-kapanışı--terminatecall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görüşmenin Kapanışı — terminateCall
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Görüşmenin Kapanışı — terminateCall">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#host-bu-bilgiyi-nereden-alır" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Host bu bilgiyi nereden alır?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-hangi-değere-göre-ne-yapar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK hangi değere göre ne yapar?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#örnek-temsilci-şüpheli-bir-durum-görüp-görüşmeyi-sonlandırdı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Örnek: temsilci şüpheli bir durum görüp görüşmeyi sonlandırdı
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#birleşik-kapanma-kodları--sdksocketclosecode-4100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Birleşik Kapanma Kodları — SDKSocketCloseCode (4100+)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Birleşik Kapanma Kodları — SDKSocketCloseCode (4100+)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41004109--bilinçli-kapanışlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4100–4109 · Bilinçli kapanışlar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41104119--sunucuprotokol-kaynaklı-gelen-standart-kodun-etiketi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4110–4119 · Sunucu/protokol kaynaklı (gelen standart kodun etiketi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41304133--ağ-kaynaklı--hepsi-lostconnection-overlayini-tetikler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4130–4133 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41404142--turn--ice-webrtc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4140–4142 · TURN / ICE (WebRTC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arka-plan-zaman-aşımı-4105" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arka Plan Zaman Aşımı (4105)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soket-trafiğini-izleme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soket Trafiğini İzleme
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../turn-webrtc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TURN & WebRTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loglama
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Sistemi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-exit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Oturum Çıkışları
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theming/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-3.1.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.1.0 Değişiklikleri
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipad-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iPad Desteği
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../localization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lokalizasyon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Özelleştirme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity-scanner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdentityScanner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modüller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modüller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Genel Bakış
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Prepare/Prepare/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prepare
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCard/IdCard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/IdCardOVD/IdCardOVD/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IdCardOVD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/NFC/NFC/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NFC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Selfie/Selfie/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Selfie
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SelfieWithLiveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Liveness/Liveness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Liveness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Speech/Speech/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speech
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/Signature/Signature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/VideoRecorder/VideoRecorder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VideoRecorder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/AddressConfirm/AddressConfirm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AddressConfirm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/CallScreen/CallScreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CallScreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ThankYou/ThankYou/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ThankYou
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/SignLang/SignLang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SignLang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LostConnection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../IdentifySample/Modules/ReadAloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesli Okuma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Köprüler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Köprüler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/react-native/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    React Native
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integration/flutter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flutter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../CHANGELOG/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sürüm Geçmişi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="İçindekiler">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      İçindekiler
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#bağlantının-kurulması" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bağlantının Kurulması
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bağlantının Kurulması">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#socket_auth--tokenlı-bağlantı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        socket_auth — Token'lı Bağlantı
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aksiyon-kataloğu--sdkcallactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aksiyon Kataloğu — SDKCallActions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Aksiyon Kataloğu — SDKCallActions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dinleme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dinleme
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modül--sunucu-sinyalleri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modül → Sunucu Sinyalleri
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bağlantı-kopması-ve-toparlanma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bağlantı Kopması ve Toparlanma
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#görüşmenin-kapanışı--terminatecall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Görüşmenin Kapanışı — terminateCall
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Görüşmenin Kapanışı — terminateCall">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#host-bu-bilgiyi-nereden-alır" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Host bu bilgiyi nereden alır?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sdk-hangi-değere-göre-ne-yapar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SDK hangi değere göre ne yapar?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#örnek-temsilci-şüpheli-bir-durum-görüp-görüşmeyi-sonlandırdı" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Örnek: temsilci şüpheli bir durum görüp görüşmeyi sonlandırdı
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#birleşik-kapanma-kodları--sdksocketclosecode-4100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Birleşik Kapanma Kodları — SDKSocketCloseCode (4100+)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Birleşik Kapanma Kodları — SDKSocketCloseCode (4100+)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41004109--bilinçli-kapanışlar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4100–4109 · Bilinçli kapanışlar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41104119--sunucuprotokol-kaynaklı-gelen-standart-kodun-etiketi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4110–4119 · Sunucu/protokol kaynaklı (gelen standart kodun etiketi)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41304133--ağ-kaynaklı--hepsi-lostconnection-overlayini-tetikler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4130–4133 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#41404142--turn--ice-webrtc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4140–4142 · TURN / ICE (WebRTC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arka-plan-zaman-aşımı-4105" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arka Plan Zaman Aşımı (4105)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#soket-trafiğini-izleme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Soket Trafiğini İzleme
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="websocket--canlı-sinyal-kanalı">WebSocket — Canlı Sinyal Kanalı<a class="headerlink" href="#websocket--canlı-sinyal-kanalı" title="Permanent link">&para;</a></h1>
+<p>SDK, oturum boyunca backend ile açık bir WebSocket bağlantısı tutar. Gelen çağrı, SMS onayı,
+agent komutları, adım bildirimleri — hepsi bu kanaldan akar. Bu rehber bağlantının nasıl
+kurulduğunu, token güvenliğini (<code>socket_auth</code>), aksiyon kataloğunu ve <strong>bağlantı koptuğunda
+ne olduğunu</strong> anlatır.</p>
+<p>← <a href="../../../">README'ye dön</a> · İlgili: <a href="../server-api/">Sunucu &amp; API</a> · <a href="../turn-webrtc/">TURN &amp; WebRTC</a></p>
+<hr />
+<h2 id="bağlantının-kurulması">Bağlantının Kurulması<a class="headerlink" href="#bağlantının-kurulması" title="Permanent link">&para;</a></h2>
+<p>Soket adresi (<code>ws_url</code>) sizin verdiğiniz bir şey değildir; <code>connectToRoom</code> cevabından gelir.
+İstemci <a href="https://github.com/daltoniam/Starscream">Starscream</a> WebSocket'idir.</p>
+<div class="highlight"><pre><span></span><code>RoomResponse.ws_url ──► WebSocket(url:)
+                          │  socket_auth == "1" ise: ws_url + "?token=&lt;HMAC token&gt;"
+                          ▼
+                        connect() ──► sendFirstSubscribe()   (odaya kayıt)
+</code></pre></div>
+<p>Bağlantı denemesi ~30 saniye içinde başarısız olursa <code>setupSDK</code> callback'ine hata döner.</p>
+<h3 id="socket_auth--tokenlı-bağlantı"><code>socket_auth</code> — Token'lı Bağlantı<a class="headerlink" href="#socket_auth--tokenlı-bağlantı" title="Permanent link">&para;</a></h3>
+<p>Backend <code>socket_auth = "1"</code> gönderiyorsa, SDK soket URL'ine kısa ömürlü bir imzalı token ekler.
+Bunun çalışması için <code>setupSDK</code>'ya <strong><code>wsSecretKey</code></strong> vermeniz zorunludur.</p>
+<p>Token şu şekilde üretilir (bilgi amaçlı — hepsi SDK içinde otomatiktir):</p>
+<div class="highlight"><pre><span></span><code>payload   = "&lt;form_uid&gt;:&lt;şimdi + 60sn unix zaman&gt;:&lt;4 bayt rastgele hex&gt;"
+imza      = HMAC-SHA256(payload, wsSecretKey)     → hex
+token     = base64("payload.imza")
+soket URL = ws_url + "?token=" + token
+</code></pre></div>
+<p>Token 60 saniye geçerlidir; <strong>her reconnect'te otomatik olarak yenisi üretilir.</strong>
+<code>wsSecretKey</code> yanlışsa soket hiç bağlanmaz — Login aşamasında "WS key hatası" görürsünüz.</p>
+<hr />
+<h2 id="aksiyon-kataloğu--sdkcallactions">Aksiyon Kataloğu — <code>SDKCallActions</code><a class="headerlink" href="#aksiyon-kataloğu--sdkcallactions" title="Permanent link">&para;</a></h2>
+<p>Soketten gelen mesajlar <code>SDKCallActions</code> enum'ına çevrilir ve dinleyicilere iletilir.
+DefaultUI kullanıyorsanız bunların hepsi zaten hazır ekranlarca işlenir; kendi ekranınızı
+yazıyorsanız ilgilendiğiniz aksiyonları dinlersiniz.</p>
+<table>
+<thead>
+<tr>
+<th>Aksiyon</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>incomingCall</code></td>
+<td>Agent arıyor — çağrı ekranı açılmalı</td>
+</tr>
+<tr>
+<td><code>endCall</code></td>
+<td>Görüşme kapandı — <code>terminateCall</code> gelmediyse müşteri kapatmıştır (<a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">Görüşmenin Kapanışı</a>)</td>
+</tr>
+<tr>
+<td><code>missedCall</code></td>
+<td>Çağrı cevapsız kaldı — oturumu bitirmez, müşteri bekleme odasında kalır</td>
+</tr>
+<tr>
+<td><code>terminateCall(reason, statusSummary)</code></td>
+<td>Panel görüşmeyi sonlandırdı — sebep ve statüye göre oturum biter ya da yeniden bağlanmaya düşer (<a href="https://github.com/2sworks/id24.tr-ios-sample-v3/tree/main/docs/guides/">karar tablosu</a>)</td>
+</tr>
+<tr>
+<td><code>comingSms</code> / <code>approveSms(Bool)</code></td>
+<td>SMS doğrulama akışı</td>
+</tr>
+<tr>
+<td><code>openWarningCircle</code> / <code>closeWarningCircle</code></td>
+<td>Agent, müşteri ekranında uyarı çemberi açtı/kapadı</td>
+</tr>
+<tr>
+<td><code>openCardCircle</code> / <code>closeCardCircle</code></td>
+<td>Kimlik gösterme çemberi açıldı/kapandı</td>
+</tr>
+<tr>
+<td><code>photoTaken(String)</code></td>
+<td>Agent görüşme sırasında fotoğraf aldı</td>
+</tr>
+<tr>
+<td><code>updateQueue(sıra, toplam)</code></td>
+<td>Bekleme odasında sıra bilgisi güncellendi</td>
+</tr>
+<tr>
+<td><code>subscribed</code></td>
+<td>Odaya kayıt tamam</td>
+</tr>
+<tr>
+<td><code>subrejectedDismiss(String)</code></td>
+<td>Kayıt reddedildi (ör. süresi geçmiş ident)</td>
+</tr>
+<tr>
+<td><code>openNfcRemote(...)</code></td>
+<td>Agent, uzaktan NFC adımı başlattı</td>
+</tr>
+<tr>
+<td><code>editNfcProcess</code></td>
+<td>Agent, NFC verisinde düzeltme istedi</td>
+</tr>
+<tr>
+<td><code>startTransfer</code></td>
+<td>Görüşme başka agent'a aktarılıyor</td>
+</tr>
+<tr>
+<td><code>networkQuality(String)</code></td>
+<td>Bağlantı kalite bildirimi</td>
+</tr>
+<tr>
+<td><code>disableEndCallButton</code></td>
+<td>Müşterinin "görüşmeyi bitir" butonu kilitlendi</td>
+</tr>
+<tr>
+<td><code>imOffline</code></td>
+<td>Karşı taraf çevrimdışı</td>
+</tr>
+<tr>
+<td><code>connectionErr</code></td>
+<td><strong>Bağlantı koptu</strong> (aşağıya bakın)</td>
+</tr>
+<tr>
+<td><code>wrongSocketActionErr(String)</code></td>
+<td>Tanınmayan soket mesajı</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dinleme">Dinleme<a class="headerlink" href="#dinleme" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Soket aksiyonlarını dinlemek (host tarafı)</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">socketMessageListener</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">self</span><span class="w">   </span><span class="c1">// SDKSocketListener</span>
+
+<span class="kd">extension</span><span class="w"> </span><span class="nc">MyController</span><span class="p">:</span><span class="w"> </span><span class="n">SDKSocketListener</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">func</span><span class="w"> </span><span class="nf">listenSocketMessage</span><span class="p">(</span><span class="n">message</span><span class="p">:</span><span class="w"> </span><span class="n">SDKCallActions</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">connectionErr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>DefaultUI'da <code>SDKFlowCoordinator</code> bu dinleyiciyi zaten yönetir; CallScreen gibi
+dinleyiciyi devralan ekranlar ayrılırken <code>coordinator.restoreSocketListener()</code> çağırır.</p>
+</blockquote>
+<hr />
+<h2 id="modül--sunucu-sinyalleri">Modül → Sunucu Sinyalleri<a class="headerlink" href="#modül--sunucu-sinyalleri" title="Permanent link">&para;</a></h2>
+<p>Soket yalnızca sunucudan komut almak için değildir; SDK her modül geçişinde durum bildirir:</p>
+<table>
+<thead>
+<tr>
+<th>Sinyal</th>
+<th>Ne zaman gider</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sendStep()</code></td>
+<td>Modül adımı tamamlandı / konum değişti</td>
+</tr>
+<tr>
+<td><code>sendPreparetatus(isCompleted:)</code></td>
+<td>Hazırlık modülü sonucu</td>
+</tr>
+<tr>
+<td><code>sendSpeechStatus(isCompleted:)</code></td>
+<td>Konuşma modülü sonucu</td>
+</tr>
+<tr>
+<td><code>modulePresented</code> (adım bildirimi)</td>
+<td><code>advanceToNextModule()</code> içinde</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bu yüzden custom ekranlar SDK VM metotlarını atlayamaz</strong> — kendi navigasyonunuzu kurarsanız
+bu sinyaller gitmez ve agent panelinde akış "takılı" görünür.
+Ayrıntı: <a href="../customization/#bypass-yok-kuralı">Özelleştirme → bypass yok kuralı</a>.</p>
+<hr />
+<h2 id="bağlantı-kopması-ve-toparlanma">Bağlantı Kopması ve Toparlanma<a class="headerlink" href="#bağlantı-kopması-ve-toparlanma" title="Permanent link">&para;</a></h2>
+<p>SDK, kopmayı <strong>iki bağımsız kaynaktan</strong> tespit eder:</p>
+<ol>
+<li><strong>Reachability izleyicisi</strong> — oturum başlarken açılır; internet <code>.notReachable</code>
+   olursa (ve KYC bitmemişse) devreye girer.</li>
+<li><strong>Soket kopması</strong> — Starscream disconnect bildirimi.</li>
+</ol>
+<p>İki kaynak da aynı kapıya çıkar: <code>.connectionErr</code> <strong>yalnızca bir kez</strong> yayınlanır
+(tekrarlar bastırılır), başarılı yeniden bağlantıda bayrak sıfırlanır.</p>
+<div class="highlight"><pre><span></span><code>internet gitti ──┐
+                 ├──► emitConnectionLost() ──► .connectionErr ──► LostConnection overlay
+soket koptu   ───┘         (tek sefer)
+                                                    │ kullanıcı "Tekrar Bağlan"
+                                                    ▼
+                                          reconnectToSocket()
+                                            ├─ socket_auth ise yeni token üret
+                                            ├─ sendImOnline + sendReconnectSubscribe
+                                            ├─ (görüşme ekranındaysa) WebRTC yeniden kur + sendStep
+                                            └─ kaldığı modülden devam
+</code></pre></div>
+<p><code>reconnectToSocket</code> eşzamanlı çift çağrıya karşı korumalıdır (<code>isReconnecting</code> guard'ı).
+Kullanıcı deneyimi tarafı için: <a href="../../../IdentifySample/Modules/LostConnection/LostConnection/">LostConnection rehberi</a>.</p>
+<hr />
+<h2 id="görüşmenin-kapanışı--terminatecall">Görüşmenin Kapanışı — <code>terminateCall</code><a class="headerlink" href="#görüşmenin-kapanışı--terminatecall" title="Permanent link">&para;</a></h2>
+<p>Panel görüşmeyi <strong>yalnızca <code>terminateCall</code></strong> ile bitirir. Temsilci kapatmaya hazırlanırken önce
+<code>disableEndCallButton</code> gönderir (müşterinin "Görüşmeyi bitir" butonu kilitlenir), ardından her
+durumda <code>terminateCall</code> gelir. <code>terminateCall</code> gelmeden kapanan görüşmeyi müşteri kapatmıştır.</p>
+<p>Mesaj iki bilgi taşır:</p>
+<table>
+<thead>
+<tr>
+<th>Alan</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>terminateReason</code></td>
+<td>Görüşmenin <strong>nasıl</strong> kapandığı (ör. <code>NORMAL_CLOSE_BY_AGENT</code>)</td>
+</tr>
+<tr>
+<td><code>statusSummary</code></td>
+<td>Temsilcinin panelde seçtiği <strong>karar</strong>: <code>id</code>, <code>type</code> (<code>positive</code> · <code>negative</code> · <code>neutral</code>), <code>status</code>, <code>name_tr</code> / <code>name_en</code> / <code>name_de</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>type</code> kararın yönünü, <code>id</code> ise <strong>hangi</strong> statünün seçildiğini söyler. Statü listesi (ve
+id'leri) panelde tanımlanır; SDK statü adlarına bakmaz, yalnızca <code>type</code> ve aşağıdaki sabit
+id'leri yorumlar.</p>
+<h3 id="host-bu-bilgiyi-nereden-alır">Host bu bilgiyi nereden alır?<a class="headerlink" href="#host-bu-bilgiyi-nereden-alır" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kanal</th>
+<th>Ne zaman gelir</th>
+<th>Ne taşır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>setupSDK(onFinished:)</code> / <code>onFlowFinished</code> / <code>flowResultDelegate</code></td>
+<td>Yalnızca <strong>oturumu bitiren</strong> kapanışlarda, bir kez</td>
+<td><code>result</code>, <code>reason = .agentDecision</code>, <code>terminateReason</code> ve <code>statusSummary</code> birebir</td>
+</tr>
+<tr>
+<td><code>eventDelegate</code> → <code>session.finished</code></td>
+<td>Aynı an</td>
+<td>metadata: <code>result</code>, <code>endReason</code>, <code>terminateReason</code>, <code>statusSummary</code>, <code>statusId</code></td>
+</tr>
+<tr>
+<td><code>eventDelegate</code> → <code>call.ended</code></td>
+<td><strong>Her</strong> <code>terminateCall</code>'da</td>
+<td>metadata: <code>reason</code>, <code>statusSummary</code> (type)</td>
+</tr>
+<tr>
+<td><code>delegate.terminateCall(terminateReason:statusSummaryType:)</code></td>
+<td><strong>Her</strong> <code>terminateCall</code>'da, ham</td>
+<td>sebep + <code>type</code></td>
+</tr>
+<tr>
+<td><code>socketMessageListener</code> → <code>.terminateCall(reason, type)</code></td>
+<td><strong>Her</strong> <code>terminateCall</code>'da, ham</td>
+<td>sebep + <code>type</code> (DefaultUI'da görüşme ekranı devralır)</td>
+</tr>
+<tr>
+<td><code>IdentifyManager.shared.lastStatusSummary</code></td>
+<td>Son <code>terminateCall</code>'dan sonra</td>
+<td>tüm <code>StatusSummary</code> (id dahil)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Sonuca göre iş yapacaksanız <code>onFinished</code> kullanın: ham kanallar karar içermeyen, yeniden
+bağlanmaya düşen kapanışlarda da tetiklenir.</p>
+</blockquote>
+<h3 id="sdk-hangi-değere-göre-ne-yapar">SDK hangi değere göre ne yapar?<a class="headerlink" href="#sdk-hangi-değere-göre-ne-yapar" title="Permanent link">&para;</a></h3>
+<p>Kural <code>SDKTerminateClassifier</code> içindedir ve <strong>yukarıdan aşağı ilk eşleşen satır</strong> uygulanır.
+Varsayılan görüşme ekranı ve <code>onFinished</code> aynı kuralı kullanır.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th><code>terminateReason</code></th>
+<th>Koşul</th>
+<th>SDK ne yapar</th>
+<th>Ekran</th>
+<th><code>onFinished</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>TURN_DISCONNECTED</code> · <code>RINGING_TIMEOUT</code></td>
+<td>— (bu değerleri panel değil <strong>SDK üretir</strong>: medya hattı düştü / çağrı yanıtlanmadı)</td>
+<td>Yeniden bağlanma ekranı; socket 4104 / 4108 ile kapanır</td>
+<td>Bağlantı Koptu</td>
+<td>— (oturum sürer)</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>NORMAL_CLOSE_BY_AGENT</code></td>
+<td><code>type</code> karar (<code>positive</code> · <code>negative</code> · <code>neutral</code>) <strong>ve</strong> <code>id ≠ -3</code></td>
+<td>Oturum biter, SDK kapanır (4103)</td>
+<td>ThankYou: <code>positive</code> → başarılı, diğerleri → tamamlanamadı · <code>showThankYouPage: false</code> ise ekran yok</td>
+<td><code>approved</code> · <code>rejected</code> · <code>neutral</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>NORMAL_CLOSE_BY_AGENT</code></td>
+<td><code>id == -3</code> ("Durum Seçilmedi") <strong>ya da</strong> statü yok / tanınmayan <code>type</code></td>
+<td>Karar yok: yeniden bağlanma → bekleme odası</td>
+<td>Bağlantı Koptu</td>
+<td>—</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>ADMIN_DISCONNECTED_TURN</code> · <code>AGENT_SOCKET_NETWORK_PROBLEM</code> · <code>AGENT_FORCE_DISCONNECT_FOR_AUTO_CLOSE</code> · <code>UNKNOW</code> / <code>UNKNOWN</code></td>
+<td>Statüden <strong>bağımsız</strong> (panelin otomatik yazdığı <code>id 8</code> "Müşteri cevap vermedi", <code>negative</code> dahil)</td>
+<td>Temsilci hüküm vermemiştir: yeniden bağlanma → bekleme odası</td>
+<td>Bağlantı Koptu</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>CLIENT_IS_DISCONNECTED</code></td>
+<td>Socket açıksa</td>
+<td>Panelin yanlış alarmı sayılır, görüşme <strong>sürer</strong></td>
+<td>değişmez</td>
+<td>—</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Socket kapalıysa</td>
+<td>Yeniden bağlanma</td>
+<td>Bağlantı Koptu</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Diğer tüm değerler (ör. <code>PING_TIMEOUT</code>)</td>
+<td><code>type</code> karar ise</td>
+<td>Oturum biter (satır 2 gibi)</td>
+<td>ThankYou</td>
+<td><code>approved</code> · <code>rejected</code> · <code>neutral</code></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Karar yoksa</td>
+<td>Yeniden bağlanma (<code>PING_TIMEOUT</code> → 4107, diğerleri 4104)</td>
+<td>Bağlantı Koptu</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Sabit statü id'leri:</p>
+<table>
+<thead>
+<tr>
+<th><code>id</code></th>
+<th>Anlamı</th>
+<th>SDK'nın yorumu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-3</code></td>
+<td>Durum Seçilmedi</td>
+<td>Karar değildir — <code>type</code> gelse bile oturumu bitirmez</td>
+</tr>
+<tr>
+<td><code>-4</code></td>
+<td>Auto Approved</td>
+<td><code>positive</code> tipinde gelir; yeniden bağlanmada da oturumu bitirir</td>
+</tr>
+<tr>
+<td><code>8</code></td>
+<td>Müşteri cevap vermedi</td>
+<td>Panelin otomatik etiketi; satır 4'teki sebeplerle geldiğinde karar sayılmaz</td>
+</tr>
+</tbody>
+</table>
+<p>Yeniden bağlanma sonrası panelin kayıtlı statüsü sorgulanır (<code>SendIdentStatusInfo</code>). Bu bir
+<strong>sorgudur</strong>, karar değildir: yalnızca <code>positive</code> oturumu bitirir (<code>onFinished</code> → <code>approved</code>);
+<code>negative</code>, <code>neutral</code> ve <code>-3</code> müşteriyi bekleme odasına döndürür. Olumsuz karar gerekiyorsa
+panel <code>terminateCall</code> gönderir.</p>
+<p>Kapanış dışı ilgili aksiyonlar:</p>
+<table>
+<thead>
+<tr>
+<th>Aksiyon</th>
+<th>SDK ne yapar</th>
+<th><code>onFinished</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>missedCall</code></td>
+<td>Oturumu <strong>bitirmez</strong>, zil susar, müşteri bekleme odasında kalır</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>endCall</code> (<code>terminateCall</code> olmadan)</td>
+<td>Görüşmeyi müşteri kapatmıştır; akış sıradaki modüle, yoksa ThankYou'ya (tamamlanamadı) geçer</td>
+<td>akış sonunda <code>notCompleted</code> / <code>userEndedCall</code></td>
+</tr>
+<tr>
+<td>Müşteri "Görüşmeyi bitir"e basar</td>
+<td>Panele <code>terminateCallOnMobile</code> gider, SDK kapanır</td>
+<td><code>notCompleted</code> / <code>userEndedCall</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="örnek-temsilci-şüpheli-bir-durum-görüp-görüşmeyi-sonlandırdı">Örnek: temsilci şüpheli bir durum görüp görüşmeyi sonlandırdı<a class="headerlink" href="#örnek-temsilci-şüpheli-bir-durum-görüp-görüşmeyi-sonlandırdı" title="Permanent link">&para;</a></h3>
+<p>Temsilci görüşme sırasında şüpheli bir durum görür (ör. belge ile yüz uyuşmuyor, ekrandan
+gösterilen belge) ve panelde bu durum için tanımlı <strong>olumsuz</strong> statüyü seçerek görüşmeyi
+kapatır. Soketten şuna benzer bir mesaj gelir (statü adı ve id'si panelinizdeki tanıma göre
+değişir):</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"terminateCall"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"terminateReason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NORMAL_CLOSE_BY_AGENT"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"statusSummary"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"negative"</span><span class="p">,</span><span class="w"> </span><span class="nt">"name_tr"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Şüpheli İşlem"</span><span class="p">,</span><span class="w"> </span><span class="nt">"name_en"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Suspicious Transaction"</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>SDK'nın yaptıkları (tablodaki satır 2):</p>
+<ol>
+<li>Oturum biter; socket kapatılır, görüşme medyası bırakılır.</li>
+<li><code>onFinished</code> <strong>karar anında</strong> çağrılır: <code>result = .rejected</code>, <code>reason = .agentDecision</code>,
+   <code>terminateReason = "NORMAL_CLOSE_BY_AGENT"</code>, <code>statusSummary</code> mesajdaki haliyle.</li>
+<li>Müşteriye ThankYou "tamamlanamadı" gösterilir — <strong>şüphe sebebi müşteriye gösterilmez</strong>.
+   <code>showThankYouPage: false</code> ise ekran açılmaz, SDK aşağı kayarak kapanır.</li>
+<li><code>sdk_logs</code>'a sebep, statü ve id ile yazılır:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>Akış sonucu — sonuç: rejected, sebep: agentDecision, son modül: Call Wait Screen, adım: 5/5, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12).
+Görüşme sonlandırma bildirimi alındı — sebep: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12)
+Sonlandırma sonucu: temsilci normal kapattı, oturum panelin statüsüyle bitiriliyor (negative)
+Oturum sonlandı — son modül: Call Wait Screen, akış tamamlandı, sebep: 4103 (forceQuit): forceQuitSDK — zorla kapatma
+</code></pre></div>
+<p>Host tarafında şüpheli kapanışı diğer retlerden <strong>statü id'si</strong> ile ayırın (adlar
+yerelleştirilir ve panelde değiştirilebilir; <code>type</code> yalnızca yönü söyler):</p>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nv">suspiciousStatusIds</span><span class="p">:</span><span class="w"> </span><span class="n">Set</span><span class="p">&lt;</span><span class="nb">Int</span><span class="p">&gt;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="w">   </span><span class="c1">// panelinizdeki "şüpheli" statülerinin id'leri</span>
+
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">setupSDK</span><span class="p">(</span>
+<span class="w">    </span><span class="p">...,</span>
+<span class="w">    </span><span class="n">onFinished</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">outcome</span><span class="w"> </span><span class="k">in</span>
+<span class="w">        </span><span class="k">guard</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">reason</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="p">.</span><span class="n">agentDecision</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">handleOther</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nv">statusId</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">statusSummary</span><span class="p">?.</span><span class="n">id</span>
+
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">approved</span><span class="p">:</span>
+<span class="w">            </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">kycSuccess</span><span class="p">)</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">rejected</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">statusId</span><span class="p">.</span><span class="bp">map</span><span class="p">(</span><span class="n">suspiciousStatusIds</span><span class="p">.</span><span class="bp">contains</span><span class="p">)</span><span class="w"> </span><span class="p">==</span><span class="w"> </span><span class="kc">true</span><span class="p">:</span>
+<span class="w">            </span><span class="n">fraudService</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">sessionId</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">sessionId</span><span class="p">,</span><span class="w"> </span><span class="n">statusId</span><span class="p">:</span><span class="w"> </span><span class="n">statusId</span><span class="p">,</span>
+<span class="w">                              </span><span class="n">reason</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">terminateReason</span><span class="p">)</span>
+<span class="w">            </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">kycFailedGeneric</span><span class="p">)</span><span class="w">          </span><span class="c1">// müşteriye sebep gösterilmez</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="p">.</span><span class="n">rejected</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">neutral</span><span class="p">:</span>
+<span class="w">            </span><span class="n">router</span><span class="p">.</span><span class="n">show</span><span class="p">(.</span><span class="n">kycFailed</span><span class="p">(</span><span class="n">statusName</span><span class="p">:</span><span class="w"> </span><span class="n">outcome</span><span class="p">.</span><span class="n">statusSummary</span><span class="p">?.</span><span class="n">name_tr</span><span class="p">))</span>
+<span class="w">        </span><span class="k">default</span><span class="p">:</span>
+<span class="w">            </span><span class="k">break</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">socket</span><span class="p">,</span><span class="w"> </span><span class="n">room</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Olay akışıyla (RN/Flutter köprüleri dahil) aynı ayrım <code>session.finished</code> olayının
+<code>metadata.result == "rejected"</code> ve <code>metadata.statusId</code> alanlarıyla yapılır.</p>
+<hr />
+<h2 id="birleşik-kapanma-kodları--sdksocketclosecode-4100">Birleşik Kapanma Kodları — <code>SDKSocketCloseCode</code> (4100+)<a class="headerlink" href="#birleşik-kapanma-kodları--sdksocketclosecode-4100" title="Permanent link">&para;</a></h2>
+<p>Soket ve TURN kapanmalarının <strong>tamamı</strong> SDK'ya özel tek bir kod uzayında toplanır
+(RFC 6455'in "private use" 4000–4999 aralığı). Son kapanışı okumak için:</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">lastSocketCloseCode</span><span class="w">          </span><span class="c1">// SDKSocketCloseCode?</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">lastSocketCloseCode</span><span class="p">?.</span><span class="n">rawValue</span><span class="w"> </span><span class="c1">// örn. 4105</span>
+</code></pre></div>
+<p>Ayrıca her kapanışta <code>socket.closed</code> (TURN için <code>turn.dropped</code>) SDKEvent'i yayınlanır —
+metadata'da <code>code</code>, <code>case</code>, <code>category</code>, <code>deliberate</code> ve varsa <code>reason</code> bulunur.
+Detay: <a href="../events/">Event Sistemi</a>.</p>
+<h3 id="41004109--bilinçli-kapanışlar">4100–4109 · Bilinçli kapanışlar<a class="headerlink" href="#41004109--bilinçli-kapanışlar" title="Permanent link">&para;</a></h3>
+<p>SDK'nın kendisi kapatır; kod <strong>close frame ile sunucuya da gider</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Case</th>
+<th>Ne zaman</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4100</td>
+<td><code>flowCompleted</code></td>
+<td>Son modül tamamlandı, teşekkür ekranına geçiliyor</td>
+</tr>
+<tr>
+<td>4101</td>
+<td><code>hostQuit</code></td>
+<td><code>quitSDK()</code></td>
+</tr>
+<tr>
+<td>4102</td>
+<td><code>hostExit</code></td>
+<td><code>exitSDK()</code></td>
+</tr>
+<tr>
+<td>4103</td>
+<td><code>forceQuit</code></td>
+<td><code>forceQuitSDK()</code></td>
+</tr>
+<tr>
+<td>4104</td>
+<td><code>reconnectCycle</code></td>
+<td>Reconnect öncesi eski bağlantının kapatılması</td>
+</tr>
+<tr>
+<td>4105</td>
+<td><code>backgroundTimeout</code></td>
+<td>Uygulama arka planda limit süreyi aştı (aşağıya bakın)</td>
+</tr>
+<tr>
+<td>4106</td>
+<td><code>callCompleted</code></td>
+<td>Görüşme tamamlandı; sonraki modüle geçiliyor (<code>disconnectSocket(reason:)</code>)</td>
+</tr>
+<tr>
+<td>4107</td>
+<td><code>pingTimeout</code></td>
+<td><em>Rezerve</em> — ölü bağlantı tespiti bu sürümde 4109 ile yapılır</td>
+</tr>
+<tr>
+<td>4108</td>
+<td><code>ringingTimeout</code></td>
+<td>Çağrı çaldı ama <code>ringingTimeout</code> (varsayılan 300 sn) boyunca yanıtlanmadı</td>
+</tr>
+<tr>
+<td>4109</td>
+<td><code>heartbeatTimeout</code></td>
+<td>Ardışık 3 PING'e PONG gelmedi — bağlantı ölü kabul edildi</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong>Sürüm notu:</strong> <code>4106</code> daha önce <code>heartbeatTimeout</code> idi. Heartbeat zaman aşımı
+<strong>4109</strong>'a taşındı, 4106 artık <code>callCompleted</code>. Sunucu tarafındaki eşlemeyi güncelleyin.</p>
+</blockquote>
+<h3 id="41104119--sunucuprotokol-kaynaklı-gelen-standart-kodun-etiketi">4110–4119 · Sunucu/protokol kaynaklı (gelen standart kodun etiketi)<a class="headerlink" href="#41104119--sunucuprotokol-kaynaklı-gelen-standart-kodun-etiketi" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Case</th>
+<th>Kaynak</th>
+<th>Davranış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4110</td>
+<td><code>serverNormal</code></td>
+<td>1000</td>
+<td>sadece log</td>
+</tr>
+<tr>
+<td>4111</td>
+<td><code>serverGoingAway</code></td>
+<td>1001</td>
+<td>sadece log</td>
+</tr>
+<tr>
+<td>4112</td>
+<td><code>noStatusReceived</code></td>
+<td>1005</td>
+<td>sadece log</td>
+</tr>
+<tr>
+<td>4113</td>
+<td><code>protocolError</code></td>
+<td>1002</td>
+<td>listener'a <strong><code>.connectionErr</code></strong></td>
+</tr>
+<tr>
+<td>4114</td>
+<td><code>unsupportedFrame</code></td>
+<td>1003</td>
+<td>listener'a <strong><code>.connectionErr</code></strong></td>
+</tr>
+<tr>
+<td>4115</td>
+<td><code>encodingError</code></td>
+<td>1007</td>
+<td>listener'a <strong><code>.connectionErr</code></strong></td>
+</tr>
+<tr>
+<td>4116</td>
+<td><code>policyViolated</code></td>
+<td>1008</td>
+<td>listener'a <strong><code>.connectionErr</code></strong></td>
+</tr>
+<tr>
+<td>4117</td>
+<td><code>messageTooBig</code></td>
+<td>1009</td>
+<td>listener'a <strong><code>.connectionErr</code></strong></td>
+</tr>
+<tr>
+<td>4118</td>
+<td><code>unknownWsError</code></td>
+<td>diğer</td>
+<td>listener'a <strong><code>.connectionErr</code></strong> (tip detayı reason'da)</td>
+</tr>
+<tr>
+<td>4119</td>
+<td><code>authRejected</code></td>
+<td>—</td>
+<td>WS anahtarı/oturum doğrulaması reddedildi; bağlantı hiç kurulamadı</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Hata kodlarında eskiden son <code>sdkSocketActions</code> yeniden yayınlanıyordu; kopma anındaki
+değer alakasız olduğu için reconnect ekranı açılmıyordu. Artık her beklenmedik kopmada
+<code>.connectionErr</code> gider ve arkada canlı kalan WebSocket/WebRTC bağlantıları elle kapatılır.</p>
+</blockquote>
+<h3 id="41304133--ağ-kaynaklı--hepsi-lostconnection-overlayini-tetikler">4130–4133 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler<a class="headerlink" href="#41304133--ağ-kaynaklı--hepsi-lostconnection-overlayini-tetikler" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Case</th>
+<th>Kaynak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4130</td>
+<td><code>networkUnreachable</code></td>
+<td>Reachability: internet erişimi yok</td>
+</tr>
+<tr>
+<td>4131</td>
+<td><code>transportError</code></td>
+<td>SSL / proxy / firewall hatası</td>
+</tr>
+<tr>
+<td>4132</td>
+<td><code>unexpectedDrop</code></td>
+<td>Hatasız kopma — sunucu sessiz kapattı</td>
+</tr>
+<tr>
+<td>4133</td>
+<td><code>connectTimeout</code></td>
+<td>Verilen sürede bağlantı hiç kurulamadı (ilk 30 sn · reconnect 10 sn)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="41404142--turn--ice-webrtc">4140–4142 · TURN / ICE (WebRTC)<a class="headerlink" href="#41404142--turn--ice-webrtc" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Case</th>
+<th>Kaynak</th>
+<th>Davranış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4140</td>
+<td><code>turnDisconnected</code></td>
+<td>ICE <code>.disconnected</code></td>
+<td>anında <code>terminateCall("TURN_DISCONNECTED")</code></td>
+</tr>
+<tr>
+<td>4141</td>
+<td><code>turnFailed</code></td>
+<td>ICE <code>.failed</code></td>
+<td>anında <code>terminateCall("TURN_DISCONNECTED")</code></td>
+</tr>
+<tr>
+<td>4142</td>
+<td><code>turnClosed</code></td>
+<td>ICE <code>.closed</code></td>
+<td>log + event</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Toparlanma penceresi YOK.</strong> ICE ya da WebSocket koptuğu anda görüşme biter, tüm
+bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir. Bekleme/askı
+yapısı denendi ve geri alındı: sunucu askıdaki oturumu canlı saydığı için yeniden
+abonelik <code>subRejected</code> ("Oda dolu") ile reddediliyor, panel çağrı oturumunu kapatmıyordu.
+Ayrıntı: <a href="../turn-webrtc/">TURN &amp; WebRTC → Neden toparlanma penceresi YOK?</a>.</p>
+</blockquote>
+<h3 id="arka-plan-zaman-aşımı-4105">Arka Plan Zaman Aşımı (4105)<a class="headerlink" href="#arka-plan-zaman-aşımı-4105" title="Permanent link">&para;</a></h3>
+<p>Aktif oturum sırasında uygulama arka plana geçerse SDK süre sayar; limit aşılırsa
+soket <strong>4105</strong> ile kapatılır ve kullanıcı döndüğünde LostConnection/reconnect ekranı
+hazırdır. Sistem uygulamayı erken dondurursa süre, ön plana dönüşte telafi edilir.</p>
+<p>Kural <strong>istisnasız</strong> işler: çalan çağrı ya da süren görüşme de muaf değildir. Süre dolunca
+görüşme biter, kullanıcı yeniden bağlanma ekranına alınır ve oradan tam prosedürle bekleme
+odasına döner (temsilci yeniden arayabilir). Eskiden canlı çağrı muaf tutuluyordu; sonuç,
+limitin görüşmede hiç işlememesi ve mobil ile panelin farklı durumda kalması oldu.</p>
+<div class="highlight"><pre><span></span><code><span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">backgroundTimeoutSeconds</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">30</span><span class="w">   </span><span class="c1">// varsayılan 30 sn</span>
+<span class="n">IdentifyManager</span><span class="p">.</span><span class="n">shared</span><span class="p">.</span><span class="n">isBackgroundTimeoutEnabled</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="c1">// kapatmak için false</span>
+</code></pre></div>
+<p>Geçişlerin kendisi de olay üretir: <code>session.background</code> (limit + soket durumu) ve
+<code>session.foreground</code> (arka planda geçen süre).</p>
+<hr />
+<h2 id="soket-trafiğini-izleme">Soket Trafiğini İzleme<a class="headerlink" href="#soket-trafiğini-izleme" title="Permanent link">&para;</a></h2>
+<p>Gelen/giden tüm soket mesajları log altyapısına <code>socket</code> kategorisiyle düşer
+(<code>SocketLog</code>: <code>incoming</code>/<code>outgoing</code>). Konsolda görmek için <code>logLevel: .all</code> yeterlidir;
+online'a da göndermek için <code>.online</code>. Ayrıntı: <a href="../logging/">Loglama</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Başa dön
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Altbilgi" >
+        
+          
+          <a href="../server-api/" class="md-footer__link md-footer__link--prev" aria-label="Önceki: Sunucu &amp; API">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Önceki
+              </span>
+              <div class="md-ellipsis">
+                Sunucu & API
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../turn-webrtc/" class="md-footer__link md-footer__link--next" aria-label="Sonraki: TURN &amp; WebRTC">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Sonraki
+              </span>
+              <div class="md-ellipsis">
+                TURN & WebRTC
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Kopyaland\u0131", "clipboard.copy": "Kopyala", "search.result.more.one": "Bu sayfada 1 tane daha", "search.result.more.other": "Bu sayfada # tane daha", "search.result.none": "E\u015fle\u015fen dok\u00fcman bulunamad\u0131", "search.result.one": "1 dok\u00fcman bulundu", "search.result.other": "# dok\u00fcman bulundu", "search.result.placeholder": "Aramaya ba\u015flamak i\u00e7in yaz\u0131n", "search.result.term.missing": "Eksik", "select.version": "Versiyon se\u00e7"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
