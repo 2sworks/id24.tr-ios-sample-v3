@@ -1,0 +1,93 @@
+# IdentifySDK iOS dokumantasyon sitesi (GitHub Pages).
+# Kaynak: repodaki .md dosyalari; `./docs-publish.sh` ile yayinlanir.
+site_name: IdentifySDK iOS
+site_url: https://2sworks.github.io/id24.tr-ios-sample-v3/
+repo_url: https://github.com/2sworks/id24.tr-ios-sample-v3
+repo_name: id24.tr-ios-sample-v3
+edit_uri: blob/main/
+
+docs_dir: .docs-build/src
+site_dir: .docs-build/site
+
+theme:
+  name: material
+  language: tr
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Koyu tema
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Acik tema
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+markdown_extensions:
+  - toc:
+      permalink: true
+      toc_depth: 3
+      # GitHub ile ayni baglanti (anchor) uretimi: Turkce karakterler korunur
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - tables
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.details
+
+plugins:
+  - search:
+      lang: [tr, en]
+
+nav:
+  - Başlangıç: README.md
+  - Full Integration: FULL-INTERGATION.md
+  - Rehberler:
+      - Mimari: docs/guides/architecture.md
+      - Sunucu & API: docs/guides/server-api.md
+      - WebSocket: docs/guides/websocket.md
+      - TURN & WebRTC: docs/guides/turn-webrtc.md
+      - Loglama: docs/guides/logging.md
+      - Event Sistemi: docs/guides/events.md
+      - Oturum Çıkışları: docs/guides/session-exit.md
+      - Tema: docs/guides/theming.md
+      - 3.1.0 Değişiklikleri: docs/guides/migration-3.1.0.md
+      - iPad Desteği: docs/guides/ipad-support.md
+      - Lokalizasyon: docs/guides/localization.md
+      - Özelleştirme: docs/guides/customization.md
+      - IdentityScanner: docs/guides/identity-scanner.md
+  - Modüller:
+      - Genel Bakış: IdentifySample/Modules/Modules.md
+      - Prepare: IdentifySample/Modules/Prepare/Prepare.md
+      - IdCard: IdentifySample/Modules/IdCard/IdCard.md
+      - IdCardOVD: IdentifySample/Modules/IdCardOVD/IdCardOVD.md
+      - NFC: IdentifySample/Modules/NFC/NFC.md
+      - Selfie: IdentifySample/Modules/Selfie/Selfie.md
+      - SelfieWithLiveness: IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md
+      - Liveness: IdentifySample/Modules/Liveness/Liveness.md
+      - Speech: IdentifySample/Modules/Speech/Speech.md
+      - Signature: IdentifySample/Modules/Signature/Signature.md
+      - VideoRecorder: IdentifySample/Modules/VideoRecorder/VideoRecorder.md
+      - AddressConfirm: IdentifySample/Modules/AddressConfirm/AddressConfirm.md
+      - CallScreen: IdentifySample/Modules/CallScreen/CallScreen.md
+      - ThankYou: IdentifySample/Modules/ThankYou/ThankYou.md
+      - SignLang: IdentifySample/Modules/SignLang/SignLang.md
+      - LostConnection: IdentifySample/Modules/LostConnection/LostConnection.md
+      - Sesli Okuma: IdentifySample/Modules/ReadAloud.md
+  - Köprüler:
+      - React Native: docs/integration/react-native/README.md
+      - Flutter: docs/integration/flutter/README.md
+  - Sürüm Geçmişi: CHANGELOG.md

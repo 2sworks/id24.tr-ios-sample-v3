@@ -287,7 +287,7 @@ interface SDKEvent {
 | `session.failed` | session | `rejected` · `neutral` · `notCompleted` · `error` | Oturum **başarısız** kapandı |
 | `session.abandoned` | session | `cancelled` | Kullanıcı ya da host çıktı (metadata.lastScreen = nerede kaldı) |
 
-Metadata anahtarlarının tamamı: [Event Sistemi → Oturum Sonucu Olayları](../../guides/events.md#oturum-sonucu-olayları-301) · tüm çıkış yolları ve kapanış sonrası yönlendirme: [Oturum Çıkışları](../../guides/session-exit.md#95-react-native--flutter).
+Metadata anahtarlarının tamamı: [Event Sistemi → Oturum Sonucu Olayları](../../guides/events.md#oturum-sonucu-olayları-310) · tüm çıkış yolları ve kapanış sonrası yönlendirme: [Oturum Çıkışları](../../guides/session-exit.md#95-react-native--flutter).
 
 > **Geriye uyumluluk:** Bu birleşik akış, SDK'nın mevcut `IdentifyTrackingListener`
 > mekanizmasının **yanına** eklenmiştir; mevcut entegrasyonları bozmaz.

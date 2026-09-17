@@ -14,3 +14,6 @@ xcuserdata/
 
 ## Claude Code proje talimatlari (yerel, repoya girmez)
 CLAUDE.md
+
+## Dokumantasyon sitesi derleme ciktisi
+.docs-build/

@@ -206,7 +206,7 @@ Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sor
 üretmez; kullanıcı yeniden bağlanır. Doğrulanmadan geçilen modüller (atlandı, NFC yok…)
 `outcome.skippedModules`'tadır. Tüm çıkış yolları ve yönlendirme:
 [Oturum Çıkışları](session-exit.md). Alanlar ve sebep tablosu:
-[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-301).
+[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-310).
 
 ### 10. Kimlik tarayıcı — MRZ kuralı, etiketli arka yüz, gömülebilir tarayıcı
 

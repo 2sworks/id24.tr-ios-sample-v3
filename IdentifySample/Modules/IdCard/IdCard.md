@@ -73,7 +73,7 @@ aldığınıza göre iki yol vardır:
 
 > **Arka yüzde neyin zorunlu olduğunu değiştirmek:** `DocumentProfile.turkishIDBack`
 > `.settingRequired(false, for: "fatherName")` / `.settingMRZRequired(false)` ile kopyalanıp
-> `IdentityScannerView(profile:)`'a verilir; ayrıntı [IdentityScanner rehberi](../../docs/guides/identity-scanner.md#neyin-çekimi-beklettiğine-profil-karar-verir).
+> `IdentityScannerView(profile:)`'a verilir; ayrıntı [IdentityScanner rehberi](../../../docs/guides/identity-scanner.md#neyin-çekimi-beklettiğine-profil-karar-verir).
 
 ### A) SDK tarayıcısıyla
 
