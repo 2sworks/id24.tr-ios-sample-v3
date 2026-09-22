@@ -1458,8 +1458,26 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `focusSettleDelay` | 0.5 / 1.2 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
 | `quadMissResetThreshold` | 3 / 5 | Kaç kare belge kaybolursa ilerleme sıfırlanır (titreme önleyici) |
 | `manualCaptureHintDelay` | 5 s / 8 s | Manuel çekim butonunun görünme süresi |
-| `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra zorunlu manuel mod |
+| `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
+
+**Otomatik davranışlar — `ScannerAutomation`** (hepsi varsayılan açık):
+
+```swift
+ScannerAutomation.default.autoTorch = false              // tüm tarayıcılar
+var cfg = ScannerConfiguration.default
+cfg.automation.manualCaptureFallback = false             // yalnız bu tarayıcı
+```
+
+| Anahtar | Kapatınca |
+|---|---|
+| `autoTorch` | Karanlıkta (ya da kamera elle kapatılınca) fener kendiliğinden açılmaz |
+| `ultraWideLensSwitch` | Kart çok yakınken ultra-geniş lense geçilmez |
+| `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden dönülmez |
+| `manualCaptureFallback` | Elle çek düğmesi hiç çıkmaz; otomatik çekim süresiz dener |
+| `glareGate` | Parlamada çekim bekletilmez |
+
+Lens senaryoları: [identity-scanner.md](docs/guides/identity-scanner.md#lens-senaryoları).
 
 ### 16.5 Çerçeve görünümü — `QuadrilateralStyle`
 

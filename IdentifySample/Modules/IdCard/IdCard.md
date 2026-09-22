@@ -59,6 +59,10 @@ aldığınıza göre iki yol vardır:
 | Tasarım serbestliği | Çerçeve, çizgi stili, metinler, fener; HUD gizlenemez ([sınırlar](../../../docs/guides/identity-scanner.md#görünüm-ve-davranış-ayarları)) | Tam |
 | Risk | — | Bulanık/parlamalı kare → "okunamadı" ya da sunucu karşılaştırma reddi |
 
+> **Otomatik fener, lens geçişi, Elle çek düğmesi, parlama kapısı** `ScannerAutomation` ile
+> kapatılır (ör. `ScannerAutomation.default.autoTorch = false`). Ayrıntı:
+> [Otomatik Davranışlar](../../../docs/guides/identity-scanner.md#otomatik-davranışlar--scannerautomation).
+
 ### A) SDK tarayıcısıyla
 
 `.documentScanner` modifier'ı tarayıcıyı tam ekran açar, sonuç gelince kapatır ve üstüne

@@ -152,7 +152,7 @@ modifier'ıdır — sunumu ve kapanışı kendisi yapar, `navOverlay` ile üstü
 Tarayıcının tüm rehber metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
 `tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`, `orientation`...) aktif SDK
 diline göre hazır gelir ve tek tek değiştirilebilir. `glare` boş verilirse yalnız metin
-kapanır, kapı çalışmaya devam eder. Üç hazır kompozisyon vardır ve **global override kancaları** sunar:
+kapanır, kapı çalışmaya devam eder (kapıyı kapatmak için bkz. [Otomatik Davranışlar](#otomatik-davranışlar--scannerautomation)). Üç hazır kompozisyon vardır ve **global override kancaları** sunar:
 
 ```swift
 ScannerConfiguration.default    // kimlik kartı (override: .overrideDefault)
@@ -269,14 +269,51 @@ ve güven eşikleri profile özeldir. Kimlik/ehliyet en çok kazanan taraftır �
 karta göre tanımlı olduğundan kırpmanın kayması bölgesel OCR'ı da kaydırır. Tanınmayan
 belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşendir.
 
-### Akıllı Davranışlar (kutudan çıkar)
+### Otomatik Davranışlar — `ScannerAutomation`
 
-- Belge sensöre çok yaklaşınca **ultra-geniş lense otomatik geçiş** (+ "uzaklaştırın" metni) — yalnız `.dynamicQuad` modunda
+Tarayıcının kullanıcı bir şey yapmadan yaptığı işler. Hepsi varsayılan olarak **açıktır**;
+kapatmak için:
+
+```swift
+// Tüm tarayıcılar için (kimlik, pasaport, belge) — tarayıcı açılmadan önce
+ScannerAutomation.default.autoTorch = false
+
+// Yalnız bir tarayıcı için
+var cfg = ScannerConfiguration.default
+cfg.automation.manualCaptureFallback = false
+IdentityScannerView(profile: .turkishIDFront, configuration: cfg) { … }
+```
+
+| Anahtar | Açıkken ne yapar | Kapatınca |
+|---|---|---|
+| `autoTorch` | Sahne çok karanlıksa ve belge 4 sn bulunamazsa feneri açar. Kamerayı elle kapatmak da karanlık sahne sayılır. | Fener yalnız kullanıcı ya da host açarsa açılır. |
+| `ultraWideLensSwitch` | Belge kadrajı dolduruyor ama geniş lens netleyemiyorsa (çok yakın) ultra-geniş lense geçer, "uzaklaştırın" der. | Geniş lenste kalır; kullanıcı kartı netlenene kadar uzaklaştırmalıdır. |
+| `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden döner (senaryolar aşağıda). | Ultra-geniş lense geçildiyse tarama bitene kadar orada kalır. |
+| `manualCaptureFallback` | Otomatik çekim zorlanınca **Elle çek** düğmesini gösterir: `manualCaptureHintDelay` sn sonra ya da `maxAutoCaptureFails` başarısız denemeden sonra. | Düğme hiç çıkmaz; tarayıcı başarılı olana ya da kullanıcı ekrandan çıkana kadar otomatik çekimi dener. |
+| `glareGate` | Kartta parlama varken çekimi bekletir, `texts.glare` metnini gösterir. | Parlama yok sayılır; yansıma altındaki alanlar OCR'da okunamayabilir. |
+
+Kapatılamayanlar: loş ışıkta görünmez pozlama artırımı ve kontrast destekli ikinci tespit
+geçişi. İkisi de ekranda görünmez, yalnız tespiti kurtarır. Çekim titreşimi `SDKHapticConfig`
+ile (modül bazında da) kapatılır. `.fixedFrame` modunda lens hiç değişmez; iki lens anahtarı
+yalnız `.dynamicQuad` modunda anlam taşır.
+
+#### Lens senaryoları
+
+Tarayıcı her zaman geniş lensle açılır.
+
+| Senaryo | `ultraWideLensSwitch` | `wideLensRecovery` | Sonuç |
+|---|---|---|---|
+| Kart çok yakın, geniş lens netleyemiyor | açık | — | Ultra-geniş lense geçer, "uzaklaştırın" der. Geçişten sonra 4 sn (`lensCommitHoldDuration`) lens değişmez. |
+| Ultra-genişe geçildi, kart kadrajda küçüldü ve 2 sn görünmedi | açık | açık | Geniş lense döner. |
+| Ultra-genişe geçildi, kart görünüyor ama bekleme süresinden sonra da netlenmiyor | açık | açık | Kart aslında yakın değilmiş; geniş lense döner. |
+| Yukarıdaki iki durum | açık | **kapalı** | Ultra-geniş lenste kalır. Kart kadrajda küçükse kullanıcı yaklaştırmalıdır; tarama ekranı kapanınca sıfırlanır. |
+| Kart çok yakın | **kapalı** | fark etmez | Geçiş olmaz; geniş lenste kalır. |
+
+### Diğer Davranışlar
+
 - Dokunarak odaklama (sarı odak göstergesi); sabit çerçevede belge oturunca **tek atış odak
   dürtmesi** — nokta değişmediği için sürekli AF'e ikinci kez yazmak hiçbir şey yapmıyordu
-- Otomatik yakalama üst üste başarısız olursa **manuel yakalama** teklifi
 - Pasaport dik tutulursa **"yana çevirin"** yönlendirmesi
-- Işık yetersizse fener önerisi (torch API'siyle)
 
 ---
 
