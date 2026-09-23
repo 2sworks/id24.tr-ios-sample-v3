@@ -325,7 +325,7 @@ struct IdCardScannerCover: View {
             SDKNavigationBar(
                 style: .overlay,
                 onBack: { onResult(nil) },
-                trailing: isTorchAvailable ? AnyView(torchButton) : nil
+                trailing: isTorchAvailable && configuration.showsTorchButton ? AnyView(torchButton) : nil
             )
         }
     }
