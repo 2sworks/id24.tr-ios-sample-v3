@@ -148,6 +148,16 @@ yolda sonuç ekranı açılmaz, SDK bulunduğu ekrandan aşağı kayarak kapanı
 | `roomOccupied` | `error` | Oda başka bir oturumda (yeniden denemeler de reddedildi) | "Oturum meşgul" uyarısı → onayla kök ekran | 4120 | `closeCode` = 4120 |
 | `connectionLost` | `error` | Bağlantı kopmuşken akışın sonuna gelindi ya da oturum başka bir kodla kapandı | ThankYou | 4104–4142 | `closeCode` |
 
+Oda kaydı beklenirken sunucu odayı dolu bildirirse her yeniden denemede
+`SDKFlowCoordinator.roomWaitStatus` ("Oturum meşgul, yeniden deneniyor (1/3)") güncellenir.
+Sunucu 20 sn içinde ne onay ne ret gönderirse akış başlamaz; "Bağlantı kurulamadı" uyarısı
+çıkar. Uyarının hangi durumdan doğduğu `roomBlockKind` ile okunur:
+
+| `roomBlockKind` | Uyarı | Seçenekler |
+|---|---|---|
+| `.occupied` | Oturum meşgul (4120) | Çıkış → `exitAfterRoomOccupied()` |
+| `.waitTimeout` | Bağlantı kurulamadı | Yeniden Bağlan → `retryAfterRoomWaitTimeout()` (oturum sürer) · Çıkış → `exitAfterRoomOccupied()` |
+
 ### 4.5 Sonuç ÜRETMEYENLER (oturum sürer)
 
 | Olay | Kullanıcı ne görür | Ne olur |

@@ -5,6 +5,10 @@ Görüntülü görüşme modülü ([CallScreen](../../IdentifySample/Modules/Cal
 zincirini ve TURN kimlik (credential) modlarını anlatır — `turnKey` parametresinin ne işe
 yaradığı burada netleşir.
 
+> **Sürüm:** 3.1.1'den itibaren WebRTC 153 (`exact: "153.0.0"`). Görüntü `RTCMTLVideoView`
+> (Metal) ile çizilir; `RTCEAGLVideoView` bu sürümde yoktur. Kendi görüşme ekranınızda video
+> view kullanıyorsanız `RTCMTLVideoView`'a geçin.
+
 ← [README'ye dön](../../README.md) · İlgili: [WebSocket](websocket.md) · [Sunucu & API](server-api.md)
 
 ---

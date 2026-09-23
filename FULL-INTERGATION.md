@@ -1024,6 +1024,11 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
 **üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
 
+Oda kaydı 20 sn içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı çıkar
+(`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Oda dolu
+yeniden denemelerinde `roomWaitStatus` güncellenir. Ayrıntı:
+[Oturum Çıkışları → 4.4](docs/guides/session-exit.md#44-oturum-kurulamadı--sürdürülemedi).
+
 Her çıkış yolu için gelen veriler, "panelde tek modül açık, müşteri adımı tamamladı" senaryosu ve kapanıştan
 sonra SwiftUI / UIKit / RN-Flutter'da yönlendirmenin nereye yazılacağı:
 [Oturum Çıkışları Rehberi](docs/guides/session-exit.md).
@@ -1478,6 +1483,15 @@ cfg.automation.manualCaptureFallback = false             // yalnız bu tarayıc�
 | `glareGate` | Parlamada çekim bekletilmez |
 
 Lens senaryoları: [identity-scanner.md](docs/guides/identity-scanner.md#lens-senaryoları).
+
+**Fener düğmesi** (tarayıcının kendi düğmesi ve kimlik ekranının üst çubuğundaki düğme):
+
+```swift
+ScannerConfiguration.showsTorchButtonDefault = false     // tüm tarayıcılar
+cfg.showsTorchButton = false                             // yalnız bu tarayıcı
+```
+
+Feneri tümüyle kapatmak için `autoTorch = false` ile birlikte verin.
 
 ### 16.5 Çerçeve görünümü — `QuadrilateralStyle`
 

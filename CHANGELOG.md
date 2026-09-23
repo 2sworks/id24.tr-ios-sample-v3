@@ -27,6 +27,18 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   kimlikte `stepChanged` + `setDocType`, OVD'de yalnız `stepChanged`
   (`Id Card OVD` / `Passport OVD`). Bkz. [IdCard.md](IdentifySample/Modules/IdCard/IdCard.md),
   [IdCardOVD.md](IdentifySample/Modules/IdCardOVD/IdCardOVD.md).
+- **`ScannerAutomation`** — kimlik tarayıcısının kendiliğinden yaptığı işler kapatılabiliyor:
+  `autoTorch`, `ultraWideLensSwitch`, `wideLensRecovery`, `manualCaptureFallback`, `glareGate`.
+  Tümü varsayılan açık; `ScannerAutomation.default` ile genel, `ScannerConfiguration.automation`
+  ile tarayıcı başına. Bkz. [Otomatik Davranışlar](docs/guides/identity-scanner.md#otomatik-davranışlar--scannerautomation).
+- **Fener düğmesi gizlenebiliyor** — `ScannerConfiguration.showsTorchButtonDefault = false`
+  (genel) ya da `showsTorchButton` (tarayıcı başına). Tarayıcının kendi düğmesi ve kimlik
+  ekranının üst çubuğundaki düğme kalkar. Feneri tümüyle kapatmak için
+  `ScannerAutomation.default.autoTorch = false` ile birlikte verin. Bkz.
+  [Fener düğmesi](docs/guides/identity-scanner.md#fener-düğmesi).
+- Oda kaydı bekleme durumu: `SDKFlowCoordinator.roomWaitStatus` (yeniden deneme satırı),
+  `roomBlockKind` (`.occupied` / `.waitTimeout`), `retryAfterRoomWaitTimeout()`. Bkz.
+  [Oturum Çıkışları](docs/guides/session-exit.md#44-oturum-kurulamadı--sürdürülemedi).
 - ViewModel okumaları: `SDKIdCardViewModel.selectionOptions` / `initialCardType` /
   `skippedCardType`, `SDKIdCardOVDViewModel.selectionOptions` / `initialDocumentType` /
   `skippedDocumentType`, `CardType.selectionIcon` / `selectionTitle` — özel ekranların aynı
@@ -38,8 +50,20 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
   ekran flaşı, yönerge metinleri, titreşim, yükleme kararı. Hata/yeniden deneme alert'i artık
   diğer modüllerle ortak `idErrorAlert` stilinde.
+- **WebRTC 94 → 153.** Görüntü `RTCMTLVideoView` (Metal) ile çiziliyor; `RTCEAGLVideoView`
+  bu sürümde yok. SPM bağımlılığı `exact: "153.0.0"`: host uygulamanın paket grafiği de
+  WebRTC'yi 153'e çözmeli, başka bir paket eski sürümü sabitliyorsa çözümleme başarısız olur.
+- Oda kaydı beklenirken sunucu odayı dolu bildirirse her yeniden denemede
+  "Oturum meşgul, yeniden deneniyor (1/3)" satırı gösteriliyor.
+- Oda kaydı 20 sn içinde onaylanmazsa akış artık sessizce başlamıyor: "Bağlantı kurulamadı"
+  uyarısı çıkar (Yeniden Bağlan / Çıkış). Önceden kullanıcı panelin görmediği bir oturumda
+  belge ve selfie yüklüyordu.
+- Kimlik ve OVD'de tek belge türü kaldığında hazırlık ekranı atlanıyor
+  (`autoSkipSingleOption = false` ile eski davranış).
 
 **Düzeltildi**
+- `SDKIdCardOVDView(documentType:)` ile açılan OVD'de çekim konumu sunucuya hiç
+  gönderilmiyordu; artık modül açılır açılmaz gönderiliyor.
 - Bir önceki ekranın sesli yönergesi yeni ekranda okunmaya devam ediyordu. İki neden: modül içi
   ekran geçişleri (hazırlık ekranı → tarama/çekim) okumayı kesmiyordu — koordinatör
   geçişlerinin (`push` / `popBack` / `advanceToNextModule`) aksine — ve ses klibi ile native

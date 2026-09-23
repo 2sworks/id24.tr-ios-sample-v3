@@ -292,6 +292,23 @@ IdentityScannerView(profile: .turkishIDFront, configuration: cfg) { … }
 | `manualCaptureFallback` | Otomatik çekim zorlanınca **Elle çek** düğmesini gösterir: `manualCaptureHintDelay` sn sonra ya da `maxAutoCaptureFails` başarısız denemeden sonra. | Düğme hiç çıkmaz; tarayıcı başarılı olana ya da kullanıcı ekrandan çıkana kadar otomatik çekimi dener. |
 | `glareGate` | Kartta parlama varken çekimi bekletir, `texts.glare` metnini gösterir. | Parlama yok sayılır; yansıma altındaki alanlar OCR'da okunamayabilir. |
 
+#### Fener düğmesi
+
+Fener düğmesi (tarayıcının kendi düğmesi ve hazır kimlik ekranının üst çubuğundaki düğme)
+`ScannerConfiguration.showsTorchButton` ile gizlenir. Varsayılan açık.
+
+```swift
+// Tüm tarayıcılar için
+ScannerConfiguration.showsTorchButtonDefault = false
+
+// Feneri tümüyle kapatmak için otomatik açmayı da kapatın
+ScannerAutomation.default.autoTorch = false
+
+// Yalnız bir tarayıcı için
+var cfg = ScannerConfiguration.default
+cfg.showsTorchButton = false
+```
+
 Kapatılamayanlar: loş ışıkta görünmez pozlama artırımı ve kontrast destekli ikinci tespit
 geçişi. İkisi de ekranda görünmez, yalnız tespiti kurtarır. Çekim titreşimi `SDKHapticConfig`
 ile (modül bazında da) kapatılır. `.fixedFrame` modunda lens hiç değişmez; iki lens anahtarı
