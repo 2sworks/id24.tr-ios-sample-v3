@@ -541,6 +541,32 @@ enum ShowcaseScenarios {
                                 run: { m.allowedCardType = [.passport]; m.selectedCardType = .passport })
                       ]),
 
+                .init(title: "Hazırlık (belge türü) ekranı",
+                      note: "Entegratör ayarı: SDKDocumentSelectionConfig.shared.idCard.",
+                      controls: [
+                        .flag(title: "showsScreen",
+                              note: "Kapalıyken ekran hiç açılmaz; seçim modül açılır açılmaz sunucuya gider.",
+                              get: { SDKDocumentSelectionConfig.shared.idCard.showsScreen },
+                              set: { SDKDocumentSelectionConfig.shared.idCard.showsScreen = $0 }),
+                        .flag(title: "speaksOnScreen",
+                              note: "Yalnız bu ekranın sesli yönergesini kapatır; modülün diğer adımları okunmaya devam eder.",
+                              get: { SDKDocumentSelectionConfig.shared.idCard.speaksOnScreen },
+                              set: { SDKDocumentSelectionConfig.shared.idCard.speaksOnScreen = $0 }),
+                        .flag(title: "autoSkipSingleOption",
+                              note: "Tek seçenek kaldığında ekranı atlar.",
+                              get: { SDKDocumentSelectionConfig.shared.idCard.autoSkipSingleOption },
+                              set: { SDKDocumentSelectionConfig.shared.idCard.autoSkipSingleOption = $0 }),
+                        .action(title: "options: kimlik + pasaport + eski tip",
+                                note: "Varsayılan.",
+                                run: { SDKDocumentSelectionConfig.shared.idCard.options = [.idCard, .passport, .oldSchool] }),
+                        .action(title: "options: yalnız kimlik",
+                                note: "Tek seçenek — autoSkipSingleOption açıksa ekran atlanır.",
+                                run: { SDKDocumentSelectionConfig.shared.idCard.options = [.idCard] }),
+                        .action(title: "options: yalnız pasaport",
+                                note: "Tek seçenek — autoSkipSingleOption açıksa ekran atlanır.",
+                                run: { SDKDocumentSelectionConfig.shared.idCard.options = [.passport] })
+                      ]),
+
                 .init(title: "OCR deneme hakkı",
                       note: "Hak bitince modülün uyarı ve çıkış davranışı değişir.",
                       controls: [
@@ -565,6 +591,32 @@ enum ShowcaseScenarios {
                         .action(title: "Pasaport — 2 adım",
                                 note: "Ön yüz → hologram; arka yüz adımı yoktur.",
                                 run: { m.selectedCardType = .passport })
+                      ]),
+
+                .init(title: "Hazırlık (belge türü) ekranı",
+                      note: "Entegratör ayarı: SDKDocumentSelectionConfig.shared.ovd. Ekran kapalıyken çekim konumu (Id Card OVD / Passport OVD) modül açılır açılmaz gider.",
+                      controls: [
+                        .flag(title: "showsScreen",
+                              note: "Kapalıyken ekran hiç açılmaz, doğrudan çekime girilir.",
+                              get: { SDKDocumentSelectionConfig.shared.ovd.showsScreen },
+                              set: { SDKDocumentSelectionConfig.shared.ovd.showsScreen = $0 }),
+                        .flag(title: "speaksOnScreen",
+                              note: "Yalnız bu ekranın sesli yönergesini kapatır.",
+                              get: { SDKDocumentSelectionConfig.shared.ovd.speaksOnScreen },
+                              set: { SDKDocumentSelectionConfig.shared.ovd.speaksOnScreen = $0 }),
+                        .flag(title: "autoSkipSingleOption",
+                              note: "Tek seçenek kaldığında ekranı atlar.",
+                              get: { SDKDocumentSelectionConfig.shared.ovd.autoSkipSingleOption },
+                              set: { SDKDocumentSelectionConfig.shared.ovd.autoSkipSingleOption = $0 }),
+                        .action(title: "options: kimlik + pasaport",
+                                note: "Varsayılan.",
+                                run: { SDKDocumentSelectionConfig.shared.ovd.options = [.idCard, .passport] }),
+                        .action(title: "options: yalnız kimlik",
+                                note: "Tek seçenek — autoSkipSingleOption açıksa ekran atlanır.",
+                                run: { SDKDocumentSelectionConfig.shared.ovd.options = [.idCard] }),
+                        .action(title: "options: yalnız pasaport",
+                                note: "Tek seçenek — autoSkipSingleOption açıksa ekran atlanır.",
+                                run: { SDKDocumentSelectionConfig.shared.ovd.options = [.passport] })
                       ])
             ]
 

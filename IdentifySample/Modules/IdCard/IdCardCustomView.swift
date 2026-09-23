@@ -29,15 +29,28 @@ struct IdCardCustomView: View {
 
     private enum Phase { case typeSelection, scanning }
 
-    @StateObject private var viewModel = SDKIdCardViewModel()
+    @StateObject private var viewModel: SDKIdCardViewModel
     @EnvironmentObject private var coordinator: SDKFlowCoordinator
     @Environment(\.colorScheme) private var colorScheme
 
-    @State private var phase: Phase = .typeSelection
-    @State private var selectedCardType: CardType = .idCard
+    @State private var phase: Phase
+    @State private var selectedCardType: CardType
     @State private var scannerSide: IdCardSide?
+    /// Seçim ekranı atlandıysa kullanılan tip; `nil` ise ekran gösterilir.
+    private let skippedCardType: CardType?
+    @State private var didReportSkippedType = false
 
     private var isPassport: Bool { selectedCardType == .passport }
+
+    /// Seçim ekranı `SDKDocumentSelectionConfig.shared.idCard` ile kapatılabilir ya da tek seçenek
+    /// kaldığında atlanır; atlandığında seçim açılışta bir kez sunucuya bildirilir.
+    init() {
+        let vm = SDKIdCardViewModel()
+        skippedCardType = vm.skippedCardType
+        _phase = State(initialValue: vm.skippedCardType == nil ? .typeSelection : .scanning)
+        _selectedCardType = State(initialValue: vm.initialCardType)
+        _viewModel = StateObject(wrappedValue: vm)
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -48,7 +61,12 @@ struct IdCardCustomView: View {
                     title: String(.idVerifyTitle),
                     subtitle: phase == .typeSelection ? String(.selectMethodContinue) : String(.completeSteps),
                     onBack: {
-                        if phase == .scanning { withAnimation { phase = .typeSelection } } else { coordinator.popBack() }
+                        if phase == .scanning, skippedCardType == nil {
+                            SDKSpeechService.shared.stop()
+                            withAnimation { phase = .typeSelection }
+                        } else {
+                            coordinator.popBack()
+                        }
                     }
                 )
                 .padding(.top, IDSpacing.sm)
@@ -76,7 +94,11 @@ struct IdCardCustomView: View {
         .onAppear {
             viewModel.onSkipRequested = { coordinator.skipCurrentModule() }
             viewModel.onFlowFailed = { coordinator.finishFlowAsFailed() }
-            if let first = viewModel.allowedCardTypes.first { selectedCardType = first }
+            // Seçim ekranı yoksa seçim modül açılır açılmaz gider (stepChanged + setDocType).
+            if let skippedCardType, !didReportSkippedType {
+                didReportSkippedType = true
+                viewModel.selectCardType(skippedCardType)
+            }
         }
     }
 
@@ -88,20 +110,10 @@ struct IdCardCustomView: View {
                 VStack(alignment: .leading, spacing: IDSpacing.xl) {
                     titleBlock(String(.scanType), String(.scanTypeDesc))
                     VStack(spacing: IDSpacing.sm) {
-                        let allowed = viewModel.allowedCardTypes
-                        if allowed.isEmpty || allowed.contains(.idCard) {
-                            CardTypeRow(icon: .idTypeChip, title: String(.chippedIdCard), isSelected: selectedCardType == .idCard) {
-                                selectedCardType = .idCard
-                            }
-                        }
-                        if allowed.isEmpty || allowed.contains(.passport) {
-                            CardTypeRow(icon: .idTypePassport, title: String(.passport), isSelected: selectedCardType == .passport) {
-                                selectedCardType = .passport
-                            }
-                        }
-                        if allowed.isEmpty || allowed.contains(.oldSchool) {
-                            CardTypeRow(icon: .idTypeOther, title: String(.otherCards), isSelected: selectedCardType == .oldSchool) {
-                                selectedCardType = .oldSchool
+                        // Satırlar `SDKDocumentSelectionConfig.shared.idCard.options` ∩ sunucunun izin verdikleri.
+                        ForEach(viewModel.selectionOptions, id: \.self) { type in
+                            CardTypeRow(icon: type.selectionIcon, title: type.selectionTitle, isSelected: selectedCardType == type) {
+                                selectedCardType = type
                             }
                         }
                     }
@@ -113,6 +125,9 @@ struct IdCardCustomView: View {
 
             SDKButton(title: String(.continuePage)) {
                 viewModel.selectCardType(selectedCardType)
+                // Modul ici ekran degisimi de bir gecistir: hazirlik ekraninin yonergesi
+                // kesilmezse tarama ekraninda okunmaya devam eder.
+                SDKSpeechService.shared.stop()
                 withAnimation { phase = .scanning }
             }
             .padding(.horizontal, IDSpacing.lg)

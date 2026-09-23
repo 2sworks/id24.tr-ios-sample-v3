@@ -68,6 +68,35 @@ Kimlik/Pasaport seçince ilgili akış başlar.
 
 Hiçbir şey yazmayın; rota gelince `SDKIdCardOVDView` çizilir.
 
+---
+
+## Hazırlık Ekranı (Belge Türü Seçimi)
+
+`SDKDocumentSelectionConfig.shared.ovd` ile ayarlanır — `setupSDK`ten önce yazın:
+
+```swift
+SDKDocumentSelectionConfig.shared.ovd.showsScreen = false     // ekranı tamamen kaldır
+SDKDocumentSelectionConfig.shared.ovd.defaultType = .passport // kaldırıldığında kullanılacak tip
+SDKDocumentSelectionConfig.shared.ovd.options = [.idCard]     // ekrandaki satırlar ve sıraları
+SDKDocumentSelectionConfig.shared.ovd.speaksOnScreen = false  // yalnız bu ekranın sesli yönergesi sussun
+SDKDocumentSelectionConfig.shared.ovd.autoSkipSingleOption = false  // tek seçenekte de ekranı göster
+```
+
+| Alan | Varsayılan | Anlam |
+|---|---|---|
+| `showsScreen` | `true` | `false` → ekran hiç açılmaz, doğrudan çekime girilir |
+| `options` | `[.idCard, .passport]` | Ekrandaki satırlar, yazdığınız sırayla. OVD yalnız bu iki tipi destekler; başka bir tip yok sayılır ve durum `sdk_logs`a yazılır |
+| `defaultType` | `nil` | Ekranda ilk seçili gelen / ekran atlandığında kullanılan tip. `nil` → `options` içindeki ilk tip |
+| `speaksOnScreen` | `true` | `false` → yalnız bu ekran okunmaz, çekim adımları okunmaya devam eder |
+| `autoSkipSingleOption` | `true` | Geriye tek seçenek kaldığında ekran atlanır |
+
+**Ekran atlandığında ne gönderilir?** `stepChanged / location: "documentSelection"` **gitmez**;
+onun yerine çekim konumu (`Id Card OVD` / `Passport OVD`) **modül açılır açılmaz** gider. OVD
+akışında `setDocType` isteği hiçbir zaman atılmaz — panel belge türünü bu `stepChanged`ten okur.
+
+`SDKIdCardOVDView(documentType:)` init'i de aynı davranışı kullanır: artık çekim konumunu açılışta
+gönderir (önceden hiç göndermiyordu).
+
 ## Kendi Tasarımınızla (Override)
 
 > **Çalışan tam örnek:** [IdCardOVDCustomView.swift](IdCardOVDCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.idCardOVD) { IdCardOVDCustomView() }`
@@ -167,6 +196,9 @@ public enum OVDStep: Int, CaseIterable {
 |---|---|
 | `progress: Double` | Genel ilerleme (0–1) |
 | `instruction: String` | Mevcut adımın kullanıcı talimatı |
+| `selectionOptions: [OVDDocumentType]` | Seçim ekranında çizilecek satırlar |
+| `initialDocumentType: OVDDocumentType` | İlk seçili gelen / ekran atlanırsa kullanılan tip |
+| `skippedDocumentType: OVDDocumentType?` | Ekran atlanacaksa o tip, gösterilecekse `nil`. Atlandığında `documentType`ı bununla ayarlayıp `onAppear`da bir kez `notifyCaptureStarted()` çağırın, `notifyDocumentSelectionShown()` **çağırmayın** |
 
 ### Metotlar
 | Metot | Etki |

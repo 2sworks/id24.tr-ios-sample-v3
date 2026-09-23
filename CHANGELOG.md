@@ -20,6 +20,17 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 - **`SDKSelfieWithLivenessConfig`** — süreler, oval oranları ve ARKit eşikleri (init'e verilir).
 - **`SDKFaceCapturePath`** public — ekranın hangi yolla çalıştığı (`.arkit` / `.vision` / `.unsupported`).
 - `SDKSelfieWithLivenessView(viewModel:)` — kendi ViewModel'ini enjekte etme.
+- **`SDKDocumentSelectionConfig`** — kimlik ve OVD modüllerindeki belge türü seçim (hazırlık)
+  ekranının entegratör ayarı: `showsScreen` (ekranı tamamen kaldır), `options` (gösterilecek
+  türler ve sırası), `defaultType`, `speaksOnScreen` (yalnız bu ekranın sesli yönergesi),
+  `autoSkipSingleOption`. Ekran kaldırıldığında seçim modül açılır açılmaz sunucuya gider:
+  kimlikte `stepChanged` + `setDocType`, OVD'de yalnız `stepChanged`
+  (`Id Card OVD` / `Passport OVD`). Bkz. [IdCard.md](IdentifySample/Modules/IdCard/IdCard.md),
+  [IdCardOVD.md](IdentifySample/Modules/IdCardOVD/IdCardOVD.md).
+- ViewModel okumaları: `SDKIdCardViewModel.selectionOptions` / `initialCardType` /
+  `skippedCardType`, `SDKIdCardOVDViewModel.selectionOptions` / `initialDocumentType` /
+  `skippedDocumentType`, `CardType.selectionIcon` / `selectionTitle` — özel ekranların aynı
+  ayarı okuyabilmesi için.
 
 **Değişti**
 - `SDKSelfieWithLivenessView` artık diğer modüller gibi **SwiftUI + ViewModel**: UIKit
@@ -27,6 +38,14 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
   ekran flaşı, yönerge metinleri, titreşim, yükleme kararı. Hata/yeniden deneme alert'i artık
   diğer modüllerle ortak `idErrorAlert` stilinde.
+
+**Düzeltildi**
+- Bir önceki ekranın sesli yönergesi yeni ekranda okunmaya devam ediyordu. İki neden: modül içi
+  ekran geçişleri (hazırlık ekranı → tarama/çekim) okumayı kesmiyordu — koordinatör
+  geçişlerinin (`push` / `popBack` / `advanceToNextModule`) aksine — ve ses klibi ile native
+  motor birbirini durdurmadığı için ardışık iki okuma farklı motora düştüğünde iki ses üst üste
+  biniyordu. Kendi ekranlarınızda da modül içinde ekran değiştirirken
+  `SDKSpeechService.shared.stop()` çağırın.
 
 ### 3.1.0 — Tema ve özelleştirme paketi
 
