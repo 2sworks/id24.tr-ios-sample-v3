@@ -92,11 +92,11 @@ aldığınıza göre iki yol vardır:
 | Risk | — | Bulanık/parlamalı kare → "okunamadı" ya da sunucu karşılaştırma reddi |
 
 > **Otomatik fener, lens geçişi, Elle çek düğmesi, parlama kapısı** `ScannerAutomation` ile
-> kapatılır (ör. `ScannerAutomation.default.autoTorch = false`). Ayrıntı:
+> ayarlanır. Otomatik fener varsayılan kapalı; açmak için
+> `ScannerAutomation.default.autoTorch = true`. Ayrıntı:
 > [Otomatik Davranışlar](../../../docs/guides/identity-scanner.md#otomatik-davranışlar--scannerautomation).
 >
-> **Fener düğmesi** `ScannerConfiguration.showsTorchButtonDefault = false` ile gizlenir; feneri
-> tümüyle kapatmak için `autoTorch = false` ile birlikte verin. Ayrıntı:
+> **Fener düğmesi** `ScannerConfiguration.showsTorchButtonDefault = false` ile gizlenir. Ayrıntı:
 > [Fener düğmesi](../../../docs/guides/identity-scanner.md#fener-düğmesi).
 
 ### A) SDK tarayıcısıyla

@@ -271,12 +271,12 @@ belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşen
 
 ### Otomatik Davranışlar — `ScannerAutomation`
 
-Tarayıcının kullanıcı bir şey yapmadan yaptığı işler. Hepsi varsayılan olarak **açıktır**;
-kapatmak için:
+Tarayıcının kullanıcı bir şey yapmadan yaptığı işler. `autoTorch` varsayılan olarak
+**kapalı**, diğerleri **açıktır**; değiştirmek için:
 
 ```swift
 // Tüm tarayıcılar için (kimlik, pasaport, belge) — tarayıcı açılmadan önce
-ScannerAutomation.default.autoTorch = false
+ScannerAutomation.default.autoTorch = true
 
 // Yalnız bir tarayıcı için
 var cfg = ScannerConfiguration.default
@@ -286,7 +286,7 @@ IdentityScannerView(profile: .turkishIDFront, configuration: cfg) { … }
 
 | Anahtar | Açıkken ne yapar | Kapatınca |
 |---|---|---|
-| `autoTorch` | Sahne çok karanlıksa ve belge 4 sn bulunamazsa feneri açar. Kamerayı elle kapatmak da karanlık sahne sayılır. | Fener yalnız kullanıcı ya da host açarsa açılır. |
+| `autoTorch` (varsayılan kapalı) | Sahne çok karanlıksa ve belge 4 sn bulunamazsa feneri açar. Kamerayı elle kapatmak da karanlık sahne sayılır. | Fener yalnız kullanıcı ya da host açarsa açılır. |
 | `ultraWideLensSwitch` | Belge kadrajı dolduruyor ama geniş lens netleyemiyorsa (çok yakın) ultra-geniş lense geçer, "uzaklaştırın" der. | Geniş lenste kalır; kullanıcı kartı netlenene kadar uzaklaştırmalıdır. |
 | `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden döner (senaryolar aşağıda). | Ultra-geniş lense geçildiyse tarama bitene kadar orada kalır. |
 | `manualCaptureFallback` | Otomatik çekim zorlanınca **Elle çek** düğmesini gösterir: `manualCaptureHintDelay` sn sonra ya da `maxAutoCaptureFails` başarısız denemeden sonra. | Düğme hiç çıkmaz; tarayıcı başarılı olana ya da kullanıcı ekrandan çıkana kadar otomatik çekimi dener. |
@@ -301,8 +301,6 @@ Fener düğmesi (tarayıcının kendi düğmesi ve hazır kimlik ekranının üs
 // Tüm tarayıcılar için
 ScannerConfiguration.showsTorchButtonDefault = false
 
-// Feneri tümüyle kapatmak için otomatik açmayı da kapatın
-ScannerAutomation.default.autoTorch = false
 
 // Yalnız bir tarayıcı için
 var cfg = ScannerConfiguration.default

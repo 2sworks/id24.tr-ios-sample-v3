@@ -1466,17 +1466,17 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
 
-**Otomatik davranışlar — `ScannerAutomation`** (hepsi varsayılan açık):
+**Otomatik davranışlar — `ScannerAutomation`** (`autoTorch` varsayılan kapalı, diğerleri açık):
 
 ```swift
-ScannerAutomation.default.autoTorch = false              // tüm tarayıcılar
+ScannerAutomation.default.autoTorch = true               // tüm tarayıcılar
 var cfg = ScannerConfiguration.default
 cfg.automation.manualCaptureFallback = false             // yalnız bu tarayıcı
 ```
 
-| Anahtar | Kapatınca |
+| Anahtar | Değiştirince |
 |---|---|
-| `autoTorch` | Karanlıkta (ya da kamera elle kapatılınca) fener kendiliğinden açılmaz |
+| `autoTorch` | `true`: karanlıkta (ya da kamera elle kapatılınca) fener kendiliğinden açılır |
 | `ultraWideLensSwitch` | Kart çok yakınken ultra-geniş lense geçilmez |
 | `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden dönülmez |
 | `manualCaptureFallback` | Elle çek düğmesi hiç çıkmaz; otomatik çekim süresiz dener |
@@ -1491,7 +1491,6 @@ ScannerConfiguration.showsTorchButtonDefault = false     // tüm tarayıcılar
 cfg.showsTorchButton = false                             // yalnız bu tarayıcı
 ```
 
-Feneri tümüyle kapatmak için `autoTorch = false` ile birlikte verin.
 
 ### 16.5 Çerçeve görünümü — `QuadrilateralStyle`
 

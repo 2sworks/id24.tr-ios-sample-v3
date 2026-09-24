@@ -115,10 +115,9 @@ struct RootView: View {
         // (verilmezse ilk seçenek) olur ve seçim modül açılır açılmaz sunucuya gider.
         SDKDocumentSelectionConfig.shared.idCard.showsScreen = false
         SDKDocumentSelectionConfig.shared.ovd.showsScreen = false
-        // Fener yok: düğme gizlenir ve karanlıkta kendiliğinden de yanmaz. OVD'nin hologram
-        // adımındaki fener bu ayardan etkilenmez; o adım fenerle ölçülür.
+        // Fener yok: düğme gizlenir (otomatik fener zaten varsayılan kapalı). OVD'nin
+        // hologram adımındaki fener bu ayardan etkilenmez; o adım fenerle ölçülür.
         ScannerConfiguration.showsTorchButtonDefault = false
-        ScannerAutomation.default.autoTorch = false
 
         // Aşağıdakiler kapalı örneklerdir.
 

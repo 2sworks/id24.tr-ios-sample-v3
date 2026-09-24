@@ -29,12 +29,12 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   [IdCardOVD.md](IdentifySample/Modules/IdCardOVD/IdCardOVD.md).
 - **`ScannerAutomation`** — kimlik tarayıcısının kendiliğinden yaptığı işler kapatılabiliyor:
   `autoTorch`, `ultraWideLensSwitch`, `wideLensRecovery`, `manualCaptureFallback`, `glareGate`.
-  Tümü varsayılan açık; `ScannerAutomation.default` ile genel, `ScannerConfiguration.automation`
+  `autoTorch` varsayılan kapalı (açmak için `ScannerAutomation.default.autoTorch = true`), diğerleri
+  açık; `ScannerAutomation.default` ile genel, `ScannerConfiguration.automation`
   ile tarayıcı başına. Bkz. [Otomatik Davranışlar](docs/guides/identity-scanner.md#otomatik-davranışlar--scannerautomation).
 - **Fener düğmesi gizlenebiliyor** — `ScannerConfiguration.showsTorchButtonDefault = false`
   (genel) ya da `showsTorchButton` (tarayıcı başına). Tarayıcının kendi düğmesi ve kimlik
-  ekranının üst çubuğundaki düğme kalkar. Feneri tümüyle kapatmak için
-  `ScannerAutomation.default.autoTorch = false` ile birlikte verin. Bkz.
+  ekranının üst çubuğundaki düğme kalkar. Bkz.
   [Fener düğmesi](docs/guides/identity-scanner.md#fener-düğmesi).
 - Oda kaydı bekleme durumu: `SDKFlowCoordinator.roomWaitStatus` (yeniden deneme satırı),
   `roomBlockKind` (`.occupied` / `.waitTimeout`), `retryAfterRoomWaitTimeout()`. Bkz.
@@ -45,6 +45,9 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   ayarı okuyabilmesi için.
 
 **Değişti**
+- **Otomatik fener varsayılan kapalı** — tarayıcı karanlıkta feneri kendiliğinden açmıyor.
+  Eski davranış için `ScannerAutomation.default.autoTorch = true`. Kimlik, pasaport ve belge
+  taramasını etkiler; OVD hologram adımındaki fener bu ayara bağlı değil.
 - `SDKSelfieWithLivenessView` artık diğer modüller gibi **SwiftUI + ViewModel**: UIKit
   `SDKSelfieWithLivenessController` / `SDKSelfieWithLivenessVisionController` kaldırıldı
   (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
