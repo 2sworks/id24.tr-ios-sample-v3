@@ -36,19 +36,39 @@ struct IdCardOVDCustomView: View {
 
     private enum Phase { case typeSelection, capturing }
 
-    @StateObject private var viewModel = SDKIdCardOVDViewModel()
+    @StateObject private var viewModel: SDKIdCardOVDViewModel
     @StateObject private var camera = OVDCamera()
     @ObservedObject private var speech = SDKSpeechService.shared
     @EnvironmentObject private var coordinator: SDKFlowCoordinator
     @Environment(\.sdkPreviewMode) private var sdkPreviewMode
     @Environment(\.colorScheme) private var colorScheme
 
-    @State private var phase: Phase = .typeSelection
-    @State private var selectedType: OVDDocumentType = .idCard
+    @State private var phase: Phase
+    @State private var selectedType: OVDDocumentType
+    /// Seçim ekranından mı gelindi? (geri tuşu: seçime dön vs. modülü kapat)
+    private let showsTypeSelection: Bool
+    /// Seçim ekranı yoksa çekim konumu ("Id Card OVD" / "Passport OVD") bir kez, açılışta gönderilir.
+    @State private var didReportCaptureLocation = false
     @State private var showSuccess = false
     @State private var didAutoAdvance = false
     /// Çizilen kılavuz kutusunun ekrandaki yeri; analiz ROI'si bundan türetilir.
     @State private var guideRectOnScreen: CGRect = .zero
+
+    /// Seçim ekranı `SDKDocumentSelectionConfig.shared.ovd` ile kapatılabilir ya da tek seçenek
+    /// kaldığında atlanır; atlandığında tip baştan yazılır ve çekim konumu açılışta gönderilir.
+    init() {
+        let vm = SDKIdCardOVDViewModel()
+        if let skipped = vm.skippedDocumentType {
+            vm.documentType = skipped
+            _phase = State(initialValue: .capturing)
+            showsTypeSelection = false
+        } else {
+            _phase = State(initialValue: .typeSelection)
+            showsTypeSelection = true
+        }
+        _selectedType = State(initialValue: vm.initialDocumentType)
+        _viewModel = StateObject(wrappedValue: vm)
+    }
 
     var body: some View {
         switch phase {
@@ -84,8 +104,10 @@ struct IdCardOVDCustomView: View {
                                     .lineSpacing(4)
                             }
                             VStack(spacing: IDSpacing.sm) {
-                                typeRow(.idTypeChip, String(.chippedIdCard), selectedType == .idCard) { selectedType = .idCard }
-                                typeRow(.idTypePassport, String(.passport), selectedType == .passport) { selectedType = .passport }
+                                // Satırlar `SDKDocumentSelectionConfig.shared.ovd.options` ile belirlenir.
+                                ForEach(viewModel.selectionOptions, id: \.self) { type in
+                                    typeRow(icon(for: type), title(for: type), selectedType == type) { selectedType = type }
+                                }
                             }
                         }
                         .padding(.top, IDSpacing.xxl)
@@ -96,6 +118,9 @@ struct IdCardOVDCustomView: View {
                     SDKButton(title: String(.continuePage)) {
                         viewModel.documentType = selectedType
                         viewModel.notifyCaptureStarted()
+                        // Modul ici ekran degisimi de bir gecistir: secim ekraninin yonergesi
+                        // kesilmezse cekim ekraninda okunmaya devam eder.
+                        SDKSpeechService.shared.stop()
                         withAnimation { phase = .capturing }
                     }
                     .padding(.horizontal, IDSpacing.lg)
@@ -108,10 +133,20 @@ struct IdCardOVDCustomView: View {
                 .onAppear {
                     viewModel.notifyDocumentSelectionShown()
                     // SDK bu rotayı otomatik okumaz: seçim ve çekim fazlarının yönergesi farklıdır.
-                    SDKSpeechService.shared.speak(.idCardOVDTts, in: .idcard_w_ovd)
+                    if SDKDocumentSelectionConfig.shared.ovd.speaksOnScreen {
+                        SDKSpeechService.shared.speak(.idCardOVDTts, in: .idcard_w_ovd)
+                    }
                 }
             }
         }
+    }
+
+    private func icon(for type: OVDDocumentType) -> SDKIconKey {
+        type == .passport ? .idTypePassport : .idTypeChip
+    }
+
+    private func title(for type: OVDDocumentType) -> String {
+        type == .passport ? String(.passport) : String(.chippedIdCard)
     }
 
     private func typeRow(_ icon: SDKIconKey, _ title: String, _ isSelected: Bool, action: @escaping () -> Void) -> some View {
@@ -150,7 +185,9 @@ struct IdCardOVDCustomView: View {
                 SDKNavigationBar(style: .overlay, onBack: {
                     camera.stop()
                     viewModel.stopMotion()
+                    guard showsTypeSelection else { coordinator.popBack(); return }
                     viewModel.reset()
+                    SDKSpeechService.shared.stop()
                     withAnimation { phase = .typeSelection }
                 })
                 HStack(spacing: 6) {
@@ -187,6 +224,11 @@ struct IdCardOVDCustomView: View {
         .onPreferenceChange(GuideRectKey.self) { guideRectOnScreen = $0 }
         .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
         .onAppear {
+            // Seçim ekranı yoksa çekim konumu ("Id Card OVD" / "Passport OVD") modül açılır açılmaz gider.
+            if !showsTypeSelection, !didReportCaptureLocation {
+                didReportCaptureLocation = true
+                viewModel.notifyCaptureStarted()
+            }
             viewModel.onSkipRequested = { coordinator.skipCurrentModule() }
             viewModel.onFlowFailed = { coordinator.finishFlowAsFailed() }
             viewModel.onRequestCapture = { camera.capturePhoto() }

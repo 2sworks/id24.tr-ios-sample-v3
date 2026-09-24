@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/2sworks/id24.tr-ios-sdk-spm",
       "state" : {
-        "revision" : "b21a3d6e281341585c7a0c0786e9a4ce3610b270",
-        "version" : "3.1.0"
+        "revision" : "1967fc4422a23c8079d8be77bcf190867df8c617",
+        "version" : "3.1.1"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stasel/WebRTC.git",
       "state" : {
-        "revision" : "8ce70d799bc637be04489376ebae7334061a1db0",
-        "version" : "94.0.0"
+        "revision" : "4266157cd08f92115de885ab12d87196a8db87e1",
+        "version" : "153.0.0"
       }
     }
   ],

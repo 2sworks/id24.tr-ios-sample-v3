@@ -969,7 +969,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 47;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -1014,7 +1014,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 47;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -1087,7 +1087,7 @@
 			repositoryURL = "https://github.com/stasel/WebRTC.git";
 			requirement = {
 				kind = exactVersion;
-				version = 94.0.0;
+				version = 153.0.0;
 			};
 		};
 		4857BFF62902D621001FE850 /* XCRemoteSwiftPackageReference "OpenSSL" */ = {
@@ -1127,7 +1127,7 @@
 			repositoryURL = "https://github.com/2sworks/id24.tr-ios-sdk-spm";
 			requirement = {
 				kind = exactVersion;
-				version = 3.1.0;
+				version = 3.1.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

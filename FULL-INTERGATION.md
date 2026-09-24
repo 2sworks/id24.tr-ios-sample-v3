@@ -1024,6 +1024,11 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
 **üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
 
+Oda kaydı 20 sn içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı çıkar
+(`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Oda dolu
+yeniden denemelerinde `roomWaitStatus` güncellenir. Ayrıntı:
+[Oturum Çıkışları → 4.4](docs/guides/session-exit.md#44-oturum-kurulamadı--sürdürülemedi).
+
 Her çıkış yolu için gelen veriler, "panelde tek modül açık, müşteri adımı tamamladı" senaryosu ve kapanıştan
 sonra SwiftUI / UIKit / RN-Flutter'da yönlendirmenin nereye yazılacağı:
 [Oturum Çıkışları Rehberi](docs/guides/session-exit.md).
@@ -1461,8 +1466,34 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `focusSettleDelay` | 0.5 / 1.2 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
 | `quadMissResetThreshold` | 3 / 5 | Kaç kare belge kaybolursa ilerleme sıfırlanır (titreme önleyici) |
 | `manualCaptureHintDelay` | 5 s / 8 s | Manuel çekim butonunun görünme süresi |
-| `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra zorunlu manuel mod |
+| `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
+
+**Otomatik davranışlar — `ScannerAutomation`** (`autoTorch` varsayılan kapalı, diğerleri açık):
+
+```swift
+ScannerAutomation.default.autoTorch = true               // tüm tarayıcılar
+var cfg = ScannerConfiguration.default
+cfg.automation.manualCaptureFallback = false             // yalnız bu tarayıcı
+```
+
+| Anahtar | Değiştirince |
+|---|---|
+| `autoTorch` | `true`: karanlıkta (ya da kamera elle kapatılınca) fener kendiliğinden açılır |
+| `ultraWideLensSwitch` | Kart çok yakınken ultra-geniş lense geçilmez |
+| `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden dönülmez |
+| `manualCaptureFallback` | Elle çek düğmesi hiç çıkmaz; otomatik çekim süresiz dener |
+| `glareGate` | Parlamada çekim bekletilmez |
+
+Lens senaryoları: [identity-scanner.md](docs/guides/identity-scanner.md#lens-senaryoları).
+
+**Fener düğmesi** (tarayıcının kendi düğmesi ve kimlik ekranının üst çubuğundaki düğme):
+
+```swift
+ScannerConfiguration.showsTorchButtonDefault = false     // tüm tarayıcılar
+cfg.showsTorchButton = false                             // yalnız bu tarayıcı
+```
+
 
 ### 16.5 Çerçeve görünümü — `QuadrilateralStyle`
 

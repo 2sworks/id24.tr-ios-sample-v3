@@ -41,6 +41,38 @@ SDKIdCardView()                       // kendi VM'ini kurar
 SDKIdCardView(viewModel: myIdCardVM)  // dışarıdan VM enjeksiyonu (host VM ile)
 ```
 
+---
+
+## Hazırlık Ekranı (Belge Türü Seçimi)
+
+Modül, tarama başlamadan önce "Çipli TC / Pasaport / Diğer" seçim ekranını açar. Bu ekran
+`SDKDocumentSelectionConfig.shared.idCard` ile ayarlanır — `setupSDK`ten önce yazın:
+
+```swift
+SDKDocumentSelectionConfig.shared.idCard.showsScreen = false      // ekranı tamamen kaldır
+SDKDocumentSelectionConfig.shared.idCard.defaultType = .idCard    // kaldırıldığında kullanılacak tip
+SDKDocumentSelectionConfig.shared.idCard.options = [.idCard, .passport]  // ekrandaki satırlar ve sıraları
+SDKDocumentSelectionConfig.shared.idCard.speaksOnScreen = false   // yalnız bu ekranın sesli yönergesi sussun
+SDKDocumentSelectionConfig.shared.idCard.autoSkipSingleOption = false  // tek seçenekte de ekranı göster
+```
+
+| Alan | Varsayılan | Anlam |
+|---|---|---|
+| `showsScreen` | `true` | `false` → ekran hiç açılmaz, doğrudan taramaya girilir |
+| `options` | `[.idCard, .passport, .oldSchool]` | Ekrandaki satırlar, yazdığınız sırayla. Sunucunun izin verdikleriyle (`identCardType`) kesiştirilir; kesişim boşsa sunucunun listesi kullanılır ve durum `sdk_logs`a yazılır |
+| `defaultType` | `nil` | Ekranda ilk seçili gelen / ekran atlandığında kullanılan tip. `nil` → `options` içindeki ilk tip |
+| `speaksOnScreen` | `true` | `false` → yalnız bu ekran okunmaz, modülün diğer adımları okunmaya devam eder |
+| `autoSkipSingleOption` | `true` | Geriye tek seçenek kaldığında ekran atlanır (kullanıcıya sorulacak bir şey yoktur) |
+
+**Ekran atlandığında ne gönderilir?** Seçim ekranı açılsaydı gidecek olan
+`stepChanged / location: "documentSelection"` mesajı **gitmez**; onun yerine seçilen tipin kendi
+konumu (`Id Card` / `Passport` / `Other`) ve `setDocType` isteği **modül açılır açılmaz**, kullanıcı
+hiçbir şeye dokunmadan gider. Ekran atlandığında bu ekranın sesli yönergesi de okunmaz.
+
+> **Dikkat — davranış değişikliği:** `setupSDK(identCardType:)` ile tek tip gönderen
+> entegratörler önceden tek satırlı bir seçim ekranı görüyordu. Artık o ekran atlanır. Eski
+> davranış için `autoSkipSingleOption = false`.
+
 ## Kendi Tasarımınızla (Override)
 
 > **Çalışan tam örnek:** [IdCardCustomView.swift](IdCardCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.idCard) { IdCardCustomView() }`
@@ -74,6 +106,14 @@ aldığınıza göre iki yol vardır:
 > **Arka yüzde neyin zorunlu olduğunu değiştirmek:** `DocumentProfile.turkishIDBack`
 > `.settingRequired(false, for: "fatherName")` / `.settingMRZRequired(false)` ile kopyalanıp
 > `IdentityScannerView(profile:)`'a verilir; ayrıntı [IdentityScanner rehberi](../../../docs/guides/identity-scanner.md#neyin-çekimi-beklettiğine-profil-karar-verir).
+>
+> **Otomatik fener, lens geçişi, Elle çek düğmesi, parlama kapısı** `ScannerAutomation` ile
+> ayarlanır. Otomatik fener varsayılan kapalı; açmak için
+> `ScannerAutomation.default.autoTorch = true`. Ayrıntı:
+> [Otomatik Davranışlar](../../../docs/guides/identity-scanner.md#otomatik-davranışlar--scannerautomation).
+>
+> **Fener düğmesi** `ScannerConfiguration.showsTorchButtonDefault = false` ile gizlenir. Ayrıntı:
+> [Fener düğmesi](../../../docs/guides/identity-scanner.md#fener-düğmesi).
 
 ### A) SDK tarayıcısıyla
 
@@ -178,6 +218,9 @@ public enum IdCardSide: String, Identifiable, Hashable { case front, back }
 | Üye | Anlam |
 |---|---|
 | `allowedCardTypes: [CardType]` | İzinli belge tipleri (`manager.allowedCardType`) |
+| `selectionOptions: [CardType]` | Seçim ekranında çizilecek satırlar (config ∩ izinliler) |
+| `initialCardType: CardType` | İlk seçili gelen / ekran atlanırsa kullanılan tip |
+| `skippedCardType: CardType?` | Ekran atlanacaksa o tip, gösterilecekse `nil`. Atlandığında `onAppear`da bir kez `selectCardType(_:)` çağırın, `notifyDocumentSelectionShown()` **çağırmayın** |
 | `nfcRetryExceeded: Bool` | NFC karşılaştırma 2+ kez denendi mi |
 
 ### Metotlar

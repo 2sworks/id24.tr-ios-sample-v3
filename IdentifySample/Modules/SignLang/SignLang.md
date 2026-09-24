@@ -23,6 +23,69 @@ Kapının görünmesi için `setupSDK(signLangSupport: true)` verilmelidir.
 
 ---
 
+## Tanımlama
+
+```swift
+IdentifyManager.shared.setupSDK(
+    identId: identId,
+    baseApiUrl: baseApiUrl,
+    networkOptions: SDKNetworkOptions(),
+    signLangSupport: true,          // görüşme ekranı açılınca kapı gösterilir
+    ...
+)
+```
+
+| `signLangSupport` | Davranış |
+|---|---|
+| `false` | Kapı açılmaz. Bekleme ekranına gelindiği anda `stepChanged` gider, müşteri paneldeki bekleme odasına düşer (`sign_language: false`). |
+| `true` | Görüşme ekranı açılınca kapı gösterilir. `stepChanged`, kullanıcı **Devam**'a basana kadar **gönderilmez**; müşteri panelde bu seçimden sonra görünür. |
+
+- Toggle varsayılan olarak **kapalı** gelir (`isSignLangEnabled = false`). `setupSDK`'da bunu
+  önceden açan bir parametre yoktur; açık gelmesini istiyorsanız kendi ekranınızda
+  `vm.isSignLangEnabled = true` atayın.
+
+## Sunucuya Giden Veri
+
+Tercih, `stepChanged` aksiyonunun `steps` nesnesinde `sign_language` alanıyla gider:
+
+```json
+{
+  "action": "stepChanged",
+  "location": "Call Wait Screen",
+  "room": "<customer_uid>",
+  "steps": {
+    "language": "TR",
+    "sign_language": true,
+    "...": "diğer modül adımları"
+  }
+}
+```
+
+| Alan | Tip | Değer |
+|---|---|---|
+| `steps.sign_language` | `Bool` | Kullanıcı toggle'ı açıp **Devam**'a bastıysa `true`, aksi hâlde `false` |
+
+Temsilci havuzu seçimi bu alana göre sunucu tarafında yapılır.
+
+## Metinler
+
+Ekrandaki metinler `SDKLocalization` anahtarlarıyla değiştirilir
+([Lokalizasyon](../../../docs/guides/localization.md)):
+
+| Anahtar | Yer | Varsayılan (TR) |
+|---|---|---|
+| `.signLangTitle` (`SignLangTitle`) | Başlık | İşaret Dili Desteği |
+| `.signLangDesc` (`SignLangDesc`) | Açıklama | Görüntülü görüşme sürecinde size işaret dili bilen bir müşteri temsilcisi bağlamak ister misiniz? |
+| `.coreSignLang` (`CoreSignLang`) | Toggle etiketi | İşaret dili bilen bir müşteri temsilcisi ile görüşmek istiyorum |
+
+```swift
+SDKLocalization.shared.setOverride(key: .signLangTitle, language: .tr, value: "Erişilebilir Görüşme")
+```
+
+Simge: `SDKTheme` ikonu `.signLang` (`person.wave.2.fill`).
+
+---
+
 ## ViewModel Referansı — `SDKSignLangViewModel`
 
 VM o kadar küçük ki tamamını gösterebiliriz:

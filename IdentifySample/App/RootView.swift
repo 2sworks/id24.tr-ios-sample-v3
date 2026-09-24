@@ -109,6 +109,16 @@ struct RootView: View {
         // D) Tam ekran değiştirme — tüm modüller (anahtar kapalıyken SDK ekranına düşer).
         CustomScreens.register(in: registry)
 
+        // E) Belge seçim ekranı ve tarayıcı ayarları. Akış başlamadan verilir;
+        //    ekranlar açılırken okunur.
+        // Belge türü seçim ekranı yok: modül doğrudan çekimle açılır, tip `defaultType`
+        // (verilmezse ilk seçenek) olur ve seçim modül açılır açılmaz sunucuya gider.
+        SDKDocumentSelectionConfig.shared.idCard.showsScreen = false
+        SDKDocumentSelectionConfig.shared.ovd.showsScreen = false
+        // Fener yok: düğme gizlenir (otomatik fener zaten varsayılan kapalı). OVD'nin
+        // hologram adımındaki fener bu ayardan etkilenmez; o adım fenerle ölçülür.
+        ScannerConfiguration.showsTorchButtonDefault = false
+
         // Aşağıdakiler kapalı örneklerdir.
 
         // B) Metin: SDK metin anahtarı dile göre ezilir.

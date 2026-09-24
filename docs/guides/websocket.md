@@ -99,6 +99,10 @@ Soket yalnızca sunucudan komut almak için değildir; SDK her modül geçişind
 | `sendSpeechStatus(isCompleted:)` | Konuşma modülü sonucu |
 | `modulePresented` (adım bildirimi) | `advanceToNextModule()` içinde |
 
+`stepChanged` gövdesindeki `steps.sign_language` alanı işaret dili tercihini taşır.
+`signLangSupport: true` iken bekleme ekranındaki `stepChanged`, kullanıcı işaret dili
+kapısını geçene kadar bekletilir — ayrıntı: [SignLang](../../IdentifySample/Modules/SignLang/SignLang.md#sunucuya-giden-veri).
+
 **Bu yüzden custom ekranlar SDK VM metotlarını atlayamaz** — kendi navigasyonunuzu kurarsanız
 bu sinyaller gitmez ve agent panelinde akış "takılı" görünür.
 Ayrıntı: [Özelleştirme → bypass yok kuralı](customization.md#bypass-yok-kuralı).

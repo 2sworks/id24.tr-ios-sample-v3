@@ -54,7 +54,8 @@ getirir: bağımlılık kümesi sürüme göre farklıdır (3.x ayrıca `Permiss
 
 Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto),
 `Starscream` (WebSocket), `WebRTC` (görüntülü görüşme), `PermissionsKit` ve
-`SwiftSignatureView` (3.x).
+`SwiftSignatureView` (3.x). 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
+uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa çözümleme başarısız olur.
 
 ### 2. İzinleri tanımlayın
 
