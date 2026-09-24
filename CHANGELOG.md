@@ -50,7 +50,7 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   taramasını etkiler; OVD hologram adımındaki fener bu ayara bağlı değil.
 - `SDKSelfieWithLivenessView` artık diğer modüller gibi **SwiftUI + ViewModel**: UIKit
   `SDKSelfieWithLivenessController` / `SDKSelfieWithLivenessVisionController` kaldırıldı
-  (ikisi de internal'dı; public API kırılması yok). Davranış aynı: küçük→büyük oval, 3 sn tutma,
+  (ikisi de internal'dı). Davranış aynı: küçük→büyük oval, 3 sn tutma,
   ekran flaşı, yönerge metinleri, titreşim, yükleme kararı. Hata/yeniden deneme alert'i artık
   diğer modüllerle ortak `idErrorAlert` stilinde.
 - **WebRTC 94 → 153.** Görüntü `RTCMTLVideoView` (Metal) ile çiziliyor; `RTCEAGLVideoView`
@@ -65,8 +65,6 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
   (`autoSkipSingleOption = false` ile eski davranış).
 
 **Düzeltildi**
-- `SDKIdCardOVDView(documentType:)` ile açılan OVD'de çekim konumu sunucuya hiç
-  gönderilmiyordu; artık modül açılır açılmaz gönderiliyor.
 - Bir önceki ekranın sesli yönergesi yeni ekranda okunmaya devam ediyordu. İki neden: modül içi
   ekran geçişleri (hazırlık ekranı → tarama/çekim) okumayı kesmiyordu — koordinatör
   geçişlerinin (`push` / `popBack` / `advanceToNextModule`) aksine — ve ses klibi ile native
