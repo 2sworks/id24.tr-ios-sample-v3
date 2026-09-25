@@ -1,9 +1,10 @@
 # Liveness — Canlılık Testi
 
 "Karşımdaki gerçek ve canlı bir insan mı, yoksa bir fotoğraf/video mu?" sorusunu cevaplar.
-Kullanıcıya sırayla hareket talimatları verilir — **göz kırp, gülümse, sola bak, sağa bak** —
-ve her adım bir doğrulama karesiyle kanıtlanır. Adım sırasını sunucu belirler (her oturumda
-farklı olabilir), böylece önceden kaydedilmiş videoyla aldatma zorlaşır.
+Kullanıcıya sırayla hareket talimatları verilir — **göz kırp, gülümse, başını sola/sağa çevir,
+başını öne/geriye eğ, kaşlarını kaldır, gözlerini sola/sağa/yukarı çevir** — ve her adım bir
+doğrulama karesiyle kanıtlanır. Hangi adımların hangi sırayla isteneceğini sunucu belirler (her
+oturumda farklı olabilir), böylece önceden kaydedilmiş videoyla aldatma zorlaşır.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -99,6 +100,7 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 | `turnLeft` / `turnRight` | `jawLeft` / `jawRight` > 0.12 |
 | `blinkEyes` | `eyeBlinkLeft` ve `eyeBlinkRight` > 0.35, `jawLeft/Right` < 0.03 |
 | `smile` | `mouthSmileLeft + mouthSmileRight` > 1.2, `jawLeft/Right` < 0.03 |
+| `nodDown` `nodUp` `lookUp` `browUp` `eyesLeft` `eyesRight` | Adım başında nötr baş pozu ölçülür; açı/blendshape farkı belirli süre tutulmalı. Bu kurallar public değildir — bu adımlar sunucuda açıksa override önerilmez. |
 
 > ❌ **Bypass yapmayın:** Adımları kendi mantığınızla "geçti" sayıp ilerlemeyin — her adım
 > `uploadFrame` ile kanıtlanmalıdır.
@@ -111,7 +113,7 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 ### State (`@Published`, salt-okunur)
 | Üye | Tip | Anlam |
 |---|---|---|
-| `currentStep` | `LivenessTestStep?` | Mevcut adım (`turnLeft/turnRight/blinkEyes/smile/completed`) |
+| `currentStep` | `LivenessTestStep?` | Mevcut adım (`turnLeft/turnRight/blinkEyes/smile/nodDown/nodUp/lookUp/browUp/eyesLeft/eyesRight/completed`) |
 | `stepInstruction` | `String` | Adım talimatı (ör. "Göz kırpın") |
 | `allStepsCompleted` | `Bool` | Tüm adımlar bitti mi |
 

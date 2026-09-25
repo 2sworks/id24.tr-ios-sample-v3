@@ -915,6 +915,17 @@ private struct DebugSettingsView: View {
                             )
                         }
 
+                        DebugSection(title: "Canlılık (ITR-1904)") {
+                            DebugToggleRow(
+                                title: "Yeni adımları dene",
+                                subtitle: "Sunucunun adım sırasını yok sayar, yalnızca yeni adımları ister "
+                                        + "(başı öne/geriye eğ, kaş kaldır, gözleri sola/sağa/yukarı çevir). "
+                                        + "Kareler sunucunun tanıdığı mevcut tiplerle yüklenir. "
+                                        + "Sunucu yeni adımları göndermeye başlayınca kapatın.",
+                                isOn: $debug.livenessDummySteps
+                            )
+                        }
+
                         DebugSection(title: "Selfie + Canlılık") {
                             VStack(alignment: .leading, spacing: IDSpacing.sm) {
                                 Text("TrueDepth modu")
