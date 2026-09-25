@@ -21,6 +21,7 @@ içindedir; ekran (SwiftUI) yalnızca kamera/ARKit girdisini ViewModel'e verir v
 | Drop-in view | `SDKSelfieWithLivenessView(trueDepthMode:)` |
 | ViewModel | `SDKSelfieWithLivenessViewModel(trueDepthMode:config:)` |
 | Dış dünya | Yüz/canlılık (cihazda) + **HTTP** (`uploadIdPhoto`) |
+| Sunucuya giden | `mobile/upload`: `type: selfie` + `with_liveness: true` · soket: `uploadSelfieWithLiveness` (3.1.2+) |
 | Ses anahtarı | `SelfieWithLivenessTts` |
 | Donanım | Moda bağlı — bkz. [TrueDepth modu](#truedepth-modu) |
 

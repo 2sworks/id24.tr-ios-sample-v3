@@ -7,6 +7,14 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### 3.1.2
+
+**Düzeltildi**
+- Canlılıklı selfie (`selfieWithLiveness`) yüklemesi `type: selfie` ile birlikte
+  `with_liveness: true` gönderiyor, soket aksiyonu `uploadSelfieWithLiveness`. Önceden normal
+  selfie gibi yalnızca `type: selfie` ve `uploadSelfie` gidiyordu. Bkz.
+  [SelfieWithLiveness.md](IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md).
+
 ### 3.1.1
 
 **Yeni**
