@@ -155,3 +155,6 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .videoRecorderTts, languag
   kabul etmez; süreyi ve çözünürlüğü düşürün.
 - **`speechSuccess` ne zaman anlamlı?** Yalnızca okuma-metni senaryosunda; doğrulama
   kapalıysa bu alanları yok sayın.
+- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
+  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.videoRecorder] = SDKNavBarButtons(showsHelp: false)`;
+  işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

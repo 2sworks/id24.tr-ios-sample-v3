@@ -1,7 +1,8 @@
 # Loglama — SDKLog Mantığı
 
-SDK'nın tek log giriş noktası `SDKLog` facade'idir. Bu rehber log seviyelerini (nereye yazılır),
-severity/kategori etiketlerini, online log akışını ve hassas veri redaksiyonunu anlatır.
+SDK'daki bütün loglar `SDKLog` üzerinden yazılır. Bu rehber logların nereye gittiğini, satırlara
+eklenen önem derecesi ve kategori etiketlerini, sunucuya log gönderimini ve hassas verinin
+loglardan nasıl ayıklandığını anlatır.
 
 ← [README'ye dön](../../README.md) · İlgili: [Event Sistemi](events.md) · [Sunucu & API](server-api.md)
 
@@ -9,22 +10,22 @@ severity/kategori etiketlerini, online log akışını ve hassas veri redaksiyon
 
 ## İki Kanal: Konsol ve Online
 
-Her log satırı iki kanaldan birine ya da ikisine gidebilir:
+Bir log satırı iki yere gidebilir:
 
-- **Konsol** — Xcode çıktısı; geliştirme sırasında okursunuz.
-- **Online kuyruk** — loglar toplanıp `RoomResponse.sdk_log_api_url` adresine gönderilir;
-  sahadaki bir sorunu müşteri cihazına dokunmadan incelemenizi sağlar.
+- Konsol: Xcode çıktısı. Geliştirirken buradan okursunuz.
+- Online kuyruk: loglar biriktirilip `RoomResponse.sdk_log_api_url` adresine gönderilir. Sahada
+  yaşanan bir sorunu kullanıcının cihazına erişmeden incelemek için bunu kullanırsınız.
 
-Hangi kanalın açık olduğunu `setupSDK(logLevel:)` belirler:
+Hangi kanalın açık olacağını `setupSDK(logLevel:)` belirler:
 
-| `SDKLogLevel` | Konsol | Online | Ne zaman kullanın |
+| `SDKLogLevel` | Konsol | Online | Ne zaman |
 |---|---|---|---|
 | `.all` (varsayılan) | ✅ | ❌ | Geliştirme |
-| `.online` | ✅ | ✅ | Debug + canlı izleme |
-| `.onlineSilent` | ❌ | ✅ | **Prod** — kullanıcı cihazında gürültüsüz, siz yine görürsünüz |
-| `.noLog` | ❌ | ❌ | Log istemiyorum |
+| `.online` | ✅ | ✅ | Debug sırasında canlı izleme |
+| `.onlineSilent` | ❌ | ✅ | Canlı ortam. Kullanıcının cihazında konsol boş kalır, loglar yine size gelir |
+| `.noLog` | ❌ | ❌ | Log istemiyorsanız |
 
-Online gönderim için `logOnlineSecretKey` parametresini de vermeniz gerekir.
+Online gönderim `logOnlineSecretKey` olmadan çalışmaz.
 
 ```swift
 IdentifyManager.shared.setupSDK(
@@ -39,7 +40,7 @@ IdentifyManager.shared.setupSDK(
 
 ## Severity ve Kategori
 
-Her log satırı bir **önem derecesi** ve bir **kategori** taşır:
+Her satırın bir önem derecesi (severity) ve bir kategorisi vardır:
 
 ```swift
 SDKLog.debug("frame alındı", .liveness)
@@ -55,49 +56,50 @@ SDKLog.error("çip okunamadı", .nfc)
 | `.warning` | WARN | ⚠️ |
 | `.error` | ERROR | 🔴 |
 
-> Severity yalnızca **etikettir** — online gönderimi etkilemez. Filtreleme kanal bazındadır
-> (`SDKLogLevel`), satır bazında değildir.
+> Severity sadece bir etikettir, online gönderimi etkilemez. Neyin gönderileceğini satır
+> değil kanal belirler (`SDKLogLevel`).
 
-Kategoriler, online payload'daki `type` alanına yazılır; panelde buna göre filtrelersiniz:
+Kategori, online log kaydındaki `type` alanına yazılır ve panelde bu alana göre filtreleme
+yaparsınız:
 
 `general` · `socket` · `nfc` · `ocr` · `webrtc` · `network` · `liveness` · `offer` · `lifecycle`
 
-(`lifecycle`, uygulamanın ön/arka plan geçişlerini izler — "kullanıcı NFC sırasında uygulamayı
-arka plana attı" gibi durumları yakalamak için birebirdir.)
+`lifecycle` uygulamanın ön plana ve arka plana geçişlerini kaydeder. "Kullanıcı NFC okurken
+uygulamayı arka plana aldı" gibi durumları bu kategoriden görürsünüz.
 
 ---
 
 ## Silent Bayrağı — 🔕
 
-Bazı satırlar geliştirirken görülmeli ama sunucuya taşınmamalıdır (ör. giden istek
-gövdeleri, saniyede birkaç kez üretilen ölçümler). Bunun için satır bazında `silent`:
+Bazı satırları geliştirirken görmek istersiniz ama sunucuya gitmelerine gerek yoktur: giden
+isteklerin gövdeleri ya da saniyede birkaç kez üretilen ölçümler gibi. Bunlar için satıra
+`silent` verilir:
 
 ```swift
 SDKLog.debug("liveness skoru: \(score)", .liveness, silent: true)
 ```
 
-`silent: true` = **konsolda görünür, online kuyruğa girmez.** `.online` seviyesinde satır
-`🔕` ekiyle basılır ve orada durur; `.onlineSilent` seviyesinde konsol zaten kapalı olduğu
-için satır tamamen düşer.
+`silent: true` olan satır konsolda görünür, online kuyruğa girmez. `.online` seviyesinde konsola
+`🔕` ekiyle basılır. `.onlineSilent` seviyesinde konsol zaten kapalı olduğundan satır hiçbir
+yere yazılmaz.
 
-Yani iki eksen birbirinden bağımsızdır: `SDKLogLevel` hangi kanalların açık olduğunu
-oturum boyunca belirler, `silent` ise tek bir satırın online kuyruğa girme hakkını alır.
+İki ayar birbirinden bağımsızdır. `SDKLogLevel` oturum boyunca hangi kanalların açık olduğunu
+belirler; `silent` ise tek bir satırı online kuyruğun dışında tutar.
 
-**Online kanalı sessizce kapatan diğer durumlar** — seviye `.online` olsa bile satır
-kuyruğa girmez:
+Seviye `.online` olsa bile şu durumlarda satır kuyruğa girmez:
 
 | Durum | Sonuç |
 |---|---|
 | `logOnlineSecretKey` boş | Konsola "Online log devre dışı: secKey boş" uyarısı basılır |
-| Oturum kapandı (`closeSDK` sonrası artçı loglar) | Konsola basılır, kuyruk kapalı olduğu için sessizce atlanır |
-| `SDKLog.console(...)` ile yazılan satırlar | Taşıma katmanına hiç girmez — aşağıya bakın |
+| Oturum kapandı (`closeSDK` sonrasında gelen loglar) | Konsola basılır. Kuyruk kapalı olduğu için gönderilmez |
+| `SDKLog.console(...)` ile yazılan satırlar | Gönderim katmanına hiç girmez, aşağıya bakın |
 
 ### `SDKLog.console` — yalnızca konsol
 
-Log gönderiminin **kendi** hata satırı online kuyruğa girerse yeni bir gönderim hatası
-doğurur ve sonsuz döngü kurar. Bu satırlar `SDKLog.console(severity, category, mesaj)`
-ile yazılır: biçim diğer tüm loglarla birebir aynıdır (redaksiyon dahil), tek farkı
-kuyruğa hiç uğramamasıdır.
+Log gönderimi hata verdiğinde bu hatanın satırı da online kuyruğa girerse yeni bir gönderim
+denemesi başlar, o da hata verirse döngü hiç bitmez. Bu yüzden gönderimin kendi hataları
+`SDKLog.console(severity, category, mesaj)` ile yazılır. Biçimi ve maskeleme kuralları diğer
+loglarla aynıdır; farkı kuyruğa hiç uğramamasıdır.
 
 ```
 [identify] ⚠️ WARN  · NETWORK  · 2026-08-11 02:49:41 › Log gönderimi tamamlanamadı. Sunucuya ulaşılamadı. Neden: …
@@ -107,24 +109,24 @@ kuyruğa hiç uğramamasıdır.
 
 ## Hassas Veri Redaksiyonu
 
-Log altyapısı, mesaj içindeki **uzun Base64 blokları** (görsel/video payload'ları) otomatik
-kısaltır. Böylece online loglarda müşteri kimlik fotoğrafı ya da selfie verisi taşınmaz;
-sadece payload'ın var olduğu ve boyutu izlenebilir kalır.
+Mesajın içinde uzun bir Base64 bloğu (görsel ya da video verisi) varsa log altyapısı onu
+otomatik kısaltır. Böylece kimlik fotoğrafı ya da selfie online loglara taşınmaz; logda yalnızca
+verinin gönderildiği ve boyutu kalır.
 
 ---
 
 ## Soket Trafiği Logları
 
-Gelen/giden her soket mesajı `socket` kategorisiyle loglanır (`incoming` / `outgoing` yönü
-işaretlenir). Bir akış sorununu incelerken genellikle en bilgilendirici kayıtlar bunlardır:
-agent'ın ne gönderdiğini ve SDK'nın ne cevap verdiğini kronolojik görürsünüz.
+Gelen ve giden her soket mesajı `socket` kategorisiyle, yönü (`incoming` / `outgoing`)
+işaretlenerek loglanır. Bir akış sorununu incelerken çoğunlukla en çok işe yarayan kayıtlar
+bunlardır: agent'ın ne gönderdiğini ve SDK'nın ne cevap verdiğini sırasıyla görürsünüz.
 
 ---
 
 ## Log mu Event mi?
 
-- **Log** = serbest metin, geliştirici için; sorun ayıklarken okunur.
-- **Event** = yapılandırılmış olay (`SDKEvent`), analitik/izleme için; koda değil veriye bakılır.
+- Log serbest metindir ve geliştirici içindir. Sorun ayıklarken okunur.
+- Event (`SDKEvent`) yapılandırılmış bir olaydır ve analitik ile izleme için kullanılır.
 
-"Kullanıcı selfie adımını kaç kere başarısız yaptı?" sorusunun cevabı loglarda değil,
-[Event Sistemi](events.md)'ndedir.
+"Kullanıcı selfie adımında kaç kez başarısız oldu?" gibi soruların cevabı loglarda değil,
+[Event Sistemi](events.md)'nde bulunur.

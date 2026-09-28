@@ -104,6 +104,10 @@ struct MySwlView: View {
 
 **Tema** ekran yazmadan da çalışır ([Tema rehberi](../../../docs/guides/theming.md)).
 
+Üst çubuktaki yardım (?) düğmesine SDK bir işlev bağlamaz, basılınca bir şey olmaz. Bu ekrandan
+kaldırmak için `SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false)`;
+işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).
+
 ## TrueDepth Modu
 
 Ekranın derinlik kamerası kullanıp kullanmayacağını entegrasyon seçer.

@@ -1,19 +1,19 @@
 # IdentityScanner — Gerçek Zamanlı Belge Tarama Motoru
 
-SDK'nın içindeki kamera tabanlı **belge tarama motoru**. Kimlik ekranında gördüğünüz o akıllı
-davranışların hepsi buradan gelir: belge dörtgenini canlı yakalama, alan alan OCR (TCKN,
-ad-soyad, doğum tarihi...), MRZ okuma, perspektif düzeltme ve TCKN/MRZ doğrulaması —
-**tamamı cihaz üzerinde.**
+IdentityScanner, SDK'nın içindeki kamera tabanlı belge tarama motorudur. Kimlik ekranındaki
+davranışların hepsi buradan gelir: belge dörtgenini canlı yakalama, alan alan OCR (TCKN, ad-soyad,
+doğum tarihi...), MRZ okuma, perspektif düzeltme ve TCKN/MRZ doğrulaması. Bunların hepsi cihaz
+üzerinde çalışır.
 
-İki şekilde karşınıza çıkar:
+Motoru iki yoldan kullanırsınız:
 
-1. **Dolaylı** — [IdCard](../../IdentifySample/Modules/IdCard/IdCard.md) ve
+1. Dolaylı: [IdCard](../../IdentifySample/Modules/IdCard/IdCard.md) ve
    [AddressConfirm](../../IdentifySample/Modules/AddressConfirm/AddressConfirm.md) modüllerinin hazır
-   ekranları bu motoru zaten kullanır; hiçbir şey yapmanız gerekmez.
-2. **Doğrudan** — `IdentityScannerView`'ı kendi ekranlarınızda **bağımsız bileşen** olarak
-   kullanabilirsiniz (KYC akışı dışındaki senaryolar için: form ön-doldurma, belge arşivleme...).
+   ekranları bu motoru zaten kullanır. Sizin bir şey yapmanız gerekmez.
+2. Doğrudan: `IdentityScannerView`'ı kendi ekranlarınıza bağımsız bir bileşen olarak koyarsınız.
+   Bu, KYC akışı dışındaki işler içindir (form ön-doldurma, belge arşivleme...).
 
-Gereksinim: **iOS 15+**.
+Gereksinim: iOS 15+.
 
 ← [README'ye dön](../../README.md) · İlgili: [Özelleştirme](customization.md) · [Tema](theming.md)
 
@@ -21,7 +21,7 @@ Gereksinim: **iOS 15+**.
 
 ## Kurulum — Tek Satır
 
-Uygulama açılışında profil ve doğrulayıcı kayıtlarını yapın:
+Uygulama açılırken profilleri ve doğrulayıcıları kaydedin:
 
 ```swift
 IdentityScanner.setup()   // built-in profiller + TCKN/MRZ doğrulayıcıları kaydedilir
@@ -42,33 +42,34 @@ IdentityScannerView(profile: .turkishIDFront) { result in
 }
 ```
 
-Kullanıcı belgeyi çerçeveye tutar; motor kareler stabilize olunca **otomatik yakalar**
-(gerekirse manuel yakalama butonu belirir), alanları okur, doğrular ve sonucu döndürür.
+Kullanıcı belgeyi çerçeveye tutar. Kareler sabitlenince motor fotoğrafı kendisi çeker (gerekirse
+elle çekim düğmesi çıkar), alanları okur, doğrular ve sonucu döndürür.
 
 ---
 
 ## Hazır Profiller
 
-Profil = "bu belge nasıl taranır" tarifi (strateji + alan bölgeleri + anahtar kelime kapısı):
+Profil, bir belgenin nasıl taranacağını tarif eder: strateji, alan bölgeleri ve anahtar kelime
+kapısı.
 
 | Profil | Strateji | Ne yapar |
 |---|---|---|
-| `.turkishIDFront` | `visionText` | TC kimlik ön yüz: TCKN, soyad, ad, doğum tarihi, belge no — **bölgesel OCR** ile |
-| `.turkishIDBack` | `mrzTurkishID` | TC kimlik arka yüz: anne adı / baba adı / veren makam basılı **etiketine göre** (`labelAnchor`), MRZ kuralı `.td1` zorunlu `.presence` |
-| `.turkishID` | — | Ön/arka birleşik anahtar kelime kümesi |
-| `.passport` | `mrzPassport` | Pasaport veri sayfası (TD3 MRZ); dik tutulursa "yana çevirin" yönergesi |
+| `.turkishIDFront` | `visionText` | TC kimlik ön yüz: TCKN, soyad, ad, doğum tarihi, belge no. Alanlar bölgesel OCR ile okunur |
+| `.turkishIDBack` | `mrzTurkishID` | TC kimlik arka yüz: anne adı, baba adı ve veren makam basılı etiketlerine göre bulunur (`labelAnchor`); MRZ kuralı `.td1`, zorunlu, `.presence` |
+| `.turkishID` | — | Ön ve arka yüzün birleşik anahtar kelime kümesi |
+| `.passport` | `mrzPassport` | Pasaport veri sayfası (TD3 MRZ); pasaport dik tutulursa "yana çevirin" yönergesi çıkar |
 | `.turkishDrivingLicense` | `visionText` | TR ehliyet |
 | `.bankCard` | `visionText` | Banka kartı |
-| `.a4Document` / `.generic` | `imageOnly` | Serbest belge — alan çıkarmadan düzgün kırpılmış görsel (AddressConfirm bunu kullanır) |
+| `.a4Document` / `.generic` | `imageOnly` | Serbest belge. Alan çıkarmaz, düzgün kırpılmış görsel verir (AddressConfirm bunu kullanır) |
 
-**Anahtar kelime kapısı (keyword gating):** Profildeki `keywordSet`, "TÜRKİYE CUMHURİYETİ /
-KİMLİK KARTI" gibi ibareler görünmeden yakalamayı tetiklemez — masadaki rastgele bir dikdörtgen
-kimlik sanılmaz.
+Anahtar kelime kapısı (keyword gating): profildeki `keywordSet` içindeki ibareler ("TÜRKİYE
+CUMHURİYETİ / KİMLİK KARTI" gibi) görünmeden çekim yapılmaz. Böylece masadaki rastgele bir
+dikdörtgen kimlik sanılmaz.
 
 ## Kendi Profiliniz
 
-`DocumentProfile` `Codable`'dır — profili **JSON'dan bile yükleyebilirsiniz** (sunucudan
-indirilen profille yeni belge tipi desteği, uygulama güncellemeden):
+`DocumentProfile` `Codable` olduğu için profili JSON'dan da yükleyebilirsiniz. Sunucudan profil
+indirerek uygulamayı güncellemeden yeni bir belge tipini destekleyebilirsiniz:
 
 ```swift
 let profile = DocumentProfile(
@@ -87,10 +88,10 @@ let profile = DocumentProfile(
 // veya: try DocumentProfile(decoding: jsonData)
 ```
 
-`FieldRegion` normalize koordinattır (0–1); alan yalnızca belgedeki o bölgede aranır — bu,
-hem hızı hem isabeti ciddi artırır. Sabit bölge yerine basılı etikete göre bulmak için
-`labelAnchor: LabelAnchor(variants: ["ANNE ADI", "MOTHER'S NAME"], direction: .below)` verin;
-belge çerçeveyi tam doldurmadığında bölge kaymaz.
+`FieldRegion` normalize koordinat kullanır (0–1). Alan yalnızca belgenin o bölgesinde aranır; bu
+hem hızı hem isabeti belirgin biçimde artırır. Alanı sabit bir bölge yerine basılı etikete göre
+bulmak için `labelAnchor: LabelAnchor(variants: ["ANNE ADI", "MOTHER'S NAME"], direction: .below)`
+verin. Belge çerçeveyi tam doldurmasa da bölge kaymaz.
 
 ### Neyin çekimi beklettiğine profil karar verir
 
@@ -98,20 +99,27 @@ Otomatik çekim iki şeye bakar ve ikisi de profilden okunur:
 
 | Ne | Nasıl ayarlanır | Etkisi |
 |---|---|---|
-| Basılı alan | `FieldDescriptor.isRequired` | `true` → alan okunmadan çekmez; `false` → okunursa döner, beklemez |
-| MRZ | `DocumentProfile.mrz: MRZRequirement?` | `nil` → aranmaz; `isRequired: false` → okunur ama beklemez; `true` → `level`'a göre bekler |
+| Basılı alan | `FieldDescriptor.isRequired` | `true`: alan okunmadan çekim yapılmaz. `false`: okunursa sonuçta döner, çekim onu beklemez |
+| MRZ | `DocumentProfile.mrz: MRZRequirement?` | `nil`: MRZ aranmaz. `isRequired: false`: okunur ama beklenmez. `true`: `level`'a göre beklenir |
 
-`MRZRequirement(format:isRequired:level:)`: `format` `.td1` (kimlik, 3×30) / `.td3` (pasaport,
-2×44); `level` `.presence` (bölge görünüyor — en az iki MRZ yapılı satır, uzunluk/kontrol hanesi
-aranmaz) / `.parsed` (belge no + doğum + geçerlilik ayrıştı). Kesin MRZ okuması çekim
-**sonrası** yapılır; canlı kural yalnızca "ne zaman çekilsin" sorusunu yanıtlar.
+`MRZRequirement(format:isRequired:level:)` parametreleri:
 
-`.mrzTurkishID` profili `mrz` vermezse eski kural (`MRZRequirement.legacyTurkishID`: `.td1`,
-zorunlu, `.parsed`) uygulanır; JSON profillerde `mrz` anahtarı yoksa da aynı.
+- `format`: `.td1` (kimlik, 3×30) ya da `.td3` (pasaport, 2×44).
+- `level`: `.presence` MRZ bölgesinin görünmesi yeter; en az iki MRZ yapılı satır aranır, uzunluk
+  ve kontrol hanesine bakılmaz. `.parsed` ise belge no, doğum tarihi ve geçerlilik tarihinin
+  ayrıştırılmasını ister.
+
+Kesin MRZ okuması çekimden sonra yapılır. Canlı kural yalnızca çekimin ne zaman yapılacağına
+karar verir.
+
+`.mrzTurkishID` stratejili bir profil `mrz` vermezse eski kural uygulanır
+(`MRZRequirement.legacyTurkishID`: `.td1`, zorunlu, `.parsed`). JSON profilde `mrz` anahtarı yoksa
+da aynısı olur.
 
 ### Hazır profili değiştirmek — kopya yardımcıları
 
-Hazır profiller sabittir; her yardımcı değiştirilmiş bir **kopya** döner:
+Hazır profiller sabittir. Aşağıdaki yardımcıların her biri profilin değiştirilmiş bir kopyasını
+döner:
 
 ```swift
 let back = DocumentProfile.turkishIDBack
@@ -125,16 +133,17 @@ let back = DocumentProfile.turkishIDBack
 IdentityScannerView(profile: back) { result in … }
 ```
 
-Kopya kendi ekranınızda (`IdentityScannerView(profile:)`) ya da aynı `id` ile
-`DocumentProfileRegistry.shared.register(_:)` sonrası `DocumentScanner`'da geçerlidir;
-SDK'nın hazır kimlik ekranı (`SDKIdCardView`) hazır profili doğrudan kullanır.
+Kopya iki yerde geçerli olur: kendi ekranınızdaki `IdentityScannerView(profile:)` içinde ya da
+aynı `id` ile `DocumentProfileRegistry.shared.register(_:)` çağrıldıktan sonra `DocumentScanner`
+içinde. SDK'nın hazır kimlik ekranı (`SDKIdCardView`) hazır profili doğrudan kullanır, kopyayı
+görmez.
 
 ## Doğrulayıcılar
 
-Kayıtlı doğrulayıcılar sonucu `validationResults`'a işler; `doc.isValid` hepsinin özetidir:
+Kayıtlı doğrulayıcılar sonuçlarını `validationResults`'a yazar. `doc.isValid` bunların özetidir.
 
-- `TCKNValidator` — TC kimlik numarası checksum kontrolü
-- `MRZValidator` — MRZ satır check-digit kontrolü
+- `TCKNValidator`: TC kimlik numarasının checksum kontrolü
+- `MRZValidator`: MRZ satırlarının check-digit kontrolü
 
 Kendi kuralınız için `DocumentValidator` protokolünü uygulayın:
 
@@ -163,41 +172,45 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 
 ## Görünüm ve Davranış Ayarları
 
-`IdentityScannerView`'ın tüm init parametreleri:
+`IdentityScannerView`'ın bütün init parametreleri:
 
 | Parametre | Ne işe yarar |
 |---|---|
-| `profile` | Hangi belge, nasıl taranır (yukarıda) |
+| `profile` | Hangi belgenin nasıl taranacağı (yukarıya bakın) |
 | `style: QuadrilateralStyle` | Dörtgen overlay'in görünümü (köşe stili, renkler) |
-| `configuration: ScannerConfiguration` | HUD metinleri + zamanlama + çerçeve modu (aşağıda) |
-| `frameMode: ScannerFrameMode?` | Çerçeve modunu tek çağrı için ezer (`nil` → configuration'ınki) |
-| `debugROI` | Alan bölgelerini ekranda çizer (geliştirme) |
-| `externalTorchOn` | El feneri kontrolünü dışarıdan bağlama (`Binding<Bool>`) |
-| `onTorchAvailability` | Cihazda fener var/yok bildirimi |
+| `configuration: ScannerConfiguration` | HUD metinleri, zamanlama ve çerçeve modu (aşağıda) |
+| `frameMode: ScannerFrameMode?` | Çerçeve modunu yalnızca bu çağrı için değiştirir (`nil` ise configuration'daki kullanılır) |
+| `debugROI` | Alan bölgelerini ekranda çizer (geliştirme için) |
+| `externalTorchOn` | El fenerini dışarıdan kontrol etmek için (`Binding<Bool>`) |
+| `onTorchAvailability` | Cihazda fener olup olmadığını bildirir |
 | `speechKey` / `speechModule` | Açılışta sesli yönerge ([ReadAloud](../../IdentifySample/Modules/ReadAloud.md) sistemiyle) |
-| `dismissesOnResult` | Sonuçtan sonra ortamın `dismiss`'ini çağırsın mı (varsayılan `true`). Tarayıcıyı bir ekranın parçası olarak gömüyorsanız `false` — yoksa ekranın kendisi kapanır |
-| `keepsCameraRunning` | Başarılı çekimden sonra kamera açık kalsın mı (varsayılan `false`); `true` ile yalnız kare işleme durur, önizleme canlı kalır |
-| `scanSession` | Değeri değişince tarayıcı kamerayı yeniden kurmadan güncel `profile`/`configuration` ile yeni çekime hazırlanır (ön → arka yüz); `keepsCameraRunning` ile anlamlı |
+| `dismissesOnResult` | Sonuçtan sonra ortamın `dismiss`'i çağrılsın mı (varsayılan `true`). Tarayıcıyı bir ekranın parçası olarak gömüyorsanız `false` verin, yoksa ekranın kendisi kapanır |
+| `keepsCameraRunning` | Başarılı çekimden sonra kamera açık kalsın mı (varsayılan `false`). `true` verirseniz yalnızca kare işleme durur, önizleme canlı kalır |
+| `scanSession` | Değeri değişince tarayıcı kamerayı yeniden kurmadan güncel `profile`/`configuration` ile yeni çekime hazırlanır (ön yüzden arka yüze geçerken). `keepsCameraRunning` ile birlikte anlamlıdır |
 | `onResult` | `Result<RecognizedDocument, Error>` |
 
-**Değiştirilemeyenler (şu an):** tarayıcının kendi HUD'u — talimat metninin konumu ve yazı
-stili, manuel çekim ve iptal düğmeleri — gizlenemez; yalnız metinleri değişir. Çerçevenin
-**içine** host içeriği (ör. kart çizimi) konamaz. Fener, kapat, adım göstergesi gibi öğeleri
-tarayıcının üstüne `ZStack` ile kendiniz çizebilirsiniz.
+Şu an değiştiremedikleriniz: tarayıcının kendi HUD'u gizlenemez. Talimat metninin konumu ve yazı
+stili, elle çekim ve iptal düğmeleri yerinde kalır; yalnızca metinleri değiştirebilirsiniz.
+Çerçevenin içine host içeriği (ör. kart çizimi) koyamazsınız. Fener, kapat düğmesi ya da adım
+göstergesi gibi öğeleri tarayıcının üstüne `ZStack` ile kendiniz çizebilirsiniz.
 
-Tarayıcı varsayılan olarak sonucu teslim edince kendini `dismiss()` eder: `fullScreenCover` /
-`sheet` içinde sunun. En kısa yol `.documentScanner(isPresented:…)` modifier'ıdır — sunumu ve
-kapanışı kendisi yapar, `navOverlay` ile üstüne katman koyarsınız. Tarayıcıyı bir ekranın
-gövdesine gömmek istiyorsanız `dismissesOnResult: false` verin; ön ve arka yüzü aynı kamera
-oturumunda çekmek için `keepsCameraRunning: true` + her yüzde artan `scanSession` kullanın —
-çalışan örnek: [IdCardSingleScreenCustomView.swift](../../IdentifySample/Modules/IdCard/IdCardSingleScreenCustomView.swift).
+Tarayıcı varsayılan olarak sonucu teslim edince kendini `dismiss()` eder, bu yüzden onu
+`fullScreenCover` ya da `sheet` içinde sunun. En kısa yol `.documentScanner(isPresented:…)`
+modifier'ıdır: sunumu ve kapanışı kendisi yapar, üstüne katman koymak için `navOverlay`
+kullanırsınız. Tarayıcıyı bir ekranın gövdesine gömecekseniz `dismissesOnResult: false` verin. Ön
+ve arka yüzü aynı kamera oturumunda çekmek için `keepsCameraRunning: true` verip her yüzde
+`scanSession`'ı artırın. Çalışan örnek:
+[IdCardSingleScreenCustomView.swift](../../IdentifySample/Modules/IdCard/IdCardSingleScreenCustomView.swift).
 
 ### HUD Metinleri ve Zamanlama — `ScannerConfiguration`
 
-Tarayıcının tüm rehber metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
-`tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`, `orientation`...) aktif SDK
-diline göre hazır gelir ve tek tek değiştirilebilir. `glare` boş verilirse yalnız metin
-kapanır, kapı çalışmaya devam eder (kapıyı kapatmak için bkz. [Otomatik Davranışlar](#otomatik-davranışlar--scannerautomation)). Üç hazır kompozisyon vardır ve **global override kancaları** sunar:
+Tarayıcının bütün yönerge metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
+`tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`, `orientation`...) aktif SDK diline
+göre hazır gelir ve her biri tek tek değiştirilebilir. `glare` metnini boş verirseniz yalnızca
+metin kaybolur, parlama kontrolü çalışmaya devam eder (kontrolü kapatmak için
+[Otomatik Davranışlar](#otomatik-davranışlar--scannerautomation) bölümüne bakın).
+
+Üç hazır kompozisyon var ve her birinin global override kancası bulunuyor:
 
 ```swift
 ScannerConfiguration.default    // kimlik kartı (override: .overrideDefault)
@@ -210,19 +223,19 @@ cfg.texts.idle = "Kimliğinizi çerçeveye yerleştirin"
 ScannerConfiguration.overrideDefault = cfg
 ```
 
-`timing` tarafında yakalama hızı, odak davranışı ve manuel yakalama gecikmesi ayarlanır
+Çekim hızı, odak davranışı ve elle çekim düğmesinin gecikmesi `timing` altında ayarlanır
 (`ScannerTimingConfig`).
 
 ### Çerçeve Modu — `ScannerFrameMode`
 
-Tarayıcı, belgenin karede nerede olduğuna iki yoldan birinden karar verir:
+Tarayıcı belgenin karedeki yerini iki yoldan biriyle bulur:
 
 | Mod | Nasıl çalışır |
 |---|---|
-| `.fixedFrame(ScannerFixedFrame)` | Ekranda **sabit** bir çerçeve çizilir; kullanıcı belgeyi ona hizalar. OCR yalnız çerçevenin içini okur. **Varsayılan.** |
-| `.dynamicQuad` | Belge canlı dikdörtgen tespitiyle **takip edilir**, perspektifi düzeltilir. |
+| `.fixedFrame(ScannerFixedFrame)` | Ekrana sabit bir çerçeve çizilir, kullanıcı belgeyi ona hizalar. OCR yalnızca çerçevenin içini okur. Varsayılan budur. |
+| `.dynamicQuad` | Belge canlı dikdörtgen tespitiyle takip edilir ve perspektifi düzeltilir. |
 
-Seçim belge türü başına yapılır — `ScannerConfiguration` presetleri zaten türe göre ayrık:
+Mod her belge türü için ayrı seçilir. `ScannerConfiguration` presetleri de zaten türe göre ayrıdır:
 
 ```swift
 // Varsayılanlar — üçü de sabit çerçeve
@@ -242,53 +255,53 @@ ScannerFrameMode.idCardDefault = .fixedFrame(
 )
 ```
 
-Hazır geometriler: `.idCard` (ID-1, 1.585), `.passport` (TD3 veri sayfası, 1.42),
-`.document` (A4 dikey, 0.707) — üçü de 15pt yan boşluk + 16pt köşe yarıçapı +
-`maxWidth: 630`.
+Hazır geometriler `.idCard` (ID-1, 1.585), `.passport` (TD3 veri sayfası, 1.42) ve `.document`
+(A4 dikey, 0.707). Üçünde de 15pt yan boşluk, 16pt köşe yarıçapı ve `maxWidth: 630` var.
 
-`maxWidth` çerçevenin nokta cinsinden üst genişliğidir; telefonda devreye girmez, tablette
-belirleyicidir. Yan boşluk kuralı iPad'de ~790 pt'lik bir çerçeve çizer ve kullanıcıdan
-85 mm'lik kartı lensin yakın odak sınırının içine sokmasını ister — belge çerçeveyi asla
-dolduramaz, otomatik çekim tetiklenmez. Değeri düşürmek de bedelsiz değildir: çerçeve
-kırpılıp gönderilen bölgedir, yarıya indirmek OCR'a giden pikseli dörtte bire düşürür.
+`maxWidth` çerçevenin nokta cinsinden en fazla ne kadar genişleyeceğini belirler. Telefonda bu
+sınıra hiç ulaşılmaz, tablette ise belirleyici olur. Yalnızca yan boşluk kuralıyla iPad'de
+yaklaşık 790 pt'lik bir çerçeve çizilirdi ve kullanıcının 85 mm'lik kartı lensin yakın odak
+sınırından daha yakına getirmesi gerekirdi. Belge çerçeveyi hiç dolduramaz, otomatik çekim de
+tetiklenmezdi. Değeri düşürmenin de bir bedeli var: kırpılıp gönderilen bölge çerçevedir, onu
+yarıya indirirseniz OCR'a giden piksel sayısı dörtte bire düşer.
 
-> Çerçeve **ekran noktasında** ölçülür, sonra kamera koordinatına çevrilir. Tersi
-> (kamera tamponuna göre ölçmek) sezgisel ama yanlıştır: önizleme tamponu kırparak
-> ekranı doldurur, dolayısıyla tampon genişliğinin %90'ı görünür genişliğin %90'ı
-> **değildir** — çerçeve ekran dışına taşar ve kırpılan bölge belgeden çok daha geniş
-> kalır. Ekranda ölçmek, gördüğünüz çerçeve ile kırpılan bölgeyi tanım gereği eşitler.
+> Çerçeve önce ekran noktasında ölçülür, sonra kamera koordinatına çevrilir. Kamera tamponuna göre
+> ölçmek daha sezgisel görünse de yanlış sonuç verir. Önizleme ekranı doldurmak için tamponu
+> kırpar; bu yüzden tampon genişliğinin %90'ı görünen genişliğin %90'ı etmez. Çerçeve ekrandan
+> taşar ve kırpılan bölge belgeden çok daha geniş kalır. Ekranda ölçünce gördüğünüz çerçeve ile
+> kırpılan bölge birebir aynı olur.
 
-Sabit modda **lens/kamera geçişi kapalıdır** — geçişin tek amacı tespiti kurtarmaktı,
-sabit çerçevede kurtarılacak tespit yok ama kadrajın kayma bedeli aynen sürüyor. Otomatik
-çekim mekanizması iki modda da aynıdır: alanlar eşleşince tarama çizgisi başlar, iki aday
-görüntüden en keskini teslim edilir.
+Sabit modda lens ve kamera geçişi kapalıdır. Geçişin tek amacı kaybolan tespiti kurtarmaktı. Sabit
+çerçevede kurtarılacak bir tespit yok, ama geçiş kadrajı yine kaydırırdı. Otomatik çekim iki modda
+da aynı işler: alanlar eşleşince tarama çizgisi başlar ve iki aday görüntüden en keskini teslim
+edilir.
 
-**Teslim edilen görüntü çerçeveye değil, belgeye kırpılır.** Sabit çerçeve kullanıcı
-yönlendirmesi ve OCR bölgesidir; çekim anında çerçevenin içinde belgenin gerçek kenarları
-aranır ve kırpma ona göre yapılır — dinamik moddaki davranışın aynısı. Bulunamazsa ya da
-bulunan şey belgeye benzemiyorsa çerçeve kırpması teslim edilir; yani deneme hiçbir şeyi
-kötüleştiremez.
+Teslim edilen görüntü çerçeveye göre değil, belgeye göre kırpılır. Sabit çerçeve kullanıcıyı
+yönlendirir ve OCR bölgesini belirler. Çekim anında çerçevenin içinde belgenin gerçek kenarları
+aranır ve kırpma bunlara göre yapılır; dinamik modda da davranış aynıdır. Kenarlar bulunamazsa ya
+da bulunan şekil belgeye benzemezse çerçeve kırpması teslim edilir. Yani bu deneme sonucu hiçbir
+durumda kötüleştirmez.
 
 ### Mesafe kapısı — "çerçeveye oturmadan çekmez"
 
-Sabit modda çekim, belge çerçeveye oturana kadar onaylanmaz; bu sırada ne yapılması
-gerektiği HUD'da yazar:
+Sabit modda belge çerçeveye oturana kadar çekim yapılmaz. Bu sırada HUD kullanıcıya ne yapması
+gerektiğini söyler:
 
 | Durum | Yönerge |
 |---|---|
-| Belge çerçeveyi taşıyor | "Kimliği biraz uzaklaştırın" |
-| Belge çerçevenin epey içinde (uzaktan çekim) | "Kimliği biraz yaklaştırın" |
+| Belge çerçeveden taşıyor | "Kimliği biraz uzaklaştırın" |
+| Belge çerçevenin epey içinde kalıyor (uzaktan çekim) | "Kimliği biraz yaklaştırın" |
 | Boyut doğru ama bir yana kaymış | "Kimliği çerçeveye ortalayın" |
-| Netlik gelmiyor ve lens yakın sınırda | "Kimliği biraz uzaklaştırın" — belge asgari odak mesafesinin içinde |
-| Belgede parlama var | `texts.glare` — patlamış piksel oranı eşiği aşınca çekim bekletilir |
+| Netlik gelmiyor ve lens yakın sınırda | "Kimliği biraz uzaklaştırın" (belge asgari odak mesafesinden daha yakında) |
+| Belgede parlama var | `texts.glare`. Patlamış piksel oranı eşiği aşınca çekim bekletilir |
 
-Oturduktan sonra da çekim hemen değil, **görüntü sabitlenince** alınır: ardışık kareler
-arası fark (kamera ya da belge hareketi) ve cihaz IMU'su birlikte sakin okunmalı, ardından
-0.5 sn beklenir. Amaç hareket yasağı değil, bulanık kare yüklenmesini engellemektir. Mesafe
-kararında histerezis vardır; belge bir kez oturduktan sonra sınırda "yaklaştır / uzaklaştır"
-arasında titremez.
+Belge oturduktan sonra da çekim hemen yapılmaz, görüntünün sabitlenmesi beklenir. Ardışık kareler
+arasındaki fark (kamera ya da belge hareketi) ve cihazın IMU'su birlikte sakin görünmeli, sonra
+0.5 sn daha beklenir. Amaç kullanıcıyı kıpırdamaz hale getirmek değil, bulanık kare yüklenmesini
+önlemektir. Mesafe kararında histerezis var; belge bir kez oturduktan sonra yönerge sınırda
+"yaklaştırın" ile "uzaklaştırın" arasında gidip gelmez.
 
-Ölçü `ScannerFixedFrame` üzerinden ayarlanır:
+Ölçüyü `ScannerFixedFrame` ile ayarlarsınız:
 
 ```swift
 ScannerFixedFrame(aspect: 1.585,
@@ -296,28 +309,29 @@ ScannerFixedFrame(aspect: 1.585,
                   overflowTolerance: 4)      // pt — çerçeveyi taşma payı
 ```
 
-`captureFitTolerance` varsayılan 30pt: 360pt genişliğindeki bir çerçevede belgenin en az
-~%83'ünü doldurması gerekir. 10'a çekmek neredeyse tam oturma ister; yükseltmek gevşetir.
+`captureFitTolerance` varsayılan olarak 30pt'dir. 360pt genişliğindeki bir çerçevede bu, belgenin
+çerçevenin en az %83 kadarını doldurması demektir. 10'a indirirseniz neredeyse tam oturma istenir,
+yükseltirseniz kural gevşer.
 
-Boyut ve konum **ayrı** ölçülür: boyut, karşılıklı kenarların toplam boşluğuna bakar
-(belgenin nerede durduğu bunu değiştirmez), kaymışlık ise bu boşluğun iki yana ne kadar
-dengesiz dağıldığına. Aksi hâlde doğru boyutta ama sola kaymış bir kimliğe "yaklaştırın"
-denirdi.
+Boyut ve konum ayrı ölçülür. Boyut için karşılıklı kenarlardaki toplam boşluğa bakılır; belgenin
+nerede durduğu bu değeri değiştirmez. Kaymışlık için bu boşluğun iki yana ne kadar dengesiz
+dağıldığına bakılır. İkisi ayrı ölçülmeseydi doğru boyutta ama sola kaymış bir kimlik için
+"yaklaştırın" denirdi.
 
-> Kapı yalnız **kanıt varken** kısıtlar: belgenin kenarları bulunamıyorsa (koyu kart +
-> koyu zemin, düşük ışık) karar üretilmez ve çekim eskisi gibi serbest kalır. Aksi hâlde
-> tarayıcı hiç tetiklenmeyen bir ekrana dönüşebilirdi. Elle çekim düğmesi her hâlükârda
-> kapıdan muaftır.
+> Kapı yalnızca elinde kanıt varken çekimi kısıtlar. Belgenin kenarları bulunamıyorsa (koyu kart
+> ve koyu zemin, düşük ışık) karar üretilmez ve çekim eskisi gibi serbest kalır. Öyle olmasaydı
+> tarayıcı hiç tetiklenmeyen bir ekrana dönüşebilirdi. Elle çekim düğmesi her durumda bu kapının
+> dışındadır.
 
-Tüm profiller dener, ama başarı oranı profile göre değişir: dikdörtgen tespitinin en-boy
-ve güven eşikleri profile özeldir. Kimlik/ehliyet en çok kazanan taraftır — alan ROI'leri
-karta göre tanımlı olduğundan kırpmanın kayması bölgesel OCR'ı da kaydırır. Tanınmayan
-belge profili en katı eşiklere sahip olduğu için en sık çerçeveye düşendir.
+Bütün profiller belgenin kenarlarını bulmayı dener, ama başarı oranı profile göre değişir; çünkü
+dikdörtgen tespitinin en-boy ve güven eşikleri profile özeldir. En çok kimlik ve ehliyet kazanır:
+alan ROI'leri karta göre tanımlandığından kırpmadaki kayma bölgesel OCR'ı da kaydırır. Tanınmayan
+belge profili en katı eşiklere sahip olduğu için en sık çerçeve kırpmasına düşer.
 
 ### Otomatik Davranışlar — `ScannerAutomation`
 
-Tarayıcının kullanıcı bir şey yapmadan yaptığı işler. `autoTorch` varsayılan olarak
-**kapalı**, diğerleri **açıktır**; değiştirmek için:
+Tarayıcının kullanıcıdan bir şey beklemeden yaptığı işler bunlar. `autoTorch` varsayılan olarak
+kapalı, diğerleri açık. Değiştirmek için:
 
 ```swift
 // Tüm tarayıcılar için (kimlik, pasaport, belge) — tarayıcı açılmadan önce
@@ -331,16 +345,16 @@ IdentityScannerView(profile: .turkishIDFront, configuration: cfg) { … }
 
 | Anahtar | Açıkken ne yapar | Kapatınca |
 |---|---|---|
-| `autoTorch` (varsayılan kapalı) | Sahne çok karanlıksa ve belge 4 sn bulunamazsa feneri açar. Kamerayı elle kapatmak da karanlık sahne sayılır. | Fener yalnız kullanıcı ya da host açarsa açılır. |
-| `ultraWideLensSwitch` | Belge kadrajı dolduruyor ama geniş lens netleyemiyorsa (çok yakın) ultra-geniş lense geçer, "uzaklaştırın" der. | Geniş lenste kalır; kullanıcı kartı netlenene kadar uzaklaştırmalıdır. |
-| `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden döner (senaryolar aşağıda). | Ultra-geniş lense geçildiyse tarama bitene kadar orada kalır. |
-| `manualCaptureFallback` | Otomatik çekim zorlanınca **Elle çek** düğmesini gösterir: `manualCaptureHintDelay` sn sonra ya da `maxAutoCaptureFails` başarısız denemeden sonra. | Düğme hiç çıkmaz; tarayıcı başarılı olana ya da kullanıcı ekrandan çıkana kadar otomatik çekimi dener. |
-| `glareGate` | Kartta parlama varken çekimi bekletir, `texts.glare` metnini gösterir. | Parlama yok sayılır; yansıma altındaki alanlar OCR'da okunamayabilir. |
+| `autoTorch` (varsayılan kapalı) | Sahne çok karanlıksa ve belge 4 sn boyunca bulunamazsa feneri açar. Kameranın elle kapatılması da karanlık sahne sayılır. | Fener yalnızca kullanıcı ya da host açarsa yanar. |
+| `ultraWideLensSwitch` | Belge kadrajı dolduruyor ama geniş lens netleyemiyorsa (belge çok yakın) ultra-geniş lense geçer ve "uzaklaştırın" der. | Geniş lenste kalır; kullanıcının kartı netlik gelene kadar uzaklaştırması gerekir. |
+| `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden döner (senaryolar aşağıda). | Ultra-geniş lense geçildiyse tarama bitene kadar orada kalınır. |
+| `manualCaptureFallback` | Otomatik çekim zorlanınca **Elle çek** düğmesini gösterir: `manualCaptureHintDelay` sn geçince ya da `maxAutoCaptureFails` kez başarısız denemeden sonra. | Düğme hiç çıkmaz. Tarayıcı başarılı olana ya da kullanıcı ekrandan çıkana kadar otomatik çekimi dener. |
+| `glareGate` | Kartta parlama varken çekimi bekletir ve `texts.glare` metnini gösterir. | Parlama yok sayılır; yansımanın altında kalan alanlar OCR'da okunamayabilir. |
 
 #### Fener düğmesi
 
-Fener düğmesi (tarayıcının kendi düğmesi ve hazır kimlik ekranının üst çubuğundaki düğme)
-`ScannerConfiguration.showsTorchButton` ile gizlenir. Varsayılan açık.
+Fener düğmesini (tarayıcının kendi düğmesi ve hazır kimlik ekranının üst çubuğundaki düğme)
+`ScannerConfiguration.showsTorchButton` ile gizlersiniz. Varsayılan olarak görünür.
 
 ```swift
 // Tüm tarayıcılar için
@@ -352,10 +366,10 @@ var cfg = ScannerConfiguration.default
 cfg.showsTorchButton = false
 ```
 
-Kapatılamayanlar: loş ışıkta görünmez pozlama artırımı ve kontrast destekli ikinci tespit
-geçişi. İkisi de ekranda görünmez, yalnız tespiti kurtarır. Çekim titreşimi `SDKHapticConfig`
-ile (modül bazında da) kapatılır. `.fixedFrame` modunda lens hiç değişmez; iki lens anahtarı
-yalnız `.dynamicQuad` modunda anlam taşır.
+İki davranış kapatılamaz: loş ışıkta pozlamanın fark ettirmeden artırılması ve kontrast destekli
+ikinci tespit geçişi. İkisi de ekranda görünmez, yalnızca tespiti kurtarır. Çekim titreşimini
+`SDKHapticConfig` ile (modül bazında da) kapatabilirsiniz. `.fixedFrame` modunda lens hiç değişmez;
+iki lens anahtarının yalnızca `.dynamicQuad` modunda bir etkisi vardır.
 
 #### Lens senaryoları
 
@@ -363,31 +377,34 @@ Tarayıcı her zaman geniş lensle açılır.
 
 | Senaryo | `ultraWideLensSwitch` | `wideLensRecovery` | Sonuç |
 |---|---|---|---|
-| Kart çok yakın, geniş lens netleyemiyor | açık | — | Ultra-geniş lense geçer, "uzaklaştırın" der. Geçişten sonra 4 sn (`lensCommitHoldDuration`) lens değişmez. |
+| Kart çok yakın, geniş lens netleyemiyor | açık | — | Ultra-geniş lense geçer, "uzaklaştırın" der. Geçişten sonra 4 sn boyunca (`lensCommitHoldDuration`) lens değişmez. |
 | Ultra-genişe geçildi, kart kadrajda küçüldü ve 2 sn görünmedi | açık | açık | Geniş lense döner. |
 | Ultra-genişe geçildi, kart görünüyor ama bekleme süresinden sonra da netlenmiyor | açık | açık | Kart aslında yakın değilmiş; geniş lense döner. |
-| Yukarıdaki iki durum | açık | **kapalı** | Ultra-geniş lenste kalır. Kart kadrajda küçükse kullanıcı yaklaştırmalıdır; tarama ekranı kapanınca sıfırlanır. |
-| Kart çok yakın | **kapalı** | fark etmez | Geçiş olmaz; geniş lenste kalır. |
+| Yukarıdaki iki durum | açık | **kapalı** | Ultra-geniş lenste kalır. Kart kadrajda küçükse kullanıcının yaklaştırması gerekir; tarama ekranı kapanınca lens sıfırlanır. |
+| Kart çok yakın | **kapalı** | fark etmez | Geçiş olmaz, geniş lenste kalır. |
 
 ### Diğer Davranışlar
 
-- Dokunarak odaklama (sarı odak göstergesi); sabit çerçevede belge oturunca **tek atış odak
-  dürtmesi** — nokta değişmediği için sürekli AF'e ikinci kez yazmak hiçbir şey yapmıyordu
-- Pasaport dik tutulursa **"yana çevirin"** yönlendirmesi
+- Dokunarak odaklama (sarı odak göstergesi). Sabit çerçevede belge oturunca odak bir kez daha
+  tetiklenir; nokta değişmediği için sürekli AF'e aynı noktayı ikinci kez yazmak hiçbir işe
+  yaramıyordu.
+- Pasaport dik tutulursa "yana çevirin" yönergesi çıkar.
 
 ---
 
 ## ⚠️ KYC Akışı İçinde Kullanmayın (Bypass)
 
-Kural tarayıcıyı kullanmak değil, **sonucu kendiniz yüklemek** üzerinedir. KYC akışında:
+Kural tarayıcıyı kullanmanızı yasaklamaz; yasak olan, sonucu kendiniz yüklemektir. KYC akışında:
 
 | Yapılış | Sonuç |
 |---|---|
 | Override ekranında `IdentityScannerView` → `doc.croppedImage` → `vm.scanFront(image:)` / `vm.scanBack(image:)` | ✅ Doğru. SDK'nın kendi kimlik ekranı da tam olarak bunu yapar. |
 | `RecognizedDocument`'i kendi HTTP isteğinizle göndermek | ❌ `upload` / `sendStep` gitmez, akış sunucuda ilerlemez. |
 
-`vm.scanFront(image:)` tarayıcıyı çalıştırmaz; verilen görüntüye OCR yapıp yükler. Görüntünün
-tarayıcıdan mı kendi kameranızdan mı geldiğini bilmez — kalite farkı buradan doğar.
-Örnek ve iki yolun karşılaştırması: [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md#kendi-tasarımınızla-override).
+`vm.scanFront(image:)` tarayıcıyı çalıştırmaz; verilen görüntüye OCR yapar ve yükler. Görüntünün
+tarayıcıdan mı yoksa kendi kameranızdan mı geldiğini bilmez. İki yol arasındaki kalite farkı da
+buradan doğar. Örnek ve iki yolun karşılaştırması:
+[IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md#kendi-tasarımınızla-override).
 
-Akış dışında (form ön-doldurma, belge arşivleme, şube içi araçlar) tarayıcı tek başına da kullanılır.
+Akış dışında (form ön-doldurma, belge arşivleme, şube içi araçlar) tarayıcıyı tek başına
+kullanabilirsiniz.

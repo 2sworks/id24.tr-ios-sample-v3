@@ -2,9 +2,9 @@
 
 > 3.1.0 ile gelen yenilikler ve geçiş adımları: [3.1.0 Değişiklik Rehberi](migration-3.1.0.md)
 
-SDK'nın hazır ekranları tek bir tema kaynağından beslenir: **`SDKTheme.shared`**.
-Renkleri, fontu, ikonları ve boşluk/köşe metriklerini `setupSDK`'dan önce bir kez ayarlarsınız;
-tüm drop-in ekranlar otomatik olarak markanıza bürünür — **hiçbir ekranı yeniden yazmadan.**
+SDK'nın hazır ekranları tek bir tema kaynağından beslenir: `SDKTheme.shared`. Renkleri, fontu,
+ikonları, boşlukları ve köşe yarıçaplarını `setupSDK`'dan önce bir kez ayarlarsınız. Hazır
+ekranların hepsi markanızın görünümüne geçer; hiçbir ekranı yeniden yazmanız gerekmez.
 
 ← [README'ye dön](../../README.md) · İlgili: [Özelleştirme](customization.md) (ekranın tamamını değiştirmek için)
 
@@ -12,8 +12,9 @@ tüm drop-in ekranlar otomatik olarak markanıza bürünür — **hiçbir ekran�
 
 ## İki Seviye Özelleştirme
 
-1. **Tema (bu rehber)** — SDK ekranları kalır, görünümleri değişir. Çoğu marka uyumu için yeterli.
-2. **Ekran override** — ekranın tamamını kendi tasarımınızla değiştirirsiniz.
+1. Tema (bu rehber): SDK ekranları yerinde kalır, yalnızca görünümleri değişir. Marka uyumu için
+   çoğu zaman bu yeterlidir.
+2. Ekran override: ekranın tamamını kendi tasarımınızla değiştirirsiniz.
    → [Özelleştirme Rehberi](customization.md)
 
 ---
@@ -44,8 +45,8 @@ theme.setIcons([
 
 ## Token Sistemi
 
-SDK ekranları renk/font/boşluk değerlerini asla elle yazmaz; her şey token üzerinden okunur.
-Token'lar `SDKTheme.shared`'a bakar — siz temayı değiştirince tüm ekranlar değişir.
+SDK ekranlarında hiçbir renk, font ya da boşluk değeri elle yazılmaz; hepsi token'lardan okunur.
+Token'lar da `SDKTheme.shared`'a bakar. Temayı değiştirdiğinizde bütün ekranlar birlikte değişir.
 
 | Token ailesi | Örnek | Kaynağı |
 |---|---|---|
@@ -55,8 +56,8 @@ Token'lar `SDKTheme.shared`'a bakar — siz temayı değiştirince tüm ekranlar
 | `IDRadius` | `IDRadius.card` (36pt) | `theme.metrics` |
 | `SDKButtonShape` | `SDKButtonShape.themed()` | `theme.buttons` (`SDKButtons`) |
 
-Kendi custom ekranlarınızda da bu token'ları kullanabilirsiniz — böylece override ettiğiniz
-ekran, SDK'nın geri kalanıyla otomatik uyumlu kalır.
+Aynı token'ları kendi custom ekranlarınızda da kullanabilirsiniz. Böylece override ettiğiniz ekran
+SDK'nın geri kalanıyla uyumlu kalır.
 
 ### Renk Paleti — `SDKColors`
 
@@ -71,7 +72,7 @@ ekran, SDK'nın geri kalanıyla otomatik uyumlu kalır.
 
 ### Fontlar — `SDKFonts`
 
-- `familyName` — tek satırla tüm SDK tipografisini değiştirir (varsayılan: **Inter**).
+- `familyName` tek satırda SDK'nın bütün tipografisini değiştirir (varsayılan: Inter).
 - Font uygulamanızda kayıtlı değilse çalışma zamanında yükleyebilirsiniz:
 
 ```swift
@@ -82,8 +83,8 @@ SDKTheme.shared.fonts.familyName = "Sofia Pro"
 
 ### Metrikler — `SDKMetrics`
 
-Boşluklar (`spacingXS` 4 → `spacingXXL` 32) ve köşe yarıçapları (`radiusSM` 8 →
-`radiusCard` 36). Daha keskin köşeli bir görünüm için örneğin:
+Boşluklar `spacingXS` (4) ile `spacingXXL` (32) arasında, köşe yarıçapları `radiusSM` (8) ile
+`radiusCard` (36) arasında tanımlı. Daha keskin köşeler için örneğin:
 
 ```swift
 SDKTheme.shared.metrics.radiusCard = 12
@@ -91,8 +92,8 @@ SDKTheme.shared.metrics.radiusCard = 12
 
 ### Butonlar — `SDKButtons`
 
-SDK'nın aksiyon butonlarının tüm görünümü `SDKTheme.shared.buttons` üzerinden ayarlanır.
-Her alan opsiyoneldir: dokunmadığınız her şey SDK varsayılanında kalır.
+SDK'nın aksiyon butonlarının bütün görünümü `SDKTheme.shared.buttons` üzerinden ayarlanır. Her
+alan isteğe bağlıdır; dokunmadığınız alanlar SDK varsayılanında kalır.
 
 ```swift
 // Tüm butonlar — köşe:
@@ -132,9 +133,9 @@ SDKTheme.shared.buttons.reset()   // her şeyi varsayılana döndür
 | `hapticsEnabled` | `true` |
 | `fullWidth` | `true` |
 
-Köşe ayarı yalnızca `SDKButton`'ı değil, hazır ekranlardaki tüm aksiyon butonlarını kapsar
+Köşe ayarı yalnızca `SDKButton`'a değil, hazır ekranlardaki bütün aksiyon butonlarına uygulanır
 (görüşme ekranı, ThankYou, bağlantı koptu, kimlik kartı, uyarı diyalogları). Kendi custom
-ekranınızda aynı biçimi yakalamak için `SDKButtonShape` kullanın:
+ekranınızda aynı biçimi elde etmek için `SDKButtonShape` kullanın:
 
 ```swift
 Text("Devam")
@@ -147,8 +148,8 @@ Text("Devam")
 
 ## İkonlar ve İllüstrasyonlar — `SDKIconKey`
 
-Her görsel öğe bir anahtarla değiştirilebilir; anahtarların tam listesi `SDKIconKey`
-(`CaseIterable`) enum'ındadır. Önemli gruplar:
+Her görsel öğeyi bir anahtarla değiştirebilirsiniz. Anahtarların tam listesi `SDKIconKey`
+(`CaseIterable`) enum'ında. Başlıca gruplar:
 
 | Grup | Anahtarlar |
 |---|---|
@@ -164,24 +165,24 @@ theme.setIcon(.nfcFront, Image("my_nfc_illustration"))
 theme.resetIcon(.nfcFront)      // SDK varsayılanına dön
 ```
 
-> **Header'daki marka işareti `.logo` değil, `.headerLogo`'dur.** `.logo` giriş ekranı ve
-> kamera üstü başlıkta, `.headerLogo` ise modül/ilerleme başlığındaki yuvarlak işarette
-> kullanılır. Eski entegrasyonlar bu işareti `.langButton` ile override ediyordu; o ad
-> hâlâ çalışır ama yeni kod `.headerLogo` kullanmalıdır.
+> Başlıktaki marka işaretinin anahtarı `.logo` değil, `.headerLogo`'dur. `.logo` giriş ekranında
+> ve kamera üstü başlıkta kullanılır; `.headerLogo` ise modül ve ilerleme başlığındaki yuvarlak
+> işarettir. Eski entegrasyonlar bu işareti `.langButton` ile değiştiriyordu. O ad hâlâ çalışır,
+> ama yeni kodda `.headerLogo` kullanın.
 >
 > ```swift
 > theme.setIcon(.headerLogo, Image("my_mark"))
 > ```
 
-Override etmediğiniz her anahtar SDK'nın kendi görselini kullanır.
+Değiştirmediğiniz her anahtar için SDK kendi görselini kullanır.
 
 ---
 
 ## Rol Renkleri
 
-Marka renkleriyle (`primary`, `success`, `error`) **yüzey rolleri** ayrıdır. Rol vermezseniz
-SDK bugünkü davranışını sürdürür; verdiğinizde yalnız o yüzey değişir — örneğin `primary`'yi
-değiştirmeden seçili satırın rengini ayarlayabilirsiniz.
+Yüzey rolleri, marka renklerinden (`primary`, `success`, `error`) ayrı tutulur. Rol vermezseniz
+SDK bugünkü gibi davranır; bir rol verdiğinizde yalnızca o yüzey değişir. Örneğin `primary`'ye
+dokunmadan seçili satırın rengini ayarlayabilirsiniz.
 
 ```swift
 // Tek renk (iki temada da aynı):
@@ -204,9 +205,9 @@ SDKTheme.shared.colors.pageBackground = SDKAdaptiveColor(light: Color(hex: "#F8F
 | `selectedItemBackground` · `selectedItemText` | seçili satır/kutu | `primary` / `primaryLight` |
 | `unselectedItemBackground` · `unselectedItemText` | seçili olmayan satır | `divider` %20 / `darkMuted` |
 
-Kamera üstüne çizilen katmanlarda (kılavuz çerçevesi, maske, uyarı yazıları) beyaz/siyah
-seçimleri **okunabilirlik** gereğidir; `capture` token'larıyla değiştirilebilir ama kontrast
-testini kendi görsellerinizle yapın.
+Kamera görüntüsünün üstüne çizilen katmanlarda (kılavuz çerçevesi, maske, uyarı yazıları) beyaz ve
+siyah okunabilirlik için seçildi. Bunları `capture` token'larıyla değiştirebilirsiniz, ama
+kontrastı kendi görsellerinizle deneyin.
 
 ---
 
@@ -223,13 +224,13 @@ SDKTheme.shared.navBar.preset = .centered
 | `.minimal` | Marka işareti yok, ince çubuk (48pt) |
 | `.prominent` | İki satır: üstte kontroller, altta büyük başlık |
 
-İnce ayar (`SDKTheme.shared.navBar`): `height`, `showsLogo`, `logoSize`, `circleButtonSize`,
-`iconSize`, `titleFont`, `subtitleFont`, `progressHeight`, `progressSpacing`, `progressCorner`,
-`overlayGradientOpacity`, `showsDivider`.
+İnce ayar için `SDKTheme.shared.navBar` alanları: `height`, `showsLogo`, `logoSize`,
+`circleButtonSize`, `iconSize`, `titleFont`, `subtitleFont`, `progressHeight`, `progressSpacing`,
+`progressCorner`, `overlayGradientOpacity`, `showsDivider`.
 
 ### Başlık Metni — Marka Adı
 
-Varsayılanda çubuk her adımın adını yazar ("Kimlik Doğrulama", "Adres Doğrulama"…). Çubuğa
+Varsayılan olarak çubukta her adımın adı yazar ("Kimlik Doğrulama", "Adres Doğrulama"…). Çubuğa
 kendi markanızı koymak için:
 
 ```swift
@@ -243,11 +244,11 @@ SDKTheme.shared.navBar.titleMode  = .brandWithModule   // varsayılan: marka ver
 | `.brandWithModule` | `brandTitle` | adım adı |
 | `.brand` | `brandTitle` | `brandSubtitle` (verilmişse) |
 
-`brandTitle` verilip `titleMode` `.module` bırakılırsa `.brandWithModule` uygulanır. Kamera üstü
-ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır. `.prominent` preset'i iki
-satırlı olduğundan marka + adım adı için en uygun yerleşimdir.
+`brandTitle` verip `titleMode`'u `.module` bırakırsanız `.brandWithModule` uygulanır. Kamera üstü
+ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır. Marka adıyla adım adını
+birlikte göstermek için en uygun yerleşim, iki satırlı olan `.prominent` preset'idir.
 
-Adım adlarının **kendisini** değiştirmek için metin override'ı kullanın — bkz. `SDKLocalization`:
+Adım adlarını değiştirmek için metin override'ı kullanın (bkz. `SDKLocalization`):
 
 ```swift
 SDKLocalization.shared.setOverride(key: .idVerifyTitle, language: .tr, value: "Kimlik Kontrolü")
@@ -255,11 +256,44 @@ SDKLocalization.shared.setOverride(key: .idVerifyTitle, language: .tr, value: "K
 
 JSON temada: `"navBar": { "brandTitle": "Acme Bank", "titleMode": "brandWithModule" }`.
 
+### Başlık Çubuğu Düğmeleri
+
+Geri, yardım (?) ve menü düğmelerini kaldırabilir, sağ tarafa kendi düğmelerinizi
+ekleyebilirsiniz:
+
+```swift
+SDKTheme.shared.navBar.buttons.showsHelp = false          // yardım düğmesi hiçbir ekranda yok
+SDKTheme.shared.navBar.buttons.onHelp = { route in        // ya da işlev verin
+    showHelp(for: route)                                  // route: .selfie, .nfc …
+}
+SDKTheme.shared.navBar.buttons.trailing = [
+    SDKNavBarButton(id: "chat", icon: Image(systemName: "message"),
+                    accessibilityLabel: "Canlı destek") { openChat() }
+]
+```
+
+Tek bir ekrana ayrı ayar verebilirsiniz. Kaydı olan ekranda genel `buttons` yerine bu kullanılır:
+
+```swift
+SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false)
+```
+
+| Alan | Varsayılan | Not |
+|---|---|---|
+| `showsBack` | `true` | Kapatılırsa kullanıcı ekrandan geri dönemez |
+| `showsHelp` | `true` | Yardım düğmesi kamera ekranlarında çizilir (selfie, canlılık, NFC, hologram, video) |
+| `showsMenu` | `true` | `.login` stilindeki menü düğmesi |
+| `onHelp` | `nil` | Verilmezse yardım düğmesi bir şey yapmaz |
+| `trailing` | `[]` | Ekranın kendi düğmesinden (ör. fener) sonra çizilir |
+
+JSON temada yalnızca görünürlük ayarlanır: `"navBar": { "buttons": { "showsHelp": false } }`.
+
 ---
 
 ## Bileşen Görünümleri
 
-Buton (`buttons`) ile aynı kalıp: her alan opsiyonel, `nil` → SDK varsayılanı.
+Butonlardaki (`buttons`) kalıp burada da geçerli: her alan isteğe bağlıdır, `nil` SDK
+varsayılanı demektir.
 
 | Kap | Alanlar |
 |---|---|
@@ -281,12 +315,12 @@ SDKTheme.shared.resetAppearance()   // renk/font/metrik/bileşen override'ların
 
 ## Titreşim (Haptik)
 
-SDK iki yerde titreşim kullanır ve ikisi de host tarafından kapatılabilir:
+SDK iki yerde titreşim kullanır ve ikisini de host kapatabilir:
 
 | Nerede | Ne yapar |
 |---|---|
-| Otomatik çekim yapan modüller | Çekim yaklaştıkça hızlanan darbeler (ramp): kullanıcı çekimin geldiğini hisseder |
-| **Canlılık adımları** | Adım (göz kırpma, gülümseme, başı çevirme…) onaylandığında **çok kısa tek darbe** — kullanıcı ekrana bakmadan adımı geçtiğini anlar |
+| Otomatik çekim yapan modüller | Çekim yaklaştıkça hızlanan darbeler (ramp); kullanıcı çekimin geldiğini hisseder |
+| Canlılık adımları | Adım (göz kırpma, gülümseme, başı çevirme…) onaylanınca çok kısa tek bir darbe; kullanıcı ekrana bakmadan adımı geçtiğini anlar |
 
 ```swift
 // Adım onay darbesi — canlılık testindeki "geçtim" hissi:
@@ -299,22 +333,22 @@ SDKHapticConfig.shared.setEnabled(false, for: .livenessDetection) // tek modül
 SDKHapticConfig.shared.setEnabled(false, for: [.selfie, .idCard])
 ```
 
-Modül anahtarı (`setEnabled(_:for:)`) hem rampayı hem adım darbesini kapsar;
-`stepFeedbackEnabled` yalnız adım darbesini hedefler. İkisi de varsayılan **açıktır**.
+Modül anahtarı (`setEnabled(_:for:)`) hem rampayı hem adım darbesini kapatır.
+`stepFeedbackEnabled` yalnızca adım darbesini etkiler. İkisi de varsayılan olarak açık.
 
-Dokunsallık donanımı olmayan cihazlarda darbe `UIImpactFeedbackGenerator` ile çalınır;
-hiç desteklenmiyorsa sessizce atlanır — **iPad'lerde Taptic Engine yoktur**, titreşim
-hissedilmez ama akış etkilenmez.
+Dokunsallık donanımı olmayan cihazlarda darbe `UIImpactFeedbackGenerator` ile çalınır; bu da
+desteklenmiyorsa sessizce atlanır. iPad'lerde Taptic Engine olmadığından titreşim hissedilmez,
+ama akış bundan etkilenmez.
 
-Adım darbesi `livenessDetection` modülüne özgüdür; birleşik `selfieWithLiveness` ekranında
-adım kavramı farklı olduğu için çalmaz (orada çekim rampası vardır).
+Adım darbesi yalnızca `livenessDetection` modülünde çalar. Birleşik `selfieWithLiveness`
+ekranında adım kavramı farklı olduğu için çalmaz; orada çekim rampası vardır.
 
 ---
 
 ## Tek Sözlükle Tema (JSON)
 
-Tüm bölümler tek bir sözlükten uygulanabilir. React Native ve Flutter köprüleri de bunu
-kullanır: **renk/logo denemesi için native derleme gerekmez.**
+Bütün bölümleri tek bir sözlükten uygulayabilirsiniz. React Native ve Flutter köprüleri de bu
+yolu kullanır, bu yüzden renk ya da logo denemek için native derleme gerekmez.
 
 ```swift
 SDKTheme.shared.apply([
@@ -342,8 +376,8 @@ Değer biçimleri:
 | Font | `{"size": 16, "weight": "semibold"}` |
 | İkon | host uygulamasının asset adı |
 
-`apply(...)` tanınmayan anahtarların listesini döner — entegrasyonda loglayın, yazım hatası
-sessizce kaybolmaz:
+`apply(...)` tanımadığı anahtarların listesini döner. Entegrasyonda bu listeyi loglayın; böylece
+bir yazım hatası gözden kaçmaz:
 
 ```swift
 let unknown = SDKTheme.shared.apply(config)
@@ -365,7 +399,6 @@ await IdentifySdk.instance.setTheme({'colors': {'primary': '#0F172A'}});
 
 ## Görsel Kontrol: Showcase Kataloğu
 
-Sample App'teki **Showcase** bölümü (`Showcase/ShowcaseCatalogView.swift`), tüm ekranları ve
-tasarım sistemini tek yerden gezmenizi sağlar. Temanızı ayarladıktan sonra kataloğu açıp
-markanızın her ekranda nasıl durduğunu hızlıca kontrol edin — akışı baştan sona koşturmanıza
-gerek kalmaz.
+Sample App'teki Showcase bölümünde (`Showcase/ShowcaseCatalogView.swift`) bütün ekranları ve
+tasarım sistemini tek yerden gezebilirsiniz. Temanızı ayarladıktan sonra kataloğu açıp markanızın
+her ekranda nasıl göründüğüne bakın; bunun için akışı baştan sona çalıştırmanız gerekmez.

@@ -1,7 +1,8 @@
 # Mimari — SDK'nın Büyük Resmi
 
-Bu rehber, IdentifySDK'nın nasıl kurgulandığını anlatır: hangi parça neyi yönetir,
-bir modül ekranı nasıl açılır, soket ve görüntülü görüşme neden ekranlardan bağımsız yaşar.
+Bu rehber IdentifySDK'nın parçalarını ve bunların birbirine nasıl bağlandığını anlatır: hangi
+parça neyi yönetir, bir modül ekranı nasıl açılır, soket ve görüntülü görüşme neden ekranlardan
+ayrı tutulur.
 
 ← [README'ye dön](../../README.md)
 
@@ -28,9 +29,9 @@ bir modül ekranı nasıl açılır, soket ve görüntülü görüşme neden ekr
                  Identify Backend
 ```
 
-En önemli tasarım kararı: **soket ve WebRTC, `IdentifyManager` singleton'ında yaşar.**
-Ekranlar (View'lar) gelip geçer; bağlantılar onlardan etkilenmez. Bu yüzden akışın
-ortasına kendi ekranınızı sokmak bağlantıyı bozmaz.
+Soket ve WebRTC bağlantıları ekranlarda değil, `IdentifyManager` singleton'ında tutulur. Ekranlar
+açılıp kapanır, bağlantılar bundan etkilenmez. Akışın ortasına kendi ekranınızı eklediğinizde
+bağlantının kopmamasının sebebi budur.
 
 ---
 
@@ -38,33 +39,33 @@ ortasına kendi ekranınızı sokmak bağlantıyı bozmaz.
 
 Bir KYC oturumu şu adımlardan geçer:
 
-1. **`coordinator.prepareForSetup()`** — DefaultUI, SDK'nın beklediği placeholder
-   controller'ları kaydeder. *Bu çağrı `setupSDK`'dan önce yapılmazsa modüller hiç başlamaz.*
-2. **`setupSDK(identId:...)`** — SDK, `baseApiUrl` üzerinden odaya bağlanır (`connectToRoom`).
-3. **Backend cevabı: `RoomResponse`** — içinde bu oturum için gereken her şey vardır:
-   `modules` (hangi adımlar, hangi sırayla), `ws_url` (soket adresi), karşılaştırma hakları,
-   TURN/soket güvenlik bayrakları... Ayrıntı: [Sunucu & API](server-api.md).
-4. **Modül hattı kurulur** — SDK, `modules` listesinden `modulesControllersArray` ve
-   `identifyModules` dizilerini oluşturur (`addWebModules` → `addModules`).
-5. **Soket bağlanır** — gerekiyorsa token'lı (`socket_auth`). Ayrıntı: [WebSocket](websocket.md).
-6. **`coordinator.start()`** — ilk modülün rotası `path`'e push edilir, ekran görünür.
-7. **Modüller sırayla akar** — her modül işini bitirince `advanceToNextModule()` çağrılır;
-   SDK backend'e adım sinyali gönderir ve sıradaki rota açılır.
-8. **Terminal: ThankYou** — akış sonucu (başarılı / reddedildi / beklemede) gösterilir.
+1. `coordinator.prepareForSetup()`: DefaultUI, SDK'nın beklediği yer tutucu controller'ları
+   kaydeder. `setupSDK`'dan önce çağrılmazsa modüller hiç başlamaz.
+2. `setupSDK(identId:...)`: SDK, `baseApiUrl` üzerinden odaya bağlanır (`connectToRoom`).
+3. Backend `RoomResponse` döner. Oturum için gereken her şey bunun içindedir: `modules` (hangi
+   adımlar, hangi sırayla), `ws_url` (soket adresi), karşılaştırma hakları, TURN ve soket
+   güvenlik bayrakları. Ayrıntı: [Sunucu & API](server-api.md).
+4. SDK, `modules` listesinden `modulesControllersArray` ve `identifyModules` dizilerini oluşturur
+   (`addWebModules` → `addModules`).
+5. Soket bağlanır, gerekiyorsa token ile (`socket_auth`). Ayrıntı: [WebSocket](websocket.md).
+6. `coordinator.start()`: ilk modülün rotası `path`'e eklenir ve ekran açılır.
+7. Modüller sırayla ilerler. Bir modül bittiğinde `advanceToNextModule()` çağrılır, SDK backend'e
+   adım sinyali gönderir ve sıradaki ekran açılır.
+8. Akış ThankYou ekranında biter ve sonucu (başarılı, reddedildi ya da beklemede) gösterir.
 
 ---
 
 ## DefaultUI Üçlüsü
 
-SwiftUI tarafındaki her şey üç yapı üzerinde döner:
+SwiftUI tarafı üç yapının üzerine kurulu:
 
 | Yapı | Tip | Görev |
 |---|---|---|
-| `SDKFlowCoordinator` | `ObservableObject` | Akışın beyni: modül geçişleri (ileri/atla/geri), navigasyon `path`'i, ilerleme sayacı, `IdentifyManager` köprüsü |
-| `SDKViewRegistry` | sınıf | Ekran çözümleme defteri: rota → view eşlemesi; override ve custom ekran kayıtları |
-| `SDKFlowHostView` | `View` | Kök view: `coordinator.path`'teki rotayı çizer; önce registry'ye bakar, kayıt yoksa SDK'nın hazır ekranına düşer |
+| `SDKFlowCoordinator` | `ObservableObject` | Akışı yönetir: modül geçişleri (ileri, atla, geri), navigasyon `path`'i, ilerleme sayacı ve `IdentifyManager` ile bağlantı |
+| `SDKViewRegistry` | sınıf | Hangi rotada hangi ekranın açılacağını tutar; override ve custom ekran kayıtları burada |
+| `SDKFlowHostView` | `View` | Kök view. `coordinator.path`'teki rotayı çizer: önce registry'ye bakar, kayıt yoksa SDK'nın hazır ekranını gösterir |
 
-Ekran çözümleme sırası her rota için aynıdır:
+Her rota için ekran aynı sırayla seçilir:
 
 ```
 rota geldi → registry.override(...) kaydı var mı? ─ evet → sizin ekranınız
@@ -73,7 +74,7 @@ rota geldi → registry.override(...) kaydı var mı? ─ evet → sizin ekranı
 
 ### Modül ViewModel'leri
 
-Her modülün bir `SDKXxxViewModel`'i vardır; hepsi şu tabandan türer:
+Her modülün bir `SDKXxxViewModel`'i var ve hepsi şu sınıftan türüyor:
 
 ```swift
 @MainActor open class SDKBaseModuleViewModel: ObservableObject {
@@ -83,33 +84,34 @@ Her modülün bir `SDKXxxViewModel`'i vardır; hepsi şu tabandan türer:
 }
 ```
 
-VM'ler `public final`'dır: davranışları **ezilemez**, yalnızca **sarılır** (composition).
-Kendi ekranınızı yapsanız bile iş mantığını (tarama, yükleme, adım sinyali) yine bu VM'ler
-yürütür — buna ["bypass yok" kuralı](customization.md#bypass-yok-kuralı) denir.
+VM'ler `public final` olduğu için davranışlarını değiştiremezsiniz, yalnızca kendi kodunuzla
+sarabilirsiniz. Kendi ekranınızı yazsanız da tarama, yükleme ve adım sinyali gibi işleri yine bu
+VM'ler yapar. Bu kuralın adı ["bypass yok" kuralı](customization.md#bypass-yok-kuralı).
 
 ### Coordinator API — sık kullanılanlar
 
 | Üye | Görev |
 |---|---|
-| `prepareForSetup()` | `setupSDK`'dan **önce**; placeholder controller kaydı |
-| `start()` | İlk modüle geçiş |
-| `advanceToNextModule()` | Sıradaki modül (varsa araya eklenmiş custom ekranlar önce) |
-| `skipCurrentModule()` | Modülü atla (`manager.skipModule()` + ilerle) |
-| `insert(_:before:)` / `insert(_:after:)` | Bir rotanın önüne/arkasına custom ekran zincirle |
-| `appendModules(_:)` / `appendModules(moduleList:)` | Akışın devamına yeni SDK modülü ekle (dallanan senaryolar; `progressTotal` otomatik güncellenir) |
-| `showExternalScreen(_:)` / `advanceExternal()` | Anlık custom ekran göster / custom ekrandan devam et |
-| `popBack()` | Geri; kökteyse `exitSDK()` |
-| `pushThankYouDirectly(status:)` | Görüşme sonucuyla doğrudan sonuç ekranına; `showThankYouPage: false` ise sonuç ekranı yerine akış aşağı kayarak kapanır |
-| `resetFlow()` | Her şeyi sıfırla |
+| `prepareForSetup()` | `setupSDK`'dan önce çağrılır; yer tutucu controller'ları kaydeder |
+| `start()` | İlk modülü açar |
+| `advanceToNextModule()` | Sıradaki modüle geçer. Araya eklenmiş custom ekran varsa önce onu açar |
+| `skipCurrentModule()` | Modülü atlar (`manager.skipModule()` ve ardından ilerleme) |
+| `insert(_:before:)` / `insert(_:after:)` | Bir rotanın önüne ya da arkasına custom ekran ekler |
+| `appendModules(_:)` / `appendModules(moduleList:)` | Akışın sonuna yeni SDK modülü ekler. Dallanan senaryolar için; `progressTotal` kendiliğinden güncellenir |
+| `showExternalScreen(_:)` / `advanceExternal()` | O an bir custom ekran gösterir / custom ekrandan akışa devam eder |
+| `popBack()` | Bir geri gider; ilk ekrandaysa `exitSDK()` çağırır |
+| `pushThankYouDirectly(status:)` | Görüşme sonucuyla doğrudan sonuç ekranını açar. `showThankYouPage: false` ise sonuç ekranı açılmaz, akış aşağı kayarak kapanır |
+| `resetFlow()` | Her şeyi sıfırlar |
 
-Yayınlanan durumlar: `path`, `activeModule`, `progressStep`, `progressTotal`, `sdkError`,
-`subRejected`, `pendingThankYouStatus` — host UI (ör. ilerleme çubuğu) bunlara bağlanabilir.
+Host uygulamanın bağlanabileceği yayınlanan değerler: `path`, `activeModule`, `progressStep`,
+`progressTotal`, `sdkError`, `subRejected`, `pendingThankYouStatus`. Kendi ilerleme çubuğunuzu
+bunlarla çizebilirsiniz.
 
 ---
 
 ## Modüllerin Dış Dünya Bağımlılıkları
 
-Her modül aynı altyapıyı kullanmaz; kimisi tamamen cihaz üzerinde çalışır:
+Modüllerin hepsi aynı altyapıyı kullanmıyor; bazıları tamamen cihazda çalışıyor:
 
 | Bağımlılık | Modüller |
 |---|---|
@@ -118,17 +120,17 @@ Her modül aynı altyapıyı kullanmaz; kimisi tamamen cihaz üzerinde çalış�
 | Soket sinyali (adım/durum bildirimi) | Prepare, SignLang, Speech, CallScreen |
 | WebRTC (canlı görüntü + data channel) | CallScreen |
 
-Pasif ekranlar (ThankYou ve sizin tanıtım/başarı ekranlarınız) hiçbir sinyal göndermez;
-akışın arasına eklenmeleri her zaman güvenlidir.
+ThankYou ve sizin tanıtım ya da başarı ekranlarınız gibi pasif ekranlar hiçbir sinyal göndermez.
+Bunları akışın herhangi bir yerine güvenle ekleyebilirsiniz.
 
 ---
 
 ## Kesişen Sistemler
 
-Modüllerin hepsine dokunan yatay katmanlar ayrı rehberlerde anlatılır:
+Bütün modülleri ilgilendiren konuların kendi rehberleri var:
 
-- [WebSocket yapısı ve reconnect](websocket.md) — bağlantı kopması dahil
-- [TURN & WebRTC](turn-webrtc.md) — görüşme altyapısı
-- [Loglama](logging.md) · [Event sistemi](events.md) — izleme
-- [Tema](theming.md) · [Lokalizasyon](localization.md) — görünüm ve dil
-- Sesli okuma (Read-Aloud) — [ReadAloud rehberi](../../IdentifySample/Modules/ReadAloud.md)
+- [WebSocket yapısı ve reconnect](websocket.md): bağlantı kopması dahil
+- [TURN & WebRTC](turn-webrtc.md): görüşme altyapısı
+- [Loglama](logging.md) · [Event sistemi](events.md): izleme
+- [Tema](theming.md) · [Lokalizasyon](localization.md): görünüm ve dil
+- Sesli okuma (Read-Aloud): [ReadAloud rehberi](../../IdentifySample/Modules/ReadAloud.md)

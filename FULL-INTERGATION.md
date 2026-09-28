@@ -319,6 +319,21 @@ SDKTheme.shared.navBar.titleMode  = .brandWithModule
 `brandTitle` verilip `titleMode` `.module` bırakılırsa `.brandWithModule` uygulanır. Kamera üstü
 ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır.
 
+**Düğmeler.** Geri, yardım (?) ve menü düğmeleri kaldırılabilir, sağ tarafa kendi düğmeniz
+eklenebilir. Yardım düğmesi kamera üstü ekranlarda çizilir ve SDK ona işlev bağlamaz; `onHelp`
+vermezseniz basılınca bir şey olmaz.
+
+```swift
+SDKTheme.shared.navBar.buttons.showsHelp = false                          // her ekranda kaldır
+SDKTheme.shared.navBar.buttons.onHelp = { route in openHelp(for: route) } // ya da işlev ver
+SDKTheme.shared.navBar.buttons.trailing = [
+    SDKNavBarButton(id: "chat", icon: Image(systemName: "message")) { openChat() }
+]
+SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false) // tek ekran
+```
+
+Ayrıntı: [Başlık Çubuğu Düğmeleri](IdentifySample/Modules/Modules.md#başlık-çubuğu-düğmeleri).
+
 | Property | Ne yapar |
 |---|---|
 | `height` | Çubuk yüksekliği; `nil` → preset değeri |

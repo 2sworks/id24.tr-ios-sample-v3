@@ -133,6 +133,7 @@ Kaynak dosya kopyalamanız gerekmez — tek isteğe bağlı dosya, projenize ekl
 | Buton biçimi | tümü: `SDKTheme.shared.buttons.base.corner = .radius(12)`, `buttons.base.height = 54` · tek stil: `SDKTheme.shared.buttons[.secondary].borderWidth = 1` |
 | Başlık çubuğu tasarımı | `SDKTheme.shared.navBar.preset = .centered` (`classic / centered / minimal / prominent`) |
 | Başlık çubuğunda marka adı | `SDKTheme.shared.navBar.brandTitle = "Acme Bank"` + `navBar.titleMode = .brandWithModule` |
+| Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsHelp = false` (`showsBack`, `showsMenu`) · yardıma işlev: `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: false)` |
 | Logo / geri / yardım / menü ikonu | `SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))` — anahtarlar `SDKIconKey`; geri al: `resetIcon(_:)` |
 | Titreşim | `SDKHapticConfig.shared.stepFeedbackEnabled = false` · per-modül `setEnabled(false, for: .selfie)` · hepsi `setEnabledForAll(false)` |
 | Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın |

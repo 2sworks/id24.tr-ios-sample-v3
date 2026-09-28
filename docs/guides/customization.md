@@ -1,8 +1,8 @@
 # Özelleştirme — SDK Ekranlarını Kendi Tasarımınızla Çalıştırmak
 
-SDK'nın her modül ekranı **drop-in**'dir: hiçbir şey yazmadan hazır akış çalışır. Ama hiçbir
-banka aynı görünmek istemez. Bu rehber, üç özelleştirme yöntemini derinlemesine anlatır ve
-hepsinin üstündeki tek altın kuralı açıklar: **"bypass yok."**
+SDK'nın modül ekranları hazır gelir; tek satır arayüz kodu yazmadan akış çalışır. Kendi
+tasarımınızı kullanmak istediğinizde üç yol var. Bu rehber üçünü de anlatıyor ve hepsinde
+geçerli olan tek kuralı açıklıyor: iş mantığını SDK'nın dışından yürütmeyin ("bypass yok").
 
 ← [README'ye dön](../../README.md) · İlgili: [Mimari](architecture.md) · [Tema](theming.md)
 
@@ -10,33 +10,33 @@ hepsinin üstündeki tek altın kuralı açıklar: **"bypass yok."**
 
 ## Önce Kendinize Sorun: Hangi Seviye?
 
-> **Sıfırıncı seviye — tema.** Ekranı değiştirmeden yalnız görünümü ayarlamak istiyorsanız
-> (renk, köşe, başlık çubuğu tasarımı, logo, font, seçili satır rengi) buraya gerek yok:
-> [theming.md](theming.md) tek sözlükle bunların tümünü karşılar ve React Native/Flutter'da
-> native derleme gerektirmez. Custom ekran, ancak akış veya içerik değişecekse gerekir.
+> Yalnızca görünümü değiştirmek istiyorsanız (renk, köşe, başlık çubuğu, logo, font, seçili
+> satır rengi) bu rehbere gerek yok. [theming.md](theming.md)'deki tema sözlüğü bunların hepsini
+> karşılar ve React Native ile Flutter'da native derleme istemez. Kendi ekranınızı ancak akış ya
+> da içerik değişecekse yazmanız gerekir.
 
 
 | İhtiyaç | Çözüm | Efor |
 |---|---|---|
-| "Renkler/font/logo bizim olsun" | [Tema](theming.md) — ekran yazmadan | ⭐ |
-| "Şu ekranın tasarımı tamamen bizim olsun" | **A) Override** (bu rehber) | ⭐⭐ |
-| "Akışın arasına kendi ekranımı sokayım" | **B) Custom ekran ekleme** | ⭐⭐ |
-| "SDK ekranı kalsın ama olup biteni izleyeyim" | **C) Host VM composition** | ⭐ |
+| "Renkler/font/logo bizim olsun" | [Tema](theming.md), ekran yazmadan | ⭐ |
+| "Şu ekranın tasarımı tamamen bizim olsun" | A) Override (bu rehber) | ⭐⭐ |
+| "Akışın arasına kendi ekranımı sokayım" | B) Custom ekran ekleme | ⭐⭐ |
+| "SDK ekranı kalsın ama olup biteni izleyeyim" | C) Host VM composition | ⭐ |
 
-Yöntemler birbirini dışlamaz — aynı projede üçünü birden kullanabilirsiniz.
+Aynı projede üç yöntemi birlikte kullanabilirsiniz.
 
 ---
 
 ## A) Tam Ekran Override
 
-Bir SDK ekranını kendi SwiftUI view'ınızla değiştirirsiniz:
+Bir SDK ekranının yerine kendi SwiftUI view'ınızı koyarsınız:
 
 ```swift
 registry.override(.selfie) { MyCustomSelfieView() }
 ```
 
-Artık `SDKFlowHostView`, selfie rotası geldiğinde sizin ekranınızı çizer. Kritik nokta:
-**UI sizin, iş mantığı SDK'nın.** Ekranınız SDK ViewModel'ini kullanmaya devam eder:
+Bundan sonra selfie rotası geldiğinde `SDKFlowHostView` sizin ekranınızı çizer. Arayüz sizin
+olur, iş mantığı SDK'da kalır; ekranınız SDK'nın ViewModel'ini kullanmaya devam eder:
 
 ```swift
 struct MyCustomSelfieView: View {
@@ -57,17 +57,17 @@ struct MyCustomSelfieView: View {
 }
 ```
 
-Her modülün VM API'si (state / metotlar / closure'lar) kendi rehberinde tablo halinde
-verilir — [Modül Kataloğu](../../README.md#modül-kataloğu)ndan ilgili modüle gidin.
+Her modülün VM API'si (state, metotlar, closure'lar) o modülün rehberinde tablo olarak duruyor.
+[Modül Kataloğu](../../README.md#modül-kataloğu)'ndan ilgili modüle geçebilirsiniz.
 
 ### Sıfırdan yazmak yerine: `XxxCustomView.swift`
 
-Yukarıdaki kısa örnek yöntemi gösterir; gerçek bir ekran çok daha fazlasını içerir (kamera
-önizlemesi, oval maske, deneme sayacı, hata alert'i, sesli okuma, ilerleme çubuğu…).
-Bunların hiçbirini sıfırdan yazmak gerekmez. Örnek uygulamada her modülün klasöründe
-`XxxCustomView.swift` vardır: SDK'nın hazır ekranının **yalnızca public API ile** yazılmış,
-çalışan birebir kopyası. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir;
-özelleştirme bu dosya üzerinde yapılır.
+Yukarıdaki örnek yalnızca yöntemi gösteriyor. Gerçek bir ekranda çok daha fazlası var: kamera
+önizlemesi, oval maske, deneme sayacı, hata uyarısı, sesli okuma, ilerleme çubuğu. Bunları
+sıfırdan yazmanız gerekmiyor. Örnek uygulamada her modülün klasöründe bir `XxxCustomView.swift`
+bulunuyor. Bu dosya SDK'nın hazır ekranının yalnızca public API kullanılarak yazılmış, çalışan bir
+kopyası. Hiç değiştirmeden bağlarsanız SDK ekranıyla aynı sonucu alırsınız; özelleştirmeyi bu
+dosyanın üzerinde yaparsınız.
 
 | Rota | Dosya | Ek bağımlılık |
 |---|---|---|
@@ -75,7 +75,7 @@ Bunların hiçbirini sıfırdan yazmak gerekmez. Örnek uygulamada her modülün
 | `.selfie` | `Modules/Selfie/SelfieCustomView.swift` | CustomKit |
 | `.selfieWithLiveness` | `Modules/SelfieWithLiveness/SelfieWithLivenessCustomView.swift` | CustomKit + `SelfieCameraController` (Vision yolu) |
 | `.idCard` | `Modules/IdCard/IdCardCustomView.swift` | — (`documentScanner` modifier SDK'da) |
-| `.idCard` (tek ekran) | `Modules/IdCard/IdCardSingleScreenCustomView.swift` | ön + arka yüz tek tam ekranda; `keepsCameraRunning` + `scanSession` |
+| `.idCard` (tek ekran) | `Modules/IdCard/IdCardSingleScreenCustomView.swift` | ön ve arka yüz tek tam ekranda; `keepsCameraRunning` + `scanSession` |
 | `.idCardOVD` | `Modules/IdCardOVD/IdCardOVDCustomView.swift` | CustomKit |
 | `.nfc` | `Modules/NFC/NfcCustomView.swift` | — |
 | `.liveness` | `Modules/Liveness/LivenessCustomView.swift` | CustomKit (ARKit) |
@@ -88,10 +88,10 @@ Bunların hiçbirini sıfırdan yazmak gerekmez. Örnek uygulamada her modülün
 | (görüşme içi) | `Modules/SignLang/SignLangCustomView.swift` | — |
 | (katman) | `Modules/LostConnection/LostConnectionCustomView.swift` | — |
 
-**CustomKit** (`Modules/CustomKit/CustomCameraPreview.swift`, `CustomComponents.swift`):
-kamera kullanan ekranların paylaştığı önizleme katmanı (iOS 17 `RotationCoordinator` ile
-portrait açı düzeltmesi), oval/çerçeve maskeleri ve ortak yardımcılar. Kamera kullanan bir
-`CustomView` kopyalandığında bu iki dosya da kopyalanır.
+CustomKit iki dosyadan oluşuyor: `Modules/CustomKit/CustomCameraPreview.swift` ve
+`CustomComponents.swift`. Kamera kullanan ekranların ortak önizleme katmanı (iOS 17
+`RotationCoordinator` ile dikey açı düzeltmesi), oval ve çerçeve maskeleri ve yardımcılar
+buradadır. Kamera kullanan bir `CustomView`'ı kopyalarken bu iki dosyayı da kopyalayın.
 
 Kullanım:
 
@@ -99,29 +99,29 @@ Kullanım:
 registry.override(.selfie) { SelfieCustomView() }     // dosya olduğu gibi projeye alınır
 ```
 
-Her `XxxCustomView.swift` dosyasının başında görev dağılımı (hangi iş VM'de, hangisi
-dosyada), ViewModel kullanımı ve kopyalanacak dosyalar listelenir.
+Her `XxxCustomView.swift` dosyasının başında hangi işin VM'de, hangisinin dosyada yapıldığı,
+ViewModel'in nasıl kullanıldığı ve hangi dosyaların kopyalanacağı yazıyor.
 
-**Çalışırken görmek:** örnek uygulamada hamburger menü → **Tam Özel Ekranlar**. Anahtar
-açıkken akıştaki her ekran `XxxCustomView` ile çizilir (`CustomKit/CustomScreens.swift`
-`registry.override` çağrılarını toplu yapar); kapalıyken SDK ekranları çalışır. Aynı
-ekrandaki listeden her modülün özel sürümü akışa girmeden tek tek önizlenir.
+Çalışırken görmek için örnek uygulamada hamburger menüden **Tam Özel Ekranlar**'ı açın. Anahtar
+açıkken akıştaki her ekran `XxxCustomView` ile çizilir (`registry.override` çağrılarının hepsi
+`CustomKit/CustomScreens.swift`'te); kapalıyken SDK ekranları çalışır. Aynı ekrandaki listeden her
+modülün özel sürümünü akışa girmeden tek tek önizleyebilirsiniz.
 
-> **Selfie + Canlılık (`.selfieWithLiveness`)** için `SDKSelfieWithLivenessViewModel` public'tir
-> (ARKit ve Vision yolu). ViewModel'de neyin yapılıp neyin yapılamadığı: [SelfieWithLiveness.md](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#viewmodelde-ne-yapılabilir).
+> Selfie + Canlılık (`.selfieWithLiveness`) için `SDKSelfieWithLivenessViewModel` public
+> (ARKit ve Vision yolu). ViewModel ile neler yapılıp neler yapılamadığı:
+> [SelfieWithLiveness.md](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#viewmodelde-ne-yapılabilir).
 
-> **Teşekkür ekranı ve bitiş durumu:** görüşme socket üzerinden bittiğinde SDK'nın kendi
-> görüşme ekranı bitiş durumunu `coordinator.pendingThankYouStatus`'a yazar; bu alanın
-> setter'ı 3.1.0'da public değildir. Özel görüşme ekranı durumu kendi tarafında tutar
-> (`CustomScreens.pendingThankYouStatus`) ve `.thankYou(nil)` rotasındaki özel teşekkür
-> ekranı oradan okur. Kalıp `CallScreenCustomView.swift` / `ThankYouCustomView.swift`
-> içindedir.
+> Teşekkür ekranı ve bitiş durumu: görüşme socket üzerinden bittiğinde SDK'nın görüşme ekranı
+> bitiş durumunu `coordinator.pendingThankYouStatus`'a yazar. Bu alanın setter'ı 3.1.0'da public
+> değil. Bu yüzden özel görüşme ekranı durumu kendisi tutar (`CustomScreens.pendingThankYouStatus`),
+> `.thankYou(nil)` rotasındaki özel teşekkür ekranı da oradan okur. Örneği
+> `CallScreenCustomView.swift` ve `ThankYouCustomView.swift` içinde bulabilirsiniz.
 
 ---
 
 ## B) Araya Custom Ekran Ekleme
 
-Akışa kendi ekranlarınızı sokarsınız — hoş geldin, sözleşme onayı, ara başarı ekranı...
+Akışa kendi ekranlarınızı eklersiniz: hoş geldin ekranı, sözleşme onayı, ara başarı ekranı gibi.
 
 ```swift
 // 1) Ekranı tanımla
@@ -135,26 +135,26 @@ coordinator.insert(["success1"], after: .idCard)     // Kimlikten sonra
 Button("Devam") { coordinator.advanceExternal() }
 ```
 
-Anlık gösterim de mümkündür (akış sırasını değiştirmeden):
+Akış sırasını değiştirmeden bir ekranı o an göstermek de mümkün:
 
 ```swift
 coordinator.showExternalScreen("kvkk")   // dönüşte yine advanceExternal()
 ```
 
-Bu ekranlar **pasiftir**: backend'in modül sayacını (`moduleStepOrder`) etkilemez, soketle
-konuşmaz. Bu yüzden istediğiniz kadar ekleyebilirsiniz — soket ve WebRTC
-`IdentifyManager` singleton'ında yaşadığı için araya giren ekranlar bağlantıyı etkilemez.
+Bu ekranlar pasiftir: backend'in modül sayacını (`moduleStepOrder`) değiştirmez ve soketle
+konuşmaz. Soket ve WebRTC `IdentifyManager` singleton'ında tutulduğu için araya giren ekranlar
+bağlantıyı etkilemez; istediğiniz kadar ekleyebilirsiniz.
 
-Birden fazla ekranı aynı noktaya zincirleyebilirsiniz — dizi sırası gösterim sırasıdır,
-aynı rotaya ikinci `insert` çağrısı kuyruğun sonuna ekler (ezmez):
+Aynı noktaya birden fazla ekran ekleyebilirsiniz. Ekranlar dizideki sırayla gösterilir. Aynı rota
+için ikinci bir `insert` çağrısı öncekini silmez, sıranın sonuna ekler:
 
 ```swift
 coordinator.insert(["intro1", "intro2"], before: .nfc)   // intro1 → intro2 → NFC
 ```
 
-**Ekran değil MODÜL eklemek istiyorsanız** (dallanan senaryolar — bir adımın sonucuna
-göre akışın uzaması), `appendModules` kullanın; eklenenler kalan modüllerin sonuna gider
-ve ilerleme şeridi (`progressTotal`) otomatik güncellenir:
+Ekran yerine modül eklemek istiyorsanız (bir adımın sonucuna göre akışın uzadığı senaryolar)
+`appendModules` kullanın. Eklenen modüller kalanların sonuna gider ve ilerleme çubuğu
+(`progressTotal`) kendiliğinden güncellenir:
 
 ```swift
 coordinator.appendModules([.idCard, .waitScreen])
@@ -165,8 +165,8 @@ coordinator.advanceToNextModule()
 
 ## C) Host VM Composition — Gözlemleyerek Zenginleştirme
 
-SDK ekranını değiştirmek istemiyorsanız ama olup biteni izlemek (log, analitik, kendi
-state'iniz) istiyorsanız, SDK VM'ini kendi VM'inizle **sarın**:
+SDK ekranını değiştirmeden olup biteni izlemek istiyorsanız (log, analitik, kendi state'iniz)
+SDK'nın VM'ini kendi VM'inizle sarın:
 
 ```swift
 @MainActor
@@ -188,21 +188,21 @@ final class SelfieHostViewModel: HostModuleViewModel {
 }
 ```
 
-> **Tasarım kararı:** Modül VM'leri `public final`'dır — subclass'lanamaz. Davranış ezmek
-> yerine sarmalayıp gözlemlersiniz. Bu bilinçli bir tercihtir: dış geliştiricinin iş mantığını
-> değiştirmesi, sunucu tarafı akışla uyumsuzluk yaratır.
+> Modül VM'leri `public final`, yani onlardan sınıf türetemezsiniz. Davranışı değiştirmek yerine
+> VM'i sarıp izlersiniz. Bunu bilerek böyle yaptık: iş mantığı dışarıdan değiştirilirse sunucudaki
+> akışla uyumsuzluk çıkar.
 
-Sample App'te her modülün `XxxHostViewModel`'i bu desenin çalışan örneğidir.
+Sample App'teki her `XxxHostViewModel` bu yöntemin çalışan bir örneği.
 
 ---
 
 ## "Bypass Yok" Kuralı
 
-Custom ekran yazarken her adım eylemini — **tara, yükle, sonraki modüle geç** —
-**SDK VM metoduna indirmelisiniz.** Nedeni basit: her VM metodu, işin yanında backend'e
-ilerleme sinyali de gönderir (`sendStep`, `modulePresented`). Kendi HTTP isteğinizi atar,
-kendi navigasyonunuzu kurarsanız görüntü aynı olur ama **sunucu akışı ilerlemez** —
-agent panelinde müşteri "takılı" görünür.
+Custom ekran yazarken tarama, yükleme ve sonraki modüle geçme gibi her adım işini SDK'nın VM
+metotlarıyla yapmalısınız. Her VM metodu işin yanında backend'e ilerleme sinyali de gönderir
+(`sendStep`, `modulePresented`). Kendi HTTP isteğinizi atıp kendi geçişinizi yaparsanız ekranda
+her şey aynı görünür ama sunucudaki akış ilerlemez ve agent panelinde müşteri takılmış gibi
+görünür.
 
 | ✅ Doğru | ❌ Bypass |
 |---|---|
@@ -211,16 +211,16 @@ agent panelinde müşteri "takılı" görünür.
 | `vm.uploadSignature(image:)` | Görseli kendiniz yüklemek |
 | `coordinator.skipCurrentModule()` | Modülü sessizce atlamak |
 
-Pasif ekranlar (B yöntemi) bu kuralın dışındadır — zaten hiçbir VM metodu çağırmazlar.
+B yöntemindeki pasif ekranlar bu kuralın dışında kalır, çünkü hiçbir VM metodu çağırmazlar.
 
 ---
 
 ## Kontrol Listesi — Custom Ekran Yayına Çıkmadan Önce
 
-- [ ] Başlangıç noktası ilgili `XxxCustomView.swift` (sıfırdan yazılmadı); dosya başındaki "Kopyalanacak dosyalar" listesi eksiksiz
-- [ ] Ekran, iş eylemlerinde yalnızca SDK VM metotlarını çağırıyor
-- [ ] Geçişler `coordinator` üzerinden (`advanceToNextModule` / `advanceExternal` / `skipCurrentModule`)
-- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya yansıtılıyor
-- [ ] Modülün closure'ları bağlandı (`onSkipRequested` vb. — modül rehberine bakın)
-- [ ] Deneme hakkı tükenme senaryosu test edildi (comparison count'lar sunucudan gelir)
-- [ ] Gerçek cihazda uçtan uca akış koşturuldu (NFC/görüşme simülatörde çalışmaz)
+- [ ] Ekran ilgili `XxxCustomView.swift`'ten başlatıldı (sıfırdan yazılmadı) ve dosyanın başındaki "Kopyalanacak dosyalar" listesindeki her şey projede
+- [ ] Ekran iş adımlarında yalnızca SDK VM metotlarını çağırıyor
+- [ ] Geçişler `coordinator` üzerinden yapılıyor (`advanceToNextModule` / `advanceExternal` / `skipCurrentModule`)
+- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya gösteriliyor
+- [ ] Modülün closure'ları bağlandı (`onSkipRequested` vb., modül rehberine bakın)
+- [ ] Deneme hakkının bittiği durum test edildi (comparison count'lar sunucudan gelir)
+- [ ] Akış gerçek cihazda baştan sona denendi (NFC ve görüşme simülatörde çalışmaz)

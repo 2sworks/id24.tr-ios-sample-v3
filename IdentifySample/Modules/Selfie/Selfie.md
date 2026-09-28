@@ -176,3 +176,6 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .selfieTts, language: .tr,
 - **Birden fazla yüz:** SDK yalnızca **tek yüz** algılandığında ilerletir (2.3.15+).
 - **Deneme hakkı:** `selfie_comparison_count` sunucudan gelir; custom ekranınızda
   `onSkipRequested`'ı bağlamayı unutmayın — yoksa hak tükenince kullanıcı sıkışır.
+- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
+  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: false)`;
+  işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

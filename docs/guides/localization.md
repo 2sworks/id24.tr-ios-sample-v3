@@ -1,11 +1,10 @@
 # Lokalizasyon — Dil Desteği ve Metin Override
 
-> **3.1.0:** İngilizce dil kodu `.eng` yerine `.en`. `.eng` deprecated alias olarak
-> derlenmeye devam eder; ayrıntı: [3.1.0 Değişiklik Rehberi](migration-3.1.0.md).
+> 3.1.0 ile İngilizcenin dil kodu `.eng` yerine `.en` oldu. `.eng` eski ad olarak derlenmeye
+> devam ediyor. Ayrıntı: [3.1.0 Değişiklik Rehberi](migration-3.1.0.md).
 
-SDK beş dilde hazır gelir: **Türkçe, İngilizce, Almanca, Azerbaycanca, Rusça.**
-Tüm ekran metinleri anahtar tabanlıdır (`SDKKeyword`) ve her biri host tarafından
-tek tek ezilebilir — kendi üslubunuzu SDK ekranlarına taşıyabilirsiniz.
+SDK beş dille gelir: Türkçe, İngilizce, Almanca, Azerbaycanca ve Rusça. Ekrandaki her metnin
+bir anahtarı vardır (`SDKKeyword`) ve her birini kendi metninizle değiştirebilirsiniz.
 
 ← [README'ye dön](../../README.md) · İlgili: [Tema](theming.md) · [ReadAloud](../../IdentifySample/Modules/ReadAloud.md)
 
@@ -13,8 +12,8 @@ tek tek ezilebilir — kendi üslubunuzu SDK ekranlarına taşıyabilirsiniz.
 
 ## Dil Seçimi
 
-Aktif dili `IdentifyManager` üzerinden ayarlarsınız (varsayılan: Türkçe; bilinmeyen durumda
-İngilizce'ye düşer):
+Dili `IdentifyManager` üzerinden seçersiniz. Varsayılan Türkçedir; tanınmayan bir dil gelirse
+İngilizce kullanılır.
 
 ```swift
 IdentifyManager.shared.sdkLang = .en     // .tr / .en / .de / .az / .ru
@@ -28,17 +27,17 @@ IdentifyManager.shared.sdkLang = .en     // .tr / .en / .de / .az / .ru
 | `.az` | Azerbaycanca | `az` |
 | `.ru` | Rusça | `ru` |
 
-Dil seçimi yalnızca ekran metinlerini değil, **konuşma tanıma** (Speech modülü) ve
-**sesli okuma** (Read-Aloud) dillerini de belirler.
+Seçtiğiniz dil ekran metinlerinin yanında konuşma tanımanın (Speech modülü) ve sesli okumanın
+(Read-Aloud) dilini de belirler.
 
-> OCR için ayrı bir ipucu vardır: `setupSDK(idCardLang:)` — belge üzerindeki yazının dili.
+> OCR'ın ayrı bir ayarı var: `setupSDK(idCardLang:)`, belgenin üzerindeki yazının dilidir.
 
 ---
 
 ## Metinleri Okumak
 
-SDK içi tüm metinler `SDKKeyword` enum'ıyla çözülür. Kendi custom ekranınızda SDK ile aynı
-metni göstermek isterseniz:
+SDK bütün metinleri `SDKKeyword` üzerinden çözer. Kendi ekranınızda SDK'nın kullandığı metnin
+aynısını göstermek için:
 
 ```swift
 let title = SDKLocalization.shared.translate(.connect)
@@ -48,7 +47,7 @@ let title = SDKLocalization.shared.translate(.connect)
 
 ## Metinleri Ezmek (Override)
 
-Üç yol vardır; hepsi çalışma zamanında, `setupSDK`'dan önce uygulanır:
+Üç yolu var. Hepsi çalışma zamanında uygulanır; `setupSDK`'dan önce çağırın.
 
 ### 1. Tek metin
 
@@ -67,8 +66,8 @@ SDKLocalization.shared.registerOverrides([
 
 ### 3. Dosyadan yükleme
 
-Metinleri uygulamanıza bir kaynak dosyası olarak koyup tek seferde yükleyin —
-sunucudan indirilen bir dosyayla **uygulama güncellemeden metin değiştirme** de mümkündür:
+Metinleri bir JSON dosyasına koyup tek seferde yükleyebilirsiniz. Dosyayı sunucudan
+indirirseniz metinleri uygulamayı güncellemeden değiştirmiş olursunuz.
 
 ```swift
 if let url = Bundle.main.url(forResource: "sdk_texts_tr", withExtension: "json") {
@@ -76,15 +75,14 @@ if let url = Bundle.main.url(forResource: "sdk_texts_tr", withExtension: "json")
 }
 ```
 
-Temizlik: `clearOverrides()` tüm ezmeleri kaldırır, `clearCache()` çeviri önbelleğini tazeler.
+`clearOverrides()` bütün ezmeleri kaldırır, `clearCache()` çeviri önbelleğini yeniler.
 
 ---
 
 ## Sesli Okuma Metinleri
 
-Modül yönergelerinin seslendirilen halleri de aynı sistemden geçer — her modülün bir
-`*Tts` anahtarı vardır (ör. `.selfieTts`). Sesli metni ekran metninden bağımsız
-değiştirebilirsiniz:
+Modül yönergelerinin sesli halleri de aynı sistemden geçer. Her modülün bir `*Tts` anahtarı
+vardır (ör. `.selfieTts`), yani sesli metni ekrandaki metne dokunmadan değiştirebilirsiniz:
 
 ```swift
 SDKLocalization.shared.setOverride(
@@ -99,8 +97,7 @@ Ayrıntı: [ReadAloud rehberi](../../IdentifySample/Modules/ReadAloud.md).
 
 ## İpuçları
 
-- Override anahtarları `SDKKeyword.rawValue` üzerinden eşleşir; mevcut anahtarların tam
-  listesi için SDK'daki `SDKKeyword` enum'ına (400+ anahtar) bakın ya da bir metnin
-  anahtarını ilgili modülün rehberinden bulun.
-- Dil değiştirme butonu SDK'nın nav bar'ında hazırdır (`langButton` ikonu) — kendi dil
-  seçiminizi kullanıyorsanız `sdkLang`'i güncellemeniz yeterlidir.
+- Override, `SDKKeyword.rawValue` ile eşleşir. 400'den fazla anahtarın tam listesi SDK'daki
+  `SDKKeyword` enum'ında. Bir metnin anahtarını ilgili modülün rehberinde de bulabilirsiniz.
+- SDK'nın başlık çubuğunda hazır bir dil düğmesi var (`langButton` ikonu). Dil seçimini kendi
+  arayüzünüzde yapıyorsanız `sdkLang`'i güncellemeniz yeterli.
