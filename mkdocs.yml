@@ -60,6 +60,7 @@ nav:
       - Sunucu & API: docs/guides/server-api.md
       - WebSocket: docs/guides/websocket.md
       - TURN & WebRTC: docs/guides/turn-webrtc.md
+      - Bağlantı Hız Testi: docs/guides/speed-test.md
       - Loglama: docs/guides/logging.md
       - Event Sistemi: docs/guides/events.md
       - Oturum Çıkışları: docs/guides/session-exit.md

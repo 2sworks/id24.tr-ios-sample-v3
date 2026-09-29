@@ -89,6 +89,7 @@ struct MyPrepareView: View {
 | `cameraAuthorized` | `Bool` | Kamera izni verildi mi |
 | `micAuthorized` | `Bool` | Mikrofon izni verildi mi |
 | `speechAuthorized` | `Bool` | Konuşma izni verildi mi |
+| `speedTestResult` | `SDKSpeedTestResult?` | Yeni hız testinin sonucu; eski test çalıştıysa `nil` |
 
 ### Yazılabilir state
 | Üye | Tip | Anlam |
@@ -96,6 +97,7 @@ struct MyPrepareView: View {
 | `showSettingsAlert` | `Bool` | İzin reddedilince Ayarlar uyarısı |
 | `settingsAlertMessage` | `String` | Uyarı metni |
 | `settingsOpenAction` | `(() -> Void)?` | "Ayarlar'a git" aksiyonu |
+| `showSpeedBlockedAlert` | `Bool` | Yeni test `blockIdent` döndürdü; "Tekrar Dene" uyarısı |
 
 ### Hesaplanan
 | Üye | Anlam |
@@ -109,7 +111,7 @@ struct MyPrepareView: View {
 | `checkCamera()` | Kamera iznini ister/günceller |
 | `checkMicrophone()` | Mikrofon iznini ister |
 | `checkSpeech()` | Konuşma iznini ister |
-| `startSpeedTest()` | `manager.startSpeedTest()` ile hız ölçer |
+| `startSpeedTest()` | Hız ölçer: `useConnectionSpeedTest` açıksa yeni test (sunucu), kapalıysa eski test (google.com) |
 | `completePrepare()` | **`manager.sendPreparetatus` (soket) + `onCompleted?()`** |
 
 ### Closure'lar
@@ -121,7 +123,7 @@ struct MyPrepareView: View {
 
 ```
 checkCamera()/checkMicrophone()/checkSpeech()  → izinler (cihazda)
-startSpeedTest()                               → manager.startSpeedTest (cihazda ölçüm)
+startSpeedTest()                               → manager.startSpeedTest ya da startConnectionSpeedTest
 completePrepare()  → manager.sendPreparetatus  [SOKET: hazır]  → onCompleted?()
                                                                 ↓ host
                                               coordinator.advanceToNextModule()  [modulePresented]
@@ -165,6 +167,8 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .prepareTts, language: .tr
 
 - **Hız testi her zaman gerekli mi?** Hayır — `needsSpeedTest` `false` ise atlanabilir;
   ama `completePrepare()` yine de çağrılmalıdır (hazır sinyali her durumda gider).
+- **Hangi hız testi çalışır?** `IdentifyManager.shared.useConnectionSpeedTest` belirler (varsayılan
+  eski test). Ayrıntı: [Bağlantı Hız Testi](../../../docs/guides/speed-test.md).
 - **Kullanıcı izni reddederse?** `showSettingsAlert` + `settingsOpenAction` ile Ayarlar'a
   yönlendirin; iOS, reddedilen izni uygulama içinden tekrar soramaz.
 - **Simülatörde?** İzin akışı çalışır; hız testi gerçek ağa bağlıdır.

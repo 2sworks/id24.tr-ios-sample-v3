@@ -18,6 +18,7 @@
 //    cameraAuthorized / micAuthorized / speechAuthorized
 //    needsSpeedTest / speedCheckDone / connectionQuality / startSpeedTest()
 //    showSettingsAlert + settingsAlertMessage + settingsOpenAction   reddedilmiş izin
+//    showSpeedBlockedAlert   sunucu hız testi akışı durdurdu (useConnectionSpeedTest)
 //    completePrepare()  → onCompleted → coordinator.advanceToNextModule()
 //
 //  Kopyalanacak dosyalar: bu dosya + CustomKit/CustomComponents.swift (başarı banner'ı)
@@ -68,6 +69,15 @@ struct PrepareCustomView: View {
             actions: [
                 IDAlertAction(title: String(.coreCancel), style: .cancel),
                 IDAlertAction(title: String(.coreSettings), style: .primary) { viewModel.settingsOpenAction?() }
+            ]
+        ))
+        .idAlert(isPresented: $viewModel.showSpeedBlockedAlert, alert: IDAlertModel(
+            type: .error,
+            title: String(.coreError),
+            message: String(.connectionErrorRetry),
+            actions: [
+                IDAlertAction(title: String(.coreCancel), style: .cancel),
+                IDAlertAction(title: String(.coreTryAgain), style: .primary) { viewModel.startSpeedTest() }
             ]
         ))
     }

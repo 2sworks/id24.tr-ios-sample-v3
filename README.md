@@ -247,6 +247,7 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Sunucu & API](docs/guides/server-api.md) | `setupSDK` tüm parametreleri, `RoomResponse`, modül sırası, SSL pinning |
 | [WebSocket](docs/guides/websocket.md) | Soket aksiyonları, `socket_auth` token'ı, reconnect ve LostConnection katmanı |
 | [TURN & WebRTC](docs/guides/turn-webrtc.md) | STUN/TURN kimlik üretimi, şifreli TURN, görüşme akışı |
+| [Bağlantı Hız Testi](docs/guides/speed-test.md) | Eski ve yeni hız testi, `useConnectionSpeedTest`, `blockIdent`, görüşme öncesi ölçüm senaryosu |
 | [Loglama](docs/guides/logging.md) | `SDKLog` facade'i, severity/kategori, online log, redaksiyon |
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
 | [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
