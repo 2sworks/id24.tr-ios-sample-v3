@@ -19,11 +19,12 @@ Varsayılan eski testtir. Mevcut entegrasyonlarda hiçbir şey değişmez; yeni 
 1. [Yeni testi açmak](#1-yeni-testi-açmak)
 2. [Test ne zaman çalışır?](#2-test-ne-zaman-çalışır)
 3. [Sonuç nasıl okunur?](#3-sonuç-nasıl-okunur)
-4. [Senaryo: görüntülü görüşmeden önce hız testi](#4-senaryo-görüntülü-görüşmeden-önce-hız-testi)
-5. [Hazırlık ekranını kendiniz çizdiyseniz](#5-hazırlık-ekranını-kendiniz-çizdiyseniz)
-6. [Testi SDK ekranları dışında çalıştırmak](#6-testi-sdk-ekranları-dışında-çalıştırmak)
-7. [Örnek uygulamada denemek](#7-örnek-uygulamada-denemek)
-8. [Sık sorulanlar](#8-sık-sorulanlar)
+4. [Modülden önce ölçüm ekranı](#4-modülden-önce-ölçüm-ekranı)
+5. [Hazırlık ekranında ölçmek](#5-hazırlık-ekranında-ölçmek)
+6. [Hazırlık ekranını kendiniz çizdiyseniz](#6-hazırlık-ekranını-kendiniz-çizdiyseniz)
+7. [Testi akış başlamadan çalıştırmak](#7-testi-akış-başlamadan-çalıştırmak)
+8. [Örnek uygulamada denemek](#8-örnek-uygulamada-denemek)
+9. [Sık sorulanlar](#9-sık-sorulanlar)
 
 ---
 
@@ -65,8 +66,8 @@ Hız testini sunucudaki akış tetikler, uygulama tarafında ayrıca bir şey a�
 4. Düğme "Bağlantı Kalitemi Ölç ve Devam Et" olur. Dokununca test çalışır.
 
 Akışta görüşme yoksa hazırlık ekranı testi atlar; düğme doğrudan "Devam Et" olur. Akışta hazırlık
-ekranı yoksa test hiç çalışmaz. Bu durumda testi kendiniz çağırabilirsiniz, bkz.
-[bölüm 6](#6-testi-sdk-ekranları-dışında-çalıştırmak).
+ekranı yoksa test hiç çalışmaz. Ölçümü belirli bir modülün hemen önünde yapmak istiyorsanız
+[bölüm 4](#4-modülden-önce-ölçüm-ekranı)'teki ara ekranı kullanın.
 
 ---
 
@@ -104,14 +105,189 @@ Hazırlık ekranının iki test için davranışı:
 
 ---
 
-## 4) Senaryo: görüntülü görüşmeden önce hız testi
+## 4) Modülden önce ölçüm ekranı
 
-Müşteri, kullanıcının zayıf bağlantıyla görüşmeye bağlanmasını istemiyor. Görüşme
-başlamadan bağlantı ölçülsün, sunucu yetersiz derse kullanıcı ilerlemesin.
+Ölçümü hazırlık ekranına bağlamadan, istediğiniz modülün hemen önünde yapabilirsiniz. Akışa kendi
+ekranınızı eklersiniz; ekran açılınca test çalışır, sunucu geçer derse kullanıcı modüle girer,
+engellerse ekranda kalır. Bu yol hazırlık ekranını ve `useConnectionSpeedTest` ayarını
+kullanmaz, akışta hazırlık modülü olmasa da çalışır.
 
+Kullanılan iki API zaten flow özelleştirmesinin parçasıdır
+([Özelleştirme, bölüm B](customization.md#b-araya-custom-ekran-ekleme)):
+
+```swift
+registry.custom("speedCheck") { SpeedCheckBeforeView() }       // ekranı kaydet
+coordinator.insert(["speedCheck"], before: .callScreen)         // hangi modülün önüne
+```
+
+### 4.1) Ölçüm ekranı
+
+```swift
+import SwiftUI
+import IdentifySDK
+
+struct SpeedCheckBeforeView: View {
+
+    @EnvironmentObject private var coordinator: SDKFlowCoordinator
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var isMeasuring = false
+    @State private var isBlocked = false
+
+    var body: some View {
+        ZStack {
+            IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea()
+            VStack(spacing: IDSpacing.xl) {
+                Spacer()
+                if isBlocked {
+                    Text(String(.connectionErrorRetry))
+                        .font(IDFont.bodyRegular(.regular))
+                        .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
+                        .multilineTextAlignment(.center)
+                } else {
+                    ProgressView()
+                }
+                Spacer()
+                if isBlocked {
+                    SDKButton(title: String(.coreTryAgain), isLoading: isMeasuring, isDisabled: isMeasuring) {
+                        measure()
+                    }
+                }
+            }
+            .padding(.horizontal, IDSpacing.lg)
+            .padding(.bottom, IDSpacing.xxl)
+            .sdkReadableWidth()
+        }
+        .onAppear(perform: measure)
+        .onDisappear { IdentifyManager.shared.cancelConnectionSpeedTest() }
+    }
+
+    private func measure() {
+        guard !isMeasuring else { return }
+        isMeasuring = true
+        IdentifyManager.shared.startConnectionSpeedTest { result in
+            isMeasuring = false
+            if result.blockIdent {
+                isBlocked = true
+            } else {
+                coordinator.advanceExternal()   // modüle geç
+            }
+        }
+    }
+}
+```
+
+Ekranın akıştaki davranışı:
+
+| Durum | Ne olur |
+|---|---|
+| Ekran açıldı | Test hemen başlar, yükleniyor göstergesi döner |
+| `blockIdent == false` | `advanceExternal()` çağrılır, kullanıcı modüle girer |
+| `outcome == .skipped` (sunucuya ulaşılamadı, test kapalı) | `blockIdent` `false` gelir, kullanıcı modüle girer |
+| `blockIdent == true` | Hata metni ve "Tekrar Dene" düğmesi görünür; kullanıcı modüle giremez |
+| Ekran kapandı | `cancelConnectionSpeedTest()` testi durdurur |
+
+Görünümü markanıza göre değiştirebilirsiniz. Akış yalnızca iki çağrıya bakar:
+`startConnectionSpeedTest` ve test geçince `advanceExternal()`.
+
+### 4.2) Senaryo: görüntülü görüşmeden önce
+
+Müşteri, kullanıcının zayıf bağlantıyla görüşmeye bağlanmasını istemiyor. Belgeler ve selfie
+alındıktan sonra, görüşmeye girmeden hemen önce bağlantı ölçülsün; sunucu yetersiz derse
+kullanıcı görüşmeye alınmasın.
+
+Panel tarafı: akışta görüntülü görüşme (`waitScreen`) var, örnek sıra
+`prepare → idCard → selfie → waitScreen`. Hız testi eşikleri ve engelleme (`gateEnabled`)
+sunucuda açılır.
+
+Uygulama tarafı:
+
+```swift
+// 1) Akış başlamadan bir kez: ekranı kaydet ve görüşmenin önüne ekle.
+registry.custom("speedCheck") { SpeedCheckBeforeView() }
+coordinator.insert(["speedCheck"], before: .callScreen)
+
+// 2) Oturum açılırken:
+IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
+    guard error == nil else { return }
+    // İsteğe bağlı: hazırlık ekranı ikinci kez ölçmesin (bkz. aşağıdaki not).
+    IdentifyManager.shared.needSpeedTest = false
+    coordinator.start()
+}
+```
+
+Kullanıcı şunları görür:
+
+1. Hazırlık, kimlik ve selfie adımlarını her zamanki gibi tamamlar.
+2. Selfie'den sonra ölçüm ekranı açılır, test birkaç saniye sürer.
+3. Sunucu geçer derse ekran kendiliğinden kapanır ve görüşme ekranı açılır.
+4. Sunucu engellerse ekranda hata metni ve "Tekrar Dene" kalır. Kullanıcı başka bir ağa geçip
+   tekrar dener; test geçmeden görüşmeye ulaşamaz.
+
+Sunucu tarafında sıra şöyle işler: ölçüm ekranı açıkken panel kullanıcıyı hâlâ selfie adımında
+görür. Görüşme modülüne geçiş (bekleme odasına alınma dahil) ancak ekran `advanceExternal()`
+çağırınca yapılır. Engellenen kullanıcı bu yüzden temsilci kuyruğuna hiç düşmez.
+
+Akışta `waitScreen` olduğu için SDK `needSpeedTest = true` yapar, hazırlık ekranı da ölçüm
+düğmesi gösterir. Ölçümü yalnızca görüşmeden önce yapmak istiyorsanız
+`setupSDK` dönüşünde, `coordinator.start()` öncesinde `needSpeedTest = false` verin. Hazırlık
+ekranı o zaman düz "Devam Et" gösterir ve sunucuya hazırlık sinyalini yine kendisi gönderir.
+
+### 4.3) Diğer modüller
+
+Aynı ekran her modülün önüne eklenebilir; yalnızca rota değişir:
+
+| Panel modülü | Rota |
+|---|---|
+| `waitScreen` (görüntülü görüşme) | `.callScreen` |
+| `nfc` | `.nfc` |
+| `selfie` | `.selfie` |
+| `selfieWithLiveness` | `.selfieWithLiveness` |
+| `idCard` | `.idCard` |
+| `idcard_w_ovd` | `.idCardOVD` |
+| `livenessDetection` | `.liveness` |
+| `videoRecord` | `.videoRecorder` |
+| `speech` | `.speech` |
+| `signature` | `.signature` |
+| `addressConf` | `.addressConfirm` |
+| `prepare` | `.prepare` |
+
+```swift
+// Birden fazla modülün önünde ölçmek: aynı ekran, her rota için ayrı kayıt.
+coordinator.insert(["speedCheck"], before: .nfc)
+coordinator.insert(["speedCheck"], before: .callScreen)
+
+// Ölçümden önce bir bilgilendirme ekranı: dizideki sırayla gösterilir.
+coordinator.insert(["networkInfo", "speedCheck"], before: .callScreen)
+```
+
+Akışta olmayan bir modülün önüne eklenen ekran hiç açılmaz. Panelde modül sırası değişse bile
+ekran ait olduğu modülün önünde kalır.
+
+### 4.4) Dikkat edilecekler
+
+- `insert` çağrıları birikir. Akış başlamadan bir kez yapın (örnekte `RootView`'ın kurulum
+  bloğu); her oturumda yeniden çağırırsanız ekran art arda iki kez açılır. Kayıtlar
+  `resetFlow()` sonrasında da geçerlidir.
+- Ölçüm ekranı adım sayacını ilerletmez ve ilerleme çubuğunda yer kaplamaz.
+- WebRTC ölçümü kamera ve mikrofon izni ister, ölçüm ekranı izin istemez. Ekranı hazırlıktan
+  önce, akışın ilk modülünün önüne koyarsanız izinler henüz verilmemiş olabilir; ping, indirme ve
+  yükleme yine ölçülür, `rtcOutcome` `no_media_permission` gelir.
+- Ölçüm ekranı `prepareCompleted()` göndermez; bu sinyal hazırlık ekranına aittir.
+- Kullanıcıya akıştan çıkış sunmak isterseniz engel durumuna kendi düğmenizi ekleyin; SDK bu
+  ekranda bir kapatma düğmesi çizmez.
+
+Tam çalışan örnek: `IdentifySample/Modules/Prepare/SpeedCheckBeforeView.swift`. Bağlantısı
+`IdentifySample/App/RootView.swift` içinde kapalı örnek olarak duruyor.
+
+---
+
+## 5) Hazırlık ekranında ölçmek
+
+SDK'nın kendi hazırlık ekranı da ölçüm yapabilir. Ek ekran yazmak istemiyorsanız bu yol yeterli.
 Panelde akışa hazırlık (`prepare`) ve görüntülü görüşme (`waitScreen`) modülleri
-eklenir, hazırlık görüşmeden önce gelir. Örnek sıra: `prepare → idCard → selfie → waitScreen`.
-Hız testi eşikleri ve engelleme (`gateEnabled`) sunucuda açılır.
+eklenir, hazırlık görüşmeden önce gelir. Hız testi eşikleri ve engelleme (`gateEnabled`)
+sunucuda açılır.
 
 Uygulamada tek satır yeterli:
 
@@ -159,7 +335,7 @@ struct PrepareObservingView: View {
 
 ---
 
-## 5) Hazırlık ekranını kendiniz çizdiyseniz
+## 6) Hazırlık ekranını kendiniz çizdiyseniz
 
 `SDKPrepareViewModel` iki testi de kendi içinde seçer. Ekranınız `startSpeedTest()` çağırıyorsa
 ayar açıldığında yeni test çalışır, çağrıyı değiştirmeniz gerekmez. Eklemeniz gereken tek şey
@@ -191,10 +367,10 @@ Tam çalışan örnek: `IdentifySample/Modules/Prepare/PrepareCustomView.swift`.
 
 ---
 
-## 6) Testi SDK ekranları dışında çalıştırmak
+## 7) Testi akış başlamadan çalıştırmak
 
-Akışta hazırlık ekranı yoksa ya da ölçümü akış başlamadan kendi ekranınızda yapmak istiyorsanız
-metodu doğrudan çağırın. Bu yol `useConnectionSpeedTest` ayarına bakmaz.
+Ölçümü ilk modülden bile önce, kendi giriş ekranınızda yapmak istiyorsanız metodu `setupSDK`
+dönüşünde çağırın. Bu yol `useConnectionSpeedTest` ayarına bakmaz.
 
 ```swift
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
@@ -235,7 +411,7 @@ IdentifyManager.shared.startSpeedTest { status, kbPerSec in
 
 ---
 
-## 7) Örnek uygulamada denemek
+## 8) Örnek uygulamada denemek
 
 Giriş ekranında sağ üstteki menü → **Hız testi → Yeni hız testi**. Açıkken hazırlık ekranı yeni
 testi, kapalıyken eski testi çalıştırır. Ayar cihazda saklanır.
@@ -249,9 +425,12 @@ SDKDebugSettings.shared.connectionSpeedTest = true   // IdentifyManager.shared.u
 `SDKDebugSettings` örnek uygulamanın deneme menüsü içindir. Kendi uygulamanızda
 `IdentifyManager.shared.useConnectionSpeedTest` kullanın.
 
+Görüşmeden önce ölçüm ekranını denemek için `IdentifySample/App/RootView.swift` içindeki
+`speedCheck` satırlarını açın. Bu ekran menüdeki ayardan bağımsız çalışır.
+
 ---
 
-## 8) Sık sorulanlar
+## 9) Sık sorulanlar
 
 - **Test ne kadar sürer?** Sunucudaki test ayarına ve bağlantıya göre değişir; `result.durationMs`
   ile görebilirsiniz.

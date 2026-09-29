@@ -82,6 +82,7 @@
 		C75945A743509F12E63836A4 /* SignLangCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2539D42762D51A58B4E46B4A /* SignLangCustomView.swift */; };
 		1AD89A2DAF7F266CD2D13C03 /* LostConnectionCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDB663DB9B990915563D177 /* LostConnectionCustomView.swift */; };
 		BAC594C573AA3A9E5D8E8A13 /* PrepareCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEAB162C879E109A5BE17AA9 /* PrepareCustomView.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* SpeedCheckBeforeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* SpeedCheckBeforeView.swift */; };
 		F0C2A299C6BEB361CA424983 /* IdCardCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C37EA1A9369FD0504EA85B0A /* IdCardCustomView.swift */; };
 		A1D0C0DE5EED100000000001 /* IdCardSingleScreenCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D0C0DE5EED100000000002 /* IdCardSingleScreenCustomView.swift */; };
 		34A30EF9B9E836A5F5186296 /* IdCardOVDCustomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3540AE4C5CE365E5669071D /* IdCardOVDCustomView.swift */; };
@@ -200,6 +201,7 @@
 		49F541B69762B57080B877C3 /* CallScreenCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CallScreenCustomView.swift; sourceTree = "<group>"; };
 		2539D42762D51A58B4E46B4A /* SignLangCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SignLangCustomView.swift; path = SignLang/SignLangCustomView.swift; sourceTree = "<group>"; };
 		CDDB663DB9B990915563D177 /* LostConnectionCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LostConnectionCustomView.swift; path = LostConnection/LostConnectionCustomView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5D /* SpeedCheckBeforeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedCheckBeforeView.swift; sourceTree = "<group>"; };
 		CEAB162C879E109A5BE17AA9 /* PrepareCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrepareCustomView.swift; sourceTree = "<group>"; };
 		C37EA1A9369FD0504EA85B0A /* IdCardCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdCardCustomView.swift; sourceTree = "<group>"; };
 		A1D0C0DE5EED100000000002 /* IdCardSingleScreenCustomView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdCardSingleScreenCustomView.swift; sourceTree = "<group>"; };
@@ -280,6 +282,7 @@
 			isa = PBXGroup;
 			children = (
 				CEAB162C879E109A5BE17AA9 /* PrepareCustomView.swift */,
+				A1B2C3D4E5F60718293A4B5D /* SpeedCheckBeforeView.swift */,
 				83FFC10ACB37A7082C2B7501 /* PrepareExample.swift */,
 				480F245BECD28CA1A34D0EC9 /* PrepareHostViewModel.swift */,
 				0046CF4158A838AC23E4A05E /* Prepare.md */,
@@ -761,6 +764,7 @@
 				F0C2A299C6BEB361CA424983 /* IdCardCustomView.swift in Sources */,
 				A1D0C0DE5EED100000000001 /* IdCardSingleScreenCustomView.swift in Sources */,
 				BAC594C573AA3A9E5D8E8A13 /* PrepareCustomView.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* SpeedCheckBeforeView.swift in Sources */,
 				1AD89A2DAF7F266CD2D13C03 /* LostConnectionCustomView.swift in Sources */,
 				C75945A743509F12E63836A4 /* SignLangCustomView.swift in Sources */,
 				72567F060C69C4FD045023D2 /* CallScreenCustomView.swift in Sources */,

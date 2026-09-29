@@ -145,6 +145,10 @@ Bu ekranlar pasiftir: backend'in modül sayacını (`moduleStepOrder`) değişti
 konuşmaz. Soket ve WebRTC `IdentifyManager` singleton'ında tutulduğu için araya giren ekranlar
 bağlantıyı etkilemez; istediğiniz kadar ekleyebilirsiniz.
 
+Sunucuya sonraki modül, son custom ekran `advanceExternal()` çağırınca bildirilir. `before: .callScreen`
+ile eklenen ekran açıkken kullanıcı henüz paneldeki bekleme odasında değildir. Görüşmeden önce
+bağlantı ölçen bir ekran örneği: [Bağlantı Hız Testi](speed-test.md#4-modülden-önce-ölçüm-ekranı).
+
 Aynı noktaya birden fazla ekran ekleyebilirsiniz. Ekranlar dizideki sırayla gösterilir. Aynı rota
 için ikinci bir `insert` çağrısı öncekini silmez, sıranın sonuna ekler:
 

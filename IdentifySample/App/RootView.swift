@@ -137,6 +137,12 @@ struct RootView: View {
 //        }
 //        coordinator.insert(["welcome"], before: .selfie)
 
+        // C) Ara ekran: görüntülü görüşmeden ÖNCE bağlantı ölçümü. Sunucu engellerse kullanıcı
+        //    bu ekranda kalır. Başka modül için rotayı değiştirin (.nfc, .selfie …).
+        //    Rehber: docs/guides/speed-test.md
+//        registry.custom("speedCheck") { SpeedCheckBeforeView() }
+//        coordinator.insert(["speedCheck"], before: .callScreen)
+
         // D) Tek bir modül, anahtardan bağımsız olarak, host ekranıyla değiştirilir.
 //        registry.override(.addressConfirm) { AddressConfirmCustomView() }
 
