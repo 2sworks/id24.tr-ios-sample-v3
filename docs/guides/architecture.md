@@ -107,6 +107,159 @@ Host uygulamanın bağlanabileceği yayınlanan değerler: `path`, `activeModule
 `progressTotal`, `sdkError`, `subRejected`, `pendingThankYouStatus`. Kendi ilerleme çubuğunuzu
 bunlarla çizebilirsiniz.
 
+### Akışın çizimi
+
+Örneklerde sunucunun sırası Prepare → Kimlik → NFC → Selfie → Görüşme, yani 5 adım.
+`┌─┐` SDK modülü, `╭┄╮` `insert` ile araya eklenen ekrandır. PANEL satırı sunucunun kullanıcıyı
+nerede gördüğünü gösterir. Bu satır değişmiyorsa sunucuya bir şey gitmemiştir.
+
+#### Ekleme yokken
+
+```
+        ┌─────────┐  advanceToNextModule()  ┌────────┐  advanceToNextModule()  ┌─────┐
+ EKRAN  │ Prepare │ ──────────────────────> │ Kimlik │ ──────────────────────> │ NFC │
+        └─────────┘                         └────────┘                         └─────┘
+ PANEL    prepare                             idCard                             nfc
+ ADIM       1/5                                 2/5                              3/5
+```
+
+#### Modülün önüne ekran
+
+`insert(["kimlikIpucu"], before: .idCard)`. Ara ekran açıkken panel ve sayaç önceki modülde
+kalır. Sunucu Kimlik'i ancak `advanceExternal()` çağrılınca öğrenir.
+
+```
+        ┌─────────┐  advanceToNextModule()  ╭┄┄┄┄┄┄┄┄┄┄┄┄┄╮  advanceExternal()  ┌────────┐
+ EKRAN  │ Prepare │ ──────────────────────> ┆ kimlikIpucu ┆ ──────────────────> │ Kimlik │
+        └─────────┘                         ╰┄┄┄┄┄┄┄┄┄┄┄┄┄╯                     └────────┘
+ PANEL    prepare                               prepare                           idCard
+ ADIM       1/5                                   1/5                               2/5
+```
+
+#### Modülün arkasına ekran
+
+`insert(["cipOkundu"], after: .nfc)`. NFC bitmiştir ama sunucu Selfie'ye geçildiğini henüz bilmez.
+
+```
+        ┌─────┐  advanceToNextModule()  ╭┄┄┄┄┄┄┄┄┄┄┄╮  advanceExternal()  ┌────────┐
+ EKRAN  │ NFC │ ──────────────────────> ┆ cipOkundu ┆ ──────────────────> │ Selfie │
+        └─────┘                         ╰┄┄┄┄┄┄┄┄┄┄┄╯                     └────────┘
+ PANEL    nfc                                nfc                            selfie
+ ADIM     3/5                                3/5                              4/5
+```
+
+#### Önüne ve arkasına aynı geçişte
+
+`insert(["cipOkundu"], after: .nfc)` ile `insert(["selfieIpucu"], before: .selfie)` tek kuyruk
+olur ve önce `after` ile eklenen açılır. Kuyrukta ekran kaldıkça `advanceExternal()` sıradaki ara
+ekranı açar; sunucuya haber kuyruk bitince gider.
+
+```
+        ┌─────┐  advanceToNextModule()  ╭┄┄┄┄┄┄┄┄┄┄┄╮  advanceExternal()  ╭┄┄┄┄┄┄┄┄┄┄┄┄┄╮  advanceExternal()  ┌────────┐
+ EKRAN  │ NFC │ ──────────────────────> ┆ cipOkundu ┆ ──────────────────> ┆ selfieIpucu ┆ ──────────────────> │ Selfie │
+        └─────┘                         ╰┄┄┄┄┄┄┄┄┄┄┄╯                     ╰┄┄┄┄┄┄┄┄┄┄┄┄┄╯                     └────────┘
+ PANEL    nfc                                nfc                                nfc                             selfie
+ ADIM     3/5                                3/5                                3/5                               4/5
+```
+
+#### Prepare'in önüne
+
+`insert(["kvkkOnay"], before: .prepare)` çalışır, çünkü `start()` ilk geçişte de eklenen ekranlara
+bakar. Yığında yalnızca bu ekran olduğu için orada geri basmak oturumu kapatır. `after: .prepare`
+ise sıradan bir arkasına eklemedir ve hız testinden sonra açılır.
+
+```
+                   ╭┄┄┄┄┄┄┄┄┄┄╮  advanceExternal()  ┌─────────┐
+ EKRAN  start() ─> ┆ kvkkOnay ┆ ──────────────────> │ Prepare │
+                   ╰┄┄┄┄┄┄┄┄┄┄╯                     └─────────┘
+ PANEL                   -                            prepare
+ ADIM                    -                              1/5
+```
+
+#### Geri gitme ve `path`
+
+`insert(["nfcRehber"], before: .nfc)` eklenmiş, kullanıcı NFC ekranında geri basıyor. Her satırda
+en sağdaki kutu ekrandaki ekrandır. SDK modülünden geri gelince imleç bir adım geri sarılır, ara
+ekrandan geri gelince yerinde kalır. Panele geri dönüş yalnızca yeni tepedeki ekran bir SDK modülü
+olduğunda bildirilir.
+
+```
+        ┌─────────┐ ┌────────┐ ╭┄┄┄┄┄┄┄┄┄┄┄╮ ┌─────┐
+ path   │ prepare │ │ idCard │ ┆ nfcRehber ┆ │ nfc │   imleç 3 · panel nfc
+        └─────────┘ └────────┘ ╰┄┄┄┄┄┄┄┄┄┄┄╯ └─────┘
+            │
+            │ popBack()   NFC modül: imleç bir geri
+            ▼
+        ┌─────────┐ ┌────────┐ ╭┄┄┄┄┄┄┄┄┄┄┄╮
+ path   │ prepare │ │ idCard │ ┆ nfcRehber ┆   imleç 2 · panel nfc      (üstte ara ekran, bildirilmez)
+        └─────────┘ └────────┘ ╰┄┄┄┄┄┄┄┄┄┄┄╯
+            │
+            │ popBack()   ara ekran: imleç aynı
+            ▼
+        ┌─────────┐ ┌────────┐
+ path   │ prepare │ │ idCard │   imleç 2 · panel idCard   (reportBackNavigation)
+        └─────────┘ └────────┘
+            │
+            │ popBack()
+            ▼
+        ┌─────────┐
+ path   │ prepare │   imleç 1 · panel prepare
+        └─────────┘
+            │
+            │ popBack()   yığında tek ekran
+            ▼
+        oturum kapanır (exitSDK, sonuç: cancelled)
+```
+
+Kullanıcı ara ekrana geri dönüp oradan yeniden ilerlerse aynı ekran bir kez daha açılır:
+
+```
+        ┌─────────┐ ┌────────┐ ╭┄┄┄┄┄┄┄┄┄┄┄╮
+ path   │ prepare │ │ idCard │ ┆ nfcRehber ┆   kullanıcı geri geldi
+        └─────────┘ └────────┘ ╰┄┄┄┄┄┄┄┄┄┄┄╯
+            │
+            │ advanceExternal()
+            ▼
+        ┌─────────┐ ┌────────┐ ╭┄┄┄┄┄┄┄┄┄┄┄╮ ╭┄┄┄┄┄┄┄┄┄┄┄╮
+ path   │ prepare │ │ idCard │ ┆ nfcRehber ┆ ┆ nfcRehber ┆   aynı ekran ikinci kez açıldı
+        └─────────┘ └────────┘ ╰┄┄┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄┄┄╯
+            │
+            │ advanceExternal()
+            ▼
+        ┌─────────┐ ┌────────┐ ╭┄┄┄┄┄┄┄┄┄┄┄╮ ╭┄┄┄┄┄┄┄┄┄┄┄╮ ┌─────┐
+ path   │ prepare │ │ idCard │ ┆ nfcRehber ┆ ┆ nfcRehber ┆ │ nfc │
+        └─────────┘ └────────┘ ╰┄┄┄┄┄┄┄┄┄┄┄╯ ╰┄┄┄┄┄┄┄┄┄┄┄╯ └─────┘
+```
+
+#### Entegratör neyi yapabilir, neyi yapamaz
+
+```
+ ✓ insert(before:/after:)   modülün önüne ya da arkasına kendi ekranı
+ ✓ showExternalScreen       akış sırasında anlık bir ekran
+ ✓ appendModules            akışın SONUNA SDK modülü
+ ✓ override                 SDK ekranının görünümü (iş yine VM'de)
+ ✓ skipCurrentModule        modülü atlamak (panel görür)
+ ✓ path, progressStep       okuyup kendi ilerleme çubuğunu çizmek
+
+ ✗ sunucunun modül sırasını değiştirmek
+ ✗ iki modülün arasına SDK modülü sokmak
+ ✗ path'e yazmak (dışarıya salt okunur)
+ ✗ ara ekrandan sunucuya adım göndermek ya da sayacı ilerletmek
+ ✗ ara ekrandan advanceToNextModule()   → yok sayılır, uyarı loglanır
+ ✗ override ekranda VM'i atlamak
+```
+
+#### Sınırlar
+
+- `insert` çağrıları birikir ve `resetFlow()` bunları silmez. Uygulama açılışında bir kez çağırın.
+- Ara ekranın her ileri yolu `advanceExternal()` ile bitmeli. Bitmezse akış orada kalır.
+- Görüşmenin arkasına ya da Teşekkür'ün önüne ekran eklemeyin. Panel kararıyla biten görüşme
+  doğrudan sonuca gider ve eklenen ekranları atlar; soketle biten görüşme onları gösterir.
+- `advanceExternal()` düğmesini ilk dokunuşta kilitleyin. Kuyrukta bekleyen ekran varken çift
+  dokunuş bir ara ekranı atlatabilir.
+- Geri dönüşte ara ekranın ikinci kez açılması yalnızca geri gidilebilen bir modülün önüne
+  eklenen ekranda olur.
+
 ---
 
 ## Modüllerin Dış Dünya Bağımlılıkları

@@ -286,6 +286,8 @@ ile eklenen ekranlar ile sıradaki modülün önüne `before:` ile eklenenler ay
   bitince ara ekran tekrar gösterilir.
 - `insert` çağrıları birikir ve `resetFlow()` ile silinmez. Uygulama açılışında bir kez
   çağırın; her oturumda çağrılırsa ekran art arda iki kez açılır.
+- Önüne ve arkasına eklemenin, geri gitmenin ve sınırların çizimi:
+  [Mimari, Akışın çizimi](architecture.md#akışın-çizimi).
 
 ---
 
