@@ -273,11 +273,14 @@ registry.override(.selfie) { MySelfieView() }
 // C) Araya kendi ekranını sok (tanıtım, sözleşme, başarı...)
 registry.custom("welcome") { MyIntroView() }
 coordinator.insert(["welcome"], before: .selfie)
+// MyIntroView'ın Devam butonu: coordinator.advanceExternal()
 ```
 
 Tek altın kural: custom ekranınız **iş mantığını SDK ViewModel'ine bırakmalı**
 (taramayı `vm.scanFront(image:)`, geçişi `coordinator.advanceToNextModule()` yapar).
-Kendi HTTP isteğinizi atarsanız backend akışı ilerlemez.
+Kendi HTTP isteğinizi atarsanız backend akışı ilerlemez. Araya eklenen (C) ekranlar
+bunun dışındadır: modül değildirler ve `coordinator.advanceExternal()` ile ilerlerler
+([ayrıntı](docs/guides/customization.md#ara-ekrandan-ilerlemek-advanceexternal)).
 
 **B için başlangıç noktası hazır:** her modül klasöründe `XxxCustomView.swift` vardır —
 SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (15 ekran). Projeye kopyalanır, `registry.override(...)` ile takılır,

@@ -189,6 +189,8 @@ Ekranın akıştaki davranışı:
 
 Görünümü markanıza göre değiştirebilirsiniz. Akış yalnızca iki çağrıya bakar:
 `startConnectionSpeedTest` ve test geçince `advanceExternal()`.
+`advanceExternal()`'ın neden ayrı bir metot olduğu ve ne zaman çağrılacağı:
+[Özelleştirme, Ara ekrandan ilerlemek](customization.md#ara-ekrandan-ilerlemek-advanceexternal).
 
 ### 4.2) Senaryo: görüntülü görüşmeden önce
 

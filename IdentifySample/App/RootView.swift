@@ -66,6 +66,8 @@
 //    • Adım bitince yalnızca ViewModel metodu çağrılır (scanFront, processSelfie, submit …);
 //      ViewModel yükler, sunucuya adım sinyalini gönderir, sonra canContinue/onCompleted verir.
 //    • İlerleme: coordinator.advanceToNextModule()  · Geri: coordinator.popBack()
+//      Araya eklenen (C) ekranlar ise coordinator.advanceExternal() çağırır; advanceToNextModule
+//      orada yok sayılır. Ayrıntı: docs/guides/customization.md, "Ara ekrandan ilerlemek".
 //    • Karşılaştırma hakları tükenince: onSkipRequested → coordinator.skipCurrentModule(),
 //      onFlowFailed → coordinator.finishFlowAsFailed()
 //    • Hata: .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
@@ -131,6 +133,7 @@ struct RootView: View {
 //        ])
 
         // C) Ara ekran: Selfie modülünden ÖNCE bir bilgilendirme ekranı.
+        //    SDKExternalInfoView'ın Devam butonu advanceExternal() çağırır; kendi ekranınız da öyle yapmalı.
 //        registry.custom("welcome") {
 //            SDKExternalInfoView(
 //                title: "Hoş geldiniz",

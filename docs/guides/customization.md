@@ -165,6 +165,70 @@ coordinator.appendModules([.idCard, .waitScreen])
 coordinator.advanceToNextModule()
 ```
 
+### Ara ekrandan ilerlemek: `advanceExternal()`
+
+Akışta iki tür ekran vardır ve ikisi farklı metotla ilerler:
+
+| | SDK modül ekranı | Araya eklenen ekran |
+|---|---|---|
+| Nereden gelir | Sunucunun modül listesinden (selfie, NFC, görüşme…) | Sizin `insert` ya da `showExternalScreen` çağrınızdan |
+| Sunucu biliyor mu | Evet, her geçiş sunucuya bildirilir | Hayır, ekran yalnızca cihazda vardır |
+| Adım sayacı (`moduleStepOrder`) ve ilerleme çubuğu | İlerler | Değişmez |
+| İlerlemek için | `coordinator.advanceToNextModule()`. Hazır ekranlarda ve `XxxCustomView` kopyalarında bunu ViewModel akışı çağırır | `coordinator.advanceExternal()` |
+
+`advanceToNextModule()` modüle geçmeden önce "sıradaki modülün önüne eklenmiş ekran var mı" diye
+bakar, varsa onu açar. Araya eklenen ekranın içinden çağrılırsa aynı ekranı yeniden bulur ve akış
+ilerlemez. `advanceExternal()` bu yüzden ayrıdır: bekleyen ekranların listesini tutar, liste
+bitince sunucuya asıl geçişi yapar.
+
+`advanceExternal()` her çağrıldığında durumdan birini seçer:
+
+1. Aynı noktaya eklenmiş başka ekran bekliyorsa onu açar. Sunucuya bir şey gitmez.
+2. Bekleyen ekran kalmadıysa sıradaki modüle geçer. Sunucuya sonraki modül bu anda bildirilir.
+   Sıradaki modül görüntülü görüşmeyse kullanıcı paneldeki bekleme odasına da bu anda alınır.
+3. Ekran `showExternalScreen(_:)` ile açıldıysa `advanceToNextModule()` gibi davranır: sıradaki
+   modüle geçer, o modülün önüne eklenmiş ekran varsa önce onu açar. Ekranın açıldığı modüle
+   geri dönülmez.
+
+#### Örnek: selfie, ölçüm ekranı, görüşme
+
+```swift
+registry.custom("speedCheck") { SpeedCheckBeforeView() }
+coordinator.insert(["speedCheck"], before: .callScreen)
+```
+
+| Ne olur | Sunucunun gördüğü modül |
+|---|---|
+| Selfie biter, ViewModel `advanceToNextModule()` çağırır. SDK sıradaki modülün görüşme olduğunu görür ve önce `speedCheck`'i açar | Selfie |
+| `speedCheck` ölçer, sonuç geçer, ekran `advanceExternal()` çağırır. Bekleyen ekran yok, SDK görüşmeye geçer | Görüşme; kullanıcı bekleme odasında |
+| Ölçüm engellerse ekran `advanceExternal()` çağırmaz, "Tekrar Dene" gösterir | Hâlâ selfie; kullanıcı bekleme odasına girmez |
+
+Aynı noktaya iki ekran:
+
+```swift
+coordinator.insert(["networkInfo", "speedCheck"], before: .callScreen)
+```
+
+Selfie bitince `networkInfo` açılır. Onun `advanceExternal()` çağrısı `speedCheck`'i açar
+(1. durum). `speedCheck`'in çağrısı görüşmeye geçirir (2. durum). Bir modülün arkasına `after:`
+ile eklenen ekranlar ile sıradaki modülün önüne `before:` ile eklenenler aynı listeye girer;
+önce `after` ekranları gösterilir.
+
+#### Kurallar
+
+- Araya eklenen ekranın ileri giden her yolu (buton, otomatik geçiş, zamanlayıcı)
+  `advanceExternal()` çağırır.
+- Bu ekranlarda `advanceToNextModule()` çağırmayın. Çağrı yok sayılır ve konsola uyarı düşer;
+  kullanıcı ekranda kalır.
+- `registry.override` ile değiştirdiğiniz SDK modül ekranları araya eklenen ekran sayılmaz.
+  Onlar `advanceToNextModule()` ile ilerler.
+- `advanceExternal()` hiç çağrılmazsa akış o ekranda durur ve sunucu önceki modülü görmeye devam
+  eder. Ölçüm ya da onay gibi engelleyen ekranlarda istenen davranış budur.
+- Ara ekrandan geri dönülürse (`popBack()`) önceki modül ekranı açılır. O modül yeniden
+  bitince ara ekran tekrar gösterilir.
+- `insert` çağrıları birikir ve `resetFlow()` ile silinmez. Uygulama açılışında bir kez
+  çağırın; her oturumda çağrılırsa ekran art arda iki kez açılır.
+
 ---
 
 ## C) Host VM Composition — Gözlemleyerek Zenginleştirme

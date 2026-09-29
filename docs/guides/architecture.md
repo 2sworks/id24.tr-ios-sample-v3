@@ -96,9 +96,9 @@ VM'ler yapar. Bu kuralın adı ["bypass yok" kuralı](customization.md#bypass-yo
 | `start()` | İlk modülü açar |
 | `advanceToNextModule()` | Sıradaki modüle geçer. Araya eklenmiş custom ekran varsa önce onu açar |
 | `skipCurrentModule()` | Modülü atlar (`manager.skipModule()` ve ardından ilerleme) |
-| `insert(_:before:)` / `insert(_:after:)` | Bir rotanın önüne ya da arkasına custom ekran ekler |
+| `insert(_:before:)` / `insert(_:after:)` | Bir rotanın önüne ya da arkasına custom ekran ekler. Eklenen ekran `advanceExternal()` ile ilerler |
 | `appendModules(_:)` / `appendModules(moduleList:)` | Akışın sonuna yeni SDK modülü ekler. Dallanan senaryolar için; `progressTotal` kendiliğinden güncellenir |
-| `showExternalScreen(_:)` / `advanceExternal()` | O an bir custom ekran gösterir / custom ekrandan akışa devam eder |
+| `showExternalScreen(_:)` / `advanceExternal()` | O an bir custom ekran gösterir / custom ekrandan akışa devam eder. Ayrıntı: [Özelleştirme, advanceExternal](customization.md#ara-ekrandan-ilerlemek-advanceexternal) |
 | `popBack()` | Bir geri gider; ilk ekrandaysa `exitSDK()` çağırır |
 | `pushThankYouDirectly(status:)` | Görüşme sonucuyla doğrudan sonuç ekranını açar. `showThankYouPage: false` ise sonuç ekranı açılmaz, akış aşağı kayarak kapanır |
 | `resetFlow()` | Her şeyi sıfırlar |
