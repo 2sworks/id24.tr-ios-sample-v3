@@ -146,7 +146,7 @@ Tablolardaki "Ekran" sütunu, `showThankYouPage: true` iken kullanıcının gör
 | `reason` | `result` | Tetikleyen | Ekran | Kapanış | Dolu gelen alanlar |
 |---|---|---|---|---|---|
 | `setupFailed` | `error` | `setupSDK` hata döndü (geçersiz `identId`, sunucuya ulaşılamadı, WS anahtarı reddedildi) | Host'un giriş ekranı (akış hiç başlamadı) | — | `errorMessage` |
-| `roomOccupied` | `error` | Oda başka bir oturumda (yeniden denemeler de reddedildi) | "Oturum meşgul" uyarısı, onaylanınca kök ekran | 4120 | `closeCode` = 4120 |
+| `roomOccupied` | `error` | Oda başka bir oturumda (yeniden denemeler de reddedildi) | "Oturum meşgul" uyarısı, onaylanınca kök ekran. Sonuç kullanıcı Çıkış'a basınca gelir | 4120 | `closeCode` = 4120 |
 | `connectionLost` | `error` | Bağlantı kopukken akışın sonuna gelindi ya da oturum başka bir kodla kapandı | ThankYou | 4104–4142 | `closeCode` |
 
 Oda kaydı beklenirken sunucu odanın dolu olduğunu bildirirse her yeniden denemede
@@ -158,6 +158,12 @@ Sunucu 20 sn içinde ne onay ne ret gönderirse akış başlamaz ve "Bağlantı 
 |---|---|---|
 | `.occupied` | Oturum meşgul (4120) | Çıkış → `exitAfterRoomOccupied()` |
 | `.waitTimeout` | Bağlantı kurulamadı | Yeniden Bağlan → `retryAfterRoomWaitTimeout()` (oturum sürer) · Çıkış → `exitAfterRoomOccupied()` |
+
+İki uyarıda da sonuç kullanıcı Çıkış'a bastığında bildirilir. Böylece
+`onFinished`'ta ekranı kapatan host uyarıyı kullanıcı görmeden kaldırmaz. `.occupied` uyarısından
+çıkış `error / roomOccupied` verir. `.waitTimeout` uyarısından çıkış ise `cancelled / userExited`
+verir: sunucu odayı reddetmedi, kullanıcı beklemeyi bıraktı. `SDKFlowCoordinator` kullanmayan
+host'larda uyarı yoktur, `roomOccupied` ret anında gelir.
 
 ### 4.5 Sonuç ÜRETMEYENLER (oturum sürer)
 
@@ -944,8 +950,18 @@ SDKFlowHostView(coordinator: coordinator, registry: registry) { LoginView() }
     }
 
 // setupSDK içinde:
-onFinished: { outcome in pendingOutcome = outcome }
+onFinished: { outcome in
+    if coordinator.path.isEmpty && coordinator.roomOccupiedMessage == nil {
+        router.handleKyc(outcome)    // akış hiç başlamadı, beklenecek ekran yok
+    } else {
+        pendingOutcome = outcome     // ThankYou açık, butonu bekle
+    }
+}
 ```
+
+Akış hiç başlamadan biten oturumlarda (`setupFailed`, `roomOccupied`, bekleme zaman aşımından
+çıkış) yığın zaten boştur ve `path.isEmpty` değişmez. Sonuç bu durumda da saklanırsa
+yönlendirme hiç çalışmaz, ekran boş kalır. İlk dal bu durumu karşılar.
 
 ### 9.5 React Native / Flutter
 

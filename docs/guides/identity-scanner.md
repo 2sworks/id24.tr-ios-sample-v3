@@ -205,7 +205,7 @@ ve arka yüzü aynı kamera oturumunda çekmek için `keepsCameraRunning: true` 
 ### HUD Metinleri ve Zamanlama — `ScannerConfiguration`
 
 Tarayıcının bütün yönerge metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
-`tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`, `orientation`...) aktif SDK diline
+`tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`...) aktif SDK diline
 göre hazır gelir ve her biri tek tek değiştirilebilir. `glare` metnini boş verirseniz yalnızca
 metin kaybolur, parlama kontrolü çalışmaya devam eder (kontrolü kapatmak için
 [Otomatik Davranışlar](#otomatik-davranışlar--scannerautomation) bölümüne bakın).
@@ -225,6 +225,48 @@ ScannerConfiguration.overrideDefault = cfg
 
 Çekim hızı, odak davranışı ve elle çekim düğmesinin gecikmesi `timing` altında ayarlanır
 (`ScannerTimingConfig`).
+
+Duruma bağlı dört metin daha vardır. Boş bırakılan gösterilmez:
+
+| Metin | Ne zaman | Kimlik için varsayılan |
+|---|---|---|
+| `preparing` | Kamera ilk karesini verene kadar. | Hazırlanıyor... |
+| `start` | Belge bu taramada tanınana kadar; tanındıktan sonra yerini `idle` alır. Anahtar kelimesi olmayan profillerde (pasaport, serbest belge) belge "tanınmaz", metin kalır. | SDK'nın kimlik ekranında "Belgenin Ön Yüzünü Hizalayın" / "Belgenin Arka Yüzünü Hizalayın"; `IdentityScannerView` doğrudan kullanılıyorsa boş |
+| `notDetected` | Çerçeveye oturan nesnede belgenin anahtar kelimeleri `timing.notDetectedDelay` (varsayılan `4.0` sn) boyunca bulunamazsa: başka bir kart ya da yanlış yüz. | Kimlik tespit edilemedi. Lütfen geçerli bir kimlik kartı kullanın. |
+| `orientation` | Sabit çerçevede belge dik tutulursa. Pasaportta gösterilmez. | Kimliği yatay tutun |
+
+#### Yönergelerin seslendirilmesi
+
+Ekrandaki yönerge her değiştiğinde sesli okunur (`ScannerAutomation.guidanceSpeech`,
+varsayılan açık). Süren okuma bölünmez; arada birkaç yönerge değişirse yalnız sonuncusu
+okunur. Kamera ilk karesini vermeden hiçbir şey okunmaz, bu yüzden `preparing` sessizdir.
+
+Ses, modülün sesli okuma modunu izler: `SDKSpeechConfig` o modül için `.off` ise yönergeler de
+sessizdir. Okunan metin ekrandaki metindir. Sesin farklı bir cümle okuması için anahtarın
+sonuna `Tts` ekleyip o metni de kaydedin:
+
+```swift
+// Tek bir yönergeyi değiştir (ekranda ve seste)
+SDKLocalization.shared.setOverride(key: .scannerTooFarId, language: .tr,
+                                   value: "Kimliği kameraya yaklaştırın")
+
+// Ekranda kısa metin, seste tam cümle
+SDKLocalization.shared.registerOverrides([.tr: [
+    "ScannerTooCloseId":    "Uzaklaşın",
+    "ScannerTooCloseIdTts": "Kimliğinizi uzaklaştırın",
+]])
+
+// Kendi ses kaydınız: anahtarla aynı adlı klibi bundle'a koyun (ScannerTooFarId.m4a)
+SDKSpeechConfig.shared.setMode(.customAudio, for: .idCard)
+
+// Yönergeleri seslendirme, yalnız baştaki talimat okunsun
+ScannerAutomation.default.guidanceSpeech = false
+```
+
+Dile özel kayıt için dosya adına dil kodu eklenir (`ScannerTooFarId_tr.m4a`). Klip yalnız
+SDK'nın hazır metinleri için aranır. `ScannerGuidanceTexts`'e elle yazdığınız metnin anahtarı
+yoktur; o metin sistem sesiyle okunur, `fallbackToNativeIfAudioMissing` kapalıysa okunmaz.
+`Tts` ekli ayrı ses metni de yalnız hazır metinlerde çalışır.
 
 ### Çerçeve Modu — `ScannerFrameMode`
 
@@ -350,6 +392,55 @@ IdentityScannerView(profile: .turkishIDFront, configuration: cfg) { … }
 | `wideLensRecovery` | Ultra-geniş lensten geniş lense kendiliğinden döner (senaryolar aşağıda). | Ultra-geniş lense geçildiyse tarama bitene kadar orada kalınır. |
 | `manualCaptureFallback` | Otomatik çekim zorlanınca **Elle çek** düğmesini gösterir: `manualCaptureHintDelay` sn geçince ya da `maxAutoCaptureFails` kez başarısız denemeden sonra. | Düğme hiç çıkmaz. Tarayıcı başarılı olana ya da kullanıcı ekrandan çıkana kadar otomatik çekimi dener. |
 | `glareGate` | Kartta parlama varken çekimi bekletir ve `texts.glare` metnini gösterir. | Parlama yok sayılır; yansımanın altında kalan alanlar OCR'da okunamayabilir. |
+| `exposureBoost` | Loş ışıkta görüntüyü biraz aydınlatır (+0.7 EV). Belge bulunamazsa ya da belge görünüp zorunlu alanlar okunmuyorsa (gölge) 1,5 sn sonra devreye girer. Kullanıcı fark etmez. | Kameranın kendi pozlaması kullanılır. |
+| `fieldLocking` | Geçerli okunan alan okunmuş kalır; alanların aynı karede okunması gerekmez. Hepsi kilitlenince OCR durur, çekim yalnızca net ve sabit bir kare bekler. Ayrıntı aşağıda. | Zorunlu alanların hepsi aynı karede, art arda birkaç karede okunmalıdır. Değerler her zaman fotoğraftan gelir. |
+| `facePhotoCheck` | Vesikalık canlıda görülüp çekilen fotoğrafta bulunamazsa (üstünde el varsa) çekimi kabul etmez. | Fotoğrafta vesikalık aranmaz. |
+| `guidanceSpeech` | Ekrandaki yönerge her değiştiğinde sesli okunur (modülün sesli okuma modu açıksa). | Yalnızca tarama başındaki talimat okunur. |
+
+#### Alan kilitleme
+
+`fieldLocking` açıkken tarayıcı her alanı bir kez geçerli okuyunca kilitler ve o alanı yeniden
+aramaz. Gölgede ya da titrek elde bir alanın arada bir okunamaması çekimi geciktirmez.
+
+- TC no sağlamasından geçtiği için tek okumada kilitlenir. Diğer alanlar ve MRZ aynı değer
+  iki kez okununca kilitlenir.
+- Kilit süreyle düşmez. Kart çerçeveden çıkınca ya da kadraj büyük oynayınca düşer; eşik
+  `ScannerTimingConfig.fieldLockDropMotion` (varsayılan `15`).
+- Çekimden sonra fotoğraftan okunan değerler kilitlenenlerle karşılaştırılır. Harf büyüklüğü,
+  aksan ve boşluk farkı sayılmaz.
+- Zorunlu bir alan fotoğrafta yoksa ya da farklıysa (üstünde parmak, parlama) tarayıcı
+  beklemeden bir fotoğraf daha çeker ve onu kilitli değerlerle teslim eder. İkinci fotoğraf
+  okunmaz.
+
+İkinci durumda `RecognizedDocument.fields` teslim edilen görüntüden değil canlı karelerden
+gelir. Değerlerin her zaman teslim edilen fotoğraftan okunmasını isteyen entegratör kilitlemeyi
+kapatır:
+
+```swift
+ScannerAutomation.default.fieldLocking = false
+```
+
+Pasaportta ve `imageOnly` profillerde kilitleme yoktur.
+
+#### Düşük ışık eşikleri
+
+Pozlama artışının ve fenerin ne zaman devreye gireceği `ScannerTimingConfig` ile ayarlanır.
+Varsayılanlar aşağıdaki gibidir.
+
+| Alan | Varsayılan | Anlamı |
+|---|---|---|
+| `exposureBoostISO` | `700` | Bu ISO'nun üstü loş sayılır. Normal iç mekân 100–400 civarıdır. |
+| `exposureBoostReleaseISO` | `400` | ISO buna inince artış geri alınır. `exposureBoostISO`'dan belirgin düşük olmalı. |
+| `exposureBoostDelay` | `1.5` | Artıştan önce sahnenin loş kalması gereken süre (sn). |
+| `exposureBoostEV` | `0.7` | Artış miktarı (EV). Yükseldikçe görüntü aydınlanır ama gürültü artar, açık renkli kart patlayabilir. |
+| `autoTorchISO` | `1400` | `autoTorch` açıkken fenerin yanabileceği ISO. |
+| `autoTorchDelay` | `4.0` | Fener için belge bulunamadan geçmesi gereken süre (sn). Belge kadrajdayken fener kendiliğinden açılmaz. |
+
+```swift
+// Gölgede daha erken ve daha güçlü aydınlat
+ScannerConfiguration.default.timing.exposureBoostISO = 500
+ScannerConfiguration.default.timing.exposureBoostEV = 1.0
+```
 
 #### Fener düğmesi
 
