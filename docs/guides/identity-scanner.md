@@ -226,7 +226,7 @@ ScannerConfiguration.overrideDefault = cfg
 Çekim hızı, odak davranışı ve elle çekim düğmesinin gecikmesi `timing` altında ayarlanır
 (`ScannerTimingConfig`).
 
-Duruma bağlı dört metin daha vardır. Boş bırakılan gösterilmez:
+Duruma bağlı altı metin daha vardır. Boş bırakılan gösterilmez:
 
 | Metin | Ne zaman | Kimlik için varsayılan |
 |---|---|---|
@@ -234,12 +234,21 @@ Duruma bağlı dört metin daha vardır. Boş bırakılan gösterilmez:
 | `start` | Belge bu taramada tanınana kadar; tanındıktan sonra yerini `idle` alır. Anahtar kelimesi olmayan profillerde (pasaport, serbest belge) belge "tanınmaz", metin kalır. | SDK'nın kimlik ekranında "Belgenin Ön Yüzünü Hizalayın" / "Belgenin Arka Yüzünü Hizalayın"; `IdentityScannerView` doğrudan kullanılıyorsa boş |
 | `notDetected` | Çerçeveye oturan nesnede belgenin anahtar kelimeleri `timing.notDetectedDelay` (varsayılan `4.0` sn) boyunca bulunamazsa: başka bir kart ya da yanlış yüz. | Kimlik tespit edilemedi. Lütfen geçerli bir kimlik kartı kullanın. |
 | `orientation` | Sabit çerçevede belge dik tutulursa. Pasaportta gösterilmez. | Kimliği yatay tutun |
+| `upsideDown` | Sabit çerçevede belge baş aşağı tutulursa. Kare 180° çevrilip anahtar kelimeler yeniden aranır; iki yüzde de çalışır. Pasaportta gösterilmez. | Kimlik ters duruyor, düzeltin |
+| `tilted` | Sabit çerçevede belge 12° ve üstü eğik tutulursa. Pasaportta gösterilmez. | Kimlik eğik duruyor, düzeltin |
+
+Son üçü duruş uyarısıdır ve yaklaştır/uzaklaştır uyarısından önce gelir.
 
 #### Yönergelerin seslendirilmesi
 
 Ekrandaki yönerge her değiştiğinde sesli okunur (`ScannerAutomation.guidanceSpeech`,
 varsayılan açık). Süren okuma bölünmez; arada birkaç yönerge değişirse yalnız sonuncusu
 okunur. Kamera ilk karesini vermeden hiçbir şey okunmaz, bu yüzden `preparing` sessizdir.
+
+Durum bildiren iki metin ekranda görünür ama yalnız karşılığı varken okunur: `reading`
+("Kimlik okunuyor…") çekim başladığında, `focusing` ("Odaklanıyor…") kart yerine oturmuş,
+alanları okunmuş ve çekimi bekleten tek şey odakken. Aynı cümle 5 saniye içinde ikinci kez
+okunmaz. Tutmayan çekimden sonra ekrana dönen `idle` metni de okunmaz.
 
 Ses, modülün sesli okuma modunu izler: `SDKSpeechConfig` o modül için `.off` ise yönergeler de
 sessizdir. Okunan metin ekrandaki metindir. Sesin farklı bir cümle okuması için anahtarın
