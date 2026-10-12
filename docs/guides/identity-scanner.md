@@ -105,9 +105,25 @@ Otomatik çekim iki şeye bakar ve ikisi de profilden okunur:
 `MRZRequirement(format:isRequired:level:)` parametreleri:
 
 - `format`: `.td1` (kimlik, 3×30) ya da `.td3` (pasaport, 2×44).
-- `level`: `.presence` MRZ bölgesinin görünmesi yeter; en az iki MRZ yapılı satır aranır, uzunluk
-  ve kontrol hanesine bakılmaz. `.parsed` ise belge no, doğum tarihi ve geçerlilik tarihinin
-  ayrıştırılmasını ister.
+- `level`: `.presence` MRZ'nin okunabilir görünmesi: belge no, doğum ve geçerlilik tarihi kendi
+  kontrol haneleriyle tutmalı, ad satırı `SOYAD<<AD` yapısında görülmeli; kimlikte (`.td1`) ayrıca
+  TC kimlik no sağlamasıyla okunmalı ve birleşik kontrol hanesi tutmalı. Her satır tam boy okunmalı
+  (kimlikte 30, pasaportta 44 karakter, ±1). Aynı okuma iki ayrı
+  karede gelmeli. Bir kısmı kapalı MRZ bu şartı karşılamaz. `.parsed` ise belge no, doğum tarihi
+  ve geçerlilik tarihinin ayrıştırılmasını ister.
+
+MRZ'nin başka bir okumayla uyuşması da istenebilir: `ScannerConfiguration.expectedMRZValues`.
+Anahtarlar `documentNumber`, `tckn`, `birthDate` ve `expirationDate` (YYAAGG), `surname`,
+`givenNames`, `sex` (`M`/`F`), `nationality`. MRZ ancak bu değerlerle aynıysa okunmuş sayılır;
+çekilen fotoğraftaki MRZ de aynı kontrolden geçer. Adlar Türkçe harfler MRZ'deki karşılığına
+çevrilerek karşılaştırılır (Ş→S, İ→I). Boş ya da verilmeyen anahtar karşılaştırılmaz, değer
+MRZ'den gelir. SDK'nın kimlik ekranı arka yüzde buraya ön yüzde okunanları koyar; uyuşmazsa
+otomatik çekim olmaz, "Kimlik bilgileri okunamıyor" çıkar, Manuel Çek açık kalır.
+
+```swift
+var configuration = ScannerConfiguration.idBack
+configuration.expectedMRZValues = ["tckn": "11717252118", "birthDate": "940107"]
+```
 
 Kesin MRZ okuması çekimden sonra yapılır. Canlı kural yalnızca çekimin ne zaman yapılacağına
 karar verir.
@@ -226,7 +242,7 @@ ScannerConfiguration.overrideDefault = cfg
 Çekim hızı, odak davranışı ve elle çekim düğmesinin gecikmesi `timing` altında ayarlanır
 (`ScannerTimingConfig`).
 
-Duruma bağlı altı metin daha vardır. Boş bırakılan gösterilmez:
+Duruma bağlı yedi metin daha vardır. Boş bırakılan gösterilmez:
 
 | Metin | Ne zaman | Kimlik için varsayılan |
 |---|---|---|
@@ -236,8 +252,9 @@ Duruma bağlı altı metin daha vardır. Boş bırakılan gösterilmez:
 | `orientation` | Sabit çerçevede belge dik tutulursa. Pasaportta gösterilmez. | Kimliği yatay tutun |
 | `upsideDown` | Sabit çerçevede belge baş aşağı tutulursa. Kare 180° çevrilip anahtar kelimeler yeniden aranır; iki yüzde de çalışır. Pasaportta gösterilmez. | Kimlik ters duruyor, düzeltin |
 | `tilted` | Sabit çerçevede belge 12° ve üstü eğik tutulursa. Pasaportta gösterilmez. | Kimlik eğik duruyor, düzeltin |
+| `unreadable` | Kart çerçeveye oturmuş, net ve sabitken zorunlu bir alan ya da zorunlu MRZ 2 saniye boyunca okunamazsa. Profilde zorunlu alan yoksa gösterilmez. Duruş, mesafe, parlama ve odak uyarılarından sonra gelir. | Kimlik bilgileri okunamıyor |
 
-Son üçü duruş uyarısıdır ve yaklaştır/uzaklaştır uyarısından önce gelir.
+`orientation`, `upsideDown` ve `tilted` duruş uyarısıdır ve yaklaştır/uzaklaştır uyarısından önce gelir.
 
 #### Yönergelerin seslendirilmesi
 
@@ -417,11 +434,13 @@ aramaz. Gölgede ya da titrek elde bir alanın arada bir okunamaması çekimi ge
   `ScannerTimingConfig.fieldLockDropMotion` (varsayılan `15`).
 - Çekimden sonra fotoğraftan okunan değerler kilitlenenlerle karşılaştırılır. Harf büyüklüğü,
   aksan ve boşluk farkı sayılmaz.
-- Zorunlu bir alan fotoğrafta yoksa ya da farklıysa (üstünde parmak, parlama) tarayıcı
-  beklemeden bir fotoğraf daha çeker ve onu kilitli değerlerle teslim eder. İkinci fotoğraf
-  okunmaz.
+- Zorunlu bir alan fotoğrafta yoksa ya da farklıysa (üstünde parmak, parlama) tarayıcı,
+  tarama boyunca sessizce topladığı en net video karesini aynı şekilde okur. Uyuşursa o
+  teslim edilir. İkinci deklanşör yoktur, çekimde tek ses duyulur.
+- İkisi de uyuşmazsa ve zorunlu alanların hepsi kilitliyse ilk okunan görüntü kilitli
+  değerlerle teslim edilir.
 
-İkinci durumda `RecognizedDocument.fields` teslim edilen görüntüden değil canlı karelerden
+Bu son durumda `RecognizedDocument.fields` teslim edilen görüntüden değil canlı karelerden
 gelir. Değerlerin her zaman teslim edilen fotoğraftan okunmasını isteyen entegratör kilitlemeyi
 kapatır:
 
