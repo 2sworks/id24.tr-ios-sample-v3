@@ -40,6 +40,26 @@ public struct SDKErrorInfo {
     public let serverText: String?       // sunucunun gönderdiği ham metin
     public let message: String           // gösterilecek metin, sizin metniniz uygulanmış
     public let attemptsLeft: Int?        // kalan hak; sınır yoksa nil
+    public let captureMode: SDKCaptureMode?  // .automatic / .manual; çekimden doğmadıysa nil
+}
+```
+
+`captureMode` kimlik çekiminden doğan hatalarda dolar. Kendi kimlik ekranınızda tarayıcının
+sonucunu ViewModel'e verdiğinizde çekim şekli kendiliğinden gelir:
+
+```swift
+viewModel.scanFront(document: document)
+```
+
+Yalnız görüntüyle çağırıyorsanız şekli siz verirsiniz: `scanFront(image:captureMode:)`.
+
+Örnek uygulama popup'ı yalnız manuel çekimin hatasında açar; otomatik çekimde `dismiss()`
+çağırıp geçer:
+
+```swift
+SDKErrorConfig.shared.onError = { info, dismiss in
+    if info.captureMode == .automatic { dismiss(); return }
+    // kendi gösteriminiz
 }
 ```
 
@@ -89,7 +109,7 @@ Ağ hatası için ayrı kod yok. SDK'nın ağ katmanı bağlantı hatasında da 
 ### Olay akışı
 
 Her hata `eventDelegate`'e de gider: ad `error.shown`, kategori `.error`, durum `.failed`.
-`metadata` içinde `code`, `source` ve varsa `attemptsLeft` bulunur.
+`metadata` içinde `code`, `source` ve varsa `attemptsLeft` ile `captureMode` bulunur.
 
 ---
 

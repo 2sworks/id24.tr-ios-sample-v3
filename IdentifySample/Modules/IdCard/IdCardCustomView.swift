@@ -17,7 +17,7 @@
 //    notifyDocumentSelectionShown()  seçim ekranı görününce
 //    allowedCardTypes                sunucunun izin verdiği belge tipleri (boşsa hepsi)
 //    selectCardType(_:)              taramadan ÖNCE
-//    scanFront(image:) / scanBack(image:)   tarayıcıdan gelen kırpılmış görüntü
+//    scanFront(document:) / scanBack(document:)   tarayıcının verdiği belge
 //    frontPhoto / backPhoto / canContinue / isLoading
 //    onSkipRequested / onFlowFailed + errorMessage/consumePendingAlertAction()
 //
@@ -85,10 +85,11 @@ struct IdCardCustomView: View {
         }
         .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
         .fullScreenCover(item: $scannerSide) { side in
-            IdCardScannerCover(side: side) { image in
+            IdCardScannerCover(side: side) { document in
                 scannerSide = nil
-                guard let image else { return }
-                if side == .back { viewModel.scanBack(image: image) } else { viewModel.scanFront(image: image) }
+                guard let document else { return }
+                if side == .back { viewModel.scanBack(document: document) }
+                else { viewModel.scanFront(document: document) }
             }
         }
         .onAppear {
@@ -290,10 +291,10 @@ private struct ScanSlot: View {
 
 // MARK: - Tarayıcı kapağı
 
-/// SDK'nın public `IdentityScannerView`'ını tam ekran açar; sonuç kırpılmış görüntüdür (iptalde nil).
+/// SDK'nın public `IdentityScannerView`'ını tam ekran açar; sonuç tarayıcının belgesidir (iptalde nil).
 struct IdCardScannerCover: View {
     let side: IdCardSide
-    let onResult: (UIImage?) -> Void
+    let onResult: (RecognizedDocument?) -> Void
 
     @State private var isTorchOn = false
     @State private var isTorchAvailable = false
@@ -316,7 +317,7 @@ struct IdCardScannerCover: View {
                 speechModule: .idCard
             ) { result in
                 switch result {
-                case .success(let document): onResult(document.croppedImage)
+                case .success(let document): onResult(document)
                 case .failure:               onResult(nil)
                 }
             }
@@ -334,7 +335,10 @@ struct IdCardScannerCover: View {
         switch cardType {
         case .passport:  return .passport
         case .oldSchool: return .generic
-        default:         return side == .back ? .turkishIDBack : .turkishIDFront
+        default:
+            // Özel kimlik formatı (`IdentifyManager.shared.idCardFormat`) verildiyse onun profilleri.
+            let format = IdentifyManager.shared.idCardFormat
+            return side == .back ? format?.back ?? .turkishIDBack : format?.front ?? .turkishIDFront
         }
     }
 
@@ -346,7 +350,11 @@ struct IdCardScannerCover: View {
         case .oldSchool: base = .default
         default: base = side == .back ? .idBack : .default
         }
-        return base.withHapticModule(.idCard)
+        var configuration = base.withHapticModule(.idCard)
+        if cardType != .passport, cardType != .oldSchool, let format = IdentifyManager.shared.idCardFormat {
+            configuration.alphabet = format.alphabet
+        }
+        return configuration
     }
 
     private var torchButton: some View {

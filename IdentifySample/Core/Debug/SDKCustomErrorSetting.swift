@@ -35,6 +35,8 @@ enum SDKCustomErrorSetting {
         if isEnabled {
             config.presentation = .custom
             config.onError = { info, dismiss in
+                // Otomatik çekimin hatası popup açmaz; tarayıcı kendi yönergesini gösterir.
+                if info.captureMode == .automatic { dismiss(); return }
                 CustomErrorPresenter.shared.show(info, dismiss: dismiss)
             }
         } else {

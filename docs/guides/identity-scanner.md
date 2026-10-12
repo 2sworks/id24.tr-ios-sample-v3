@@ -102,9 +102,12 @@ Otomatik çekim iki şeye bakar ve ikisi de profilden okunur:
 | Basılı alan | `FieldDescriptor.isRequired` | `true`: alan okunmadan çekim yapılmaz. `false`: okunursa sonuçta döner, çekim onu beklemez |
 | MRZ | `DocumentProfile.mrz: MRZRequirement?` | `nil`: MRZ aranmaz. `isRequired: false`: okunur ama beklenmez. `true`: `level`'a göre beklenir |
 
-`MRZRequirement(format:isRequired:level:)` parametreleri:
+`MRZRequirement(format:isRequired:level:issuingState:)` parametreleri:
 
 - `format`: `.td1` (kimlik, 3×30) ya da `.td3` (pasaport, 2×44).
+- `issuingState`: kartı veren ülkenin MRZ kodu, ör. `"AZE"`. Yalnız `.td1`'de kullanılır,
+  varsayılan `"TUR"`. Türkiye dışındaki kartta TC kimlik no sağlaması aranmaz; ICAO kontrol
+  haneleri (belge no, tarihler, birleşik) tutmalıdır.
 - `level`: `.presence` MRZ'nin okunabilir görünmesi: belge no, doğum ve geçerlilik tarihi kendi
   kontrol haneleriyle tutmalı, ad satırı `SOYAD<<AD` yapısında görülmeli; kimlikte (`.td1`) ayrıca
   TC kimlik no sağlamasıyla okunmalı ve birleşik kontrol hanesi tutmalı. Her satır tam boy okunmalı
@@ -153,6 +156,155 @@ Kopya iki yerde geçerli olur: kendi ekranınızdaki `IdentityScannerView(profil
 aynı `id` ile `DocumentProfileRegistry.shared.register(_:)` çağrıldıktan sonra `DocumentScanner`
 içinde. SDK'nın hazır kimlik ekranı (`SDKIdCardView`) hazır profili doğrudan kullanır, kopyayı
 görmez.
+
+## Alfabe — `ScannerAlphabet`
+
+OCR bir harfi aksanlı bir benzeri olarak okuyabilir ("Ķ", "ŝ", "î"). Alfabe, okunan metni
+belgenin harflerine düzeltir: Türkçe kimlikte "Ķ" → "K", "ŝ" → "Ş", "î" → "İ" olur. Azerice
+kimlikte "Ə" olduğu gibi kalır, "ə" ve benzerleri "Ə" olur. Varsayılan Türkçedir; ayar
+yapmayan uygulamada davranış değişmez.
+
+```swift
+ScannerAlphabet.default = .azerbaijani      // tüm tarayıcılar ve SDK'nın kimlik ekranı
+
+var config = ScannerConfiguration.default
+config.alphabet = .azerbaijani              // yalnız bu tarayıcı
+IdentityScannerView(profile: myProfile, configuration: config) { result in … }
+```
+
+Alfabenin alanları:
+
+| Alan | Ne işe yarar | Türkçe |
+|---|---|---|
+| `extraLetters` | A–Z dışındaki büyük harfler | `ÇĞİÖŞÜ` |
+| `locale` | Büyük harf kuralı (i → İ, ı → I) | `tr_TR` |
+| `recognitionLanguages` | Vision tanıma dilleri | `tr-TR`, `en-US` |
+| `substitutions` | Alfabe dışı okunan harfin karşılığı | `ŝ → Ş`, `î → İ`, `ø → Ö` … |
+| `mrzTransliteration` | Harfin MRZ'deki karşılığı (arka yüz karşılaştırması) | `Ş → S`, `İ → I` … |
+
+Tabloda olmayan alfabe dışı bir büyük harfin aksanı düşürülür; kalan harf alfabedeyse o
+kullanılır. Küçük harfler yalnız tabloyla çevrilir, çünkü tarayıcı etiket satırlarını
+("Soyadı") küçük harflerinden tanır.
+
+Vision Azerice okumaz; `.azerbaijani` tanımayı Türkçe ile yapar, Ə dışındaki harfler ortaktır.
+Başka bir dil için hazır alfabeden türetebilir ya da baştan kurabilirsiniz:
+
+```swift
+var alphabet = ScannerAlphabet.turkish
+alphabet.substitutions["Ț"] = "T"
+
+let custom = ScannerAlphabet(id: "xx", extraLetters: "…", localeIdentifier: "xx",
+                             recognitionLanguages: ["en-US"])
+```
+
+Hazır kimlik profillerinin alan desenleri Türkçe harflerle yazılıdır. Başka bir dilin kimliği
+için kendi profilinizi kurarken desende `letterClass` kullanın:
+
+```swift
+pattern: "[\(ScannerAlphabet.azerbaijani.letterClass)]{2,}"   // [A-ZÇƏĞİÖŞÜ]{2,}
+```
+
+## Başka ülkenin kimlik kartı: `SDKIdCardFormat`
+
+Kimlik modülü varsayılan olarak TC kimlik kartını tarar. Başka bir ülkenin kartı için iki yüzün
+profilini ve alfabeyi tek bir formatta verin. Format `setupSDK`'dan önce atanır; SDK'nın hazır
+kimlik ekranı da kendi yazdığınız ekran da onu kullanır.
+
+```swift
+let letters = ScannerAlphabet.azerbaijani.letterClass          // A-ZÇƏĞİÖŞÜ
+let name = "[\(letters)]{2,}(?:\\s+[\(letters)]{2,})*"
+let date = #"\d{2}[.\/\-]\d{2}[.\/\-]\d{4}"#
+
+let front = DocumentProfile(
+    id: "az.id.front",
+    displayName: "AZ kimlik ön yüz",
+    strategy: .visionText,
+    fields: [
+        FieldDescriptor(key: SDKIdCardFormat.Key.surname, pattern: name, isRequired: true,
+                        regionOfInterest: FieldRegion(x: 0.35, y: 0.30, width: 0.40, height: 0.10),
+                        labelAnchor: LabelAnchor(variants: ["SURNAME"], direction: .below)),
+        FieldDescriptor(key: SDKIdCardFormat.Key.givenNames, pattern: name, isRequired: true,
+                        labelAnchor: LabelAnchor(variants: ["GIVEN NAME"], direction: .below)),
+        FieldDescriptor(key: SDKIdCardFormat.Key.birthDate, pattern: date, valueType: .date, isRequired: true,
+                        labelAnchor: LabelAnchor(variants: ["DATE OF BIRTH"], direction: .below)),
+        FieldDescriptor(key: SDKIdCardFormat.Key.documentNumber, pattern: "[A-Z]{2}[0-9]{7}", isRequired: true),
+    ],
+    keywordSet: DocumentKeywordSet(keywords: [DocumentKeyword(variants: ["IDENTITY CARD"])])
+)
+
+let back = DocumentProfile(
+    id: "az.id.back",
+    displayName: "AZ kimlik arka yüz",
+    strategy: .visionText,
+    mrz: MRZRequirement(format: .td1, isRequired: true, issuingState: "AZE")
+)
+
+IdentifyManager.shared.idCardFormat = SDKIdCardFormat(id: "az.id", front: front, back: back,
+                                                      alphabet: .azerbaijani)
+```
+
+Örnekteki bölgeler, etiketler ve desenler yer tutucudur; kendi kartınızdan ölçün. Bölgeleri
+kart görüntüsünün üzerinde görmek için `RoiPreviewView(profile:image:)` kullanın. Profil yazımı için
+bkz. [Kendi Profiliniz](#kendi-profiliniz).
+
+Format verildiğinde:
+
+- Tarayıcı sizin profillerinizle ve alfabenizle çalışır. Otomatik çekim `isRequired` alanları
+  ve zorunluysa MRZ'yi bekler.
+- Çekimden sonra TC kimlik kartına özel okuma ve denetimler (TC kimlik no sağlaması, anne/baba
+  adı) çalışmaz. Profilin okuduğu alanlar aşağıdaki anahtarlarla sunucuya giden modele yazılır.
+- `isRequired` bir alan okunamadıysa ya da bir doğrulayıcı tutmadıysa çekim yüklenmez, kullanıcı
+  aynı yüzü yeniden çeker. Elle çekimde de böyledir.
+- Arka yüzde ön yüzle karşılaştırılan MRZ alanları: belge no, doğum tarihi, geçerlilik tarihi,
+  soyad, ad. Tarihler ön yüzde `gg.aa.yyyy` okunduysa karşılaştırılır.
+- Pasaport ve "diğer" belge formattan etkilenmez.
+
+`setupSDK`'da `idCardLang` değerini `.TR` bırakmayın (`.AZ` ya da `.OTHER` verin): NFC
+anahtarının elle düzeltilmesinde belge numarası `.TR` iken TC kimlik kartı biçimine göre denetlenir.
+
+Sunucuya giden alanlar (`SDKIdCardFormat.Key`):
+
+| Anahtar | Ön yüz | Arka yüz |
+|---|---|---|
+| `personalNumber` | `idTcknOcr` | `idTcknMRZ` (yoksa MRZ'nin isteğe bağlı verisi) |
+| `surname` | `idSurnameOcr` | `idSurnameMRZ` |
+| `givenNames` | `idNameOcr` | `idNameMRZ` |
+| `birthDate` | `idBirthDateOcr` | `idBirthDateMRZ` |
+| `documentNumber` | `idSerialNoOcr` | `idDocumentNumberMRZ` |
+| `expirationDate` | `idValidUntilOcr` | `idValidDateMRZ` |
+| `nationality` | `idNationalityOcr` | `idNationalityMRZ` |
+| `sex` | `idGenderOcr` | `idGenderMRZ` |
+| `motherName`, `fatherName`, `issuedBy` | yok | `idMotherNameOcr`, `idFatherNameOcr`, `idIssuedByOcr` |
+
+Başka adla tanımladığınız alan `RecognizedDocument.fields` içinde size döner, sunucuya gitmez.
+Kişisel numara için `tckn` anahtarını kullanmayın: o anahtar TC kimlik no sağlamasından geçer.
+Kendi numara kuralınızı [doğrulayıcı](#doğrulayıcılar) olarak ekleyin.
+
+Arka yüzde MRZ kuralı varsa ve kontrol haneleri tutuyorsa MRZ'nin değerleri belgeye yazılır ve
+aynı anahtardaki basılı alanın yerini alır: `documentNumber`, `birthDate` ve `expirationDate`
+(YYAAGG), `surname`, `givenNames`, `sex`, `nationality`, `documentType`, `optionalData`,
+`optionalData2`, `mrzText`. NFC anahtarı bu değerlerden kurulur, bu yüzden çipli kartta MRZ'yi
+zorunlu tutun.
+
+Kendi ekranınızda tarayıcının sonucunu olduğu gibi ViewModel'e verin:
+
+```swift
+IdentityScannerView(profile: IdentifyManager.shared.idCardFormat?.front ?? .turkishIDFront) { result in
+    if case .success(let document) = result { viewModel.scanFront(document: document) }
+}
+```
+
+`scanFront(image:)` ve `scanBack(image:)` yalnız görüntü alır, profilin okuduğu alanları
+taşımaz; özel formatta `document:` olanları kullanın.
+
+Sınırlar:
+
+- MRZ yalnız TD1 (3×30) kimlik kartında desteklenir. Belge numarası 9 karakteri aşan kartlar
+  okunmaz.
+- Vision'ın okumadığı dillerde tanıma en yakın dille yapılır (bkz. [Alfabe](#alfabe--scanneralphabet)).
+- Hologramlı kimlik (OVD) modülü formatı kullanmaz, TC kimlik kartını tarar.
+- Sunucunun TC kimlik no dışındaki bir kişisel numarayı nasıl karşıladığı panel ayarınıza
+  bağlıdır; canlıya çıkmadan önce test ortamında deneyin.
 
 ## Doğrulayıcılar
 
@@ -517,11 +669,12 @@ Kural tarayıcıyı kullanmanızı yasaklamaz; yasak olan, sonucu kendiniz yükl
 
 | Yapılış | Sonuç |
 |---|---|
-| Override ekranında `IdentityScannerView` → `doc.croppedImage` → `vm.scanFront(image:)` / `vm.scanBack(image:)` | ✅ Doğru. SDK'nın kendi kimlik ekranı da tam olarak bunu yapar. |
+| Override ekranında `IdentityScannerView` → `vm.scanFront(document:)` / `vm.scanBack(document:)` | ✅ Doğru. SDK'nın kendi kimlik ekranı da tam olarak bunu yapar. |
 | `RecognizedDocument`'i kendi HTTP isteğinizle göndermek | ❌ `upload` / `sendStep` gitmez, akış sunucuda ilerlemez. |
 
-`vm.scanFront(image:)` tarayıcıyı çalıştırmaz; verilen görüntüye OCR yapar ve yükler. Görüntünün
-tarayıcıdan mı yoksa kendi kameranızdan mı geldiğini bilmez. İki yol arasındaki kalite farkı da
+`vm.scanFront(document:)` tarayıcının sonucunu işler ve yükler. Kendi kameranızın görüntüsü için
+`vm.scanFront(image:)` vardır: tarayıcıyı çalıştırmaz, verilen görüntüye OCR yapar ve yükler,
+görüntünün nereden geldiğini bilmez. İki yol arasındaki kalite farkı da
 buradan doğar. Örnek ve iki yolun karşılaştırması:
 [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md#kendi-tasarımınızla-override).
 

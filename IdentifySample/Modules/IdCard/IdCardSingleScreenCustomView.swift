@@ -17,7 +17,7 @@
 //
 //  ViewModel kullanımı:
 //    selectCardType(.idCard)                 ekran açılınca (bu örnek yalnızca çipli kimlik içindir)
-//    scanFront(image:) / scanBack(image:)    tarayıcıdan gelen kırpılmış görüntü
+//    scanFront(document:) / scanBack(document:)   tarayıcının verdiği belge
 //    currentSide == .back                    ön yüz sunucuda onaylandı
 //    canContinue                             arka yüz sunucuda onaylandı
 //    errorMessage + consumePendingAlertAction()   ret; haklar tükendiyse aksiyon modülü atlar/bitirir
@@ -168,9 +168,9 @@ struct IdCardSingleScreenCustomView: View {
                     if side == .back { backPassed() } else { frontPassed() }
                 }
             } else if side == .back {
-                viewModel.scanBack(image: image)
+                viewModel.scanBack(document: document)
             } else {
-                viewModel.scanFront(image: image)
+                viewModel.scanFront(document: document)
             }
         case .failure(let error):
             reject(error.localizedDescription)
@@ -422,15 +422,27 @@ private struct ScannerHost: View {
     let onTorchAvailability: (Bool) -> Void
     let onResult: (Result<RecognizedDocument, Error>) -> Void
 
+    /// Özel kimlik formatı (`IdentifyManager.shared.idCardFormat`) verildiyse onun profilleri.
+    private var profile: DocumentProfile {
+        let format = IdentifyManager.shared.idCardFormat
+        return side == .back ? format?.back ?? .turkishIDBack : format?.front ?? .turkishIDFront
+    }
+
+    private var configuration: ScannerConfiguration {
+        var configuration = (side == .back ? ScannerConfiguration.idBack : .default).withHapticModule(.idCard)
+        if let format = IdentifyManager.shared.idCardFormat { configuration.alphabet = format.alphabet }
+        return configuration
+    }
+
     var body: some View {
         IdentityScannerView(
-            profile: side == .back ? .turkishIDBack : .turkishIDFront,
+            profile: profile,
             style: QuadrilateralStyle(
                 strokeColor: SDKTheme.shared.capture.guideStrokeColor ?? IDColor.primary.opacity(0.55),
                 lockedStrokeColor: SDKTheme.shared.capture.guideLockedColor ?? IDColor.primary,
                 lineWidth: 2.5
             ),
-            configuration: (side == .back ? ScannerConfiguration.idBack : .default).withHapticModule(.idCard),
+            configuration: configuration,
             frameMode: .fixedFrame(.idCard),
             externalTorchOn: $isTorchOn,
             onTorchAvailability: onTorchAvailability,
