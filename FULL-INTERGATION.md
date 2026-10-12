@@ -37,6 +37,7 @@ buradadır.
 16. [IdentityScanner — Detaylı İmplementasyon](#16-identityscanner--detaylı-i̇mplementasyon)
 17. [Çoklu İş Senaryosu — Aynı SDK, Farklı Akışlar](#17-çoklu-i̇ş-senaryosu)
 18. [Cihaz Yetenekleri, Yedek Modüller ve Titreşim](#18-cihaz-yetenekleri-yedek-modüller-ve-titreşim)
+19. [Hata Kanalı, Deneme Sınırları ve Çoklu Yüz](#19-hata-kanalı-deneme-sınırları-ve-çoklu-yüz)
 
 ---
 
@@ -638,6 +639,43 @@ vm.speak(.selfieTts, in: .selfie)
 vm.stopSpeech()
 ```
 
+### Eylem bazında mod ve metin
+
+Okumalar eyleme göre ayrılır (`SDKSpeechAction`):
+
+| Eylem | Nerede |
+|---|---|
+| `.intro` | Ekran açılışındaki yönerge |
+| `.liveGuidance` | Selfie yüz yönlendirmesi, NFC "okunuyor", kimlik tarayıcısı yönergeleri |
+| `.stepCommand` | Canlılık adım komutları |
+| `.error` | NFC okuma hatası; diğer hatalar yalnızca bu eyleme mod verilirse okunur |
+| `.success` | SDK okumaz; `speak(text:in:action:)` ile siz okutursunuz |
+
+```swift
+// Selfie açılış yönergesi okunsun, canlı yönlendirme okunmasın
+SDKSpeechConfig.shared.setMode(.off, for: .selfie, actions: [.liveGuidance])
+// Canlılıkta ekranda çıkan hataları da oku
+SDKSpeechConfig.shared.setMode(.native, for: .livenessDetection, actions: [.error])
+// NFC hatasında okunan cümleyi değiştir
+SDKSpeechConfig.shared.setText("Kimliği telefonun arkasına yeniden yaslayın.",
+                               for: .nfc, action: .error, language: .tr)
+// Kendiniz okutun; modülün ve eylemin modu uygulanır
+SDKSpeechService.shared.speak(text: "Kimliğiniz doğrulandı.", in: .idCard, action: .success)
+```
+
+Eylem için mod verilmezse modülün modu geçerlidir. `setText` verilen eylemde SDK'nın metni
+ve klibi yerine o metin okunur.
+
+### Sessiz anahtar
+
+```swift
+SDKSpeechConfig.shared.silentSwitch = .ignore    // varsayılan: sessizde de okur
+SDKSpeechConfig.shared.silentSwitch = .respect   // sessizde okumaz
+```
+
+Kayıt süren ekranlarda (kısa video, görüntülü görüşme) ses oturumu kayıt kipinde kalmak
+zorunda; `.respect` orada uygulanamaz, okuma sessizde de duyulur.
+
 ---
 
 ## 6) Akış Kontrolü
@@ -890,7 +928,7 @@ IdentifyManager.shared.setupSDK(
     nfcMaxErrorCount: Int,                  // NFC deneme hakkı
     logLevel: SDKLogLevel?,                 // varsayılan .all — bkz. Loglama
     logOnlineSecretKey: String?,            // online log şifreleme anahtarı
-    bigCustomerCam: Bool?,                  // görüşmede büyük müşteri kamerası (vars. false)
+    bigCustomerCam: Bool?,                  // true (vars.): temsilci tam ekran, kullanıcı küçük pencerede; false: tersi
     selectedModules: [SdkModules],          // vars. [] — backend sırası kullanılır
     idCardLang: IDLang?,                    // OCR belge dili: .TR / .AZ / .OTHER (vars. .TR)
     needCertForNfc: Bool?,                  // NFC sertifika (CSCA) doğrulaması (vars. false)
@@ -1100,8 +1138,17 @@ ya da sonra ayarlanabilir.
 ```swift
 let m = IdentifyManager.shared
 
-// Yeniden bağlanma denemesinin vazgeçme süresi (ilk bağlantı sabit 30 sn)
-m.reconnectTimeoutSeconds   = 10
+// Yeniden bağlanma denemesinin vazgeçme süresi: görüşme dışında 30 sn, görüşmede 10 sn
+m.reconnectTimeoutSeconds     = 30
+m.callReconnectTimeoutSeconds = 10
+
+// Bağlantı kopması kuralı: otomatik yeniden bağlanma (0 = kapalı, varsayılan) ve kopma sınırı
+SDKAttemptLimits.shared.connection = SDKConnectionPolicy(
+    maxDrops: 3,                 // nil = sınırsız (varsayılan)
+    onExceeded: .exit,           // .continue (varsayılan): ekran açılmaya devam eder
+    autoReconnectAttempts: 6,
+    autoReconnectInterval: 5
+)
 
 // Çift yönlü PING/PONG heartbeat — ölü bağlantı tespiti
 m.isHeartbeatEnabled        = true
@@ -1962,3 +2009,33 @@ kilitlidir. Metin sütunları `.sdkReadableWidth()` ile, kılavuz çerçeveleri
 `SDKLayout.maxGuideWidth` / `maxFaceGuideWidth` ile sınırlanır; ölçüler ekran değil
 **pencere** tabanlıdır (`SDKLayout.bounds`) — Split View / Stage Manager altında doğru olsun
 diye. Tam ayrıntı ve test matrisi: [iPad Desteği](docs/guides/ipad-support.md).
+
+---
+
+## 19) Hata Kanalı, Deneme Sınırları ve Çoklu Yüz
+
+Ayrıntılı rehber: [`docs/guides/errors-and-limits.md`](docs/guides/errors-and-limits.md).
+
+```swift
+// Hataları kendiniz gösterin
+SDKErrorConfig.shared.presentation = .custom
+SDKErrorConfig.shared.onError = { info, dismiss in
+    myBanner.show(info.message) { dismiss() }
+}
+SDKErrorConfig.shared.setMessage("Yüzünüz kimlikle eşleşmedi.", for: .comparisonFailed,
+                                 module: .selfie, language: .tr)
+SDKErrorConfig.shared.onGuidance = { info in myGuidanceLabel.text = info.message }
+
+// Deneme hakları
+SDKAttemptLimits.shared.set(SDKModuleLimits(comparison: .manual(2), onExhausted: .fail), for: .selfie)
+SDKAttemptLimits.shared.connection = SDKConnectionPolicy(maxDrops: 3, onExceeded: .exit)
+
+// Canlılık
+SDKLivenessRules.default.stepTimeout = 8
+SDKLivenessRules.default.wrongActionCheck = true
+
+// Çoklu yüz
+SDKFaceConfig.shared.setMultipleFaces(.fail, for: .selfie)
+SDKFaceConfig.shared.setMultipleFaces(.warn, for: .waitScreen)
+```
+

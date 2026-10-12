@@ -48,6 +48,7 @@
 		8DD4665F2FED275C00710491 /* SDKNetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */; };
 		8DD466702FED275C00710491 /* SDKLogPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466712FED275C00710491 /* SDKLogPanel.swift */; };
 		8DD466722FED275C00710491 /* SDKReadAloudSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */; };
+		3E5F5BC3B58D23639AAF4770 /* SDKCustomErrorSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46DA998EB68E013E1714064E /* SDKCustomErrorSetting.swift */; };
 		94955B41D87342FB90614A15 /* EventJourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDE0731CCB95FC8930B4CDF9 /* EventJourneyView.swift */; };
 		98A6E9F76B0CDEF0E6748CF1 /* LivenessHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4636F8DFEB15E2CF8A987 /* LivenessHostViewModel.swift */; };
 		9BD45CE3D0D66FF246AFBBF8 /* SelfieExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A57F8CBAD67C67E1AE6DEF4 /* SelfieExample.swift */; };
@@ -169,6 +170,7 @@
 		8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKNetworkLogger.swift; sourceTree = "<group>"; };
 		8DD466712FED275C00710491 /* SDKLogPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKLogPanel.swift; sourceTree = "<group>"; };
 		8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKReadAloudSetting.swift; sourceTree = "<group>"; };
+		46DA998EB68E013E1714064E /* SDKCustomErrorSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKCustomErrorSetting.swift; sourceTree = "<group>"; };
 		956407D26FD611F5BFB3EA14 /* ThankYouExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ThankYouExample.swift; sourceTree = "<group>"; };
 		9D371CF8DF83A9DCADBB5BDC /* CallScreenExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CallScreenExample.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600000000D002 /* SpeechShowcaseView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeechShowcaseView.swift; sourceTree = "<group>"; };
@@ -517,6 +519,7 @@
 			children = (
 				8DD4665E2FED275C00710491 /* SDKNetworkLogger.swift */,
 				8DD466732FED275C00710491 /* SDKReadAloudSetting.swift */,
+				46DA998EB68E013E1714064E /* SDKCustomErrorSetting.swift */,
 				8DD466712FED275C00710491 /* SDKLogPanel.swift */,
 			);
 			path = Debug;
@@ -775,6 +778,7 @@
 				5E734FB5D42AEE387F968709 /* CustomCameraPreview.swift in Sources */,
 				8DD4665F2FED275C00710491 /* SDKNetworkLogger.swift in Sources */,
 				8DD466722FED275C00710491 /* SDKReadAloudSetting.swift in Sources */,
+				3E5F5BC3B58D23639AAF4770 /* SDKCustomErrorSetting.swift in Sources */,
 				8DD466702FED275C00710491 /* SDKLogPanel.swift in Sources */,
 				485C155C2907F3A7007B9ED0 /* SDKBundle+.swift in Sources */,
 				8AB276D52F749D9600A764F1 /* LoginView.swift in Sources */,
@@ -973,7 +977,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 53;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",
@@ -1018,7 +1022,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = IdentifySample/SupportingFiles/IdentifySample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 52;
+				CURRENT_PROJECT_VERSION = 53;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/IdentifySample",

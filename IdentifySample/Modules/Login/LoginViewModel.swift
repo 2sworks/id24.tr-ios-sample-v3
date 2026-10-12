@@ -62,7 +62,7 @@ final class LoginViewModel: ObservableObject {
 
     // MARK: - Toggles
 
-    @Published var useBigCustomerCam: Bool = false
+    @Published var useBigCustomerCam: Bool = true
     @Published var useSignLang: Bool = false
     @Published var useNewLiveness: Bool = false
     @Published var useSSLPinning: Bool = false

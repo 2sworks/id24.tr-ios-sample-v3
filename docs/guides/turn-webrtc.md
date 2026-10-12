@@ -81,7 +81,7 @@ Agent'ın görüşme sırasında gönderebileceği komutların listesi:
 
 | Ayar | Kaynak | Etki |
 |---|---|---|
-| `bigCustomerCam` | `setupSDK` parametresi | Müşterinin kamerası büyük pencerede gösterilir |
+| `bigCustomerCam` | `setupSDK` parametresi | `true` (verilmezse de böyle): temsilci tam ekran, kullanıcının kamerası küçük pencerede. `false`: tersi |
 | `agent_view_scale` | `RoomResponse` | Agent görüntüsünün ölçeği (dikey gösterim dahil) |
 | `hide_call_answer_screen` | `RoomResponse` | Çağrı cevaplama ekranı atlanır |
 | `signLangSupport` | `setupSDK` parametresi | Görüşmeden önce işaret dili tercihi sorulur ([SignLang](../../IdentifySample/Modules/SignLang/SignLang.md)) |

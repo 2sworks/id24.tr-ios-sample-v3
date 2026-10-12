@@ -443,7 +443,8 @@ struct CallScreenCustomView: View {
 
     @ViewBuilder
     private var errorToast: some View {
-        if let msg = viewModel.errorMessage {
+        // Hataları host gösteriyorsa (SDKErrorConfig.presentation = .custom) toast çizilmez.
+        if SDKErrorConfig.shared.showsSDKPopup, let msg = viewModel.errorMessage {
             VStack {
                 Spacer()
                 Text(msg)

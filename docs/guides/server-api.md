@@ -59,7 +59,7 @@ IdentifyManager.shared.setupSDK(
 | `nfcMaxErrorCount` | `Int` | — | NFC okuması kaç hatadan sonra bırakılır |
 | `logLevel` | `SDKLogLevel?` | `.all` | Konsol ve online log ayarı → [Loglama](logging.md) |
 | `logOnlineSecretKey` | `String?` | `""` | Online log imza anahtarı |
-| `bigCustomerCam` | `Bool?` | `false` | Görüşmede müşterinin kamerası büyük gösterilsin mi |
+| `bigCustomerCam` | `Bool?` | `true` | `true`: temsilci tam ekran, kullanıcının kamerası küçük pencerede. `false`: tersi |
 | `selectedModules` | `[SdkModules]` | `[]` | Boşsa backend'in sırası, doluysa yalnızca bu modüller |
 | `idCardLang` | `IDLang?` | `.TR` | OCR'a belgenin dilini söyler |
 | `needCertForNfc` | `Bool?` | `false` | NFC'de sertifika zinciri doğrulansın mı |

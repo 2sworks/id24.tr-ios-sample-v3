@@ -23,6 +23,9 @@ struct SpeechShowcaseView: View {
     private var sampleText: String { SDKLocalization.shared.translate(sampleKey) }
 
     @State private var mode: ModeOption = .native
+    @State private var respectsSilentSwitch = SDKSpeechConfig.shared.silentSwitch == .respect
+    /// Demodan çıkınca geri yüklenir.
+    @State private var initialSilentSwitch = SDKSpeechConfig.shared.silentSwitch
 
     enum ModeOption: String, CaseIterable, Identifiable {
         case native = "Native (Siri)"
@@ -43,6 +46,10 @@ struct SpeechShowcaseView: View {
             VStack(alignment: .leading, spacing: IDSpacing.lg) {
                 intro
                 modePicker
+                Toggle("Sessiz anahtara uy", isOn: $respectsSilentSwitch)
+                    .font(IDFont.bodyMedium(.medium))
+                    .foregroundColor(IDColor.adaptiveTitle(for: colorScheme))
+                    .tint(IDColor.accentPurple)
                 sampleCard
                 actions
                 note
@@ -50,7 +57,10 @@ struct SpeechShowcaseView: View {
             .padding(IDSpacing.lg)
         }
         .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
-        .onDisappear { SDKSpeechService.shared.stop() }
+        .onDisappear {
+            SDKSpeechService.shared.stop()
+            SDKSpeechConfig.shared.silentSwitch = initialSilentSwitch
+        }
     }
 
     // MARK: - Bölümler
@@ -114,7 +124,11 @@ struct SpeechShowcaseView: View {
             Text("• Custom Audio seçili ama bundle'da SelfieTts klibi yoksa, otomatik olarak "
                  + "native okuma devreye girer (fallbackToNativeIfAudioMissing).\n"
                  + "• Gerçek akışta seslendirme, ekran açılışında SDKFlowHostView tarafından "
-                 + "otomatik yapılır; host'un ekstra kod yazması gerekmez.")
+                 + "otomatik yapılır; host'un ekstra kod yazması gerekmez.\n"
+                 + "• Sessiz anahtara uy: telefon sessizdeyse okunmaz (silentSwitch = .respect). "
+                 + "Kayıt süren ekranlarda (kısa video, görüntülü görüşme) uygulanamaz.\n"
+                 + "• Okumalar eyleme göre ayrı açılıp kapatılabilir: "
+                 + "setMode(_:for:actions:), ör. yalnız hata metinlerini okutmak.")
                 .font(IDFont.bodySmall())
                 .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))
         }
@@ -125,6 +139,7 @@ struct SpeechShowcaseView: View {
     private func play() {
         // Demoda örnek modülün modunu seçilen değere ayarla, sonra o modül bağlamında oku.
         SDKSpeechConfig.shared.setMode(mode.configMode, for: sampleModule)
+        SDKSpeechConfig.shared.silentSwitch = respectsSilentSwitch ? .respect : .ignore
         SDKSpeechService.shared.speak(sampleKey, in: sampleModule)
     }
 }

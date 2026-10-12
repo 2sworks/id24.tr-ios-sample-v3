@@ -21,6 +21,7 @@
 //    beginSession()                   ekran görününce; hata alert'i kapanınca ViewModel kendisi yeniden çağırır
 //    isSessionActive / sessionGeneration   AR/kamera oturumu açılır (yeni nesil) ya da duraklatılır
 //    analyzeFace(_:) / analyzeNoFace()     .arkit: her takip karesinde (ekran koordinatı + metre)
+//    analyzeMultipleFaces()                .arkit: birden fazla yüz izleniyorsa (SDKFaceConfig)
 //    analyzeFrame(_:cameraPosition:)       .vision: her kamera karesinde
 //    phase / ovalPhase / ovalScale / guidanceText / holdProgress / isFaceMeshHidden  çizim girdileri
 //    shouldCapture == true            → kare alınır (flaş burada) ve presentCaptured(image:) çağrılır
@@ -374,6 +375,10 @@ struct FaceTrackingCameraView: UIViewRepresentable {
                 if !isRunning || appliedGeneration != viewModel.sessionGeneration {
                     appliedGeneration = viewModel.sessionGeneration
                     isRunning = true
+                    // Çoklu yüz denetimi açıksa ikinci yüz de izlenir.
+                    configuration.maximumNumberOfTrackedFaces = SDKFaceConfig.shared
+                        .multipleFaces(for: .selfieWithLiveness) == .off
+                        ? 1 : min(2, ARFaceTrackingConfiguration.supportedNumberOfTrackedFaces)
                     sceneView.session.run(configuration)
                 }
             } else if isRunning {
@@ -417,7 +422,14 @@ struct FaceTrackingCameraView: UIViewRepresentable {
             let transform = faceAnchor.transform
             DispatchQueue.main.async { [weak self] in
                 guard let self, let sceneView = self.sceneView else { return }
-                guard isTracked else { self.viewModel.analyzeNoFace(); return }
+                let trackedFaces = self.trackedFaceCount(isTracked ? 1 : 0)
+                if trackedFaces > 1 { self.viewModel.analyzeMultipleFaces(); return }
+                // İkinci yüz çıkınca onun çıpası izlenmez olur; kullanıcının yüzü hâlâ
+                // izleniyorsa "yüz yok" sayılmaz.
+                guard isTracked else {
+                    if trackedFaces == 0 { self.viewModel.analyzeNoFace() }
+                    return
+                }
                 let col = transform.columns.3
                 let proj = sceneView.projectPoint(SCNVector3(col.x, col.y, col.z))
                 let ambient = sceneView.session.currentFrame?.lightEstimate?.ambientIntensity
@@ -432,7 +444,16 @@ struct FaceTrackingCameraView: UIViewRepresentable {
 
         func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
             guard anchor is ARFaceAnchor else { return }
-            DispatchQueue.main.async { [weak self] in self?.viewModel.analyzeNoFace() }
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.trackedFaceCount(0) == 0 else { return }
+                self.viewModel.analyzeNoFace()
+            }
+        }
+
+        /// O an izlenen yüz sayısı. Kare yoksa `fallback`.
+        @MainActor private func trackedFaceCount(_ fallback: Int) -> Int {
+            guard let anchors = sceneView?.session.currentFrame?.anchors else { return fallback }
+            return anchors.reduce(0) { $0 + ((($1 as? ARFaceAnchor)?.isTracked ?? false) ? 1 : 0) }
         }
     }
 }

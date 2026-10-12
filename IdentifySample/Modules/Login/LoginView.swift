@@ -779,6 +779,7 @@ private struct HamburgerMenuSheet: View {
     let onSelect: (HamburgerMenuItem) -> Void
     @ObservedObject private var nfxState = NFXDebugState.shared
     @AppStorage("sdkReadAloudEnabled") private var readAloudEnabled = false
+    @AppStorage("sdkCustomErrorEnabled") private var customErrorEnabled = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
@@ -823,6 +824,17 @@ private struct HamburgerMenuSheet: View {
                         set: { newValue in
                             readAloudEnabled = newValue
                             SDKReadAloudSetting.isEnabled = newValue
+                        }
+                    )
+                )
+                MenuOptionRow(
+                    icon: Image(systemName: "exclamationmark.bubble.fill"),
+                    title: "Hataları Kendim Göster",
+                    isOn: Binding(
+                        get: { customErrorEnabled },
+                        set: { newValue in
+                            customErrorEnabled = newValue
+                            SDKCustomErrorSetting.isEnabled = newValue
                         }
                     )
                 )

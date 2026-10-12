@@ -102,6 +102,9 @@ struct RootView: View {
             LoginView()
                 .environmentObject(coordinator)
         }
+        // F) Hata gösterimi: menüde "Hataları Kendim Göster" açıkken SDK popup açmaz, hata
+        //    bize gelir, SDK popup bileşeniyle (idAlert) ortada gösterilir (SDKErrorConfig.presentation = .custom). Kod: Core/Debug/SDKCustomErrorSetting.swift
+        .customErrorPopup()
         .onAppear(perform: configureIfNeeded)
     }
 

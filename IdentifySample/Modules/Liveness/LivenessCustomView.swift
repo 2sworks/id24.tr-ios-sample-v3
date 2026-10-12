@@ -20,6 +20,10 @@
 //    uploadFrame(image:)     ifade algılanınca o anın karesi; başarıda sonraki adım gelir
 //    allStepsCompleted       ARKit'i kapatın; kayıt yüklemesini ViewModel yapar
 //    noteWillResignActive() / noteDidBecomeActive()  uygulama aktifliği (kayıt kesintisi tespiti)
+//    trackingDidStart() / trackingDidPause()  takip açılıp kapanınca; adım süresi yalnız takip açıkken işler
+//    faceVisibilityChanged(_:)   yüz kadraja girip çıkınca; isFaceVisible ile metin değişir
+//    multipleFacesChanged(_:)    birden fazla yüz izlenince (SDKFaceConfig); hasMultipleFaces
+//    reportWrongAction(_:)       istenmeyen hareket yapılınca (SDKLivenessRules.default.wrongActionCheck)
 //    abandonRecording()      ekrandan çıkarken
 //    reportFaceTrackingUnsupported()  cihaz ARKit yüz takibi desteklemiyorsa
 //    onCompleted / onSkipRequested / onFlowFailed → coordinator
@@ -72,15 +76,20 @@ struct LivenessCustomView: View {
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(.white)
             }
-            Text(viewModel.stepInstruction)
+            Text(instructionText)
                 .foregroundColor(.white)
                 .font(IDFont.custom(20, .semibold))
                 .multilineTextAlignment(.center)
                 .transition(.opacity)
-                .animation(.easeInOut(duration: 0.3), value: viewModel.stepInstruction)
+                .animation(.easeInOut(duration: 0.3), value: instructionText)
         }
         .frame(maxWidth: .infinity, minHeight: 151)
         .background(Color.black.opacity(0.5).clipShape(LivenessTopRoundedShape(radius: 30)))
+    }
+
+    private var instructionText: String {
+        if viewModel.hasMultipleFaces { return String(.multipleFacesDetected) }
+        return viewModel.isFaceVisible ? viewModel.stepInstruction : String(.fitFaceInFrame)
     }
 
     private var stepIconName: String? {
@@ -149,6 +158,12 @@ struct LivenessARView: UIViewRepresentable {
         private var step: LivenessTestStep?
         private var allowBlink = false, allowSmile = false, allowLeft = false, allowRight = false
         private var isCapturing = false
+        private var isPaused = false
+        private var lastFaceVisible = true, lastMultipleFaces = false
+        /// Yanlış hareketin sayılması için koşulun kesintisiz sürmesi gereken süre.
+        private let holdSecs: TimeInterval = 0.35
+        private var wrongCandidate: LivenessTestStep?
+        private var wrongHoldStart: TimeInterval?
 
         init(viewModel: SDKLivenessViewModel) {
             self.viewModel = viewModel
@@ -164,6 +179,7 @@ struct LivenessARView: UIViewRepresentable {
             allowSmile = vm.allowSmile
             allowLeft = vm.allowLeft
             allowRight = vm.allowRight
+            isPaused = vm.errorMessage != nil || vm.isLoading
         }
 
         /// Sıra önemli: önce ekran kaydı, kayıt hazır olunca ARKit.
@@ -172,20 +188,29 @@ struct LivenessARView: UIViewRepresentable {
                 viewModel.reportFaceTrackingUnsupported()
                 return
             }
+            if SDKFaceConfig.shared.multipleFaces(for: .livenessDetection) != .off {
+                configuration.maximumNumberOfTrackedFaces = min(2, ARFaceTrackingConfiguration.supportedNumberOfTrackedFaces)
+            }
             let center = NotificationCenter.default
             appStateObservers = [
                 center.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [viewModel] _ in
-                    Task { @MainActor in viewModel.noteWillResignActive() }
+                    Task { @MainActor in
+                        viewModel.noteWillResignActive()
+                        viewModel.trackingDidPause()
+                    }
                 },
-                center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [viewModel] _ in
-                    Task { @MainActor in viewModel.noteDidBecomeActive() }
+                center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self, viewModel] _ in
+                    Task { @MainActor in
+                        viewModel.noteDidBecomeActive()
+                        if self?.isRunning == true { viewModel.trackingDidStart() }
+                    }
                 }
             ]
             viewModel.onRecordingReady = { [weak self] in
                 guard let self else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + self.sessionWarmupSecs) { [weak self] in
                     guard let self, !self.viewModel.allStepsCompleted else { return }
-                    self.sceneView?.session.run(self.configuration)
+                    self.runSession()
                 }
             }
             viewModel.prepareRecording()
@@ -194,8 +219,22 @@ struct LivenessARView: UIViewRepresentable {
         @MainActor func stop() {
             appStateObservers.forEach { NotificationCenter.default.removeObserver($0) }
             appStateObservers = []
-            sceneView?.session.pause()
+            pauseSession()
             viewModel.abandonRecording()
+        }
+
+        /// Takibi açar. Adım süresi yalnız takip açıkken işler.
+        private var isRunning = false
+        @MainActor private func runSession() {
+            sceneView?.session.run(configuration)
+            isRunning = true
+            viewModel.trackingDidStart()
+        }
+
+        @MainActor private func pauseSession() {
+            sceneView?.session.pause()
+            isRunning = false
+            viewModel.trackingDidPause()
         }
 
         // MARK: ARSCNViewDelegate
@@ -210,7 +249,32 @@ struct LivenessARView: UIViewRepresentable {
         func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
             guard let face = anchor as? ARFaceAnchor, let geometry = node.geometry as? ARSCNFaceGeometry else { return }
             geometry.update(from: face.geometry)
+            let trackedFaces = sceneView?.session.currentFrame?.anchors
+                .reduce(0) { $0 + ((($1 as? ARFaceAnchor)?.isTracked ?? false) ? 1 : 0) } ?? 1
+            noteMultipleFaces(trackedFaces > 1)
+            guard trackedFaces <= 1 else { return }
+            // İkinci yüzün çıpası izlenmez olunca kullanıcının yüzü kadrajda sayılmaya devam eder.
+            guard face.isTracked || trackedFaces == 0 else { return }
+            noteFaceVisible(face.isTracked)
             detectExpression(face)
+        }
+
+        func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
+            guard anchor is ARFaceAnchor else { return }
+            noteFaceVisible(false)
+        }
+
+        private func noteMultipleFaces(_ present: Bool) {
+            guard present != lastMultipleFaces else { return }
+            lastMultipleFaces = present
+            if present { wrongCandidate = nil; wrongHoldStart = nil }
+            Task { @MainActor [viewModel] in viewModel.multipleFacesChanged(present) }
+        }
+
+        private func noteFaceVisible(_ visible: Bool) {
+            guard visible != lastFaceVisible else { return }
+            lastFaceVisible = visible
+            Task { @MainActor [viewModel] in viewModel.faceVisibilityChanged(visible) }
         }
 
         // MARK: İfade algılama (eşikler SDK ile aynı)
@@ -235,7 +299,34 @@ struct LivenessARView: UIViewRepresentable {
             default:
                 triggered = false
             }
-            if triggered { captureAndUpload() }
+            if triggered { captureAndUpload(); return }
+            checkWrongAction(requested: step, face: face)
+        }
+
+        /// İstenmeyen hareketin koşulu `holdSecs` boyunca sürerse ViewModel'e bildirilir.
+        /// Göz kırpma istemsiz olduğu için sayılmaz.
+        private func checkWrongAction(requested: LivenessTestStep, face: ARFaceAnchor) {
+            guard SDKLivenessRules.default.wrongActionCheck, !isPaused, face.isTracked else { return }
+            func value(_ key: ARFaceAnchor.BlendShapeLocation) -> Float { face.blendShapes[key]?.floatValue ?? 0 }
+            let jawLeft = abs(value(.jawLeft)), jawRight = abs(value(.jawRight))
+            let smiling = value(.mouthSmileLeft) + value(.mouthSmileRight) > 1.2 && jawLeft < 0.03 && jawRight < 0.03
+            let detected: LivenessTestStep? = [
+                (LivenessTestStep.turnLeft, jawLeft > 0.12),
+                (.turnRight, jawRight > 0.12),
+                (.smile, smiling)
+            ].first { $0.0 != requested && $0.1 }?.0
+            guard let detected else { wrongCandidate = nil; wrongHoldStart = nil; return }
+            let now = Date().timeIntervalSince1970
+            guard detected == wrongCandidate, let start = wrongHoldStart else {
+                wrongCandidate = detected
+                wrongHoldStart = now
+                return
+            }
+            guard now - start >= holdSecs else { return }
+            wrongCandidate = nil
+            wrongHoldStart = nil
+            isPaused = true
+            Task { @MainActor [viewModel] in viewModel.reportWrongAction(detected) }
         }
 
         /// İfadenin kanıt karesini alır ve yükler; bekleme süresince takip kapalı kalır.
@@ -246,11 +337,11 @@ struct LivenessARView: UIViewRepresentable {
 
             Task { @MainActor in
                 let image = sceneView.snapshot()
-                sceneView.session.pause()
+                self.pauseSession()
                 self.viewModel.uploadFrame(image: image)
                 try? await Task.sleep(nanoseconds: UInt64(self.waitSecs * 1_000_000_000))
                 if !self.viewModel.allStepsCompleted {
-                    sceneView.session.run(self.configuration)
+                    self.runSession()
                 }
                 self.isCapturing = false
             }

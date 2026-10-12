@@ -132,6 +132,10 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 | `abandonRecording()` | Ekrandan çıkışta kaydı bırakır |
 | `noteWillResignActive()` / `noteDidBecomeActive()` | Uygulama aktiflik bildirimleri (kesilen kayıt yönetimi) |
 | `reportFaceTrackingUnsupported()` | Cihaz ARKit yüz takibini desteklemiyor — modül atlanır |
+| `trackingDidStart()` / `trackingDidPause()` | Yüz takibi açıldı / durdu. Adım süresi (`SDKLivenessRules.default.stepTimeout`) yalnız takip açıkken işler |
+| `faceVisibilityChanged(_:)` | Yüz kadraja girdi ya da çıktı; `isFaceVisible` güncellenir |
+| `multipleFacesChanged(_:)` | Birden fazla yüz izleniyor (`SDKFaceConfig`); `hasMultipleFaces` güncellenir, `.fail` modunda hata gösterilir |
+| `reportWrongAction(_:)` | İstenen yerine başka bir hareket yapıldı (`SDKLivenessRules.default.wrongActionCheck`); hata gösterilir, haktan düşer |
 | `fetchNextStep()` | Sıradaki adımı sunucudan alır; `init` ve `uploadFrame` zaten çağırır |
 | `finishRecordingAndUpload()` / `uploadVideo(videoData:)` | İç akış; son adımda VM kendisi çağırır |
 | `resetTest()` | Testi başa alır |

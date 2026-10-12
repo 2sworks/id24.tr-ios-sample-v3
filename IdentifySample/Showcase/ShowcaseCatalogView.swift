@@ -68,6 +68,8 @@ struct ShowcaseCatalogView: View {
             }
         }
         .navigationViewStyle(.stack)
+        // "Hataları kendim göster" açıkken hata penceresi (RootView'deki pencere bu örtünün altında kalır).
+        .customErrorPopup()
         // Debug/test: seçilen modülü tam ekran çizer (yerleşim kontrolü için).
         .fullScreenCover(isPresented: .constant(autoOpenFullScreen && autoOpenItem != nil)) {
             if let item = autoOpenItem {
