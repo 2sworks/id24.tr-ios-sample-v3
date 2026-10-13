@@ -188,3 +188,6 @@ sonuç `setupSDK(onFinished:)`'a gelir:
   gösterilebilir; event akışında `notFound` durumu görülür ([Event Sistemi](../../../docs/guides/events.md)).
 - **Sertifika doğrulama:** `needCertForNfc: true` ile çip sertifika zinciri, gömülü CSCA
   listesine karşı doğrulanır.
+- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
+  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.nfc] = SDKNavBarButtons(showsHelp: false)`;
+  işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

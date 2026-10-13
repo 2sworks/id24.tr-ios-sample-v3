@@ -49,6 +49,9 @@
 //    C) Ara ekran      registry.custom("welcome") { MyIntroView() }
 //                      coordinator.insert(["welcome"], before: .selfie)
 //                      → MyIntroView'ın Devam butonu coordinator.advanceExternal() çağırır.
+//                      Modülden önce hız testi: registry.custom("speedCheck") { SpeedCheckBeforeView() }
+//                      coordinator.insert(["speedCheck"], before: .callScreen)
+//                      → ekran testi çalıştırır; geçerse advanceExternal(), engellenirse ekranda kalır.
 //    D) Tam ekran      registry.override(.selfie) { SelfieCustomView() }
 //                      Ekranın tamamı host'a aittir; iş mantığı SDK ViewModel'inde kalır.
 //                      Başlangıç noktası: her modülün XxxCustomView.swift dosyası — SDK ekranının
@@ -63,6 +66,8 @@
 //    • Adım bitince yalnızca ViewModel metodu çağrılır (scanFront, processSelfie, submit …);
 //      ViewModel yükler, sunucuya adım sinyalini gönderir, sonra canContinue/onCompleted verir.
 //    • İlerleme: coordinator.advanceToNextModule()  · Geri: coordinator.popBack()
+//      Araya eklenen (C) ekranlar ise coordinator.advanceExternal() çağırır; advanceToNextModule
+//      orada yok sayılır. Ayrıntı: docs/guides/customization.md, "Ara ekrandan ilerlemek".
 //    • Karşılaştırma hakları tükenince: onSkipRequested → coordinator.skipCurrentModule(),
 //      onFlowFailed → coordinator.finishFlowAsFailed()
 //    • Hata: .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
@@ -128,6 +133,7 @@ struct RootView: View {
 //        ])
 
         // C) Ara ekran: Selfie modülünden ÖNCE bir bilgilendirme ekranı.
+        //    SDKExternalInfoView'ın Devam butonu advanceExternal() çağırır; kendi ekranınız da öyle yapmalı.
 //        registry.custom("welcome") {
 //            SDKExternalInfoView(
 //                title: "Hoş geldiniz",
@@ -136,6 +142,27 @@ struct RootView: View {
 //            )
 //        }
 //        coordinator.insert(["welcome"], before: .selfie)
+
+        // C) Ara ekran: modülden ÖNCE bağlantı ölçümü (örnekte görüntülü görüşme).
+        //
+        //    1) Ekran bir id ile kaydedilir. Açılınca startConnectionSpeedTest çalışır.
+        //       blockIdent false gelirse coordinator.advanceExternal() ile modüle geçilir;
+        //       true gelirse hata metni ve "Tekrar Dene" ile kullanıcı ekranda kalır.
+        //    2) Ekranın hangi modülün önünde açılacağı söylenir. Görüşme için .callScreen.
+        //       Başka modül için rota değişir: .nfc, .selfie, .idCard, .idCardOVD, .liveness …
+        //       Birden fazla modülün önünde ölçmek için her rotaya ayrı insert yazılır.
+        //    3) İsteğe bağlı: hazırlık ekranı ikinci kez ölçmesin diye setupSDK dönüşünde,
+        //       coordinator.start() çağrısından önce IdentifyManager.shared.needSpeedTest = false
+        //       verilir (bu uygulamada LoginViewModel içinde).
+        //
+        //    insert bir kez çağrılır; bu fonksiyon da bir kez çalışır. Her oturumda yeniden
+        //    çağrılırsa ekran art arda iki kez açılır. Ölçüm geçene kadar sunucu kullanıcıyı
+        //    görüşme modülüne, dolayısıyla bekleme odasına almaz.
+        //    Ekran kodu: Modules/Prepare/SpeedCheckBeforeView.swift
+        //    Rehber: docs/guides/speed-test.md, bölüm 4.
+//        registry.custom("speedCheck") { SpeedCheckBeforeView() }
+//        coordinator.insert(["speedCheck"], before: .callScreen)
+//        coordinator.insert(["speedCheck"], before: .nfc)   // aynı ekran NFC'den önce de açılır
 
         // D) Tek bir modül, anahtardan bağımsız olarak, host ekranıyla değiştirilir.
 //        registry.override(.addressConfirm) { AddressConfirmCustomView() }

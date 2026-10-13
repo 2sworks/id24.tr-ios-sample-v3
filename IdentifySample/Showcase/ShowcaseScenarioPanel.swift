@@ -585,7 +585,8 @@ enum ShowcaseScenarios {
                         .action(title: "0 hak (tükendi)",
                                 note: "Hak tükenmiş senaryosu.",
                                 run: { m.ocrComparisonCount = 0 })
-                      ])
+                      ]),
+                limitGroup(.idCard),
             ]
 
         // MARK: Kimlik OVD (hologram)
@@ -626,7 +627,8 @@ enum ShowcaseScenarios {
                         .action(title: "options: yalnız pasaport",
                                 note: "Tek seçenek — autoSkipSingleOption açıksa ekran atlanır.",
                                 run: { SDKDocumentSelectionConfig.shared.ovd.options = [.passport] })
-                      ])
+                      ]),
+                limitGroup(.idcard_w_ovd),
             ]
 
         // MARK: NFC
@@ -663,7 +665,18 @@ enum ShowcaseScenarios {
                         .action(title: "0 hak (tükendi)",
                                 note: "Hak tükenmiş senaryosu.",
                                 run: { m.nfcComparisonCount = 0 })
-                      ])
+                      ]),
+                limitGroup(.nfc),
+                .init(title: "Anahtar düzeltme",
+                      note: "SDKAttemptLimits.shared.nfcKeyEntry: çip okunamazsa kaç hatadan sonra MRZ düzeltme ekranı açılır.",
+                      controls: [
+                        .action(title: "3 hata (varsayılan)",
+                                note: "Üçüncü hatada ekran açılır.",
+                                run: { SDKAttemptLimits.shared.nfcKeyEntry = .manual(3) }),
+                        .action(title: "1 hata",
+                                note: "İlk hatada ekran açılır.",
+                                run: { SDKAttemptLimits.shared.nfcKeyEntry = .manual(1) })
+                      ]),
             ]
 
         // MARK: Selfie
@@ -686,7 +699,9 @@ enum ShowcaseScenarios {
                         .action(title: "0 hak (tükendi)",
                                 note: "Hak tükenmiş senaryosu.",
                                 run: { m.selfieComparisonCount = 0 })
-                      ])
+                      ]),
+                limitGroup(.selfie),
+                multipleFacesGroup(.selfie, note: "SDKFaceConfig.shared.setMultipleFaces(_:for: .selfie). Varsayılan: uyar. Arkadaki küçük yüzler sayılmaz."),
             ]
 
         // MARK: Canlılık
@@ -701,7 +716,33 @@ enum ShowcaseScenarios {
                         .flag(title: "liveness_report",
                               note: "Sunucuya ek canlılık raporu gönderilir.",
                               get: { m.livenessReportEnabled }, set: { m.livenessReportEnabled = $0 })
-                      ])
+                      ]),
+
+                .init(title: "Adım kuralları",
+                      note: "SDKLivenessRules.default. Süre yalnız yüz takibi açıkken işler; hata ya da yükleme sırasında durur.",
+                      controls: [
+                        .action(title: "Adım süresi 10 sn (varsayılan)",
+                                note: "Hareket 10 sn içinde yapılmazsa hata gösterilir.",
+                                run: { SDKLivenessRules.default.stepTimeout = 10 }),
+                        .action(title: "Adım süresi 5 sn",
+                                note: "Daha kısa bekleme.",
+                                run: { SDKLivenessRules.default.stepTimeout = 5 }),
+                        .action(title: "Adım süresi kapalı",
+                                note: "Süre sınırı yok.",
+                                run: { SDKLivenessRules.default.stepTimeout = nil }),
+                        .flag(title: "Yanlış hareket denetimi",
+                              note: "İstenen yerine başka bir hareket yapılırsa hata gösterilir. Göz kırpma sayılmaz.",
+                              get: { SDKLivenessRules.default.wrongActionCheck },
+                              set: { SDKLivenessRules.default.wrongActionCheck = $0 }),
+                        .action(title: "Adım hatası hakkı: 3 (varsayılan)",
+                                note: "SDKAttemptLimits.shared.livenessStepFailure. Süre aşımı ve yanlış hareket adımın hakkından düşer; her adım hakkı baştan alır.",
+                                run: { SDKAttemptLimits.shared.livenessStepFailure = .manual(3) }),
+                        .action(title: "Adım hatası hakkı: 1",
+                                note: "İlk hatada hak biter; modül hak kuralına göre atlanır ya da akış biter.",
+                                run: { SDKAttemptLimits.shared.livenessStepFailure = .manual(1) })
+                      ]),
+                limitGroup(.livenessDetection),
+                multipleFacesGroup(.livenessDetection, note: "SDKFaceConfig.shared.setMultipleFaces(_:for: .livenessDetection). Varsayılan: kapalı. TrueDepth kamera ister."),
 
                 // Adım seti (göz kırpma, gülümseme, baş çevirme…) modülün kendi
                 // ViewModel'indeki `allow*` alanlarından gelir ve sunucunun gönderdiği
@@ -728,7 +769,9 @@ enum ShowcaseScenarios {
                         .action(title: "0 hak (tükendi)",
                                 note: "Hak tükenmiş senaryosu.",
                                 run: { m.selfieComparisonCount = 0 })
-                      ])
+                      ]),
+                limitGroup(.selfieWithLiveness),
+                multipleFacesGroup(.selfieWithLiveness, note: "SDKFaceConfig.shared.setMultipleFaces(_:for: .selfieWithLiveness). Varsayılan: uyar."),
             ]
 
         // MARK: Video kayıt
@@ -757,7 +800,7 @@ enum ShowcaseScenarios {
                         .action(title: "15 saniye",
                                 note: "Uzun kayıt penceresi.",
                                 run: { m.videoRecordDurationSeconds = 15 })
-                      ])
+                      ]),
             ]
 
         // MARK: Konuşma tanıma
@@ -775,7 +818,7 @@ enum ShowcaseScenarios {
                         .action(title: "Boş cümle",
                                 note: "Sunucu cümle göndermediğinde ekranın davranışı.",
                                 run: { m.speechExpectedSentence = "" })
-                      ])
+                      ]),
             ]
 
         // MARK: İşaret dili
@@ -793,6 +836,44 @@ enum ShowcaseScenarios {
         default:
             return []
         }
+    }
+
+    // MARK: Ortak gruplar
+
+    /// Entegratörün karşılaştırma hakkı ve hak bitince kuralı.
+    private static func limitGroup(_ module: SdkModules) -> ShowcaseScenarioGroup {
+        let limits = SDKAttemptLimits.shared
+        return .init(title: "Hak kuralı (entegratör)",
+                     note: "SDKAttemptLimits.shared.set(_:for:). Sunucunun hak sayısı ve atlama kuralı yerine geçer.",
+                     controls: [
+                        .action(title: "Sunucu değeri (varsayılan)",
+                                note: "Hak ve atlama kuralı oturumdan gelir.",
+                                run: { limits.set(SDKModuleLimits(), for: module) }),
+                        .action(title: "2 hak, bitince atla",
+                                note: "Hak bitince modül atlanır, akış sürer.",
+                                run: { limits.set(SDKModuleLimits(comparison: .manual(2), onExhausted: .skip), for: module) }),
+                        .action(title: "2 hak, bitince bitir",
+                                note: "Hak bitince akış başarısız biter.",
+                                run: { limits.set(SDKModuleLimits(comparison: .manual(2), onExhausted: .fail), for: module) })
+                     ])
+    }
+
+    /// Kadrajda birden fazla yüz görülünce yapılacak iş.
+    private static func multipleFacesGroup(_ module: SdkModules, note: String) -> ShowcaseScenarioGroup {
+        let faces = SDKFaceConfig.shared
+        return .init(title: "Çoklu yüz",
+                     note: note,
+                     controls: [
+                        .action(title: "Kapalı",
+                                note: "Denetim yok; en büyük yüz kullanılır.",
+                                run: { faces.setMultipleFaces(.off, for: module) }),
+                        .action(title: "Uyar",
+                                note: "Uyarı çıkar, çekim tek yüz kalana kadar bekler.",
+                                run: { faces.setMultipleFaces(.warn, for: module) }),
+                        .action(title: "Hata",
+                                note: "Yüzler 1,5 sn kadrajda kalırsa hata gösterilir ve haktan düşer.",
+                                run: { faces.setMultipleFaces(.fail, for: module) })
+                     ])
     }
 }
 

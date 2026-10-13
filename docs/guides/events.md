@@ -1,8 +1,8 @@
 # Event Sistemi — Akışı Veriyle İzlemek
 
-Kullanıcı hangi adımda? Selfie kaç kez başarısız oldu? Görüşme kuruldu mu? Bu soruların cevabı
-SDK'nın **olay (event) akışındadır**. Host uygulama bu akışa abone olup kendi analitik
-altyapısına (Firebase, Adjust, kendi paneliniz...) besleyebilir.
+Kullanıcı hangi adımda, selfie kaç kez başarısız oldu, görüşme kuruldu mu? Bunları SDK'nın olay
+(event) akışından öğrenirsiniz. Host uygulama bu akışa abone olup olayları kendi analitik
+altyapısına (Firebase, Adjust ya da kendi paneliniz) gönderebilir.
 
 ← [README'ye dön](../../README.md) · İlgili: [Loglama](logging.md)
 
@@ -10,15 +10,15 @@ altyapısına (Firebase, Adjust, kendi paneliniz...) besleyebilir.
 
 ## İki API, Tek Akış
 
-Tarihsel olarak iki dinleyici vardır; ikisi de çalışır, **yenisini öneririz**:
+İki dinleyici var ve ikisi de çalışıyor. Yeni projelerde `SDKEventListener`'ı öneriyoruz:
 
 | API | Model | Durum |
 |---|---|---|
-| `SDKEventListener` (yeni) | Zengin `SDKEvent` nesnesi | ✅ Önerilen |
-| `IdentifyTrackingListener` (eski) | `TrackingEventType` enum'ı | Korunuyor (geriye uyum) |
+| `SDKEventListener` (yeni) | Ayrıntılı `SDKEvent` nesnesi | ✅ Önerilen |
+| `IdentifyTrackingListener` (eski) | `TrackingEventType` enum'ı | Geriye uyum için duruyor |
 
-Eski `TrackingEventType` olayları, SDK içinde otomatik olarak yeni `SDKEvent` modeline
-köprülenir — yani yeni API'ye abone olduğunuzda **eski enstrümantasyonun tamamını** da alırsınız.
+Eski `TrackingEventType` olayları SDK içinde yeni `SDKEvent` modeline çevrilir. Yeni API'ye abone
+olduğunuzda eski API'nin gönderdiği olayların hepsini de alırsınız.
 
 ---
 
@@ -36,8 +36,8 @@ let analytics = MyAnalytics()
 IdentifyManager.shared.eventDelegate = analytics   // weak tutulur — referansı siz saklayın
 ```
 
-> `eventDelegate` **weak**'tir; dinleyicinizi kendi tarafınızda güçlü referansla yaşatın,
-> yoksa sessizce serbest bırakılır ve olay gelmez.
+> `eventDelegate` weak tutulur. Dinleyiciyi kendi tarafınızda güçlü bir referansla saklayın;
+> saklamazsanız nesne serbest kalır ve hiçbir olay gelmez, bir hata da görmezsiniz.
 
 ---
 
@@ -45,19 +45,19 @@ IdentifyManager.shared.eventDelegate = analytics   // weak tutulur — referans�
 
 | Alan          | Tip                | Anlamı                                                                                           |
 | ------------- | ------------------ | ------------------------------------------------------------------------------------------------ |
-| `name`        | `String`           | Olay adı — `module.<modül>.<durum>` / `session.<durum>` (ör. `module.Selfie.completed`)          |
+| `name`        | `String`           | Olay adı: `module.<modül>.<durum>` ya da `session.<durum>` (ör. `module.Selfie.completed`)       |
 | `category`    | `SDKEventCategory` | `session` · `module` · `call` · `network` · `error` · `navigation`                               |
 | `status`      | `SDKEventStatus`   | `info` · `presented` · `completed` · `failed` · `skipped` · `success` · `abandoned` · `notFound` |
-| `module`      | `String?`          | İlgili modül                                                                                     |
-| `screen`      | `String?`          | İlgili ekran                                                                                     |
-| `sessionId`   | `String`           | Oturum kimliği — tüm olayları tek oturumda gruplamak için                                        |
+| `module`      | `String?`          | Olayın ait olduğu modül                                                                          |
+| `screen`      | `String?`          | Olayın ait olduğu ekran                                                                          |
+| `sessionId`   | `String`           | Oturum kimliği; bir oturumun bütün olaylarını gruplamak için                                     |
 | `timestampMs` | `Int64`            | Olay zamanı (ms)                                                                                 |
 | `message`     | `String?`          | Açıklama                                                                                         |
-| `metadata`    | `[String: String]` | Ek bağlam                                                                                        |
+| `metadata`    | `[String: String]` | Ek bilgi                                                                                         |
 
 ### Tipik Olay Örüntüsü — Modül Yaşam Döngüsü
 
-Her modül dört temel durumdan geçer; funnel analizi doğrudan bunlarla kurulur:
+Her modül dört temel durumdan geçer. Funnel analizini bu durumlarla kurabilirsiniz:
 
 ```
 presented ──► completed        (Happy path)
@@ -65,60 +65,60 @@ presented ──► completed        (Happy path)
           └─► skipped          (hak tükendi / modül atlandı)
 ```
 
-NFC için ek bir durum vardır: `notFound` (çipsiz belge).
-Oturum düzeyinde ise `success` (akış bitti) ve `abandoned` (yarıda bırakıldı) görürsünüz.
+NFC'nin bir durumu daha var: çipsiz belgeler için `notFound`. Oturum düzeyinde `success` (akış
+bitti) ve `abandoned` (yarıda bırakıldı) gelir.
 
 ### Bağlantı & Yaşam Döngüsü Olayları
 
-Soket/TURN kapanmaları ve ön/arka plan geçişleri de olay üretir:
+Soket ve TURN kapanmaları ile uygulamanın ön plana ya da arka plana geçmesi de olay üretir:
 
 | Olay | Kategori | Ne zaman | Önemli metadata |
 |---|---|---|---|
-| `socket.closed` | `network` | Her soket kapanışında (bilinçli ya da kopma) | `code` (4100+), `case`, `category`, `deliberate`, `reason` |
-| `turn.dropped` | `call` | TURN/ICE düşmesinde (4140–4142) | aynı alanlar |
+| `socket.closed` | `network` | Soket her kapandığında (bilerek kapatıldığında da, koptuğunda da) | `code` (4100+), `case`, `category`, `deliberate`, `reason` |
+| `turn.dropped` | `call` | TURN/ICE bağlantısı düştüğünde (4140–4142) | aynı alanlar |
 | `session.background` | `session` | Uygulama arka plana geçtiğinde | `timeoutSeconds`, `socketConnected` |
-| `session.foreground` | `session` | Ön plana dönüşte | `elapsedSeconds`, `socketConnected` |
-| `app.background` | `navigation` | (DefaultUI) arka plana geçiş — modül bilgisiyle | `state` |
+| `session.foreground` | `session` | Uygulama ön plana döndüğünde | `elapsedSeconds`, `socketConnected` |
+| `app.background` | `navigation` | DefaultUI'da arka plana geçiş, modül bilgisiyle | `state` |
 
 ### Oturum Sonucu Olayları (3.1.0)
 
-Oturum nasıl biterse bitsin **tam bir kez** iki olay yayınlanır: sonucu taşıyan
-`session.finished` ve sonuca göre `session.completed` / `session.failed` / `session.abandoned`.
-Aynı sonuç `setupSDK(onFinished:)`, `IdentifyManager.shared.onFlowFinished` ve
-`flowResultDelegate` ile tipli (`SDKFlowOutcome`) olarak da alınır —
-[FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-310) ·
-tüm çıkış yolları ve yönlendirme: [Oturum Çıkışları](session-exit.md).
+Oturum nasıl biterse bitsin iki olay tam bir kez gönderilir: sonucu taşıyan `session.finished` ve
+sonuca göre `session.completed`, `session.failed` ya da `session.abandoned`. Aynı sonucu
+`setupSDK(onFinished:)`, `IdentifyManager.shared.onFlowFinished` ve `flowResultDelegate`
+üzerinden tipli olarak (`SDKFlowOutcome`) da alabilirsiniz.
+Bkz. [FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-310);
+bütün çıkış yolları ve yönlendirme için [Oturum Çıkışları](session-exit.md).
 
 | Olay | `status` | Ne zaman |
 |---|---|---|
 | `session.finished` | sonuca göre | Her bitişte |
 | `session.completed` | `success` | `result == approved` |
 | `session.failed` | `failed` | `rejected` · `neutral` · `notCompleted` · `error` |
-| `session.abandoned` | `abandoned` | `cancelled` (kullanıcı/host çıkışı, uygulama kapatıldı) |
+| `session.abandoned` | `abandoned` | `cancelled` (kullanıcı ya da host çıktı, uygulama kapatıldı) |
 
 | Metadata | Anlamı |
 |---|---|
 | `result` | `approved` · `rejected` · `neutral` · `notCompleted` · `cancelled` · `error` |
 | `endReason` | `agentDecision` · `allModulesCompleted` · `userEndedCall` · `moduleFailed` · `userExited` · `hostQuit` · `hostExit` · `hostForceQuit` · `appTerminated` · `roomOccupied` · `connectionLost` · `setupFailed` |
-| `reason` | Panelin `terminateReason`'ı; yoksa `endReason` (3.0.0 uyumu) |
-| `terminateReason`, `statusSummary`, `statusId` | Panel kapattıysa birebir |
+| `reason` | Panelin gönderdiği `terminateReason`; yoksa `endReason` (3.0.0 uyumu için) |
+| `terminateReason`, `statusSummary`, `statusId` | Oturumu panel kapattıysa panelin gönderdiği değerler |
 | `lastScreen`, `lastModule`, `stepIndex`, `totalSteps` | Oturumun bittiği yer |
-| `skippedModules` | Doğrulanmadan geçilen modüller, virgülle ayrılmış (boşsa anahtar yok) |
-| `closeCode`, `errorMessage` | Son kapanış kodu / setup hatası |
+| `skippedModules` | Doğrulanmadan geçilen modüller, virgülle ayrılmış (hiç yoksa anahtar gelmez) |
+| `closeCode`, `errorMessage` | Son kapanış kodu ve setup hatası |
 
-> **3.0.0'dan fark:** `session.completed` / `session.failed` eskiden her `terminateCall`'da
-> gönderiliyordu ve başarıyı `success`/`approve` içeren statüde arıyordu — panel `positive`
-> gönderdiği için onaylanan oturumlar da `failed` görünüyordu. Artık yalnızca gerçek bir karar
-> (ya da başka bir bitiş) gönderilir; karar içermeyen sonlandırmalar olay üretmez.
+> 3.0.0'da `session.completed` ve `session.failed` her `terminateCall`'da gönderiliyordu. Başarı
+> da statünün içinde `success` ya da `approve` aranarak belirleniyordu. Panel `positive`
+> gönderdiği için onaylanan oturumlar da `failed` görünüyordu. Artık bu olaylar yalnızca gerçek bir
+> karar ya da başka bir bitiş olduğunda gönderiliyor; karar içermeyen sonlandırmalar olay üretmiyor.
 
-`status` alanı bilinçli kapanışlarda `info`, kopmalarda `failed` gelir. Kod
-tablosunun tamamı: [WebSocket rehberi → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100).
+`status` alanı bilerek yapılan kapanışlarda `info`, kopmalarda `failed` olur. Kodların tam listesi:
+[WebSocket rehberi → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100).
 
 ---
 
 ## Eski API — IdentifyTrackingListener
 
-Mevcut entegrasyonunuz varsa dokunmanıza gerek yok:
+Bu API ile entegrasyonunuz varsa değiştirmeniz gerekmiyor:
 
 ```swift
 IdentifyManager.shared.trackingDelegate = self   // IdentifyTrackingListener
@@ -126,23 +126,22 @@ IdentifyManager.shared.trackingDelegate = self   // IdentifyTrackingListener
 func eventReceived(event: TrackingEvent) { ... }
 ```
 
-`TrackingEventType`, modül başına `...ModulePresented / Failed / Completed / Skipped`
-case'leri ile HTTP izleme olaylarını (`HTTP_REQUEST_TRACKING_EVENT`,
-`HTTP_RESPONSE_TRACKING_EVENT`) içerir. Yeni projede bunun yerine `SDKEventListener` kullanabilirisiniz.
+`TrackingEventType` her modül için `...ModulePresented / Failed / Completed / Skipped` case'lerini
+ve HTTP izleme olaylarını (`HTTP_REQUEST_TRACKING_EVENT`, `HTTP_RESPONSE_TRACKING_EVENT`) içerir.
+Yeni bir projede bunun yerine `SDKEventListener` kullanın.
 
 ---
 
 ## Canlı Görmek İçin: Sample App Showcase
 
-Sample App'teki **Event Journey** ekranı (`Showcase/EventJourney/`), akış boyunca üretilen
-tüm olayları kronolojik bir zaman çizelgesinde gösterir. SDK'yı ilk kez tanıyorsanız bir
-oturumu baştan sona koşturup bu ekranı izlemek, olay modelini öğrenmenin en hızlı yoludur.
-`SDKEventRecorder`, `SDKEventListener`'ın örnek bir implementasyonudur — kopyalayıp
-kendi analitik köprünüze dönüştürebilirsiniz.
+Sample App'teki Event Journey ekranı (`Showcase/EventJourney/`) akış boyunca üretilen olayları
+zaman sırasıyla listeler. Olay modelini öğrenmenin en kısa yolu, bir oturumu baştan sona
+tamamlayıp bu ekrana bakmaktır. `SDKEventRecorder` örnek bir `SDKEventListener`; kopyalayıp kendi
+analitik bağlantınıza uyarlayabilirsiniz.
 
 ---
 
 ## Event mi Log mu?
 
-- Ürün/analitik sorusu ("kaç kullanıcı NFC'de takıldı?") → **Event**
-- Teknik sorun ("NFC neden takıldı?") → **[Log](logging.md)** (`nfc` kategorisi)
+- Ürün ya da analitik sorusu ("kaç kullanıcı NFC'de takıldı?") için event'lere bakın.
+- Teknik sorun ("NFC neden takıldı?") için [Log](logging.md)'lara bakın (`nfc` kategorisi).

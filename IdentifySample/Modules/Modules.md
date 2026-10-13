@@ -169,6 +169,41 @@ rehberinde kendi ses anahtarı yazar. Tam ayrıntı: [ReadAloud.md](ReadAloud.md
 
 ---
 
+## Başlık Çubuğu Düğmeleri
+
+Hazır ekranların üst çubuğunda solda geri düğmesi var. Kamera üstü ekranlarda (Selfie,
+Selfie + Canlılık, Canlılık, NFC, Kimlik OVD, Video Kayıt) sağda bir de yardım (?) düğmesi
+durur. SDK bu düğmeye bir işlev bağlamaz; siz `onHelp` vermezseniz basıldığında hiçbir şey
+olmaz. Ya kaldırın ya da kendi yardım ekranınızı açtırın.
+
+```swift
+// Yardım düğmesi hiçbir ekranda görünmesin
+SDKTheme.shared.navBar.buttons.showsHelp = false
+
+// Ya da basılınca kendi yardımınızı açın. route, düğmeye basılan ekrandır (.selfie, .nfc …)
+SDKTheme.shared.navBar.buttons.onHelp = { route in helpCenter.open(for: route) }
+
+// Sağ tarafa kendi düğmenizi ekleyin
+SDKTheme.shared.navBar.buttons.trailing = [
+    SDKNavBarButton(id: "chat", icon: Image(systemName: "message"),
+                    accessibilityLabel: "Canlı destek") { openChat() }
+]
+
+// Tek bir ekran için ayrı ayar
+SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false)
+```
+
+Ekrana özel kayıt genel ayarla birleşmez, onun yerine geçer: `routeButtons[.nfc]` verdiyseniz
+NFC ekranında `buttons` hiç okunmaz. `showsBack = false` verirseniz kullanıcı o ekrandan geri
+dönemez; bunu yalnızca geri dönüşü başka bir yoldan sağlıyorsanız yapın.
+
+`registry.override` ile taktığınız ekran da `SDKNavigationBar` kullanıyorsa bu ayarlar ona da
+uygulanır. Flutter ve React Native köprülerindeki JSON tema yalnızca görünürlüğü taşır:
+`"navBar": { "buttons": { "showsHelp": false } }`. Bütün alanlar
+[Tema rehberinde](../../docs/guides/theming.md#başlık-çubuğu-düğmeleri).
+
+---
+
 ## Modüllerin Dış Bağımlılıkları
 
 | Bağımlılık | Modüller |

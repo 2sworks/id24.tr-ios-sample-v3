@@ -43,7 +43,17 @@ enum ShowcaseMockData {
         let modulesControllersArray: [UIViewController]
         let manipulatedModulesControllersArray: [UIViewController]
         let moduleStepOrder: Int
+        // Senaryo panelinin değiştirdiği entegratör ayarları.
+        let moduleLimits: [SdkModules: SDKModuleLimits]
+        let faceModes: [SdkModules: SDKMultipleFacesMode]
+        let livenessRules: SDKLivenessRules
+        let nfcKeyEntry: SDKLimit
+        let livenessStepFailure: SDKLimit
     }
+
+    /// Senaryo panelinde hak kuralı ve çoklu yüz ayarı olan modüller.
+    private static let limitModules: [SdkModules] = [.idCard, .idcard_w_ovd, .nfc, .selfie, .livenessDetection, .selfieWithLiveness]
+    private static let faceModules: [SdkModules] = [.selfie, .livenessDetection, .selfieWithLiveness]
 
     private static var snapshot: Snapshot?
 
@@ -80,7 +90,12 @@ enum ShowcaseMockData {
             ocrComparisonCount: m.ocrComparisonCount,
             modulesControllersArray: m.modulesControllersArray,
             manipulatedModulesControllersArray: m.manipulatedModulesControllersArray,
-            moduleStepOrder: m.moduleStepOrder
+            moduleStepOrder: m.moduleStepOrder,
+            moduleLimits: Dictionary(uniqueKeysWithValues: limitModules.map { ($0, SDKAttemptLimits.shared.limits(for: $0)) }),
+            faceModes: Dictionary(uniqueKeysWithValues: faceModules.map { ($0, SDKFaceConfig.shared.multipleFaces(for: $0)) }),
+            livenessRules: SDKLivenessRules.default,
+            nfcKeyEntry: SDKAttemptLimits.shared.nfcKeyEntry,
+            livenessStepFailure: SDKAttemptLimits.shared.livenessStepFailure
         )
 
         // Konuşma tanıma (Speech) — okunacak/soylenecek cümle sunucudan gelir.
@@ -155,6 +170,11 @@ enum ShowcaseMockData {
         m.modulesControllersArray = s.modulesControllersArray
         m.manipulatedModulesControllersArray = s.manipulatedModulesControllersArray
         m.moduleStepOrder = s.moduleStepOrder
+        s.moduleLimits.forEach { SDKAttemptLimits.shared.set($1, for: $0) }
+        s.faceModes.forEach { SDKFaceConfig.shared.setMultipleFaces($1, for: $0) }
+        SDKLivenessRules.default = s.livenessRules
+        SDKAttemptLimits.shared.nfcKeyEntry = s.nfcKeyEntry
+        SDKAttemptLimits.shared.livenessStepFailure = s.livenessStepFailure
 
         snapshot = nil
     }

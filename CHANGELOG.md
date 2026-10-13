@@ -7,6 +7,50 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### 3.2.0
+
+**Yeni**
+- Başka ülkenin kimlik kartı taranabiliyor: `SDKIdCardFormat`, `IdentifyManager.shared.idCardFormat` ile verilir. Verilmezse TC kimlik kartı akışı değişmez.
+- OCR alfabesi dışarıdan verilebiliyor: `ScannerAlphabet` (`.turkish` varsayılan).
+- MRZ kuralı ülke kodu alıyor: `MRZRequirement.issuingState` (varsayılan `"TUR"`). Doğrulanan MRZ değerleri `RecognizedDocument.fields` ile geliyor.
+- Hatalar kodu, kaynağı ve kalan hakkıyla `SDKErrorConfig.shared.onError`'a geliyor. Gösterimi SDK, host ya da ikisi birden yapar. Çekimin şekli `SDKErrorInfo.captureMode` ile okunur.
+- Canlılıkta adım süresi ve yanlış hareket denetimi `SDKLivenessRules.default` ile ayarlanıyor.
+- Kadrajda birden fazla yüz `SDKFaceConfig.shared` ile denetleniyor.
+- Sesli okumada sessiz anahtar, eylem bazında mod ve metin (`SDKSpeechConfig`), `SDKSpeechService.speak(text:in:action:)` ve `speakAfterCurrent(text:key:in:)`.
+- Başlık çubuğundaki düğmeler özelleştirilebiliyor: `SDKTheme.shared.navBar.buttons` ile geri, yardım ve menü düğmeleri gizlenir, yardım düğmesine işlev verilir (`onHelp`), host düğmesi eklenir (`trailing`).
+- Sunucu kontratına göre bağlantı hız testi: `startConnectionSpeedTest` / `cancelConnectionSpeedTest`, TURN ölçümü ve `lastSpeedTestReport`. Hazırlık ekranında `useConnectionSpeedTest = true` ile açılır, varsayılan eski speedtest.
+- İşaret dili tercihi host'un kendi ekranından verilebiliyor: `setupSDK(signLangPreference:)`.
+- Kimlik tarayıcısında alan kilitleme (`ScannerAutomation.fieldLocking`).
+- Kimlik arka yüzünün MRZ'si ön yüzde okunanlarla karşılaştırılıyor: `ScannerConfiguration.expectedMRZValues`.
+- Kimlik tarayıcısına yeni yönergeler: hazırlanıyor, hizalayın, kimlik tespit edilemedi, yatay tutun, ters duruyor, eğik duruyor, okunamıyor (`ScannerGuidanceTexts`). Yönergeler seslendiriliyor (`ScannerAutomation.guidanceSpeech`).
+- Kimlik tarayıcısında yönerge metni ve "Manuel Çek" düğmesi kaldırılabiliyor: `ScannerConfiguration.showsGuidanceDefault = false` yönerge satırını, `ScannerAutomation.default.manualCaptureFallback = false` düğmeyi kaldırır.
+- Kimlik tarayıcısı ayarları: çerçeve çizgisi (`QuadrilateralStyle(frameOutline:)`), algılamayı durdurma (`pausesDetection`), çekim hızı ve düşük ışık eşikleri (`ScannerTimingConfig`, `ScannerAutomation.exposureBoost`).
+-  DocumentProfile alanlarının etiketi, bölgesi ve deseni tek çağrıyla değişiyor: `settingLabelAnchor`, `settingRegionOfInterest`, `settingPattern`.
+- Görüşme boyunca bağlantı kalitesi (`turnStats`) ve görüşme canlılığı ölçülüp sunucuya gönderiliyor.
+
+**Değişti**
+- Deneme hakları tek yerde toplandı: `SDKAttemptLimits.shared`. Karşılaştırma tutmadığında kullanıcının kaç kez deneyebileceği ve hak bitince modülün atlanacağı ya da akışın biteceği modül bazında buradan ayarlanıyor. Değer verilmezse eskisi gibi sunucunun ayarı geçerli.
+- Bağlantı kopması kuralları `SDKConnectionPolicy` altında toplandı: oturum başına izin verilen kopma sayısı, sınır dolunca yapılacak iş ve otomatik yeniden bağlanma denemesi.
+- Canlılıkta adım süresi 10 saniyeye çıktı bu değer daha sonradan değiştirilebiliyor. Adım hatası hakkı her adım için ayrı sayılıyor, başka bir adımın hareketi hata sayılıyor.
+- Karşılaştırma hakları modül başına sayılıyor. NFC okuma hakkı dolunca modül atlanmıyor, anahtar düzeltme ekranı açılıyor. bu senaryolar entegratör tarafından değiştirilebiliyor.
+- Kimlik ekranında otomatik çekim de hata ekranları çıkartabiliyor: `.idErrorAlert(_:isSilent:onDismiss:)`.
+- Ad alanlarında alfabe dışı harf okunursa alan reddediliyor (`rejectedFields`). Türkçe harf düzeltme tablosu genişledi.
+- Alan kilitleme varsayılan açık: her zorunlu alanın bir kez geçerli okunması çekim için yeter.
+- `ScannerGuidanceTexts.orientation` artık ekranda gösteriliyor. Kimlik için varsayılan metin "Kimliği yatay tutun".
+- Bağlantı koptu ekranındaki "Yeniden Bağlan" düğmesi internet yok göründüğünde de basılabiliyor. Önceden Wi-Fi'dan hücresele geçerken düğme birkaç saniye kilitleniyor, kullanıcı yeniden bağlanamıyordu.
+- `SDKFlowCoordinator` akışlarında oda reddinin sonucu (`roomOccupied`), kullanıcı uyarıda Çıkış'a basınca bildiriliyor.
+- Hazırlık ekranında hız testi sonucu üç metinle gösteriliyor: iyi, orta, zayıf.
+
+**Düzeltildi**
+- Cevapsız çağrıda ön kamera açık kalıyordu. Artık kamera kapanıyor, zil duruyor.
+- Gölgede çekilen kartta alan okuma iyileştirmesi yapıldı.
+- `keepsCameraRunning` açıkken çekimden hemen sonra ikinci bir çekim başlayabiliyordu.
+- `ScannerAutomation.manualCaptureFallback = false` verildiğinde elle çekim düğmesi yine çıkabiliyordu.
+- Kimliğin arka yüzündeki MRZ'de dolgu işareti (`<`) harf okunduğunda ad ve soyad panele yanlış gidiyordu.
+- İşaret dili seçiminden sonra yeniden bağlanmada adım bilgisi (`stepChanged`) gönderilmiyordu.
+- `coordinator.insert` ile eklenen ekranlar açıkken sonraki modül sunucuya erken bildiriliyordu. Araya eklenen ekran ilerlemek için `advanceExternal()` çağırmalı.
+- "Bağlantı kurulamadı" uyarısında Çıkış'a basılınca sonuç `cancelled / hostExit` geliyordu, artık `cancelled / userExited`.
+
 ### 3.1.2
 
 **Düzeltildi**

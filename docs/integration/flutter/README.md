@@ -1,11 +1,11 @@
 # IdentifySDK — Flutter Entegrasyonu
 
-Bu rehber, `IdentifySDK` (iOS KYC kimlik doğrulama SDK'sı) için bir **Flutter plugin
-köprüsü** kurmayı ve SDK'nın **birleşik olay akışını** (SDKEvent) Dart tarafında bir
-`Stream` olarak dinlemeyi anlatır. Köprü iskeleti bu klasördedir.
+Bu rehber, iOS KYC SDK'sı `IdentifySDK` için bir Flutter plugin köprüsünün nasıl kurulacağını ve
+SDK'nın olay akışının (SDKEvent) Dart tarafında bir `Stream` olarak nasıl dinleneceğini anlatır.
+Köprünün iskelet dosyaları bu klasörde.
 
-> SDK yalnızca iOS'tur. Android için ayrı bir SDK gerekir (bu pakette yoktur);
-> plugin'i `Platform.isIOS` ile koşullayın.
+> SDK yalnızca iOS'ta çalışır. Android için ayrı bir SDK gerekir ve bu pakette yoktur.
+> Plugin çağrılarını `Platform.isIOS` kontrolünün içine alın.
 
 ---
 
@@ -16,9 +16,9 @@ köprüsü** kurmayı ve SDK'nın **birleşik olay akışını** (SDKEvent) Dart
 `https://github.com/2sworks/id24.tr-ios-sdk-spm`
 (XCFramework + OpenSSL/Starscream/WebRTC/SwiftSignatureView/PermissionsKit).
 
-**Dependency Rule `Exact Version` olmalı** (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılır;
-Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış
-sürümü çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
+Dependency Rule'u `Exact Version` yapın (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
+Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış sürümü
+çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
 `ios/Runner/Info.plist` izinleri:
 
@@ -31,44 +31,44 @@ sürümü çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ek
 ### Köprü dosyaları
 | Dosya | Konum | Görev |
 |---|---|---|
-| `IdentifySdkPlugin.swift` | plugin: `ios/Classes/` — doğrudan uygulama: `ios/Runner/` | MethodChannel (`setupSDK`, `setTheme`, `resetTheme`, `reportAbandoned`) + EventChannel (olaylar) |
+| `IdentifySdkPlugin.swift` | plugin olarak: `ios/Classes/`; doğrudan uygulamada: `ios/Runner/` | MethodChannel (`setupSDK`, `setTheme`, `resetTheme`, `reportAbandoned`) + EventChannel (olaylar) |
 | `identify_sdk.dart`       | `lib/identify_sdk.dart` | Dart sarmalayıcı + `SDKEvent` modeli + `Stream` |
-| `../theme.example.json`   | `assets/identify_theme.json` (+ `pubspec.yaml` → `assets:`) | isteğe bağlı başlangıç teması; `setTheme` ile gönderilir |
+| `../theme.example.json`   | `assets/identify_theme.json` (+ `pubspec.yaml` → `assets:`) | İsteğe bağlı başlangıç teması; `setTheme` ile gönderilir |
 
 Plugin'i `Runner` içine koyduysanız `AppDelegate`'te kaydedin:
 `IdentifySdkPlugin.register(with: registrar(forPlugin: "IdentifySdkPlugin")!)`.
 
-Plugin dört metot açar:
+Plugin'in Dart'a açtığı metotlar:
 
 | Dart | Native karşılığı | Ne zaman |
 |---|---|---|
-| `IdentifySdk.setTheme(map)` → `unknownKeys` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan **önce**; hot reload yeter, derleme yok |
-| `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönüş |
-| `IdentifySdk.setupSDK(...)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | akışı başlatır |
-| `IdentifySdk.events` (`Stream<SDKEvent>`) | `SDKEventListener` → `EventChannel` | `listen` **önce**, sonra `setupSDK` |
-| `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | kullanıcı akışı Dart tarafından terk ettiğinde |
+| `IdentifySdk.setTheme(map)` → `unknownKeys` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan önce. Hot reload yeterli, derleme gerekmez |
+| `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönmek için |
+| `IdentifySdk.setupSDK(...)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | Akışı başlatır |
+| `IdentifySdk.events` (`Stream<SDKEvent>`) | `SDKEventListener` → `EventChannel` | Önce `listen`, sonra `setupSDK` |
+| `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | Kullanıcı akışı Dart tarafında terk ettiğinde |
 
 ### Örnek uygulamadan kopyalanacaklar (iOS tarafı)
 
-Köprü dosyaları dışında örnekten alınacak bir şey yoktur; ekranlar XCFramework'ün içindedir.
-İki istisna:
+Ekranlar XCFramework'ün içinde olduğu için köprü dosyaları dışında örnekten bir şey almanız
+gerekmez. İki istisna var:
 
 | Kaynak | Hedef | Ne zaman |
 |---|---|---|
 | `IdentifySample/SupportingFiles/*.cer` | `ios/Runner/` + *Copy Bundle Resources* | `useSslPinning: true` ise zorunlu |
-| `IdentifySample/Modules/<Modül>/<Modül>CustomView.swift` (kamera kullananlar için ek olarak `IdentifySample/Modules/CustomKit/CustomCameraPreview.swift` + `CustomComponents.swift`) | `ios/Runner/Modules/` | bir SDK ekranını **native tarafta** kendi tasarımınızla değiştirecekseniz (`registry.override`): SDK ekranının public API ile yazılmış birebir, çalışan kopyası; özelleştirme bu dosya üzerinde yapılır. Dart'tan ekran override edilemez |
+| `IdentifySample/Modules/<Modül>/<Modül>CustomView.swift` (kamera kullananlarda ayrıca `IdentifySample/Modules/CustomKit/CustomCameraPreview.swift` + `CustomComponents.swift`) | `ios/Runner/Modules/` | Bir SDK ekranını native tarafta kendi tasarımınızla değiştirecekseniz (`registry.override`). Bu dosya SDK ekranının public API ile yazılmış, çalışan bir kopyasıdır; özelleştirmeyi bunun üzerinde yaparsınız. Dart'tan ekran değiştirilemez |
 
-`IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift` kopyalanmaz ama
-referans olarak okunmalıdır: `prepareForSetup()` → `setupSDK` → `start()` sıralaması ve akışın
-`SDKFlowHostView` ile sunumu orada çalışır hâlde durur.
+`IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift`'i kopyalamanız
+gerekmez ama okuyun: `prepareForSetup()` → `setupSDK` → `start()` sırası ve akışın
+`SDKFlowHostView` ile gösterilmesi orada çalışan haliyle duruyor.
 
-**Dart'tan yapılamayan üç şey**, `IdentifySdkPlugin.swift` içinde yapılır:
+Dart'tan yapılamayan üç şeyi `IdentifySdkPlugin.swift` içinde yaparsınız:
 
 | Ne | Nerede |
 |---|---|
-| Yeni bir görsel (logo) eklemek | iOS asset kataloğu; Dart yalnız **adını** gönderir (`icons.headerLogo`) |
-| Dil ve metin override'ı | `setupSDK` dalının başına `IdentifyManager.shared.setSDKLang(lang:)` ve `SDKLocalization.shared.registerOverrides([.tr: ["IdVerifyTitle": "…"]])`; isterseniz `setupSDK` argümanlarına `language` ekleyip Dart'tan geçirin |
-| Cihaz yeteneği politikası (TrueDepth/NFC yoksa) | bkz. [§2.2](#22-cihaz-yetenekleri--native-tarafta-ayarlanır) |
+| Yeni bir görsel (logo) eklemek | iOS asset kataloğu. Dart yalnızca görselin adını gönderir (`icons.headerLogo`) |
+| Dil ve metin override'ı | `setupSDK` dalının başına `IdentifyManager.shared.setSDKLang(lang:)` ve `SDKLocalization.shared.registerOverrides([.tr: ["IdVerifyTitle": "…"]])` ekleyin. İsterseniz `setupSDK` argümanlarına `language` ekleyip dili Dart'tan geçirin |
+| Cihaz yeteneği politikası (TrueDepth ya da NFC yoksa) | bkz. [§2.2](#22-cihaz-yetenekleri--native-tarafta-ayarlanır) |
 
 ---
 
@@ -112,9 +112,9 @@ await sub.cancel();
 
 ### Hata kontrolü — `E_SETUP` tuzağı
 
-`setupSDK` geri çağrısındaki hata parametresi **her zaman doludur**; başarılı kurulumda
-`errorMessages` boş string olur. Köprüde `if let error = error { ... }` yazılırsa akış
-hiç başlamadan `E_SETUP` ile başarısız olur. Doğru kontrol mesajın dolu olmasıdır:
+`setupSDK` geri çağrısındaki hata parametresi hiçbir zaman `nil` gelmez; kurulum başarılıysa
+`errorMessages` boş string olur. Köprüde `if let error = error { ... }` yazarsanız akış daha
+başlamadan `E_SETUP` hatasıyla biter. Mesajın dolu olup olmadığına bakın:
 
 ```swift
 if let message = error?.errorMessages, !message.isEmpty {
@@ -127,8 +127,8 @@ guard socket?.isConnected == true, roomResponse.result == true else { ... }
 
 ## 2.1) Tema — native derleme olmadan
 
-SDK'nın hazır ekranlarının görünümü Dart'tan uygulanır; renk/logo/köşe denemesi için
-**yeniden derleme gerekmez**, hot reload yeterlidir.
+SDK'nın hazır ekranlarının görünümünü Dart'tan ayarlarsınız. Renk, logo ya da köşe denerken
+yeniden derlemeniz gerekmez; hot reload yeterli.
 
 ```dart
 final unknownKeys = await IdentifySdk.instance.setTheme({
@@ -150,19 +150,24 @@ if (unknownKeys.isNotEmpty) debugPrint('Tema: tanınmayan anahtar $unknownKeys')
 await IdentifySdk.instance.resetTheme();   // SDK varsayılanlarına dön
 ```
 
-Renk değeri `'#RRGGBB'` ya da `{'light': ..., 'dark': ...}`; köşe `'capsule'` ya da sayı.
-Bölümler: `colors`, `fonts`, `metrics`, `buttons`, `navBar`, `selection`, `alerts`,
+Renkler `'#RRGGBB'` ya da `{'light': ..., 'dark': ...}` olarak, köşeler `'capsule'` ya da sayı
+olarak verilir. Bölümler: `colors`, `fonts`, `metrics`, `buttons`, `navBar`, `selection`, `alerts`,
 `banners`, `fields`, `sheets`, `capture`, `controls`, `call`, `motion`, `icons`.
-Tüm anahtarlar: [Tema Rehberi](../../guides/theming.md) ·
+Bütün anahtarlar: [Tema Rehberi](../../guides/theming.md) ·
 örnek sözlük: [theme.example.json](../theme.example.json).
 
-> **Header'daki marka işareti** `icons.logo` değil `icons.headerLogo`'dur. `logo` giriş
-> ekranı ve kamera üstü başlıkta kullanılır.
+> Başlık çubuğundaki marka işaretinin anahtarı `icons.headerLogo`. `icons.logo` giriş ekranında
+> ve kamera ekranlarının üstündeki başlıkta kullanılır.
+
+Başlık çubuğundaki geri, yardım ("?") ve menü düğmelerini `navBar.buttons` ile gizleyebilirsiniz
+(`showsBack`, `showsHelp`, `showsMenu`). Kendi düğmenizi eklemek ve yardım düğmesine iş bağlamak
+Swift closure'ı gerektirdiği için `IdentifySdkPlugin.swift` içinde yapılır. Ayrıntı:
+[Tema Rehberi → Başlık Çubuğu Düğmeleri](../../guides/theming.md#başlık-çubuğu-düğmeleri).
 
 ## 2.2) Cihaz yetenekleri — native tarafta ayarlanır
 
-Bunlar tema değil **akış politikasıdır** ve köprüden geçmez; `IdentifySdkPlugin.swift`
-içinde, `setupSDK` çağrısından **önce** ayarlanır:
+Bu ayarlar tema değil, akış politikası; köprüden geçmez. `IdentifySdkPlugin.swift` içinde
+`setupSDK` çağrısından önce ayarlanır:
 
 ```swift
 // IdentifySdkPlugin.swift — setupSDK'dan önce
@@ -176,22 +181,22 @@ SDKHapticConfig.shared.stepFeedbackIntensity = 0.6      // 0…1
 
 | Ne | Ne zaman devreye girer |
 |---|---|
-| `faceTrackingFallback` | Cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth'siz A11 ve öncesi): `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler — `.selfie` (varsayılan) ya da `.skip` |
-| `selfieWithLivenessTrueDepth` | Selfie + canlılık ekranının derinlik kullanımı: `.automatic` (varsayılan), `.required` (yalnız TrueDepth kamerada), `.disabled` (ARKit yok, Vision ile her cihazda — derinlik koruması yok). [Ayrıntı](../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) |
-| NFC | iPad'de ve NFC'siz iPhone'larda modül otomatik çıkarılır; panele `NFCStatus = notAvailable` gider. Bilgi sayfası için `setupSDK(..., showNFCNotFoundPage: true)` |
-| `SDKHapticConfig` | Çekim rampası + canlılık adım darbesi; ikisi de kapatılabilir |
+| `faceTrackingFallback` | Cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth kamerası olmayan A11 ve öncesi). `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler: `.selfie` (varsayılan) ya da `.skip` |
+| `selfieWithLivenessTrueDepth` | Selfie + canlılık ekranının derinlik kamerasını nasıl kullanacağı: `.automatic` (varsayılan), `.required` (yalnızca TrueDepth kamerası olan cihazlarda), `.disabled` (ARKit kullanılmaz, Vision ile her cihazda çalışır ama derinlik kontrolü olmaz). [Ayrıntı](../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) |
+| NFC | iPad'de ve NFC'siz iPhone'larda modül kendiliğinden çıkarılır ve panele `NFCStatus = notAvailable` gider. Kullanıcıya bilgi sayfası göstermek için `setupSDK(..., showNFCNotFoundPage: true)` |
+| `SDKHapticConfig` | Çekim sırasındaki artan titreşim ve canlılık adımlarındaki titreşim; ikisi de kapatılabilir |
 
-Dart tarafında bu durumları olaylardan izlersiniz: atlanan adım `module.<Modül>.skipped`
+Dart tarafında bu durumları olaylardan takip edersiniz: atlanan adım `module.<Modül>.skipped`
 olarak gelir.
 
-SDK iPhone ve iPad'de çalışır, yönelim ikisinde de portrait'e kilitlidir.
+SDK iPhone ve iPad'de çalışır; ekran ikisinde de dikey konuma kilitlidir.
 Ayrıntı: [iPad Desteği](../../guides/ipad-support.md).
 
 ---
 
 ## 3) Olay (SDKEvent) yapısı
 
-EventChannel, native `SDKEvent.toDictionary()` çıktısını **olduğu gibi** Dart'a iletir.
+EventChannel, native `SDKEvent.toDictionary()` çıktısını değiştirmeden Dart'a iletir.
 `SDKEvent.fromMap` bunu modele çevirir:
 
 ```dart
@@ -214,17 +219,17 @@ class SDKEvent {
 |---|---|---|---|
 | `session.started` | session | `setupSDK` | Oturum başladı |
 | `module.<Modül>.presented` | module | Ekran açıldığında | Kullanıcı o ekranda (lastScreen güncellenir) |
-| `module.<Modül>.completed` | module | Modül bitince | Adım başarıyla tamamlandı |
-| `module.<Modül>.failed` | module | Modül hata | Adım başarısız |
-| `module.<Modül>.skipped` | module | Atlanınca | Adım atlandı |
-| `call.connected` | call | Çağrı başlayınca | Görüşme başladı |
-| `call.ended` | call | Çağrı bitince | Görüşme bitti (metadata['statusSummary']) |
+| `module.<Modül>.completed` | module | Modül bittiğinde | Adım başarıyla tamamlandı |
+| `module.<Modül>.failed` | module | Modül hata verdiğinde | Adım başarısız |
+| `module.<Modül>.skipped` | module | Modül atlandığında | Adım atlandı |
+| `call.connected` | call | Çağrı başladığında | Görüşme başladı |
+| `call.ended` | call | Çağrı bittiğinde | Görüşme bitti (metadata['statusSummary']) |
 | `session.finished` | session | Oturum nasıl biterse bitsin, bir kez | Nihai sonuç: `metadata['result']`, `endReason`, `terminateReason`, `statusSummary`, `lastModule` (3.1.0) |
-| `session.completed` | session | `result == approved` | Oturum **başarıyla** kapandı (status `success`) |
-| `session.failed` | session | `rejected` · `neutral` · `notCompleted` · `error` | Oturum **başarısız** kapandı |
-| `session.abandoned` | session | `cancelled` | Kullanıcı ya da host çıktı (metadata['lastScreen'] = nerede kaldı) |
+| `session.completed` | session | `result == approved` | Oturum başarıyla kapandı (status `success`) |
+| `session.failed` | session | `rejected` · `neutral` · `notCompleted` · `error` | Oturum başarısız kapandı |
+| `session.abandoned` | session | `cancelled` | Kullanıcı ya da host çıktı (metadata['lastScreen'] kullanıcının kaldığı ekran) |
 
-Metadata anahtarlarının tamamı: [Event Sistemi → Oturum Sonucu Olayları](../../guides/events.md#oturum-sonucu-olayları-310) · tüm çıkış yolları ve kapanış sonrası yönlendirme: [Oturum Çıkışları](../../guides/session-exit.md#95-react-native--flutter).
+Metadata anahtarlarının tamamı: [Event Sistemi → Oturum Sonucu Olayları](../../guides/events.md#oturum-sonucu-olayları-310) · bütün çıkış yolları ve kapanıştan sonra yönlendirme: [Oturum Çıkışları](../../guides/session-exit.md#95-react-native--flutter).
 
-> **Geriye uyumluluk:** Bu birleşik akış, SDK'nın mevcut `IdentifyTrackingListener`
-> mekanizmasının **yanına** eklenmiştir; mevcut entegrasyonları bozmaz.
+> Bu olay akışı SDK'daki `IdentifyTrackingListener`'ın yanına eklendi, onun yerini almadı.
+> Mevcut entegrasyonlar olduğu gibi çalışmaya devam eder.

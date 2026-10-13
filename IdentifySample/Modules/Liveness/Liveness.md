@@ -130,6 +130,10 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 | `abandonRecording()` | Ekrandan çıkışta kaydı bırakır |
 | `noteWillResignActive()` / `noteDidBecomeActive()` | Uygulama aktiflik bildirimleri (kesilen kayıt yönetimi) |
 | `reportFaceTrackingUnsupported()` | Cihaz ARKit yüz takibini desteklemiyor — modül atlanır |
+| `trackingDidStart()` / `trackingDidPause()` | Yüz takibi açıldı / durdu. Adım süresi (`SDKLivenessRules.default.stepTimeout`) yalnız takip açıkken işler |
+| `faceVisibilityChanged(_:)` | Yüz kadraja girdi ya da çıktı; `isFaceVisible` güncellenir |
+| `multipleFacesChanged(_:)` | Birden fazla yüz izleniyor (`SDKFaceConfig`); `hasMultipleFaces` güncellenir, `.fail` modunda hata gösterilir |
+| `reportWrongAction(_:)` | İstenen yerine başka bir hareket yapıldı (`SDKLivenessRules.default.wrongActionCheck`); hata gösterilir, haktan düşer |
 | `fetchNextStep()` | Sıradaki adımı sunucudan alır; `init` ve `uploadFrame` zaten çağırır |
 | `finishRecordingAndUpload()` / `uploadVideo(videoData:)` | İç akış; son adımda VM kendisi çağırır |
 | `resetTest()` | Testi başa alır |
@@ -213,3 +217,6 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
   `stepFeedbackIntensity` (0…1, vars. 0.6) ile şiddeti ayarlanır.
 - **iPad:** Face ID'li iPad Pro'da derinlikli, A12+ Touch ID'li iPad'lerde (iPad 8+, mini 5+, Air 3+) derinliksiz çalışır. Yüz ovali tablette pencereyle
   birlikte büyümez; `SDKLayout.maxFaceGuideWidth` ile sınırlanır.
+- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
+  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.liveness] = SDKNavBarButtons(showsHelp: false)`;
+  işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

@@ -915,6 +915,14 @@ private struct DebugSettingsView: View {
                             )
                         }
 
+                        DebugSection(title: "Hız testi") {
+                            DebugToggleRow(
+                                title: "Yeni hız testi",
+                                subtitle: "Hazırlık ekranında sunucu testi çalışır. Kapalıyken eski test (google.com).",
+                                isOn: $debug.connectionSpeedTest
+                            )
+                        }
+
                         DebugSection(title: "Selfie + Canlılık") {
                             VStack(alignment: .leading, spacing: IDSpacing.sm) {
                                 Text("TrueDepth modu")

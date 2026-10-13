@@ -57,6 +57,7 @@ Kamera/ARKit ve çizim sizin; ölçüm, durum makinesi, çekim zamanı, yükleme
 |---|---|
 | `updatePreviewSize(_:)` + `beginSession()` | Oval geometrisi (`ovalRect`, `ovalScale`), ısınma, durum makinesi |
 | `.arkit`: her takip karesinde `analyzeFace(SDKFaceObservation)` / yüz yokken `analyzeNoFace()` | Işık/eğim/mesafe/konum eşikleri (histerezis), küçük→büyük oval geçişi, tutma süresi → `guidanceText`, `phase`, `holdProgress`, `isFaceAligned` |
+| `.arkit`: birden fazla yüz izlenirken `analyzeMultipleFaces()` (`maximumNumberOfTrackedFaces` 2'ye çıkarılır) | `SDKFaceConfig` moduna göre uyarı ya da hata |
 | `.vision`: her kamera karesinde `analyzeFrame(_:cameraPosition:)` | Aynı durum makinesi; ölçüm Vision ile (mesafe = yüz/oval oranı, eğim ölçülmez) |
 | `shouldCapture` → kare alınır → `presentCaptured(image:)` | Titreşimin bitişi, yükleme, `SDKComparisonGate` kararı, deneme sayacı → `onCompleted` / `onSkipRequested` / `onFlowFailed`, `errorMessage` + `pendingAlertAction` |
 | `isSessionActive` / `sessionGeneration` gözlenir | AR/kamera oturumunun ne zaman açılıp duraklatılacağı (çekimden sonra kapanır, hata alert'i kapanınca yeniden açılır) |
@@ -104,6 +105,10 @@ struct MySwlView: View {
 `SelfieWithLivenessCustomView.swift` içindeki `FaceTrackingCameraView`'dadır.
 
 **Tema** ekran yazmadan da çalışır ([Tema rehberi](../../../docs/guides/theming.md)).
+
+Üst çubuktaki yardım (?) düğmesine SDK bir işlev bağlamaz, basılınca bir şey olmaz. Bu ekrandan
+kaldırmak için `SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false)`;
+işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).
 
 ## TrueDepth Modu
 

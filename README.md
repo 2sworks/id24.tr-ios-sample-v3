@@ -133,6 +133,7 @@ Kaynak dosya kopyalamanız gerekmez — tek isteğe bağlı dosya, projenize ekl
 | Buton biçimi | tümü: `SDKTheme.shared.buttons.base.corner = .radius(12)`, `buttons.base.height = 54` · tek stil: `SDKTheme.shared.buttons[.secondary].borderWidth = 1` |
 | Başlık çubuğu tasarımı | `SDKTheme.shared.navBar.preset = .centered` (`classic / centered / minimal / prominent`) |
 | Başlık çubuğunda marka adı | `SDKTheme.shared.navBar.brandTitle = "Acme Bank"` + `navBar.titleMode = .brandWithModule` |
+| Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsHelp = false` (`showsBack`, `showsMenu`) · yardıma işlev: `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: false)` |
 | Logo / geri / yardım / menü ikonu | `SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))` — anahtarlar `SDKIconKey`; geri al: `resetIcon(_:)` |
 | Titreşim | `SDKHapticConfig.shared.stepFeedbackEnabled = false` · per-modül `setEnabled(false, for: .selfie)` · hepsi `setEnabledForAll(false)` |
 | Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın |
@@ -246,6 +247,7 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Sunucu & API](docs/guides/server-api.md) | `setupSDK` tüm parametreleri, `RoomResponse`, modül sırası, SSL pinning |
 | [WebSocket](docs/guides/websocket.md) | Soket aksiyonları, `socket_auth` token'ı, reconnect ve LostConnection katmanı |
 | [TURN & WebRTC](docs/guides/turn-webrtc.md) | STUN/TURN kimlik üretimi, şifreli TURN, görüşme akışı |
+| [Bağlantı Hız Testi](docs/guides/speed-test.md) | Eski ve yeni hız testi, `useConnectionSpeedTest`, `blockIdent`, görüşme öncesi ölçüm senaryosu |
 | [Loglama](docs/guides/logging.md) | `SDKLog` facade'i, severity/kategori, online log, redaksiyon |
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
 | [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
@@ -271,11 +273,14 @@ registry.override(.selfie) { MySelfieView() }
 // C) Araya kendi ekranını sok (tanıtım, sözleşme, başarı...)
 registry.custom("welcome") { MyIntroView() }
 coordinator.insert(["welcome"], before: .selfie)
+// MyIntroView'ın Devam butonu: coordinator.advanceExternal()
 ```
 
 Tek altın kural: custom ekranınız **iş mantığını SDK ViewModel'ine bırakmalı**
 (taramayı `vm.scanFront(image:)`, geçişi `coordinator.advanceToNextModule()` yapar).
-Kendi HTTP isteğinizi atarsanız backend akışı ilerlemez.
+Kendi HTTP isteğinizi atarsanız backend akışı ilerlemez. Araya eklenen (C) ekranlar
+bunun dışındadır: modül değildirler ve `coordinator.advanceExternal()` ile ilerlerler
+([ayrıntı](docs/guides/customization.md#ara-ekrandan-ilerlemek-advanceexternal)).
 
 **B için başlangıç noktası hazır:** her modül klasöründe `XxxCustomView.swift` vardır —
 SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (15 ekran). Projeye kopyalanır, `registry.override(...)` ile takılır,
