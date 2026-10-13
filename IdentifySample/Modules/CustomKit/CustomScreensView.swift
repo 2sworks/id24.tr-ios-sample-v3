@@ -79,8 +79,6 @@ struct CustomScreensView: View {
             .navigationBarHidden(true)
         }
         .navigationViewStyle(.stack)
-        // "Hataları kendim göster" açıkken hata penceresi (RootView'deki pencere bu örtünün altında kalır).
-        .customErrorPopup()
     }
 
     private var header: some View {

@@ -22,7 +22,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // burada işlenir. Çağrılmazsa katmanlar kapalı varsayılanlarıyla çalışır.
         SDKDebugSettings.shared.apply()
         SDKReadAloudSetting.apply()
-        SDKCustomErrorSetting.apply()
         // Panelde hangi sekmelerin açılacağı burada belirlenir; panel yalnız login
         // ekranındaki "Network Debug (Netfox)" anahtarı açıldığında kurulur.
         SDKLogPanel.configure(requests: true, console: true, socket: true)

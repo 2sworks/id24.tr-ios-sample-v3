@@ -587,7 +587,6 @@ enum ShowcaseScenarios {
                                 run: { m.ocrComparisonCount = 0 })
                       ]),
                 limitGroup(.idCard),
-                errorGroup
             ]
 
         // MARK: Kimlik OVD (hologram)
@@ -630,7 +629,6 @@ enum ShowcaseScenarios {
                                 run: { SDKDocumentSelectionConfig.shared.ovd.options = [.passport] })
                       ]),
                 limitGroup(.idcard_w_ovd),
-                errorGroup
             ]
 
         // MARK: NFC
@@ -679,7 +677,6 @@ enum ShowcaseScenarios {
                                 note: "İlk hatada ekran açılır.",
                                 run: { SDKAttemptLimits.shared.nfcKeyEntry = .manual(1) })
                       ]),
-                errorGroup
             ]
 
         // MARK: Selfie
@@ -705,7 +702,6 @@ enum ShowcaseScenarios {
                       ]),
                 limitGroup(.selfie),
                 multipleFacesGroup(.selfie, note: "SDKFaceConfig.shared.setMultipleFaces(_:for: .selfie). Varsayılan: uyar. Arkadaki küçük yüzler sayılmaz."),
-                errorGroup
             ]
 
         // MARK: Canlılık
@@ -725,12 +721,12 @@ enum ShowcaseScenarios {
                 .init(title: "Adım kuralları",
                       note: "SDKLivenessRules.default. Süre yalnız yüz takibi açıkken işler; hata ya da yükleme sırasında durur.",
                       controls: [
-                        .action(title: "Adım süresi 5 sn (varsayılan)",
-                                note: "Hareket 5 sn içinde yapılmazsa hata gösterilir.",
-                                run: { SDKLivenessRules.default.stepTimeout = 5 }),
-                        .action(title: "Adım süresi 10 sn",
-                                note: "Daha uzun bekleme.",
+                        .action(title: "Adım süresi 10 sn (varsayılan)",
+                                note: "Hareket 10 sn içinde yapılmazsa hata gösterilir.",
                                 run: { SDKLivenessRules.default.stepTimeout = 10 }),
+                        .action(title: "Adım süresi 5 sn",
+                                note: "Daha kısa bekleme.",
+                                run: { SDKLivenessRules.default.stepTimeout = 5 }),
                         .action(title: "Adım süresi kapalı",
                                 note: "Süre sınırı yok.",
                                 run: { SDKLivenessRules.default.stepTimeout = nil }),
@@ -739,7 +735,7 @@ enum ShowcaseScenarios {
                               get: { SDKLivenessRules.default.wrongActionCheck },
                               set: { SDKLivenessRules.default.wrongActionCheck = $0 }),
                         .action(title: "Adım hatası hakkı: 3 (varsayılan)",
-                                note: "SDKAttemptLimits.shared.livenessStepFailure. Süre aşımı ve yanlış hareket bu haktan düşer.",
+                                note: "SDKAttemptLimits.shared.livenessStepFailure. Süre aşımı ve yanlış hareket adımın hakkından düşer; her adım hakkı baştan alır.",
                                 run: { SDKAttemptLimits.shared.livenessStepFailure = .manual(3) }),
                         .action(title: "Adım hatası hakkı: 1",
                                 note: "İlk hatada hak biter; modül hak kuralına göre atlanır ya da akış biter.",
@@ -747,7 +743,6 @@ enum ShowcaseScenarios {
                       ]),
                 limitGroup(.livenessDetection),
                 multipleFacesGroup(.livenessDetection, note: "SDKFaceConfig.shared.setMultipleFaces(_:for: .livenessDetection). Varsayılan: kapalı. TrueDepth kamera ister."),
-                errorGroup
 
                 // Adım seti (göz kırpma, gülümseme, baş çevirme…) modülün kendi
                 // ViewModel'indeki `allow*` alanlarından gelir ve sunucunun gönderdiği
@@ -777,7 +772,6 @@ enum ShowcaseScenarios {
                       ]),
                 limitGroup(.selfieWithLiveness),
                 multipleFacesGroup(.selfieWithLiveness, note: "SDKFaceConfig.shared.setMultipleFaces(_:for: .selfieWithLiveness). Varsayılan: uyar."),
-                errorGroup
             ]
 
         // MARK: Video kayıt
@@ -807,7 +801,6 @@ enum ShowcaseScenarios {
                                 note: "Uzun kayıt penceresi.",
                                 run: { m.videoRecordDurationSeconds = 15 })
                       ]),
-                errorGroup
             ]
 
         // MARK: Konuşma tanıma
@@ -826,7 +819,6 @@ enum ShowcaseScenarios {
                                 note: "Sunucu cümle göndermediğinde ekranın davranışı.",
                                 run: { m.speechExpectedSentence = "" })
                       ]),
-                errorGroup
             ]
 
         // MARK: İşaret dili
@@ -847,18 +839,6 @@ enum ShowcaseScenarios {
     }
 
     // MARK: Ortak gruplar
-
-    /// Uygulama menüsündeki "Hataları Kendim Göster" anahtarıyla aynıdır.
-    private static var errorGroup: ShowcaseScenarioGroup {
-        .init(title: "Hata gösterimi",
-              note: "SDKErrorConfig.shared.presentation. Uygulama menüsündeki anahtarla aynıdır.",
-              controls: [
-                .flag(title: "Hataları kendim göster",
-                      note: "Açıkken SDK popup açmaz; hata onError ile gelir ve ekranın ortasında örnek pencere açılır.",
-                      get: { SDKCustomErrorSetting.isEnabled },
-                      set: { SDKCustomErrorSetting.isEnabled = $0 })
-              ])
-    }
 
     /// Entegratörün karşılaştırma hakkı ve hak bitince kuralı.
     private static func limitGroup(_ module: SdkModules) -> ShowcaseScenarioGroup {

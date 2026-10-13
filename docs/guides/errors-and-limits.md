@@ -53,8 +53,10 @@ viewModel.scanFront(document: document)
 
 Yalnız görüntüyle çağırıyorsanız şekli siz verirsiniz: `scanFront(image:captureMode:)`.
 
-Örnek uygulama popup'ı yalnız manuel çekimin hatasında açar; otomatik çekimde `dismiss()`
-çağırıp geçer:
+SDK'nın popup'ı otomatik çekimin hatasında açılmaz. Hata kapatılmış sayılır ve kullanıcı aynı
+yüzü yeniden tarar; hak bittiyse modül mesaj gösterilmeden atlanır ya da akış biter. Manuel
+çekimin hatası popup olarak gösterilir. Hatayı kendiniz gösteriyorsanız aynı kuralı `onError`
+içinde uygulayın:
 
 ```swift
 SDKErrorConfig.shared.onError = { info, dismiss in
@@ -83,6 +85,14 @@ kalmasın diye SDK popup'ı yine açılır. Görüntülü görüşme ekranındak
 
 Kendi modül ekranınızı yazdıysanız `.idErrorAlert` bu ayara zaten uyar. Hatayı başka bir
 yolla çiziyorsanız (bant, toast) `SDKErrorConfig.shared.showsSDKPopup` false iken çizmeyin.
+
+Kendi kimlik ekranınızda otomatik çekimin hatasını popup'sız geçmek için `isSilent` verin:
+
+```swift
+.idErrorAlert($viewModel.errorMessage,
+              isSilent: { viewModel.lastError?.captureMode == .automatic },
+              onDismiss: { viewModel.consumePendingAlertAction() })
+```
 
 `dismiss()` çağrılmazsa hata açık kalır ve akış ilerlemez.
 
@@ -189,7 +199,7 @@ SDK'nın kendi sınırları:
 |---|---|---|
 | `nfcRead` | `setupSDK(nfcMaxErrorCount:)` | Çip okunamadı. Dolunca anahtar düzeltme ekranı açılır |
 | `nfcKeyEntry` | 3 | Düzeltilen anahtarla da okunamadı. Dolunca modül doğrulanmamış geçilir; NFC için `.fail` verilmişse akış biter |
-| `livenessStepFailure` | 3 | Canlılık adımı süre ya da yanlış hareketle başarısız oldu |
+| `livenessStepFailure` | 3 | Canlılık adımı süre ya da yanlış hareketle başarısız oldu. Her adım için ayrı sayılır |
 | `livenessRecordingFailure` | 3 | Canlılık kaydı hatası (izin, başlatma, kesinti, boyut, yükleme) |
 | `multipleFacesFailure` | 3 | Çoklu yüz `.fail` hatası |
 | `livenessVideoUpload` | 3 | Canlılık videosu yükleme denemesi |
@@ -225,7 +235,7 @@ Yalnızca bağlantı koptu ekranını açan kopmalar sayılır. `.exit` ile bite
 ## 6) Canlılık kuralları
 
 ```swift
-SDKLivenessRules.default.stepTimeout = 8          // saniye; nil süreyi kapatır (varsayılan 5)
+SDKLivenessRules.default.stepTimeout = 8          // saniye; nil süreyi kapatır (varsayılan 10)
 SDKLivenessRules.default.wrongActionCheck = false // varsayılan açık
 ```
 
@@ -237,8 +247,8 @@ SDKLivenessRules.default.wrongActionCheck = false // varsayılan açık
   sağlanırsa adım başarısız sayılır. Yeni eşik yoktur, her adımın kendi koşulu kullanılır.
   Birlikte oluşan hareketler sayılmaz: göz kırpma hiçbir zaman, kaş kaldırma ile yukarı
   bakma birbirini, başı geriye eğerken yukarı bakma ve kaş kaldırma.
-- Hata sonrası aynı adım yeniden istenir. Her başarısız adım `livenessStepFailure`
-  hakkından düşer.
+- Hata sonrası aynı adım yeniden istenir. Her başarısız deneme o adımın `livenessStepFailure`
+  hakkından düşer; sonraki adım hakkı baştan alır.
 
 Selfie+canlılık modülünde bu kurallar yoktur: o ekranda komut verilen hareket ve kayıt yok.
 
@@ -297,7 +307,7 @@ Ayar vermeyen entegrasyonda şunlar değişir:
 
 1. Karşılaştırma sayaçları modül başına ayrıldı.
 2. NFC okuma hatası sınırı dolunca modül atlanmaz, anahtar düzeltme ekranı açılır.
-3. Canlılıkta her adımın 5 sn süresi var ve başka bir adımın hareketi hata sayılıyor.
+3. Canlılıkta her adımın 10 sn süresi var ve başka bir adımın hareketi hata sayılıyor.
 4. Canlılık kaydı hataları sayılıyor; üçüncüde modülün hak bitti kuralı uygulanır.
 5. Selfie ve selfie+canlılıkta ikinci yüz kendi metniyle uyarılıyor; arkadaki küçük yüzler
    çekimi engellemiyor. Selfie+canlılığın ARKit yolu ikinci yüzü artık görüyor.
