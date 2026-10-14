@@ -30,6 +30,9 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 - Kimlik tarayıcısı ayarları: çerçeve çizgisi (`QuadrilateralStyle(frameOutline:)`), algılamayı durdurma (`pausesDetection`), çekim hızı ve düşük ışık eşikleri (`ScannerTimingConfig`, `ScannerAutomation.exposureBoost`).
 -  DocumentProfile alanlarının etiketi, bölgesi ve deseni tek çağrıyla değişiyor: `settingLabelAnchor`, `settingRegionOfInterest`, `settingPattern`.
 - Görüşme boyunca bağlantı kalitesi (`turnStats`) ve görüşme canlılığı ölçülüp sunucuya gönderiliyor.
+- Host, görüşmede fener ve kamera değişikliklerini `onTorchChange` ve `onCameraChange` ile öğreniyor. Feneri temsilci de açsa kullanıcı da açsa iki taraf aynı durumu görür.
+- Görüşme sesi host uygulamadan yönetiliyor. Çıkış `IdentifyManager.shared.callAudioOutput` ile hoparlör ya da ahize seçilir; sesin o an çıktığı yer (hoparlör, ahize, kulaklık, Bluetooth) `currentAudioRoute` ile okunur, değişince `onAudioRouteChange` çağrılır. Seçimler yeniden bağlanınca korunur.
+- Görüşmede mikrofon girişi `availableAudioInputs` ve `setAudioInput(_:)` ile seçilir, mikrofon `isMicMuted` ile sessize alınır.
 
 **Değişti**
 - Deneme hakları tek yerde toplandı: `SDKAttemptLimits.shared`. Karşılaştırma tutmadığında kullanıcının kaç kez deneyebileceği ve hak bitince modülün atlanacağı ya da akışın biteceği modül bazında buradan ayarlanıyor. Değer verilmezse eskisi gibi sunucunun ayarı geçerli.
