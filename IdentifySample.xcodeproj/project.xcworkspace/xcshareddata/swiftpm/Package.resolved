@@ -6,7 +6,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/2sworks/id24.tr-ios-sdk-spm",
       "state" : {
-        "revision" : "f1a9600c78a1ab85497982660fe23ba58177c5df",
+        "revision" : "aab00ffa480a4e79fef417c20fbdf12cbd910852",
         "version" : "3.2.0"
       }
     },

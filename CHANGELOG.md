@@ -24,6 +24,9 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 - Kimlik arka yüzünün MRZ'si ön yüzde okunanlarla karşılaştırılıyor: `ScannerConfiguration.expectedMRZValues`.
 - Kimlik tarayıcısına yeni yönergeler: hazırlanıyor, hizalayın, kimlik tespit edilemedi, yatay tutun, ters duruyor, eğik duruyor, okunamıyor (`ScannerGuidanceTexts`). Yönergeler seslendiriliyor (`ScannerAutomation.guidanceSpeech`).
 - Kimlik tarayıcısında yönerge metni ve "Manuel Çek" düğmesi kaldırılabiliyor: `ScannerConfiguration.showsGuidanceDefault = false` yönerge satırını, `ScannerAutomation.default.manualCaptureFallback = false` düğmeyi kaldırır.
+- Kimlik tarayıcısında alan kutuları, FOTO kutusu, tarama çizgisi, dokunarak odaklama ve odak karesi kapatılabiliyor: `ScannerConfiguration.showsFieldBoxesDefault`, `showsFaceBoxDefault`, `showsSweepLineDefault`, `tapToFocusDefault`, `showsFocusIndicatorDefault` değerlerinden biri `false` yapılınca o parça kalkar.
+- Tarayıcıda karartmanın rengi ve opaklığı ile odak karesinin rengi değiştirilebiliyor: `QuadrilateralStyle(dimmingColor:dimmingOpacity:focusIndicatorColor:)`. SDK ekranlarında aynı değerler temadan gelir: `SDKTheme.shared.capture.maskColor`, `maskOpacity`, `focusIndicatorColor`.
+- Tarama çizgisinin rengi, kalınlığı, parıltısı, izi ve kesik deseni `SweepLineStyle` ile ayarlanıyor. `custom` verilirse çizgiyi host kendisi çizer; uçlar kartın kenarlarını izler. `SweepLineStyle.default` SDK ekranları dahil her tarayıcıda geçerli, renk temadan da verilebilir (`SDKTheme.shared.capture.scanLineColor`).
 - Kimlik tarayıcısı ayarları: çerçeve çizgisi (`QuadrilateralStyle(frameOutline:)`), algılamayı durdurma (`pausesDetection`), çekim hızı ve düşük ışık eşikleri (`ScannerTimingConfig`, `ScannerAutomation.exposureBoost`).
 -  DocumentProfile alanlarının etiketi, bölgesi ve deseni tek çağrıyla değişiyor: `settingLabelAnchor`, `settingRegionOfInterest`, `settingPattern`.
 - Görüşme boyunca bağlantı kalitesi (`turnStats`) ve görüşme canlılığı ölçülüp sunucuya gönderiliyor.
@@ -40,12 +43,15 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 - Bağlantı koptu ekranındaki "Yeniden Bağlan" düğmesi internet yok göründüğünde de basılabiliyor. Önceden Wi-Fi'dan hücresele geçerken düğme birkaç saniye kilitleniyor, kullanıcı yeniden bağlanamıyordu.
 - `SDKFlowCoordinator` akışlarında oda reddinin sonucu (`roomOccupied`), kullanıcı uyarıda Çıkış'a basınca bildiriliyor.
 - Hazırlık ekranında hız testi sonucu üç metinle gösteriliyor: iyi, orta, zayıf.
+- Tarayıcının yönerge yazısı ve "Manuel Çek" düğmesi tema fontuyla yazılıyor.
+- SDK'nın kimlik ve adres ekranlarında tarayıcı çerçevesi tema renginde çiziliyor (`guideStrokeColor`, `guideLockedColor`, `guideLineWidth`; varsayılan `IDColor.primary`). Önceden kimlik ekranındaki sabit çerçeve beyaz, kilitlenince yeşildi.
 
 **Düzeltildi**
 - Cevapsız çağrıda ön kamera açık kalıyordu. Artık kamera kapanıyor, zil duruyor.
 - Gölgede çekilen kartta alan okuma iyileştirmesi yapıldı.
 - `keepsCameraRunning` açıkken çekimden hemen sonra ikinci bir çekim başlayabiliyordu.
 - `ScannerAutomation.manualCaptureFallback = false` verildiğinde elle çekim düğmesi yine çıkabiliyordu.
+- Sabit çerçevenin `.solid` görünümü ve hareketli köşe işaretleri `QuadrilateralStyle`'daki renk, kalınlık ve kesik çizgi değerlerini yok sayıyordu.
 - Kimliğin arka yüzündeki MRZ'de dolgu işareti (`<`) harf okunduğunda ad ve soyad panele yanlış gidiyordu.
 - İşaret dili seçiminden sonra yeniden bağlanmada adım bilgisi (`stepChanged`) gönderilmiyordu.
 - `coordinator.insert` ile eklenen ekranlar açıkken sonraki modül sunucuya erken bildiriliyordu. Araya eklenen ekran ilerlemek için `advanceExternal()` çağırmalı.
