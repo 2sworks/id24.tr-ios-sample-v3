@@ -60,6 +60,8 @@ registry.override(.liveness) { MyLivenessView() }
 struct MyLivenessView: View {
     @EnvironmentObject var coordinator: SDKFlowCoordinator
     @StateObject private var vm = SDKLivenessViewModel()   // init ilk adımı zaten ister
+    @State private var awaitingResult = false             // VM yanıt verene kadar aynı adım yeniden yüklenmez
+    @State private var resumeTask: Task<Void, Never>?
     let face = MyARFaceTracker()
 
     var body: some View {
@@ -74,19 +76,24 @@ struct MyLivenessView: View {
             vm.onRecordingReady = { face.start() }       // ✅ kamerayı kayıt hazır olunca aç
             vm.prepareRecording()                         // ✅ ekran kaydını başlatır
             face.onDetected = { step, snapshot in
-                guard step == vm.currentStep else { return }
-                face.pause()                              // yükleme sürerken ikinci tetik olmasın
+                guard step == vm.currentStep, !awaitingResult else { return }
+                awaitingResult = true                     // ✅ yanıt gelene kadar ikinci kare yok
+                face.pause()                              // yükleme sürerken takip durur
                 vm.uploadFrame(image: snapshot)           // ✅ başarıda sıradaki adım kendiliğinden gelir
-                Task { @MainActor in                      // ✅ sonuç ne olursa olsun 2 sn sonra sürdür
+                resumeTask = Task { @MainActor in         // ✅ sonuç ne olursa olsun 2 sn sonra sürdür
                     try? await Task.sleep(nanoseconds: 2_000_000_000)
-                    if !vm.allStepsCompleted { face.resume() }
+                    if !Task.isCancelled, !vm.allStepsCompleted { face.resume() }
                 }
             }
         }
-        .onDisappear { face.stop(); vm.abandonRecording() }
+        .onChange(of: vm.currentStep) { _ in awaitingResult = false }   // başarı ya da yükleme hatası
+        .onDisappear { resumeTask?.cancel(); face.stop(); vm.abandonRecording() }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in vm.noteWillResignActive() }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in vm.noteDidBecomeActive() }
-        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
+        .idErrorAlert($vm.errorMessage, onDismiss: {
+            awaitingResult = false                        // "tekrar deneyin": aynı adım yeniden yüklenebilir
+            vm.consumePendingAlertAction()
+        })   // ✅ zorunlu
     }
 }
 ```
@@ -96,6 +103,9 @@ struct MyLivenessView: View {
 - Karşılaştırma tutmazsa VM aynı adımı yeniden ister, `currentStep` değişmez. Takibi bu yüzden
   adım değişimine değil yüklemeye bağlayın: hazır ekran gibi, sonuç ne olursa olsun 2 sn sonra
   sürdürün. Yalnız adım değişince sürdüren ekran ilk "tekrar deneyin"den sonra takılır.
+- Yanıt gelene kadar aynı adımı ikinci kez yüklemeyin (`awaitingResult`). Yükleme 2 sn'yi aşarsa
+  ikinci kare de geçer ve sıradaki adım kullanıcı yapmadan tamamlanır; hazır ekran da yakalamada
+  adımı kapatıp VM yanıt verince açıyor. Ekran kapanırsa bekleyen sürdürmeyi iptal edin.
 - Cihaz yüz takibini desteklemiyorsa `vm.reportFaceTrackingUnsupported()` çağırın; uyarı
   kapanınca modül atlanır (`onSkipRequested` bağlı değilse akış biter). Normalde buna gerek
   kalmaz: `faceTrackingFallback` akış kurulurken bu cihazlarda modülü değiştirir ya da çıkarır.
