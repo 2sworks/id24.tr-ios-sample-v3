@@ -77,20 +77,32 @@ struct MyLivenessView: View {
                 guard step == vm.currentStep else { return }
                 face.pause()                              // yükleme sürerken ikinci tetik olmasın
                 vm.uploadFrame(image: snapshot)           // ✅ başarıda sıradaki adım kendiliğinden gelir
+                Task { @MainActor in                      // ✅ sonuç ne olursa olsun 2 sn sonra sürdür
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    if !vm.allStepsCompleted { face.resume() }
+                }
             }
         }
-        .onChange(of: vm.currentStep) { _ in if !vm.allStepsCompleted { face.resume() } }
         .onDisappear { face.stop(); vm.abandonRecording() }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in vm.noteWillResignActive() }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in vm.noteDidBecomeActive() }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```
 
 - Son adım yüklenince VM kaydı durdurup yükler ve `onCompleted`'ı çağırır; `uploadVideo` ya da
   `fetchNextStep` elle çağrılmaz.
-- Cihaz yüz takibini desteklemiyorsa `vm.reportFaceTrackingUnsupported()` çağırın; modül
-  entegrasyonun `faceTrackingFallback` politikasıyla atlanır.
+- Karşılaştırma tutmazsa VM aynı adımı yeniden ister, `currentStep` değişmez. Takibi bu yüzden
+  adım değişimine değil yüklemeye bağlayın: hazır ekran gibi, sonuç ne olursa olsun 2 sn sonra
+  sürdürün. Yalnız adım değişince sürdüren ekran ilk "tekrar deneyin"den sonra takılır.
+- Cihaz yüz takibini desteklemiyorsa `vm.reportFaceTrackingUnsupported()` çağırın; uyarı
+  kapanınca modül atlanır (`onSkipRequested` bağlı değilse akış biter). Normalde buna gerek
+  kalmaz: `faceTrackingFallback` akış kurulurken bu cihazlarda modülü değiştirir ya da çıkarır.
+- Hata mesajı kapanınca çalışan işler: hak bitince atlama ya da akışı bitirme, kayıt
+  hatasından sonra kaydın ya da testin yeniden başlaması, `reportFaceTrackingUnsupported()`
+  sonrası atlama ve (3.2.0+) süre aşımı, yanlış hareket ya da çoklu yüz uyarısından sonra adım
+  süresinin yeniden işlemesi. `.idErrorAlert` satırı bu yüzden zorunlu.
 
 SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikler cihazda ayarlandı):
 

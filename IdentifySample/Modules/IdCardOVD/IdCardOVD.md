@@ -114,6 +114,7 @@ Aşağıdaki kancaların hepsi bağlanmadan otomatik çekim çalışmaz.
 | `onSetTorch` | VM → host | Hologram adımında fener yanmaz, gökkuşağı ölçülemez |
 | `startMotion()` / `stopMotion()` | host → VM | IMU sabitlik kapısı hiç açılmaz |
 | `motionFeed` | host → VM, her kare (`CVPixelBuffer`) | Görüntü sabitlik kapısı atlanır, yalnız IMU'ya bakılır — elde eğilen kartta bulanık kare riski |
+| `errorMessage` + `consumePendingAlertAction()` | VM hatayı yazar, host gösterip kapatır | Mesaj doluyken `ingest` kare işlemez: ilk ret ya da karşılaştırma hatasından sonra **çekim olmaz**; hak bitince modül atlanmaz, akış bitmez |
 | `onRequestLensSwitch` | VM → host | İsteğe bağlı: çok yakın belgede lens geçişi yok |
 | `onRequestFocusNudge`, `focusProbe` | VM ↔ host | İsteğe bağlı: aktif odak dürtmesi ve "uzaklaştırın" yönergesi yok |
 
@@ -138,6 +139,7 @@ struct MyOVDView: View {
         .onAppear {
             vm.onCompleted       = { coordinator.advanceToNextModule() }      // ✅
             vm.onSkipRequested   = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed      = { coordinator.finishFlowAsFailed() }
             vm.onRequestCapture  = { camera.capturePhoto() }                  // ✅ zorunlu
             vm.onSetTorch        = { camera.setTorch($0) }                    // ✅ zorunlu (hologram)
             let motion = vm.motionFeed
@@ -147,6 +149,7 @@ struct MyOVDView: View {
             camera.start(); vm.startMotion()
         }
         .onDisappear { vm.stopMotion(); camera.stop() }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```

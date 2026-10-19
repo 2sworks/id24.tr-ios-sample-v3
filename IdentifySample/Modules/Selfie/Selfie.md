@@ -66,7 +66,7 @@ struct MySelfieView: View {
                 MyCameraPreview(camera: camera)
                 MyOval(aligned: vm.isFaceAligned, progress: vm.holdProgress)
                 Text(vm.guidanceText)
-                if vm.awaitingConfirmation {
+                if vm.selfieImage != nil && !vm.canContinue && !vm.isLoading {   // onayda ve hatadan sonra
                     MyConfirm(image: vm.selfieImage, onConfirm: vm.confirmSelfie, onRetake: vm.reset)
                 }
             }
@@ -77,11 +77,23 @@ struct MySelfieView: View {
         }
         .onChange(of: vm.shouldAutoCapture) { if $0 { camera.takePhoto { vm.presentCaptured(image: $0) } } }
         .onChange(of: vm.canContinue) { if $0 { coordinator.advanceToNextModule() } }   // ✅
-        .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
+        .onAppear {
+            vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed = { coordinator.finishFlowAsFailed() }
+        }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```
 
+- Hatayı göstermek ve kapatmak zorunlu. `vm.errorMessage` doluyken VM kare işlemez:
+  karşılaştırma tutmayınca otomatik çekim mesaj kapanana kadar durur, hak bitince modülü
+  atlama ya da akışı bitirme de mesaj kapanınca çalışır. `.idErrorAlert` kapanınca mesajı
+  siler, `onDismiss` bekleyen işi çalıştırır. Hatayı kendiniz çiziyorsanız kapatırken
+  `vm.dismissError()` çağırın (3.2.0+; önceki sürümlerde önce `vm.errorMessage = nil`, sonra
+  `vm.consumePendingAlertAction()`). Ayrıntı: [Kendi ekranınızı yazdıysanız](../../../docs/guides/errors-and-limits.md#8-kendi-ekranınızı-yazdıysanız).
+- Yüz bulunamaz ya da yükleme düşerse fotoğraf `selfieImage`'da kalır, otomatik çekim durur.
+  Tekrar Çek / Onayla bu yüzden `awaitingConfirmation`'a değil fotoğrafa bağlı.
 - Oval, `updatePreviewSize` ile verilen ölçüye göre hesaplanır; önizlemeniz ekranı
   kaplamıyorsa gerçek önizleme boyutunu verin.
 - Sesli okuma sürerken çekimi bekletmek için `vm.isCaptureSuspended = true`.
@@ -120,12 +132,13 @@ struct MySelfieView: View {
 | Üye | Ne zaman |
 |---|---|
 | `onSkipRequested: (() -> Void)?` | Karşılaştırma hakkı tükenip atlamaya izin varsa |
+| `onFlowFailed: (() -> Void)?` | Karşılaştırma hakkı tükendi, atlama kapalı → `coordinator.finishFlowAsFailed()` |
 
 ## Sinyal Zinciri — Perde Arkası
 
 ```
 processSelfie(image:)  → manager.detectHumanFace (cihazda) → uploadIdPhoto [HTTP]
-                       → (selfieComparisonCount tükendi & skip izinli) → onSkipRequested?()
+                       → (selfieComparisonCount tükendi & skip izinli) → hata kapanınca onSkipRequested?()
 host: canContinue → coordinator.advanceToNextModule() [modulePresented]
 ```
 
@@ -175,7 +188,8 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .selfieTts, language: .tr,
   `reset()` ile yeniden çekime yönlendirin (ışık ve tek-yüz koşulunu hatırlatın).
 - **Birden fazla yüz:** SDK yalnızca **tek yüz** algılandığında ilerletir (2.3.15+).
 - **Deneme hakkı:** `selfie_comparison_count` sunucudan gelir; custom ekranınızda
-  `onSkipRequested`'ı bağlamayı unutmayın — yoksa hak tükenince kullanıcı sıkışır.
+  `onSkipRequested` ve `onFlowFailed`'ı bağlayın, hata kapanınca `consumePendingAlertAction()`
+  çağırın — yoksa hak tükenince kullanıcı sıkışır.
 - **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
   Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: false)`;
   işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

@@ -65,13 +65,21 @@ struct MyNfcView: View {
         .onAppear {
             vm.onCompleted     = { coordinator.advanceToNextModule() }
             vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed    = { coordinator.finishFlowAsFailed() }
+            vm.onRetryFromPreviousStep = { if coordinator.path.count > 1 { coordinator.popBack() } }
         }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```
 
 - İlerlemeyi **yalnız `onCompleted`** yapar; ayrıca bir "Devam" düğmesi `advanceToNextModule`
   çağırırsa akış iki adım ilerler.
+- Hata mesajı kapanınca çalışan işler: karşılaştırma hakkı bitince atlama ya da akışı
+  bitirme, veri uyuşmayınca önceki adıma dönüş (`onRetryFromPreviousStep`; NFC ilk adımsa
+  ekranda kalınır) ve (3.2.0+) elle düzeltilen anahtarla da çip okunamayınca formun yeniden
+  açılması. `.idErrorAlert` satırı bu yüzden zorunlu. 3.1.x'te okuma hatası sınırına
+  ulaşılınca form ya da atlama mesajsız, hemen gelir.
 - `startNFC()`, belge no / doğum / geçerlilik tarihi boşsa okuma başlatmaz,
   `showEditScreen`'i açar. Bu alanları gösteren formu siz sunarsınız.
 - **Çipe dokundurma sırasında açılan sayfa iOS'a aittir** (Core NFC); tasarımı
@@ -117,7 +125,8 @@ kullanılır — sunucudan şifreli MRZ da gelebilir
 ```
 (VM init) ← manager.mrzDocNo / mrzBirthDay / mrzValidDate (önceki OCR'dan)
 startNFC()  → manager.startNFC (CoreNFC çip okuma) → nfcMsgHandler (durum) → onCompleted?()
-            → (nfcComparisonCount tükendi & skip izinli) → onSkipRequested?()
+            → (karşılaştırma hakkı tükendi & skip izinli) → hata kapanınca onSkipRequested?()
+            → (3.1.x: okuma hatası nfcComparisonCount'a ulaştı & skip izinli) → hemen onSkipRequested?()
 host: → coordinator.advanceToNextModule() [modulePresented]
 ```
 

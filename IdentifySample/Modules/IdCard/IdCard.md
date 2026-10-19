@@ -130,8 +130,7 @@ struct MyIdCardScanView: View {
     @State private var torchOn = false
 
     var body: some View {
-        MyIdCardIntro(side: vm.currentSide, isLoading: vm.isLoading,
-                      error: vm.errorMessage) { scanning = true }      // "Tara" düğmesi
+        MyIdCardIntro(side: vm.currentSide, isLoading: vm.isLoading) { scanning = true }   // "Tara" düğmesi
             .documentScanner(
                 isPresented: $scanning,
                 profile: vm.currentSide == .front ? .turkishIDFront : .turkishIDBack,
@@ -147,13 +146,18 @@ struct MyIdCardScanView: View {
                     : vm.scanBack(image: doc.croppedImage)    // ✅
             }
             .onChange(of: vm.canContinue) { if $0 { coordinator.advanceToNextModule() } }
-            .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
+            .onAppear {
+                vm.onSkipRequested = { coordinator.skipCurrentModule() }
+                vm.onFlowFailed = { coordinator.finishFlowAsFailed() }
+            }
+            .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```
 
 - Ön yüz yüklenince `vm.currentSide` kendiliğinden `.back` olur; arka yüz için tarayıcıyı
-  yeniden açın. OCR ya da yükleme düşerse `vm.errorMessage` dolar, yüz değişmez.
+  yeniden açın. OCR ya da yükleme düşerse `vm.errorMessage` dolar, yüz değişmez. Hak bittiyse
+  modülü atlama ya da akışı bitirme mesaj kapanınca çalışır (`.idErrorAlert` satırı).
 - Arka yüzde `configuration: .idBack` kullanın: arka yüz daha az dokulu, netlik eşikleri ayrı.
 - Pasaport: `profile: .passport` + `configuration: .passport`.
 - `IdentityScannerView`'ı modifier olmadan kullanacaksanız mutlaka `fullScreenCover` içinde
@@ -169,7 +173,8 @@ MyCameraView { captured in
 
 Bu yolda kalite kontrolü sizdedir: çekimden önce görüntünün net, parlamasız ve belgeye
 kırpılmış olduğundan emin olun. `vm.errorMessage` OCR başarısızlığını, `vm.isLoading`
-yüklemeyi bildirir.
+yüklemeyi bildirir. Hatayı A'daki `.idErrorAlert` satırıyla gösterip kapatın; yoksa hak
+tükenince modül atlanmaz, akış bitmez.
 
 ### Örnek Senaryo: Akışı 4 Ekranla Sarmak
 
@@ -235,6 +240,7 @@ public enum IdCardSide: String, Identifiable, Hashable { case front, back }
 | Üye | Ne zaman |
 |---|---|
 | `onSkipRequested: (() -> Void)?` | Deneme hakkı tükenip atlamaya izin varsa |
+| `onFlowFailed: (() -> Void)?` | Deneme hakkı tükendi, atlama kapalı → `coordinator.finishFlowAsFailed()` |
 
 ## Sinyal Zinciri — Perde Arkası
 
@@ -242,7 +248,7 @@ public enum IdCardSide: String, Identifiable, Hashable { case front, back }
 selectCardType(_:)                       → manager.selectedCardType (cihazda)
 scanFront(image:)  → startFrontIdOcr (cihazda OCR) → uploadIdPhoto [HTTP] → sendStep idFront=true [SOKET]
 scanBack(image:)   → startBackIdOcr  (cihazda OCR) → uploadIdPhoto [HTTP] → sendStep idBack=true [SOKET]
-                   → (deneme hakkı tükendi & skip izinli) → onSkipRequested?()
+                   → (deneme hakkı tükendi & skip izinli) → hata kapanınca onSkipRequested?()
 host: tüm yüzler tamam → coordinator.advanceToNextModule()  [modulePresented]
 ```
 
@@ -290,5 +296,6 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .idCardTts, language: .tr,
 - **Tarama motoru:** Hazır ekranın altındaki gerçek zamanlı tarayıcı (dörtgen yakalama,
   bölgesel OCR, TCKN/MRZ doğrulama) bağımsız bir bileşen olarak da kullanılabilir —
   [IdentityScanner rehberi](../../../docs/guides/identity-scanner.md).
-- **Deneme hakları:** `ocr_comparison_count` sunucudan gelir; tükenince `onSkipRequested`
-  devreye girebilir — custom ekranınızda bu closure'ı mutlaka bağlayın.
+- **Deneme hakları:** `ocr_comparison_count` sunucudan gelir; custom ekranınızda
+  `onSkipRequested` ve `onFlowFailed`'ı bağlayın, hata kapanınca `consumePendingAlertAction()`
+  çağırın — yoksa hak tükenince modül atlanmaz, akış bitmez.
