@@ -105,6 +105,20 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
         let selectedModules = moduleRaws.compactMap { SdkModules(rawValue: $0) }
 
         DispatchQueue.main.async {
+            // SDK ekranını uygulama kendisi kapattıysa (ör. çıkışta bütün ekranları kapatmak) kaydı
+            // bırak; yoksa sonraki her çağrı E_BUSY alır.
+            if let host = self.flowController, host.presentingViewController == nil {
+                self.flowController = nil
+                self.pathObserver = nil
+                let sessionWasOpen = !IdentifyManager.shared.isSessionClosed
+                self.coordinator.resetFlow()   // ekransız kalan oturumu kapatır, akışı köke döndürür
+                if sessionWasOpen {
+                    // SDK kapanışı 0,1 sn sonra tamamlıyor; yeni kurulum hemen başlarsa onun
+                    // verisini silebilir. Bu yüzden bu çağrı E_BUSY ile döner.
+                    reject("E_BUSY", "Önceki oturum kapatılıyor, tekrar deneyin", nil)
+                    return
+                }
+            }
             // Kurulum sürerken ya da SDK ekranı açıkken gelen ikinci çağrı (ör. çift dokunma)
             // reddedilir; yoksa SDK ekranları üst üste açılır.
             guard self.pendingSetup == nil, self.flowController == nil else {
@@ -235,7 +249,8 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
             .flatMap { $0.windows }
             .first { $0.isKeyWindow }
         var top = window?.rootViewController
-        while let presented = top?.presentedViewController { top = presented }
+        // Kapanmakta olan ekranın üstüne sunulan ekran hiç açılmaz; onu atla, sunum sıraya girer.
+        while let presented = top?.presentedViewController, !presented.isBeingDismissed { top = presented }
         return top
     }
 
