@@ -83,9 +83,9 @@ export const IdentifySdk = {
    * { result: true } ile çözülür. Nihai sonuç 'session.finished' olayıyla gelir; SDK ekranı
    * akış köke dönünce kendiliğinden kapanır.
    * Hata kodları: E_ARGS (eksik parametre), E_SETUP (kurulum/bağlantı; 120 sn içinde yanıt
-   * gelmezse de), E_BUSY (kurulum sürüyor ya da SDK ekranı açık; ör. çift dokunma), E_PRESENT
-   * (SDK ekranını sunacak view controller yok; açılan oturum kapatılır, 'session.finished' da
-   * gelir).
+   * gelmezse de), E_BUSY (kurulum sürüyor, SDK ekranı açık ya da önceki oturum kapatılıyor;
+   * ör. çift dokunma, biraz sonra tekrar deneyin), E_PRESENT (SDK ekranını sunacak view
+   * controller yok; açılan oturum kapatılır, 'session.finished' da gelir).
    */
   setupSDK(options: SetupOptions): Promise<{ result: boolean }> {
     return IdentifySdkModule.setupSDK(options);

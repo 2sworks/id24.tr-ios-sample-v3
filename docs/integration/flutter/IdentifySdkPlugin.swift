@@ -42,6 +42,10 @@ public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, Flutt
     /// setupSDK ilkinin bağlantı denetimini durdurmuyor), bazı ağ hatalarında hiç vermeyebiliyor.
     private var pendingSetup: FlutterResult?
     private var setupID = 0
+    /// SDK ekranının sunumu tamamlandı mı ve ne zaman istendi. Sıraya giren sunumda host bir
+    /// süre ekranda görünmez; bu, "uygulama kapattı" ile karıştırılmasın.
+    private var flowShown = false
+    private var presentRequestedAt = Date.distantPast
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = IdentifySdkPlugin()
@@ -121,9 +125,11 @@ public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, Flutt
 
         // Coordinator ve SDK ekranları ana thread'de (MainActor) çalışır.
         DispatchQueue.main.async {
-            // SDK ekranını uygulama kendisi kapattıysa (ör. çıkışta bütün ekranları kapatmak) kaydı
-            // bırak; yoksa sonraki her çağrı E_BUSY alır.
-            if let host = self.flowController, host.presentingViewController == nil {
+            // SDK ekranını uygulama kendisi kapattıysa (ör. çıkışta bütün ekranları kapatmak) ya da
+            // sunum hiç gerçekleşmediyse kaydı bırak; yoksa sonraki her çağrı E_BUSY alır. Sıraya
+            // giren sunum (gösterilmedi, 2 sn dolmadı) kapatılmış sayılmaz.
+            if let host = self.flowController, host.presentingViewController == nil,
+               self.flowShown || Date().timeIntervalSince(self.presentRequestedAt) > 2 {
                 self.flowController = nil
                 self.pathObserver = nil
                 let sessionWasOpen = !IdentifyManager.shared.isSessionClosed
@@ -231,7 +237,12 @@ public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, Flutt
         })
         host.modalPresentationStyle = .fullScreen
         host.modalTransitionStyle = .coverVertical
-        presenter.present(host, animated: true)
+        flowShown = false
+        presentRequestedAt = Date()
+        presenter.present(host, animated: true) { [weak self, weak host] in
+            // Sunum tamamlandı (sıraya girdiyse önceki geçiş bitince); reddedilirse hiç gelmez.
+            if let self = self, let host = host, self.flowController === host { self.flowShown = true }
+        }
         flowController = host
         pathObserver = coordinator.$path
             .dropFirst()

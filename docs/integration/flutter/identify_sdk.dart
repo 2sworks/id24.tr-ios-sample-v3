@@ -198,9 +198,9 @@ class IdentifySdk {
   /// köke dönünce kendiliğinden kapanır.
   ///
   /// Hata: PlatformException — E_ARGS (eksik parametre), E_SETUP (kurulum/bağlantı; 120 sn
-  /// içinde yanıt gelmezse de), E_BUSY (kurulum sürüyor ya da SDK ekranı açık; ör. çift
-  /// dokunma), E_PRESENT (SDK ekranını sunacak view controller yok; açılan oturum kapatılır,
-  /// `session.finished` da gelir).
+  /// içinde yanıt gelmezse de), E_BUSY (kurulum sürüyor, SDK ekranı açık ya da önceki oturum
+  /// kapatılıyor; ör. çift dokunma, biraz sonra tekrar deneyin), E_PRESENT (SDK ekranını
+  /// sunacak view controller yok; açılan oturum kapatılır, `session.finished` da gelir).
   Future<bool> setupSDK(SetupOptions options) async {
     final res = await _methods.invokeMethod<Map>('setupSDK', options.toMap());
     return (res?['result'] as bool?) ?? false;
