@@ -92,6 +92,9 @@ SDKTheme.shared.colors.pageBackground =
 SDKTheme.shared.colors.selectedItemBackground = SDKAdaptiveColor(Color.black)
 ```
 
+SDK'nın kendi `Color(hex:)` init'i `internal`'dır; örnekteki satır için uygulamanıza
+[Tema → Hızlı Başlangıç](theming.md#hızlı-başlangıç)'taki küçük yardımcıyı ekleyin.
+
 Roller: `pageBackground`, `moduleBackground`, `surface`, `title`, `subtitle`, `border`,
 `headerBackground`, `headerTitle`, `headerSubtitle`, `headerIcon`, `headerIconBackground`,
 `headerIconBorder`, `progressActive`, `progressInactive`, `selectedItemBackground`,

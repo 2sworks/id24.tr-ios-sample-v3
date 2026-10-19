@@ -52,7 +52,7 @@ IdentifyManager.shared.setSDKLang(lang: .tr)
 
 // 2. Tema (renk / font / ikon / metrik)
 let theme = SDKTheme.shared
-theme.colors.primary = Color(hex: "#E4002B")
+theme.colors.primary = Color(hex: "#E4002B")     // Color(hex:) uygulamanızdaki yardımcı — bkz. 2) Renkler
 theme.fonts.familyName = "Sofia Pro"
 theme.setIcon(.logo, Image("my_logo"))
 
@@ -74,7 +74,8 @@ IdentifyManager.shared.eventDelegate = myAnalytics
 // 7. SDK kurulumu
 coordinator.prepareForSetup()                    // setupSDK'dan ÖNCE — zorunlu
 IdentifyManager.shared.setupSDK(...) { socket, room, error in
-    if error == nil { coordinator.start() }     // ilk modüle geçer
+    if let message = error?.errorMessages, !message.isEmpty { return }   // error nil gelmez; başarıda mesajı boştur
+    if socket?.isConnected == true, room.result == true { coordinator.start() }   // ilk modüle geçer
 }
 ```
 
@@ -145,10 +146,24 @@ Tam liste ve fabrika varsayılanları:
 | `accentTeal` | `#1A8C73` | Alternatif vurgu (tema örnekleri için) |
 
 ```swift
-SDKTheme.shared.colors.primary = Color(hex: "#E4002B")   // hex init SDK'da hazır
+SDKTheme.shared.colors.primary = Color(hex: "#E4002B")   // Color(hex:) aşağıdaki uygulama yardımcısı
 ```
 
-> `Color(hex:)` 6 haneli (`#RRGGBB`) ve 8 haneli (`#RRGGBBAA`) formatları destekler.
+> SDK'nın kendi `Color(hex:)` init'i `internal`'dır, uygulamanızdan çağrılamaz. Yukarıdaki satır
+> için uygulamanıza şu küçük yardımcıyı ekleyin (6 haneli `#RRGGBB`; zaten bir `Color(hex:)`
+> yardımcınız varsa onu kullanın):
+
+```swift
+// Uygulamanızda — SDK'nın değil
+extension Color {
+    init(hex: String) {                                   // "#RRGGBB"
+        let rgb = UInt64(hex.filter(\.isHexDigit), radix: 16) ?? 0
+        self.init(red:   Double((rgb >> 16) & 0xFF) / 255,
+                  green: Double((rgb >> 8) & 0xFF) / 255,
+                  blue:  Double(rgb & 0xFF) / 255)
+    }
+}
+```
 
 ### Fontlar — `SDKFonts`
 
@@ -941,7 +956,7 @@ IdentifyManager.shared.setupSDK(
     enableAutoRotateOCR: Bool?,             // OCR otomatik oryantasyon düzeltme (vars. false)
     ttsEnabled: Bool?,                      // sesli okumayı native modda aç (vars. false)
     onFinished: ((SDKFlowOutcome) -> Void)?, // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
-    callback: (WebSocket?, RoomResponse, SDKWebError?) -> ()
+    callback: (WebSocket?, RoomResponse, SDKWebError?) -> ()   // hata nesnesi başarıda da gelir (errorMessages boş)
 )
 ```
 
@@ -1851,9 +1866,10 @@ func startKycFlow(scenario: KycScenario, identId: String) {
     }
 
     coordinator.prepareForSetup()
-    IdentifyManager.shared.setupSDK(identId: identId, ...) { _, resp, err in
+    IdentifyManager.shared.setupSDK(identId: identId, ...) { socket, resp, err in
         Task { @MainActor in
-            if err == nil, resp.result == true { coordinator.start() }
+            if let message = err?.errorMessages, !message.isEmpty { return }   // err nil gelmez; başarıda mesajı boştur
+            if socket?.isConnected == true, resp.result == true { coordinator.start() }
         }
     }
 }

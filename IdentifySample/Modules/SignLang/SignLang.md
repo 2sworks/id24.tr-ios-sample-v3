@@ -29,7 +29,12 @@ Kapının görünmesi için `setupSDK(signLangSupport: true)` verilmelidir.
 IdentifyManager.shared.setupSDK(
     identId: identId,
     baseApiUrl: baseApiUrl,
-    networkOptions: SDKNetworkOptions(),
+    networkOptions: SDKNetworkOptions(
+        timeoutIntervalForRequest: 30,
+        timeoutIntervalForResource: 30,
+        useSslPinning: false
+    ),
+    kpsData: nil,
     signLangSupport: true,          // görüşme ekranı açılınca kapı gösterilir
     ...
 )

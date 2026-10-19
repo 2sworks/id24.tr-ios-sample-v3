@@ -25,7 +25,7 @@ ekranların hepsi markanızın görünümüne geçer; hiçbir ekranı yeniden ya
 // Uygulama açılışında, setupSDK'dan ÖNCE — bir kez.
 let theme = SDKTheme.shared
 
-// Renkler
+// Renkler — Color(hex:) aşağıdaki uygulama yardımcısıdır (SDK'nınki internal)
 theme.colors.primary      = Color(hex: "#E4002B")     // marka ana rengi
 theme.colors.primaryDark  = Color(hex: "#B80023")
 theme.colors.success      = Color(hex: "#0BA34E")
@@ -39,6 +39,22 @@ theme.setIcons([
     .thankYouSuccess: Image("my_success_hero"),
     .lostConnection:  Image("my_offline_hero"),
 ])
+```
+
+SDK'nın kendi `Color(hex:)` init'i `internal`'dır, uygulamanızdan çağrılamaz. Yukarıdaki renk
+satırları için uygulamanıza şu küçük yardımcıyı ekleyin (6 haneli `#RRGGBB`; zaten bir
+`Color(hex:)` yardımcınız varsa onu kullanın):
+
+```swift
+// Uygulamanızda — SDK'nın değil
+extension Color {
+    init(hex: String) {                                   // "#RRGGBB"
+        let rgb = UInt64(hex.filter(\.isHexDigit), radix: 16) ?? 0
+        self.init(red:   Double((rgb >> 16) & 0xFF) / 255,
+                  green: Double((rgb >> 8) & 0xFF) / 255,
+                  blue:  Double(rgb & 0xFF) / 255)
+    }
+}
 ```
 
 ---
@@ -187,7 +203,7 @@ dokunmadan seçili satırın rengini ayarlayabilirsiniz.
 ```swift
 // Tek renk (iki temada da aynı):
 SDKTheme.shared.colors.selectedItemBackground = SDKAdaptiveColor(Color.black)
-// Açık/koyu ayrı:
+// Açık/koyu ayrı (Color(hex:): Hızlı Başlangıç'taki uygulama yardımcısı):
 SDKTheme.shared.colors.pageBackground = SDKAdaptiveColor(light: Color(hex: "#F8FAFC"),
                                                          dark:  Color(hex: "#0B1120"))
 ```

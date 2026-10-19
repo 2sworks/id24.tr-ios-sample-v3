@@ -37,7 +37,11 @@ sıra kullanılır.
 IdentifyManager.shared.setupSDK(
     identId: "...",
     baseApiUrl: "https://v2api.identify.com.tr/",
-    networkOptions: SDKNetworkOptions(useSslPinning: false),
+    networkOptions: SDKNetworkOptions(
+        timeoutIntervalForRequest: 30,
+        timeoutIntervalForResource: 30,
+        useSslPinning: false
+    ),
     kpsData: nil,
     signLangSupport: false,
     nfcMaxErrorCount: 3,
@@ -79,10 +83,11 @@ IdentifyManager.shared.setupSDK(
 ```swift
 { socket, roomResponse, error in
     Task { @MainActor in
-        if error == nil, socket?.isConnected == true, roomResponse.result == true {
+        // error hiçbir zaman nil gelmez; kurulum başarılıysa errorMessages boştur
+        if let message = error?.errorMessages, !message.isEmpty {
+            // message kullanıcıya gösterilebilir metin içerir
+        } else if socket?.isConnected == true, roomResponse.result == true {
             coordinator.start()
-        } else {
-            // error?.message kullanıcıya gösterilebilir metin içerir
         }
     }
 }
@@ -121,8 +126,8 @@ veriyi siz de verebilirsiniz, sunucu da.
 ## SDKNetworkOptions — Ağ Ayarları
 
 ```swift
-// Basit kullanım
-SDKNetworkOptions(useSslPinning: false)
+// Basit kullanım (tek parametreli init yoktur; üç parametre de verilir)
+SDKNetworkOptions(timeoutIntervalForRequest: 30, timeoutIntervalForResource: 30, useSslPinning: false)
 
 // Tam kontrol
 SDKNetworkOptions(
@@ -147,7 +152,8 @@ Sertifikanızı bunlardan birine koymanız yeterli. Sample App'te örnek bir ser
 
 ## Hata Modeli
 
-HTTP hataları `SDKWebError` olarak döner; `message` alanını kullanıcıya gösterebilirsiniz. Sunucu
+HTTP hataları `SDKWebError` olarak döner; `errorMessages` alanını kullanıcıya gösterebilirsiniz.
+`setupSDK` geri çağrısında bu nesne başarıda da gelir, mesajı boştur (yukarıdaki başarı kontrolü). Sunucu
 `result == false` döndürürse mesaj `RoomResponse.messages` listesinden alınır. Modül içindeki
 yüklemelerde VM'ler hatayı `errorMessage`'a yazar; kendi ekranınızda
 `@Published errorMessage`'ı dinlemeniz yeterli.

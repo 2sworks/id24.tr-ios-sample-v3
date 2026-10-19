@@ -46,7 +46,8 @@ Ayarı `coordinator.start()` çağrısından önce verin. En kolay yer `setupSDK
 IdentifyManager.shared.useConnectionSpeedTest = true
 
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
+    if let message = error?.errorMessages, !message.isEmpty { return }   // error nil gelmez; başarıda mesajı boştur
+    guard socket?.isConnected == true, room.result == true else { return }
     coordinator.start()
 }
 ```
@@ -211,7 +212,8 @@ coordinator.insert(["speedCheck"], before: .callScreen)
 
 // 2) Oturum açılırken:
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
+    if let message = error?.errorMessages, !message.isEmpty { return }   // error nil gelmez; başarıda mesajı boştur
+    guard socket?.isConnected == true, room.result == true else { return }
     // İsteğe bağlı: hazırlık ekranı ikinci kez ölçmesin (bkz. aşağıdaki not).
     IdentifyManager.shared.needSpeedTest = false
     coordinator.start()
@@ -298,7 +300,8 @@ Uygulamada tek satır yeterli:
 IdentifyManager.shared.useConnectionSpeedTest = true
 
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
+    if let message = error?.errorMessages, !message.isEmpty { return }   // error nil gelmez; başarıda mesajı boştur
+    guard socket?.isConnected == true, room.result == true else { return }
     coordinator.start()
 }
 ```
@@ -376,7 +379,8 @@ dönüşünde çağırın. Bu yol `useConnectionSpeedTest` ayarına bakmaz.
 
 ```swift
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
+    if let message = error?.errorMessages, !message.isEmpty { return }   // error nil gelmez; başarıda mesajı boştur
+    guard socket?.isConnected == true, room.result == true else { return }
 
     showLoading(true)
     IdentifyManager.shared.startConnectionSpeedTest { result in   // ana thread'de bir kez döner

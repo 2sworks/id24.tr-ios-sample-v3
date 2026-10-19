@@ -57,13 +57,18 @@ struct RootView: View {
 }
 
 // 2) Bağlanma — prepareForSetup HER ZAMAN setupSDK'dan önce
+@MainActor                                               // coordinator ana thread'de çalışır
 func connect(coordinator: SDKFlowCoordinator) {
     coordinator.prepareForSetup()                        // ⚠️ önce bu
 
     IdentifyManager.shared.setupSDK(
         identId: "...",
         baseApiUrl: "https://v2api.identify.com.tr/",
-        networkOptions: SDKNetworkOptions(useSslPinning: false),
+        networkOptions: SDKNetworkOptions(
+            timeoutIntervalForRequest: 30,
+            timeoutIntervalForResource: 30,
+            useSslPinning: false
+        ),
         kpsData: nil,
         signLangSupport: false,
         nfcMaxErrorCount: 3,
@@ -73,7 +78,10 @@ func connect(coordinator: SDKFlowCoordinator) {
         showThankYouPage: true
     ) { socket, roomResponse, error in
         Task { @MainActor in
-            if error == nil, socket?.isConnected == true, roomResponse.result == true {
+            // error hiçbir zaman nil gelmez; kurulum başarılıysa errorMessages boştur
+            if let message = error?.errorMessages, !message.isEmpty {
+                print(message)                           // kurulum hatası — kullanıcıya gösterin
+            } else if socket?.isConnected == true, roomResponse.result == true {
                 coordinator.start()                      // ilk modüle geç
             }
         }

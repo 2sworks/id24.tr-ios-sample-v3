@@ -37,7 +37,7 @@ Xcode → *File → Add Package Dependencies* →
 https://github.com/2sworks/id24.tr-ios-sdk-spm
 ```
 
-**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.0.0`).
+**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.2.0`).
 
 Sebebi: **2.x ve 3.x aynı depodan dağıtılır.** Bunlar iki ayrı sürüm ailesidir — 3.x, hazır
 SwiftUI ekranlarını (DefaultUI) SDK'nın içine taşıyan farklı bir entegrasyon modelidir ve
@@ -88,13 +88,18 @@ struct RootView: View {
     }
 }
 
+@MainActor                                   // coordinator ana thread'de çalışır
 func connect(coordinator: SDKFlowCoordinator) {
     coordinator.prepareForSetup()            // 1) setupSDK'dan ÖNCE
 
     IdentifyManager.shared.setupSDK(
         identId: "MÜŞTERİ-İŞLEM-NO",
         baseApiUrl: "https://v2api.identify.com.tr/",
-        networkOptions: SDKNetworkOptions(useSslPinning: false),
+        networkOptions: SDKNetworkOptions(
+            timeoutIntervalForRequest: 30,
+            timeoutIntervalForResource: 30,
+            useSslPinning: false
+        ),
         kpsData: nil,
         signLangSupport: false,
         nfcMaxErrorCount: 3,
@@ -104,7 +109,10 @@ func connect(coordinator: SDKFlowCoordinator) {
         showThankYouPage: true
     ) { socket, roomResponse, error in
         Task { @MainActor in
-            if error == nil, socket?.isConnected == true, roomResponse.result == true {
+            // error hiçbir zaman nil gelmez; kurulum başarılıysa errorMessages boştur
+            if let message = error?.errorMessages, !message.isEmpty {
+                print(message)               // kurulum hatası — kullanıcıya gösterin
+            } else if socket?.isConnected == true, roomResponse.result == true {
                 coordinator.start()          // 2) ilk modüle geç
             }
         }
