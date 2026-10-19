@@ -122,6 +122,16 @@ class SetupOptions {
   final bool showThankYouPage;
   final bool showNFCNotFoundPage;
   final bool supportU18;
+  final bool useSslPinning;
+
+  /// Sunucudan şifreli gelen MRZ alanlarını (NFC için) çözen anahtar. Native: `AESKey`.
+  final String? aesKey;
+
+  // Verilmezse (null) SDK varsayılanı geçerlidir.
+  final bool? bigCustomerCam;
+  final bool? needCertForNfc;
+  final bool? enableAutoRotateOCR;
+  final bool? ttsEnabled;
 
   const SetupOptions({
     required this.identId,
@@ -134,6 +144,12 @@ class SetupOptions {
     this.showThankYouPage = false,
     this.showNFCNotFoundPage = false,
     this.supportU18 = false,
+    this.useSslPinning = false,
+    this.aesKey,
+    this.bigCustomerCam,
+    this.needCertForNfc,
+    this.enableAutoRotateOCR,
+    this.ttsEnabled,
   });
 
   Map<String, dynamic> toMap() => {
@@ -147,12 +163,23 @@ class SetupOptions {
         'showThankYouPage': showThankYouPage,
         'showNFCNotFoundPage': showNFCNotFoundPage,
         'supportU18': supportU18,
+        'useSslPinning': useSslPinning,
+        'AESKey': aesKey,
+        'bigCustomerCam': bigCustomerCam,
+        'needCertForNfc': needCertForNfc,
+        'enableAutoRotateOCR': enableAutoRotateOCR,
+        'ttsEnabled': ttsEnabled,
       };
 }
 
 // MARK: - Public API
 
 class IdentifySdk {
+  /// Paylaşılan örnek. Kanallar statik olduğundan `IdentifySdk()` ile oluşturulan her örnek
+  /// aynı native köprüye gider; `events` akışını tek bir örnekten dinleyin (native tarafta
+  /// tek EventSink var, sonraki dinleme öncekinin yerini alır).
+  static final IdentifySdk instance = IdentifySdk();
+
   static const MethodChannel _methods = MethodChannel('identify_sdk/methods');
   static const EventChannel _events = EventChannel('identify_sdk/events');
 
@@ -166,7 +193,14 @@ class IdentifySdk {
     return _eventStream!;
   }
 
-  /// SDK'yı başlatır. { 'result': bool } döner.
+  /// Oturumu kurar. Başarılıysa SDK ekranlarını Flutter'ın üstüne tam ekran açar, akışı
+  /// başlatır ve true döner. Nihai sonuç `session.finished` olayıyla gelir; SDK ekranı akış
+  /// köke dönünce kendiliğinden kapanır.
+  ///
+  /// Hata: PlatformException — E_ARGS (eksik parametre), E_SETUP (kurulum/bağlantı; 120 sn
+  /// içinde yanıt gelmezse de), E_BUSY (kurulum sürüyor ya da SDK ekranı açık; ör. çift
+  /// dokunma), E_PRESENT (SDK ekranını sunacak view controller yok; açılan oturum kapatılır,
+  /// `session.finished` da gelir).
   Future<bool> setupSDK(SetupOptions options) async {
     final res = await _methods.invokeMethod<Map>('setupSDK', options.toMap());
     return (res?['result'] as bool?) ?? false;

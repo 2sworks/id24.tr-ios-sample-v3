@@ -16,7 +16,7 @@ Köprünün iskelet dosyaları bu klasörde.
 `https://github.com/2sworks/id24.tr-ios-sdk-spm`
 (XCFramework + OpenSSL/Starscream/WebRTC/SwiftSignatureView/PermissionsKit).
 
-Dependency Rule'u `Exact Version` yapın (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
+Dependency Rule'u `Exact Version` yapın (ör. `3.2.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
 Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış sürümü
 çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
@@ -29,6 +29,9 @@ Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı i
 ```
 
 ### Köprü dosyaları
+Köprü dosyaları en az IdentifySDK `3.1.0` ister: `onFinished`, `roomOccupiedMessage` ve tema
+köprüsünün kullandığı `SDKTheme.shared.apply` / `resetAppearance` `3.0.0`'da yok.
+
 | Dosya | Konum | Görev |
 |---|---|---|
 | `IdentifySdkPlugin.swift` | plugin olarak: `ios/Classes/`; doğrudan uygulamada: `ios/Runner/` | MethodChannel (`setupSDK`, `setTheme`, `resetTheme`, `reportAbandoned`) + EventChannel (olaylar) |
@@ -44,7 +47,7 @@ Plugin'in Dart'a açtığı metotlar:
 |---|---|---|
 | `IdentifySdk.setTheme(map)` → `unknownKeys` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan önce. Hot reload yeterli, derleme gerekmez |
 | `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönmek için |
-| `IdentifySdk.setupSDK(...)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | Akışı başlatır |
+| `IdentifySdk.setupSDK(...)` | `coordinator.prepareForSetup()` → `IdentifyManager.shared.setupSDK(...)` → başarıda SDK ekranını (`SDKFlowHostView`) tam ekran sunar ve `coordinator.start()` | Akışı başlatır. Akış köke dönünce ekranı kapatır; sonuç `session.finished` olayıyla gelir |
 | `IdentifySdk.events` (`Stream<SDKEvent>`) | `SDKEventListener` → `EventChannel` | Önce `listen`, sonra `setupSDK` |
 | `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | Kullanıcı akışı Dart tarafında terk ettiğinde |
 
@@ -60,7 +63,8 @@ gerekmez. İki istisna var:
 
 `IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift`'i kopyalamanız
 gerekmez ama okuyun: `prepareForSetup()` → `setupSDK` → `start()` sırası ve akışın
-`SDKFlowHostView` ile gösterilmesi orada çalışan haliyle duruyor.
+`SDKFlowHostView` ile gösterilmesi orada çalışan haliyle duruyor. `IdentifySdkPlugin.swift` aynı
+sırayı izler; SDK ekranını Flutter ekranının üstüne tam ekran sunar ve akış bitince kapatır.
 
 Dart'tan yapılamayan üç şeyi `IdentifySdkPlugin.swift` içinde yaparsınız:
 
@@ -95,7 +99,7 @@ final sub = sdk.events.listen((SDKEvent event) {
   }
 });
 
-// 2) SDK'yı başlat
+// 2) Oturumu kur: başarıda SDK ekranı Flutter'ın üstünde açılır ve akış başlar
 final result = await sdk.setupSDK(SetupOptions(
   identId: 'XXXX-XXXX',
   baseApiUrl: 'https://api.example.com/',
@@ -106,9 +110,25 @@ final result = await sdk.setupSDK(SetupOptions(
   showThankYouPage: true,        // false: sonuç ekranı yok, SDK kapanır — sonucu 'session.finished' ile alın
 ));
 
-// 3) Temizlik
-await sub.cancel();
+// 3) Temizlik — hemen değil: 'session.finished' geldikten sonra ya da sayfa kapanırken (dispose)
+// await sub.cancel();
 ```
+
+`setupSDK`, SDK ekranı açılıp akış başlayınca `true` döner; nihai sonucu beklemez. Sonuç
+`session.finished` olayıyla gelir. Akış köke dönünce (sonuç ekranında "Tamam", ilk ekranda geri,
+`showThankYouPage: false` ile kapanış) köprü SDK ekranını kendisi kapatır. `session.finished`
+işleyicisinde `setupSDK`'yı yeniden çağırmayın; yeni oturumu SDK ekranı kapandıktan sonra,
+kullanıcı bir şey yaptığında başlatın ([Oturum Çıkışları §10](../../guides/session-exit.md#10-kurallar-ve-tuzaklar)).
+
+`SetupOptions` ayrıca `useSslPinning`, `aesKey` (native `AESKey`; sunucudan şifreli gelen MRZ
+alanları için), `bigCustomerCam`, `needCertForNfc`, `enableAutoRotateOCR` ve `ttsEnabled` alır;
+verilmeyenlerde SDK varsayılanı geçerlidir. `showThankYouPage` verilmezse köprüde `false` olur
+(SDK'nın kendi varsayılanı `true`). Anlamları:
+[Sunucu & API Rehberi](../../guides/server-api.md#setupsdk--tam-parametre-referansı). `kpsData`,
+`logLevel`, `idCardLang` ve `identCardType` köprüden geçmez; gerekirse `IdentifySdkPlugin.swift`
+içinde ekleyin. SDK `3.2.0` ve üzerinde `signLangPreference` de verilebilir (host'un kendi
+ekranında aldığı işaret dili tercihi; verilirse SDK'nın işaret dili ekranı açılmaz): bunun için
+`IdentifySdkPlugin.swift`'teki yorum satırını açın ve alanı `SetupOptions`'a ekleyin.
 
 ### Hata kontrolü — `E_SETUP` tuzağı
 
@@ -122,6 +142,12 @@ if let message = error?.errorMessages, !message.isEmpty {
 }
 guard socket?.isConnected == true, roomResponse.result == true else { ... }
 ```
+
+Köprü, kurulum sürerken ya da SDK ekranı açıkken gelen ikinci `setupSDK`'yı (ör. düğmeye çift
+dokunma) `E_BUSY` ile reddeder ve geri çağrının yalnız ilkini işler. Bu koruma şart: SDK aynı
+kurulumun geri çağrısını tekrarlayabiliyor; korumasız köprüde SDK ekranları üst üste açılır.
+Geri çağrı 120 sn içinde gelmezse `E_SETUP` döner. Kendi köprünüzü yazarsanız bu korumayı da
+taşıyın; düğmeyi `setupSDK` dönene kadar kapatmanız da iyi olur.
 
 ---
 

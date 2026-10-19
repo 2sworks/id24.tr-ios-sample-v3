@@ -75,6 +75,13 @@ struct CrossPlatformIntegrationView: View {
     static let rnBridge = """
     @objc(IdentifySdkModule)
     class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
+      @MainActor private lazy var coordinator = SDKFlowCoordinator()
+      private var flowController: UIViewController?   // sunulan SDK ekranı
+      private var sessionFinished = false   // onFinished geldi mi
+      // Yanıt bekleyen çağrı: SDK geri çağrıyı tekrarlayabilir, yalnız ilki işlenir
+      private var pendingSetup: (resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)?
+      private var setupID = 0
+
       override func supportedEvents() -> [String]! { ["onSDKEvent"] }
 
       override func startObserving() {
@@ -95,19 +102,50 @@ struct CrossPlatformIntegrationView: View {
       func setupSDK(_ o: NSDictionary,
                     resolver resolve: @escaping RCTPromiseResolveBlock,
                     rejecter reject: @escaping RCTPromiseRejectBlock) {
-        IdentifyManager.shared.setupSDK(
-          identId: o["identId"] as! String,
-          baseApiUrl: o["baseApiUrl"] as! String,
-          networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: 30,
-                                            timeoutIntervalForResource: 30,
-                                            useSslPinning: false),
-          kpsData: nil,
-          signLangSupport: o["signLangSupport"] as? Bool ?? false,
-          nfcMaxErrorCount: o["nfcMaxErrorCount"] as? Int ?? 3,
-          turnKey: o["turnKey"] as! String
-        ) { _, room, err in
-          err == nil ? resolve(["result": room.result ?? false])
-                     : reject("E_SETUP", err!.localizedDescription, err)
+        DispatchQueue.main.async {
+          guard self.pendingSetup == nil, self.flowController == nil else {   // ör. çift dokunma
+            reject("E_BUSY", "Kurulum sürüyor ya da SDK ekranı açık", nil); return
+          }
+          self.setupID += 1
+          let id = self.setupID
+          self.pendingSetup = (resolve, reject)   // 120 sn zaman aşımı tam dosyada
+          self.sessionFinished = false
+          self.coordinator.prepareForSetup()   // ZORUNLU, setupSDK'dan ÖNCE
+          IdentifyManager.shared.setupSDK(
+            identId: o["identId"] as! String,
+            baseApiUrl: o["baseApiUrl"] as! String,
+            networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: 30,
+                                              timeoutIntervalForResource: 30,
+                                              useSslPinning: false),
+            kpsData: nil,
+            signLangSupport: o["signLangSupport"] as? Bool ?? false,
+            nfcMaxErrorCount: o["nfcMaxErrorCount"] as? Int ?? 3,
+            turnKey: o["turnKey"] as! String,
+            onFinished: { [weak self] _ in     // sonuç JS'e 'session.finished' olayıyla gider
+              DispatchQueue.main.async {
+                self?.sessionFinished = true
+                self?.dismissFlowIfFinished()  // akış köke döndüyse ekranı kapatır (tam dosyada)
+              }
+            }
+          ) { [weak self] socket, room, err in
+            DispatchQueue.main.async {
+              guard let self = self, self.setupID == id, let p = self.pendingSetup else { return }
+              self.pendingSetup = nil
+              // err başarıda da dolu gelir (errorMessages boş); mesaja bakılır
+              if let err = err, err.errorMessages != "" {
+                p.reject("E_SETUP", err.errorMessages, nil); return
+              }
+              guard socket?.isConnected == true, room.result ?? false else {
+                p.reject("E_SETUP", "Socket bağlantısı kurulamadı", nil); return
+              }
+              guard self.presentFlow() else {  // SDK ekranını tam ekran sunar (tam dosyada)
+                self.coordinator.resetFlow()
+                p.reject("E_PRESENT", "SDK ekranını sunacak view controller bulunamadı", nil); return
+              }
+              self.coordinator.start()    // ilk modülü açar
+              p.resolve(["result": true])
+            }
+          }
         }
       }
     }
@@ -130,6 +168,7 @@ struct CrossPlatformIntegrationView: View {
     const sub = IdentifySdk.addEventListener((e: SDKEvent) => {
       switch (e.name) {
         case 'session.started':   break;
+        case 'session.finished':  /* nihai sonuç: e.metadata.result */ break;
         case 'session.completed': /* e.status === 'success' */ break;
         case 'session.failed':    /* e.metadata.reason */ break;
         case 'session.abandoned': /* e.metadata.lastScreen */ break;
@@ -171,6 +210,7 @@ struct CrossPlatformIntegrationView: View {
       public func onSDKEvent(_ event: SDKEvent) {
         DispatchQueue.main.async { [weak self] in self?.sink?(event.toDictionary()) }
       }
+      // handle(_:result:): setupSDK → prepareForSetup, sunum, start; setTheme … (tam dosyada)
     }
     """
 
@@ -198,6 +238,7 @@ struct CrossPlatformIntegrationView: View {
     final sdk = IdentifySdk();
     final sub = sdk.events.listen((e) {
       switch (e.name) {
+        case 'session.finished':  /* nihai sonuç: e.metadata['result'] */ break;
         case 'session.completed': /* e.status == success */ break;
         case 'session.abandoned': /* e.metadata['lastScreen'] */ break;
       }
@@ -213,6 +254,7 @@ struct CrossPlatformIntegrationView: View {
     session.started                       // setupSDK
     module.<Modül>.presented/completed/failed/skipped
     call.connected / call.ended
+    session.finished    (oturum başına bir kez) // nihai sonuç: metadata.result
     session.completed   (status: success) // başarıyla kapandı
     session.failed      (status: failed)  // başarısız kapandı
     session.abandoned   (status: abandoned, metadata.lastScreen = nerede kaldı)

@@ -65,12 +65,28 @@ export interface SetupOptions {
   showThankYouPage?: boolean;
   showNFCNotFoundPage?: boolean;
   supportU18?: boolean;
+  useSslPinning?: boolean;
+  /** Sunucudan şifreli gelen MRZ alanlarını (NFC için) çözen anahtar. */
+  AESKey?: string;
+  // Verilmezse SDK varsayılanı geçerlidir.
+  bigCustomerCam?: boolean;
+  needCertForNfc?: boolean;
+  enableAutoRotateOCR?: boolean;
+  ttsEnabled?: boolean;
 }
 
 // MARK: - Public API
 
 export const IdentifySdk = {
-  /** SDK'yı başlatır. Çözülürse { result } döner. */
+  /**
+   * Oturumu kurar. Başarılıysa SDK ekranlarını tam ekran açar, akışı başlatır ve
+   * { result: true } ile çözülür. Nihai sonuç 'session.finished' olayıyla gelir; SDK ekranı
+   * akış köke dönünce kendiliğinden kapanır.
+   * Hata kodları: E_ARGS (eksik parametre), E_SETUP (kurulum/bağlantı; 120 sn içinde yanıt
+   * gelmezse de), E_BUSY (kurulum sürüyor ya da SDK ekranı açık; ör. çift dokunma), E_PRESENT
+   * (SDK ekranını sunacak view controller yok; açılan oturum kapatılır, 'session.finished' da
+   * gelir).
+   */
   setupSDK(options: SetupOptions): Promise<{ result: boolean }> {
     return IdentifySdkModule.setupSDK(options);
   },
@@ -161,6 +177,9 @@ export interface SDKThemeConfig {
     titleFont?: SDKFontValue; subtitleFont?: SDKFontValue;
     progressHeight?: number; progressSpacing?: number; progressCorner?: SDKCornerValue;
     overlayGradientOpacity?: number; showsDivider?: boolean;
+    /** Marka başlığı. brandWithModule: üst satır marka, alt satır adım adı. */
+    brandTitle?: string; brandSubtitle?: string;
+    titleMode?: 'module' | 'brand' | 'brandWithModule';
   };
   selection?: {
     cornerRadius?: number; rowMinHeight?: number; checkboxSize?: number;
@@ -203,6 +222,7 @@ export interface SDKThemeConfig {
 // Bilinen olay adları (switch'lerde tip yardımı için).
 export const SDKEventName = {
   sessionStarted: 'session.started',
+  sessionFinished: 'session.finished',
   sessionCompleted: 'session.completed',
   sessionFailed: 'session.failed',
   sessionAbandoned: 'session.abandoned',

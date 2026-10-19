@@ -6,8 +6,19 @@
 //  Bu bir İSKELETTİR: imza ve alan eşlemeleri gerçek SDK'ya göredir; projenize
 //  uyarlayın (TURN/WS anahtarları, ek parametreler, hata yönetimi).
 //
+//  setupSDK başarılı olunca SDK ekranlarını (SDKFlowHostView) React Native ekranının üstüne
+//  tam ekran sunar ve akışı başlatır; akış bitip köke dönünce ekranı kapatır. Sıra örnek
+//  uygulamadakiyle aynı: IdentifySample/Modules/Login/LoginViewModel.swift (connect) ve
+//  IdentifySample/App/RootView.swift.
+//
+//  En az IdentifySDK 3.1.0 ister: `onFinished`, `roomOccupiedMessage` ve tema köprüsünün
+//  kullandığı `SDKTheme.shared.apply` / `resetAppearance` 3.0.0'da yok.
+//
 
 import Foundation
+import UIKit
+import SwiftUI
+import Combine
 import IdentifySDK
 import React
 
@@ -15,6 +26,25 @@ import React
 class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
 
     private var hasListeners = false
+
+    // MARK: Akış durumu
+
+    /// Akışın beyni. Modül örneği başına bir tane; tek bridge'de uygulama ömrü boyunca tek
+    /// örnek (örnek uygulamadaki RootView gibi).
+    @MainActor private lazy var coordinator = SDKFlowCoordinator()
+    /// Rota → ekran kayıt defteri. Bir SDK ekranını native tarafta kendi tasarımınızla
+    /// değiştirecekseniz (`registry.override`, `registry.custom`) kaydı akış başlamadan yapın.
+    private let registry = SDKViewRegistry()
+    /// React Native ekranının üstüne sunulan, SDK ekranlarını taşıyan controller.
+    private var flowController: UIViewController?
+    private var pathObserver: AnyCancellable?
+    /// Oturumun sonucu (`onFinished`) geldi mi.
+    private var sessionFinished = false
+    /// Yanıt bekleyen setupSDK çağrısı ve kimliği. Geri çağrı ile zaman aşımından hangisi önce
+    /// gelirse o yanıtlar: SDK aynı kurulumun geri çağrısını tekrarlayabiliyor (ikinci bir
+    /// setupSDK ilkinin bağlantı denetimini durdurmuyor), bazı ağ hatalarında hiç vermeyebiliyor.
+    private var pendingSetup: (resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock)?
+    private var setupID = 0
 
     // MARK: RCTEventEmitter
 
@@ -75,6 +105,26 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
         let selectedModules = moduleRaws.compactMap { SdkModules(rawValue: $0) }
 
         DispatchQueue.main.async {
+            // Kurulum sürerken ya da SDK ekranı açıkken gelen ikinci çağrı (ör. çift dokunma)
+            // reddedilir; yoksa SDK ekranları üst üste açılır.
+            guard self.pendingSetup == nil, self.flowController == nil else {
+                reject("E_BUSY", "Kurulum sürüyor ya da SDK ekranı açık", nil)
+                return
+            }
+            self.setupID += 1
+            let id = self.setupID
+            self.pendingSetup = (resolve, reject)
+            // Geri çağrı hiç gelmezse promise asılı kalmasın, yeni kurulum da engellenmesin.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 120) { [weak self] in
+                guard let self = self, self.setupID == id, let pending = self.pendingSetup else { return }
+                self.pendingSetup = nil
+                pending.reject("E_SETUP", "Kurulum yanıt vermedi", nil)
+            }
+            self.sessionFinished = false
+            // ZORUNLU ve setupSDK'dan ÖNCE: modül controller'larını SDK'ya kaydeder.
+            // Atlanırsa ya da setupSDK'dan sonra çağrılırsa modüller başlamaz.
+            self.coordinator.prepareForSetup()
+
             IdentifyManager.shared.setupSDK(
                 identId: identId,
                 baseApiUrl: baseApiUrl,
@@ -85,43 +135,108 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
                 ),
                 kpsData: nil,
                 signLangSupport: signLang,
+                // SDK 3.2.0 ve üzerinde işaret dili tercihini de geçirebilirsiniz (3.1.x'te yok):
+                // signLangPreference: options["signLangPreference"] as? Bool,
                 nfcMaxErrorCount: nfcMax,
+                bigCustomerCam: options["bigCustomerCam"] as? Bool,
                 selectedModules: selectedModules,
+                needCertForNfc: options["needCertForNfc"] as? Bool,
                 turnKey: turnKey,
                 wsSecretKey: wsSecretKey,
                 showThankYouPage: showThankYou,
                 showNFCNotFoundPage: showNfcNotFound,
-                supportU18: supportU18
-            ) { socket, roomResponse, error in
-                // DİKKAT: setupSDK hata parametresini HER ZAMAN dolu gönderir; başarılı
-                // kurulumda `errorMessages` boş string olur. Bu yüzden `if let error = error`
-                // başarıda da doğrudur ve akış hiç başlamadan E_SETUP ile reddedilir.
-                // Doğru kontrol, mesajın dolu olup olmadığıdır.
-                if let message = error?.errorMessages, !message.isEmpty {
-                    reject("E_SETUP", message, nil)
-                    return
+                supportU18: supportU18,
+                AESKey: options["AESKey"] as? String,
+                enableAutoRotateOCR: options["enableAutoRotateOCR"] as? Bool,
+                ttsEnabled: options["ttsEnabled"] as? Bool,
+                // Oturum nasıl biterse bitsin bir kez çağrılır. Sonuç JS'e ayrıca
+                // `session.finished` olayıyla gider; burada yalnızca SDK ekranı kapatılır.
+                onFinished: { [weak self] _ in
+                    DispatchQueue.main.async {
+                        self?.sessionFinished = true
+                        self?.dismissFlowIfFinished()
+                    }
                 }
-                guard socket?.isConnected == true, roomResponse.result == true else {
-                    reject("E_SETUP", "Socket bağlantısı kurulamadı", nil)
-                    return
+            ) { [weak self] socket, roomResponse, error in
+                DispatchQueue.main.async {
+                    // Yalnız bu kurulumun ilk geri çağrısı işlenir; tekrarları yok sayılır.
+                    guard let self = self, self.setupID == id, let pending = self.pendingSetup else { return }
+                    self.pendingSetup = nil
+                    // DİKKAT: setupSDK hata parametresini HER ZAMAN dolu gönderir; başarılı
+                    // kurulumda `errorMessages` boş string olur. Bu yüzden `if let error = error`
+                    // başarıda da doğrudur ve akış hiç başlamadan E_SETUP ile reddedilir.
+                    // Doğru kontrol, mesajın dolu olup olmadığıdır.
+                    if let message = error?.errorMessages, !message.isEmpty {
+                        pending.reject("E_SETUP", message, nil)
+                        return
+                    }
+                    guard socket?.isConnected == true, roomResponse.result == true else {
+                        pending.reject("E_SETUP", "Socket bağlantısı kurulamadı", nil)
+                        return
+                    }
+                    guard self.presentFlow() else {
+                        self.coordinator.resetFlow()   // açık kalan oturumu da kapatır
+                        pending.reject("E_PRESENT", "SDK ekranını sunacak view controller bulunamadı", nil)
+                        return
+                    }
+                    self.coordinator.start()   // sunucunun modül listesiyle ilk ekranı açar
+                    pending.resolve(["result": true])
                 }
-                // Akışı sunmak için: kendi UIViewController host'unuzu present edin,
-                // veya SDKFlowHostView (SwiftUI) ile coordinator'ı start() edin.
-                //
-                // KAPANIŞ ANİMASYONU: SDK akışı kendini sunmaz ve kapatmaz — sunum da
-                // kapanış da host'a aittir. Akış bittiğinde ekranı animasyonlu kaldırın:
-                //
-                //   host.modalPresentationStyle = .fullScreen
-                //   host.modalTransitionStyle = .coverVertical     // yukarıdan aşağı
-                //   presenter.present(host, animated: true)
-                //   ...
-                //   host.dismiss(animated: true)                   // animated: false ANINDA kapatır
-                //
-                // React Native tarafında akışı <Modal animationType="slide"> içinde
-                // gösteriyorsanız kapanış animasyonu oradan gelir.
-                resolve(["result": true])
             }
         }
+    }
+
+    // MARK: SDK ekranının sunumu
+
+    /// SDK ekranlarını React Native ekranının üstüne tam ekran sunar.
+    ///
+    /// KAPANIŞ ANİMASYONU: SDK akışı kendini sunmaz ve kapatmaz — sunum da kapanış da
+    /// host'a (bu köprüye) aittir. Akış köke döndüğünde (sonuç ekranında "Tamam", ilk ekranda
+    /// geri, `showThankYouPage: false` ile kapanış) `coordinator.path` boşalır; oturum da
+    /// bittiyse ekran animasyonlu kaldırılır. Sunumu değiştirirseniz kapanışı da
+    /// animasyonlu yapın: `dismiss(animated: false)` ekranı ANINDA kapatır.
+    @MainActor
+    private func presentFlow() -> Bool {
+        guard let presenter = Self.topViewController() else { return false }
+        let host = UIHostingController(rootView: SDKFlowHostView(coordinator: coordinator, registry: registry) {
+            EmptyView()   // kök: path boşken (akış başlamadan hemen önce, kapanırken) görünür
+        })
+        host.modalPresentationStyle = .fullScreen
+        host.modalTransitionStyle = .coverVertical     // yukarıdan aşağı kapanış
+        presenter.present(host, animated: true)
+        flowController = host
+        pathObserver = coordinator.$path
+            .dropFirst()
+            .filter { $0.isEmpty }
+            .sink { [weak self] _ in
+                DispatchQueue.main.async { self?.dismissFlowIfFinished() }
+            }
+        return true
+    }
+
+    /// Oturum bittiyse ve akış köke döndüyse SDK ekranını kapatır. Sonuç ekranı açıksa
+    /// (`showThankYouPage: true`) kullanıcı "Tamam"a basana kadar beklenir.
+    @MainActor
+    private func dismissFlowIfFinished() {
+        guard sessionFinished, let host = flowController,
+              coordinator.path.isEmpty, coordinator.roomOccupiedMessage == nil else { return }
+        flowController = nil
+        pathObserver = nil
+        // Host'un üstünde SDK'nın açtığı bir ekran (ör. bağlantı koptu) kaldıysa onunla birlikte
+        // kapatır; host.dismiss yalnız o üstteki ekranı kapatırdı.
+        host.presentingViewController?.dismiss(animated: true)
+    }
+
+    /// SDK ekranının sunulacağı, uygulamanın en üstteki controller'ı.
+    @MainActor
+    private static func topViewController() -> UIViewController? {
+        let window = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+        var top = window?.rootViewController
+        while let presented = top?.presentedViewController { top = presented }
+        return top
     }
 
     // MARK: Tema köprüsü

@@ -5,14 +5,43 @@
 //  MethodChannel ile setupSDK'yı, EventChannel ile birleşik olay akışını (SDKEvent)
 //  Dart tarafına bağlar. Bu bir İSKELETTİR; projenize uyarlayın.
 //
+//  setupSDK başarılı olunca SDK ekranlarını (SDKFlowHostView) Flutter ekranının üstüne tam
+//  ekran sunar ve akışı başlatır; akış bitip köke dönünce ekranı kapatır. Sıra örnek
+//  uygulamadakiyle aynı: IdentifySample/Modules/Login/LoginViewModel.swift (connect) ve
+//  IdentifySample/App/RootView.swift.
+//
+//  En az IdentifySDK 3.1.0 ister: `onFinished`, `roomOccupiedMessage` ve tema köprüsünün
+//  kullandığı `SDKTheme.shared.apply` / `resetAppearance` 3.0.0'da yok.
+//
 
 import Flutter
 import UIKit
+import SwiftUI
+import Combine
 import IdentifySDK
 
 public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, FlutterStreamHandler {
 
     private var eventSink: FlutterEventSink?
+
+    // MARK: Akış durumu
+
+    /// Akışın beyni. Plugin örneği başına bir tane; tek FlutterEngine'de uygulama ömrü boyunca
+    /// tek örnek (örnek uygulamadaki RootView gibi).
+    @MainActor private lazy var coordinator = SDKFlowCoordinator()
+    /// Rota → ekran kayıt defteri. Bir SDK ekranını native tarafta kendi tasarımınızla
+    /// değiştirecekseniz (`registry.override`, `registry.custom`) kaydı akış başlamadan yapın.
+    private let registry = SDKViewRegistry()
+    /// Flutter ekranının üstüne sunulan, SDK ekranlarını taşıyan controller.
+    private var flowController: UIViewController?
+    private var pathObserver: AnyCancellable?
+    /// Oturumun sonucu (`onFinished`) geldi mi.
+    private var sessionFinished = false
+    /// Yanıt bekleyen setupSDK çağrısı ve kimliği. Geri çağrı ile zaman aşımından hangisi önce
+    /// gelirse o yanıtlar: SDK aynı kurulumun geri çağrısını tekrarlayabiliyor (ikinci bir
+    /// setupSDK ilkinin bağlantı denetimini durdurmuyor), bazı ağ hatalarında hiç vermeyebiliyor.
+    private var pendingSetup: FlutterResult?
+    private var setupID = 0
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = IdentifySdkPlugin()
@@ -90,37 +119,137 @@ public class IdentifySdkPlugin: NSObject, FlutterPlugin, SDKEventListener, Flutt
         let moduleRaws = args["selectedModules"] as? [String] ?? []
         let selectedModules = moduleRaws.compactMap { SdkModules(rawValue: $0) }
 
-        IdentifyManager.shared.setupSDK(
-            identId: identId,
-            baseApiUrl: baseApiUrl,
-            networkOptions: SDKNetworkOptions(
-                timeoutIntervalForRequest: 30,
-                timeoutIntervalForResource: 30,
-                useSslPinning: args["useSslPinning"] as? Bool ?? false
-            ),
-            kpsData: nil,
-            signLangSupport: args["signLangSupport"] as? Bool ?? false,
-            nfcMaxErrorCount: args["nfcMaxErrorCount"] as? Int ?? 3,
-            selectedModules: selectedModules,
-            turnKey: turnKey,
-            wsSecretKey: args["wsSecretKey"] as? String,
-            showThankYouPage: args["showThankYouPage"] as? Bool ?? false,
-            showNFCNotFoundPage: args["showNFCNotFoundPage"] as? Bool ?? false,
-            supportU18: args["supportU18"] as? Bool ?? false
-        ) { socket, roomResponse, error in
-            // DİKKAT: setupSDK hata parametresini HER ZAMAN dolu gönderir; başarılı
-            // kurulumda `errorMessages` boş string olur. Bu yüzden `if let error = error`
-            // başarıda da doğrudur ve akış hiç başlamadan E_SETUP ile reddedilir.
-            // Doğru kontrol, mesajın dolu olup olmadığıdır.
-            if let message = error?.errorMessages, !message.isEmpty {
-                result(FlutterError(code: "E_SETUP", message: message, details: nil))
+        // Coordinator ve SDK ekranları ana thread'de (MainActor) çalışır.
+        DispatchQueue.main.async {
+            // Kurulum sürerken ya da SDK ekranı açıkken gelen ikinci çağrı (ör. çift dokunma)
+            // reddedilir; yoksa SDK ekranları üst üste açılır.
+            guard self.pendingSetup == nil, self.flowController == nil else {
+                result(FlutterError(code: "E_BUSY", message: "Kurulum sürüyor ya da SDK ekranı açık", details: nil))
                 return
             }
-            guard socket?.isConnected == true, roomResponse.result == true else {
-                result(FlutterError(code: "E_SETUP", message: "Socket bağlantısı kurulamadı", details: nil))
-                return
+            self.setupID += 1
+            let id = self.setupID
+            self.pendingSetup = result
+            // Geri çağrı hiç gelmezse çağrı yanıtsız kalmasın, yeni kurulum da engellenmesin.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 120) { [weak self] in
+                guard let self = self, self.setupID == id, let reply = self.pendingSetup else { return }
+                self.pendingSetup = nil
+                reply(FlutterError(code: "E_SETUP", message: "Kurulum yanıt vermedi", details: nil))
             }
-            result(["result": true])
+            self.sessionFinished = false
+            // ZORUNLU ve setupSDK'dan ÖNCE: modül controller'larını SDK'ya kaydeder.
+            // Atlanırsa ya da setupSDK'dan sonra çağrılırsa modüller başlamaz.
+            self.coordinator.prepareForSetup()
+
+            IdentifyManager.shared.setupSDK(
+                identId: identId,
+                baseApiUrl: baseApiUrl,
+                networkOptions: SDKNetworkOptions(
+                    timeoutIntervalForRequest: 30,
+                    timeoutIntervalForResource: 30,
+                    useSslPinning: args["useSslPinning"] as? Bool ?? false
+                ),
+                kpsData: nil,
+                signLangSupport: args["signLangSupport"] as? Bool ?? false,
+                // SDK 3.2.0 ve üzerinde işaret dili tercihini de geçirebilirsiniz (3.1.x'te yok):
+                // signLangPreference: args["signLangPreference"] as? Bool,
+                nfcMaxErrorCount: args["nfcMaxErrorCount"] as? Int ?? 3,
+                bigCustomerCam: args["bigCustomerCam"] as? Bool,
+                selectedModules: selectedModules,
+                needCertForNfc: args["needCertForNfc"] as? Bool,
+                turnKey: turnKey,
+                wsSecretKey: args["wsSecretKey"] as? String,
+                showThankYouPage: args["showThankYouPage"] as? Bool ?? false,
+                showNFCNotFoundPage: args["showNFCNotFoundPage"] as? Bool ?? false,
+                supportU18: args["supportU18"] as? Bool ?? false,
+                AESKey: args["AESKey"] as? String,
+                enableAutoRotateOCR: args["enableAutoRotateOCR"] as? Bool,
+                ttsEnabled: args["ttsEnabled"] as? Bool,
+                // Oturum nasıl biterse bitsin bir kez çağrılır. Sonuç Dart'a ayrıca
+                // `session.finished` olayıyla gider; burada yalnızca SDK ekranı kapatılır.
+                onFinished: { [weak self] _ in
+                    DispatchQueue.main.async {
+                        self?.sessionFinished = true
+                        self?.dismissFlowIfFinished()
+                    }
+                }
+            ) { [weak self] socket, roomResponse, error in
+                DispatchQueue.main.async {
+                    // Yalnız bu kurulumun ilk geri çağrısı işlenir; tekrarları yok sayılır.
+                    guard let self = self, self.setupID == id, let reply = self.pendingSetup else { return }
+                    self.pendingSetup = nil
+                    // DİKKAT: setupSDK hata parametresini HER ZAMAN dolu gönderir; başarılı
+                    // kurulumda `errorMessages` boş string olur. Bu yüzden `if let error = error`
+                    // başarıda da doğrudur ve akış hiç başlamadan E_SETUP ile reddedilir.
+                    // Doğru kontrol, mesajın dolu olup olmadığıdır.
+                    if let message = error?.errorMessages, !message.isEmpty {
+                        reply(FlutterError(code: "E_SETUP", message: message, details: nil))
+                        return
+                    }
+                    guard socket?.isConnected == true, roomResponse.result == true else {
+                        reply(FlutterError(code: "E_SETUP", message: "Socket bağlantısı kurulamadı", details: nil))
+                        return
+                    }
+                    guard self.presentFlow() else {
+                        self.coordinator.resetFlow()   // açık kalan oturumu da kapatır
+                        reply(FlutterError(code: "E_PRESENT", message: "SDK ekranını sunacak view controller bulunamadı", details: nil))
+                        return
+                    }
+                    self.coordinator.start()   // sunucunun modül listesiyle ilk ekranı açar
+                    reply(["result": true])
+                }
+            }
         }
+    }
+
+    // MARK: SDK ekranının sunumu
+
+    /// SDK ekranlarını Flutter ekranının üstüne tam ekran sunar.
+    ///
+    /// SDK akışı kendini sunmaz ve kapatmaz; ikisi de host'un (bu köprünün) işi. Akış köke
+    /// döndüğünde (sonuç ekranında "Tamam", ilk ekranda geri, `showThankYouPage: false` ile
+    /// kapanış) `coordinator.path` boşalır; oturum da bittiyse ekran kapatılır.
+    @MainActor
+    private func presentFlow() -> Bool {
+        guard let presenter = Self.topViewController() else { return false }
+        let host = UIHostingController(rootView: SDKFlowHostView(coordinator: coordinator, registry: registry) {
+            EmptyView()   // kök: path boşken (akış başlamadan hemen önce, kapanırken) görünür
+        })
+        host.modalPresentationStyle = .fullScreen
+        host.modalTransitionStyle = .coverVertical
+        presenter.present(host, animated: true)
+        flowController = host
+        pathObserver = coordinator.$path
+            .dropFirst()
+            .filter { $0.isEmpty }
+            .sink { [weak self] _ in
+                DispatchQueue.main.async { self?.dismissFlowIfFinished() }
+            }
+        return true
+    }
+
+    /// Oturum bittiyse ve akış köke döndüyse SDK ekranını kapatır. Sonuç ekranı açıksa
+    /// (`showThankYouPage: true`) kullanıcı "Tamam"a basana kadar beklenir.
+    @MainActor
+    private func dismissFlowIfFinished() {
+        guard sessionFinished, let host = flowController,
+              coordinator.path.isEmpty, coordinator.roomOccupiedMessage == nil else { return }
+        flowController = nil
+        pathObserver = nil
+        // Host'un üstünde SDK'nın açtığı bir ekran (ör. bağlantı koptu) kaldıysa onunla birlikte
+        // kapatır; host.dismiss yalnız o üstteki ekranı kapatırdı. animated: false ANINDA kapatır.
+        host.presentingViewController?.dismiss(animated: true)
+    }
+
+    /// SDK ekranının sunulacağı, uygulamanın en üstteki controller'ı.
+    @MainActor
+    private static func topViewController() -> UIViewController? {
+        let window = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+        var top = window?.rootViewController
+        while let presented = top?.presentedViewController { top = presented }
+        return top
     }
 }

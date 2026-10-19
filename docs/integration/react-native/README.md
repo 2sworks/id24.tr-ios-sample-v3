@@ -21,7 +21,7 @@ React Native projenizin iOS tarafında `Podfile` olsa bile SDK'yı SPM ile ekley
 https://github.com/2sworks/id24.tr-ios-sdk-spm
 ```
 
-Dependency Rule'u `Exact Version` yapın (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
+Dependency Rule'u `Exact Version` yapın (ör. `3.2.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
 Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış sürümü
 çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
@@ -52,9 +52,12 @@ Bu klasördeki dosyaları aşağıdaki konumlara kopyalayın. Swift ve Obj-C dos
 uygulama target'ına ekleyin: sürükleyip bırakırken "Copy items if needed" ve target kutusunu
 işaretleyin (Target Membership açık olmalı).
 
+Köprü dosyaları en az IdentifySDK `3.1.0` ister: `onFinished`, `roomOccupiedMessage` ve tema
+köprüsünün kullandığı `SDKTheme.shared.apply` / `resetAppearance` `3.0.0`'da yok.
+
 | Dosya | Hedef | Görev |
 |---|---|---|
-| `IdentifySdkModule.swift` | `ios/<App>/IdentifySdkModule.swift` | `RCTEventEmitter` köprüsü: `setupSDK` + `setTheme` + olay yayını |
+| `IdentifySdkModule.swift` | `ios/<App>/IdentifySdkModule.swift` | `RCTEventEmitter` köprüsü: `setupSDK` (SDK ekranını sunar, akışı başlatır) + `setTheme` + olay yayını |
 | `IdentifySdkModule.m`     | `ios/<App>/IdentifySdkModule.m` | Obj-C `RCT_EXTERN_MODULE` köprü kaydı |
 | `IdentifySdk.ts`          | `src/native/IdentifySdk.ts` | JS/TS sarmalayıcı + tip tanımlı `SDKEvent` + `SDKThemeConfig` |
 | `../theme.example.json`   | `src/theme/identifyTheme.json` | İsteğe bağlı başlangıç teması; `setTheme` ile gönderilir |
@@ -65,7 +68,7 @@ Köprünün JS'e açtığı metotlar:
 |---|---|---|
 | `IdentifySdk.setTheme(config)` → `{ unknownKeys }` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan önce. JS reload yeterli, derleme gerekmez |
 | `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönmek için |
-| `IdentifySdk.setupSDK(options)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | Akışı başlatır |
+| `IdentifySdk.setupSDK(options)` | `coordinator.prepareForSetup()` → `IdentifyManager.shared.setupSDK(...)` → başarıda SDK ekranını (`SDKFlowHostView`) tam ekran sunar ve `coordinator.start()` | Akışı başlatır. Akış köke dönünce ekranı kapatır; sonuç `session.finished` olayıyla gelir |
 | `IdentifySdk.addEventListener(h)` | `SDKEventListener` → `RCTEventEmitter` | `setupSDK`'dan önce bağlayın |
 | `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | Kullanıcı akışı JS tarafında terk ettiğinde |
 
@@ -81,7 +84,8 @@ gerekmez. İki istisna var:
 
 `IdentifySample/Modules/Login/LoginViewModel.swift` ile `App/RootView.swift`'i kopyalamanız
 gerekmez ama okuyun: `prepareForSetup()` → `setupSDK` → `start()` sırası ve akışın
-`SDKFlowHostView` ile gösterilmesi orada çalışan haliyle duruyor.
+`SDKFlowHostView` ile gösterilmesi orada çalışan haliyle duruyor. `IdentifySdkModule.swift` aynı
+sırayı izler; SDK ekranını React Native ekranının üstüne tam ekran sunar ve akış bitince kapatır.
 
 JS'ten yapılamayan üç şeyi `IdentifySdkModule.swift` içinde yaparsınız:
 
@@ -121,7 +125,7 @@ const sub = IdentifySdk.addEventListener((event: SDKEvent) => {
   }
 });
 
-// 2) SDK'yı başlat
+// 2) Oturumu kur: başarıda SDK ekranı React Native'in üstünde açılır ve akış başlar
 await IdentifySdk.setupSDK({
   identId: 'XXXX-XXXX',
   baseApiUrl: 'https://api.example.com/',
@@ -132,9 +136,25 @@ await IdentifySdk.setupSDK({
   showThankYouPage: true,       // false: sonuç ekranı yok, SDK kapanır — sonucu 'session.finished' ile alın
 });
 
-// 3) Temizlik
-sub.remove();
+// 3) Temizlik — hemen değil: 'session.finished' geldikten sonra ya da ekran kapanırken (unmount)
+// sub.remove();
 ```
+
+`setupSDK`, SDK ekranı açılıp akış başlayınca `{ result: true }` ile çözülür; nihai sonucu
+beklemez. Sonuç `session.finished` olayıyla gelir. Akış köke dönünce (sonuç ekranında "Tamam",
+ilk ekranda geri, `showThankYouPage: false` ile kapanış) köprü SDK ekranını kendisi kapatır.
+`session.finished` işleyicisinde `setupSDK`'yı yeniden çağırmayın; yeni oturumu SDK ekranı
+kapandıktan sonra, kullanıcı bir şey yaptığında başlatın ([Oturum Çıkışları §10](../../guides/session-exit.md#10-kurallar-ve-tuzaklar)).
+
+`SetupOptions` ayrıca `useSslPinning`, `AESKey` (sunucudan şifreli gelen MRZ alanları için),
+`bigCustomerCam`, `needCertForNfc`, `enableAutoRotateOCR` ve `ttsEnabled` alır; verilmeyenlerde
+SDK varsayılanı geçerlidir. `showThankYouPage` verilmezse köprüde `false` olur (SDK'nın kendi
+varsayılanı `true`). Anlamları:
+[Sunucu & API Rehberi](../../guides/server-api.md#setupsdk--tam-parametre-referansı). `kpsData`,
+`logLevel`, `idCardLang` ve `identCardType` köprüden geçmez; gerekirse `IdentifySdkModule.swift`
+içinde ekleyin. SDK `3.2.0` ve üzerinde `signLangPreference` de verilebilir (host'un kendi
+ekranında aldığı işaret dili tercihi; verilirse SDK'nın işaret dili ekranı açılmaz): bunun için
+`IdentifySdkModule.swift`'teki yorum satırını açın ve alanı `SetupOptions`'a ekleyin.
 
 ### Hata kontrolü — `E_SETUP` tuzağı
 
@@ -155,6 +175,12 @@ guard socket?.isConnected == true, roomResponse.result == true else { ... }
 
 `IdentifySdkModule.swift` bu kontrolü zaten doğru yapıyor. Kendi köprünüzü yazarsanız aynı deseni
 kullanın.
+
+Köprü, kurulum sürerken ya da SDK ekranı açıkken gelen ikinci `setupSDK`'yı (ör. düğmeye çift
+dokunma) `E_BUSY` ile reddeder ve geri çağrının yalnız ilkini işler. Bu koruma şart: SDK aynı
+kurulumun geri çağrısını tekrarlayabiliyor; korumasız köprüde SDK ekranları üst üste açılır.
+Geri çağrı 120 sn içinde gelmezse promise `E_SETUP` ile reddedilir. Kendi köprünüzü yazarsanız
+bu korumayı da taşıyın; düğmeyi `setupSDK` dönene kadar kapatmanız da iyi olur.
 
 ---
 
@@ -201,10 +227,11 @@ Swift closure'ı gerektirdiği için `IdentifySdkModule.swift` içinde yapılır
 
 ## 3.2) Akışın kapanış animasyonu
 
-SDK akışı kendisi sunmaz ve kendisi kapatmaz; ikisi de host uygulamanın işi. Ekran animasyonsuz
-kapanıyorsa sebep, akışın içinde durduğu görünümün animasyonsuz kaldırılmasıdır.
+SDK akışı kendisi sunmaz ve kendisi kapatmaz; ikisi de host uygulamanın işi. Bu iskelette ikisini
+de `IdentifySdkModule.swift` yapar: akışı tam ekran sunar, akış bitince animasyonla kapatır. Ekran
+animasyonsuz kapanıyorsa sebep, akışın içinde durduğu görünümün animasyonsuz kaldırılmasıdır.
 
-React Native'de akışı bir modal içinde gösteriyorsanız:
+Sunumu değiştirip akışı React Native'de bir modal içinde gösteriyorsanız:
 
 ```tsx
 <Modal visible={flowVisible} animationType="slide" presentationStyle="fullScreen">
@@ -212,15 +239,19 @@ React Native'de akışı bir modal içinde gösteriyorsanız:
 </Modal>
 ```
 
-Native tarafta kendi controller'ınızı sunuyorsanız:
+Native tarafta (`IdentifySdkModule.swift`'teki gibi) kendi controller'ınızı sunuyorsanız:
 
 ```swift
 host.modalPresentationStyle = .fullScreen
 host.modalTransitionStyle = .coverVertical     // yukarıdan aşağı kapanış
 presenter.present(host, animated: true)
 ...
-host.dismiss(animated: true)                   // animated: false ANINDA kapatır
+host.presentingViewController?.dismiss(animated: true)   // animated: false ANINDA kapatır
 ```
+
+`host.dismiss` yerine `presentingViewController?.dismiss` kullanılır: host'un üstünde SDK'nın
+açtığı bir ekran (ör. bağlantı koptu) kalmışsa `host.dismiss` yalnız onu kapatır, host ekranda
+kalır.
 
 Akış içindeki adım geçişlerinin süresini temadan ayarlarsınız:
 
