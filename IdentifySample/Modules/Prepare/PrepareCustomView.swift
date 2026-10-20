@@ -50,7 +50,6 @@ struct PrepareCustomView: View {
                 SDKNavigationBar(
                     style: .progress(steps: coordinator.progressTotal, current: coordinator.progressStep),
                     title: String(.idVerifyTitle),
-                    subtitle: String(.prepareEnvSubtitle),
                     onBack: { coordinator.popBack() }
                 )
                 cardArea
