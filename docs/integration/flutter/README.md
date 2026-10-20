@@ -34,9 +34,13 @@ köprüsünün kullandığı `SDKTheme.shared.apply` / `resetAppearance` `3.0.0`
 
 | Dosya | Konum | Görev |
 |---|---|---|
-| `IdentifySdkPlugin.swift` | plugin olarak: `ios/Classes/`; doğrudan uygulamada: `ios/Runner/` | MethodChannel (`setupSDK`, `setTheme`, `resetTheme`, `reportAbandoned`) + EventChannel (olaylar) |
+| `IdentifySdkPlugin.swift` | doğrudan uygulamada: `ios/Runner/`; ayrı plugin paketinde: `ios/Classes/` (aşağıdaki nota bakın) | MethodChannel (`setupSDK`, `setTheme`, `resetTheme`, `reportAbandoned`) + EventChannel (olaylar) |
 | `identify_sdk.dart`       | `lib/identify_sdk.dart` | Dart sarmalayıcı + `SDKEvent` modeli + `Stream` |
 | `../theme.example.json`   | `assets/identify_theme.json` (+ `pubspec.yaml` → `assets:`) | İsteğe bağlı başlangıç teması; `setTheme` ile gönderilir |
+
+> SDK'yı yukarıdaki gibi `Runner`'a SPM ile eklediyseniz köprüyü `ios/Runner/` altına koyun. Ayrı bir
+> plugin paketi (`ios/Classes/`) yalnız `Runner`'a eklenen SDK'yı göremez; o yolda SDK paketi plugin'in
+> kendi bağımlılığı olarak eklenmelidir.
 
 Plugin'i `Runner` içine koyduysanız `AppDelegate`'te kaydedin:
 `IdentifySdkPlugin.register(with: registrar(forPlugin: "IdentifySdkPlugin")!)`.
