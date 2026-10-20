@@ -895,12 +895,20 @@ Slotlar: `onBack`, `onMenu`, `onHelp` closure'ları, `trailing: AnyView?`.
 // Bool ile:
 .idAlert(isPresented: $showAlert, alert: IDAlertModel(type: .info, title: "...", message: "...",
                                                       actions: [IDAlertAction(title: "Tamam")]))
-// errorMessage binding'ini otomatik hata alert'ine bağla:
-.idErrorAlert($vm.errorMessage)
+// errorMessage binding'ini otomatik hata alert'ine bağla; kapanınca bekleyen işi çalıştır:
+.idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })
 ```
 
 Tipler: `.normal` · `.error` · `.info` · `.success` (ikon + vurgu rengi otomatik).
 Aksiyon stilleri: `.primary` · `.cancel` · `.destructive`.
+
+`onDismiss` alert kapanınca SDK'nın beklettiği işi çalıştırır: yeniden deneme, hak bitince
+modülü atlama ya da akışı bitirme. `.selfie`, `.selfieWithLiveness`, `.idCard`, `.idCardOVD`,
+`.nfc` ve `.liveness` ekranlarında zorunludur; yoksa hak bitince modül atlanmaz, akış bitmez.
+Bu ekranlarda `onSkipRequested` ve `onFlowFailed`'ı da bağlayın. Hatayı kendiniz çiziyorsanız
+kapatırken `vm.dismissError()` çağırın (3.2.0+; önceki sürümlerde önce `vm.errorMessage = nil`,
+sonra `vm.consumePendingAlertAction()`). Ayrıntı:
+[Hata Kanalı → Kendi ekranınızı yazdıysanız](docs/guides/errors-and-limits.md#8-kendi-ekranınızı-yazdıysanız).
 
 ### Diğer yardımcılar
 
@@ -1200,7 +1208,8 @@ Pasif ekranlar (bölüm 7-B) kuralın dışındadır — zaten VM metodu çağı
 - [ ] `coordinator.prepareForSetup()` `setupSDK`'dan önce çağrılıyor
 - [ ] Custom ekranlar iş eylemlerinde yalnızca SDK VM metotlarını çağırıyor
 - [ ] Geçişler `coordinator` üzerinden (`advanceToNextModule` / `advanceExternal` / `skipCurrentModule`)
-- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya yansıtılıyor (`.idErrorAlert` hazır)
+- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya yansıtılıyor; hata kapanınca `vm.consumePendingAlertAction()` çağrılıyor (`.idErrorAlert`'in `onDismiss`'i ya da 3.2.0+ `vm.dismissError()`)
+- [ ] Deneme hakkı olan ekranlarda `onSkipRequested` ve `onFlowFailed` bağlandı; hak bitince modül atlanıyor ya da akış bitiyor
 - [ ] Custom fontun **PostScript family adı** doğrulandı (Font Book)
 - [ ] Klavye içeren kendi sheet/login ekranlarınızda klavye kapatma davranışı kuruldu (SDK'nın global jesti yalnızca akış ekranlarını kapsar)
 - [ ] Tema, Showcase kataloğunda (`Showcase/ShowcaseCatalog.swift`) her ekranda kontrol edildi

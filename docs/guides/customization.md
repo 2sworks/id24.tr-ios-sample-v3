@@ -48,14 +48,23 @@ struct MyCustomSelfieView: View {
             MyBrandedCameraView { captured in
                 vm.processSelfie(image: captured)    // ✅ yüz tespiti + upload SDK'da
             }
-            if let err = vm.errorMessage { Text(err) }
             Button("Devam") { coordinator.advanceToNextModule() }  // ✅ adım sinyali SDK'da
                 .disabled(!vm.canContinue)
         }
-        .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
+        .onAppear {
+            vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed = { coordinator.finishFlowAsFailed() }
+        }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```
+
+Hatayı göstermek ve kapatmak zorunlu. Hak bitince modülü atlama (`onSkipRequested`) ya da
+akışı bitirme (`onFlowFailed`) mesaj kapanınca çalışır: `.idErrorAlert` kapanınca mesajı siler,
+`onDismiss` bekleyen işi çalıştırır. Hatayı kendiniz çiziyorsanız kapatırken `vm.dismissError()`
+çağırın (3.2.0+; önceki sürümlerde önce `vm.errorMessage = nil`, sonra
+`vm.consumePendingAlertAction()`). Ayrıntı: [Kendi ekranınızı yazdıysanız](errors-and-limits.md#8-kendi-ekranınızı-yazdıysanız).
 
 Her modülün VM API'si (state, metotlar, closure'lar) o modülün rehberinde tablo olarak duruyor.
 [Modül Kataloğu](../../README.md#modül-kataloğu)'ndan ilgili modüle geçebilirsiniz.
@@ -348,7 +357,7 @@ B yöntemindeki pasif ekranlar bu kuralın dışında kalır, çünkü hiçbir V
 - [ ] Ekran ilgili `XxxCustomView.swift`'ten başlatıldı (sıfırdan yazılmadı) ve dosyanın başındaki "Kopyalanacak dosyalar" listesindeki her şey projede
 - [ ] Ekran iş adımlarında yalnızca SDK VM metotlarını çağırıyor
 - [ ] Geçişler `coordinator` üzerinden yapılıyor (`advanceToNextModule` / `advanceExternal` / `skipCurrentModule`)
-- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya gösteriliyor
-- [ ] Modülün closure'ları bağlandı (`onSkipRequested` vb., modül rehberine bakın)
+- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya gösteriliyor; hata kapanınca `vm.consumePendingAlertAction()` çağrılıyor (`.idErrorAlert`'in `onDismiss`'i ya da 3.2.0+ `vm.dismissError()`)
+- [ ] Modülün closure'ları bağlandı (`onSkipRequested`, `onFlowFailed` vb., modül rehberine bakın)
 - [ ] Deneme hakkının bittiği durum test edildi (comparison count'lar sunucudan gelir)
 - [ ] Akış gerçek cihazda baştan sona denendi (NFC ve görüşme simülatörde çalışmaz)

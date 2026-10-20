@@ -100,6 +100,13 @@ Tüm `setupSDK` parametreleri için: [Sunucu & API rehberi](../../docs/guides/se
 Her VM'de hazır olanlar: `isLoading`, `errorMessage` (`@Published`) ve `manager`
 (`IdentifyManager.shared`) erişimi.
 
+Hatayı kapatma da her VM'de aynı: hata kapanınca `consumePendingAlertAction()` çağrılmalı,
+SDK'nın beklettiği iş (yeniden deneme, hak bitince modülü atlama ya da akışı bitirme) o anda
+çalışır. Kendi ekranınızda bunu `.idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })`
+yapar. Hatayı kendiniz çiziyorsanız kapatırken `vm.dismissError()` çağırın (3.2.0+; önceki
+sürümlerde önce `vm.errorMessage = nil`, sonra `vm.consumePendingAlertAction()`). Ayrıntı:
+[Kendi ekranınızı yazdıysanız](../../docs/guides/errors-and-limits.md#8-kendi-ekranınızı-yazdıysanız).
+
 ---
 
 ## Ekranları Özelleştirme — Üç Yöntem
