@@ -114,6 +114,7 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 | `currentStep` | `LivenessTestStep?` | Mevcut adım (`turnLeft/turnRight/blinkEyes/smile/completed`) |
 | `stepInstruction` | `String` | Adım talimatı (ör. "Göz kırpın") |
 | `allStepsCompleted` | `Bool` | Tüm adımlar bitti mi |
+| `isWaitingForNextStep` | `Bool` | Kare çekildi, sıradaki komut bekleniyor (`SDKLivenessRules.default.nextStepDelay`). Bu sırada hareket aramayın; `uploadFrame` yok sayılır, `stepInstruction` "Lütfen bekleyin" olur |
 
 ### Hesaplanan / ayar
 | Üye | Anlam |

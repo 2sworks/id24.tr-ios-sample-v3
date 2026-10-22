@@ -779,6 +779,7 @@ private struct HamburgerMenuSheet: View {
     let onSelect: (HamburgerMenuItem) -> Void
     @ObservedObject private var nfxState = NFXDebugState.shared
     @AppStorage("sdkReadAloudEnabled") private var readAloudEnabled = false
+    @State private var livenessStepWait = SDKLivenessRules.default.nextStepWait
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
@@ -823,6 +824,17 @@ private struct HamburgerMenuSheet: View {
                         set: { newValue in
                             readAloudEnabled = newValue
                             SDKReadAloudSetting.isEnabled = newValue
+                        }
+                    )
+                )
+                MenuOptionRow(
+                    icon: Image(systemName: "timer"),
+                    title: "Canlılık Adım Arası Bekleme",
+                    isOn: Binding(
+                        get: { livenessStepWait },
+                        set: { newValue in
+                            livenessStepWait = newValue
+                            SDKLivenessRules.default.nextStepWait = newValue
                         }
                     )
                 )

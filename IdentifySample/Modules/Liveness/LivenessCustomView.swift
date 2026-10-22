@@ -18,6 +18,8 @@
 //    prepareRecording()      ekran açılınca; kayıt hazır olunca onRecordingReady gelir → ARKit'i O ZAMAN aç
 //    currentStep / allowX    hangi ifadenin beklendiği
 //    uploadFrame(image:)     ifade algılanınca o anın karesi; başarıda sonraki adım gelir
+//    isWaitingForNextStep    kare çekildi, sıradaki komut bekleniyor (SDKLivenessRules.default.nextStepDelay);
+//                            bu sırada hareket aramayın
 //    allStepsCompleted       ARKit'i kapatın; kayıt yüklemesini ViewModel yapar
 //    noteWillResignActive() / noteDidBecomeActive()  uygulama aktifliği (kayıt kesintisi tespiti)
 //    trackingDidStart() / trackingDidPause()  takip açılıp kapanınca; adım süresi yalnız takip açıkken işler
@@ -71,7 +73,14 @@ struct LivenessCustomView: View {
 
     private var bottomInfoArea: some View {
         HStack(spacing: 12) {
-            if let iconName = stepIconName {
+            if viewModel.isWaitingForNextStep {
+                // Adımın karesi çekildi, sıradaki komut bekleniyor: onay işareti.
+                if SDKTheme.shared.capture.showsLivenessStepDoneIcon ?? true {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundColor(SDKTheme.shared.capture.livenessStepDoneColor ?? .green)
+                }
+            } else if let iconName = stepIconName {
                 Image(systemName: iconName)
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundColor(.white)
@@ -147,9 +156,12 @@ struct LivenessARView: UIViewRepresentable {
         weak var sceneView: ARSCNView?
 
         private let configuration = ARFaceTrackingConfiguration()
-        /// Kare yüklendikten sonra yüz takibinin kapalı kalacağı süre: kullanıcı yükleme sürerken
-        /// bir sonraki ifadeyi yapıp adımı yanlışlıkla tetikleyemesin.
+        /// Bekleme kapalıyken (`SDKLivenessRules.default.nextStepWait = false`) kare yüklendikten
+        /// sonra yüz takibinin kapalı kalacağı süre: kullanıcı yükleme sürerken bir sonraki
+        /// ifadeyi yapıp adımı yanlışlıkla tetikleyemesin.
         private let waitSecs: TimeInterval = 2.0
+        /// Bekleme açıkken kamera sıradaki komuttan bu kadar önce açılır; pozlama otursun.
+        private let cameraSettleSecs: TimeInterval = 0.5
         /// Ekran kaydı hazır olduktan sonra ARKit'in açılması için beklenen süre.
         private let sessionWarmupSecs: TimeInterval = 1.0
         private var appStateObservers: [NSObjectProtocol] = []
@@ -159,6 +171,8 @@ struct LivenessARView: UIViewRepresentable {
         private var allowBlink = false, allowSmile = false, allowLeft = false, allowRight = false
         private var isCapturing = false
         private var isPaused = false
+        /// Sıradaki adım bekleniyor (`isWaitingForNextStep`): hiçbir hareket aranmaz.
+        private var isWaiting = false
         private var lastFaceVisible = true, lastMultipleFaces = false
         /// Yanlış hareketin sayılması için koşulun kesintisiz sürmesi gereken süre.
         private let holdSecs: TimeInterval = 0.35
@@ -180,6 +194,7 @@ struct LivenessARView: UIViewRepresentable {
             allowLeft = vm.allowLeft
             allowRight = vm.allowRight
             isPaused = vm.errorMessage != nil || vm.isLoading
+            isWaiting = vm.isWaitingForNextStep
         }
 
         /// Sıra önemli: önce ekran kaydı, kayıt hazır olunca ARKit.
@@ -280,7 +295,7 @@ struct LivenessARView: UIViewRepresentable {
         // MARK: İfade algılama (eşikler SDK ile aynı)
 
         private func detectExpression(_ face: ARFaceAnchor) {
-            guard !isCapturing, let step else { return }
+            guard !isCapturing, !isWaiting, let step else { return }
             func value(_ key: ARFaceAnchor.BlendShapeLocation) -> Float { face.blendShapes[key]?.floatValue ?? 0 }
 
             let jawLeft = abs(value(.jawLeft)), jawRight = abs(value(.jawRight))
@@ -339,7 +354,11 @@ struct LivenessARView: UIViewRepresentable {
                 let image = sceneView.snapshot()
                 self.pauseSession()
                 self.viewModel.uploadFrame(image: image)
-                try? await Task.sleep(nanoseconds: UInt64(self.waitSecs * 1_000_000_000))
+                let rules = SDKLivenessRules.default
+                let resumeAfter = rules.nextStepWait
+                    ? max(rules.nextStepDelay - self.cameraSettleSecs, 0)
+                    : self.waitSecs
+                try? await Task.sleep(nanoseconds: UInt64(resumeAfter * 1_000_000_000))
                 if !self.viewModel.allStepsCompleted {
                     self.runSession()
                 }

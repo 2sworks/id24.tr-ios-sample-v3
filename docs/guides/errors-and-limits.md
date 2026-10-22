@@ -6,7 +6,7 @@ Bu rehber dört ayarı anlatır:
 |---|---|
 | `SDKErrorConfig.shared` | Hataların nasıl gösterileceği, metinleri, canlı yönergeler |
 | `SDKAttemptLimits.shared` | Modül başına deneme hakkı, hak bitince ne olacağı, bağlantı kopması |
-| `SDKLivenessRules.default` | Canlılık adımının süresi ve yanlış hareket denetimi |
+| `SDKLivenessRules.default` | Canlılık adımının süresi, yanlış hareket denetimi ve adımlar arası bekleme |
 | `SDKFaceConfig.shared` | Kadrajda birden fazla yüz görülünce yapılacak iş |
 
 Ayarlar `setupSDK` çağrılmadan önce verilir ve oturum boyunca geçerlidir. Hiçbirini
@@ -237,7 +237,20 @@ Yalnızca bağlantı koptu ekranını açan kopmalar sayılır. `.exit` ile bite
 ```swift
 SDKLivenessRules.default.stepTimeout = 8          // saniye; nil süreyi kapatır (varsayılan 10)
 SDKLivenessRules.default.wrongActionCheck = false // varsayılan açık
+SDKLivenessRules.default.nextStepDelay = 2        // adımlar arası bekleme, saniye (varsayılan 1)
+SDKLivenessRules.default.nextStepWait = false     // beklemeyi kapatır (varsayılan açık)
+
+// Bekleme sırasındaki yazı ve onay işareti
+SDKLocalization.shared.setOverride(key: .livenessNextStepWait, language: .tr, value: "Tamamlandı")
+SDKTheme.shared.setIcon(.livenessStepDone, Image("onay"))   // varsayılan checkmark.circle.fill
+SDKTheme.shared.capture.livenessStepDoneColor = .blue       // varsayılan yeşil
+SDKTheme.shared.capture.showsLivenessStepDoneIcon = false   // onay işaretini gizler
 ```
+
+- Adımın karesi çekilince sıradaki komut `nextStepDelay` saniye sonra gelir. Bu sırada altta
+  onay işareti ve "Lütfen bekleyin" yazar, hareket aranmaz, adımın süresi işlemez. Yükleme
+  bu süreden uzun sürerse komut yükleme bitince gelir. Son adımdan sonra beklenmez.
+- `nextStepWait = false` iken yazı ve onay işareti çıkmaz, komut yükleme bitince gelir.
 
 - Süre yalnızca yüz takibi açıkken, hata gösterilmiyorken ve kare yüklenmiyorken işler.
   Kare yüklendikten sonra takip yeniden açılınca süre baştan başlar.
