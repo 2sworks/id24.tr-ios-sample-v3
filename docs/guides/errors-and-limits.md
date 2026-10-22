@@ -53,17 +53,9 @@ viewModel.scanFront(document: document)
 
 Yalnız görüntüyle çağırıyorsanız şekli siz verirsiniz: `scanFront(image:captureMode:)`.
 
-SDK'nın popup'ı otomatik çekimin hatasında açılmaz. Hata kapatılmış sayılır ve kullanıcı aynı
-yüzü yeniden tarar; hak bittiyse modül mesaj gösterilmeden atlanır ya da akış biter. Manuel
-çekimin hatası popup olarak gösterilir. Hatayı kendiniz gösteriyorsanız aynı kuralı `onError`
-içinde uygulayın:
-
-```swift
-SDKErrorConfig.shared.onError = { info, dismiss in
-    if info.captureMode == .automatic { dismiss(); return }
-    // kendi gösteriminiz
-}
-```
+Sunucu hatası her zaman gösterilir: otomatik çekimde de, elle çekimde de. Kullanıcı popup'ı
+kapatınca aynı yüzü yeniden tarar; hak bittiyse modül atlanır ya da akış biter. Hatayı kendiniz
+gösteriyorsanız `onError` içinde de sessiz geçmeyin.
 
 Gösterimi siz seçersiniz:
 
@@ -86,11 +78,10 @@ kalmasın diye SDK popup'ı yine açılır. Görüntülü görüşme ekranındak
 Kendi modül ekranınızı yazdıysanız `.idErrorAlert` bu ayara zaten uyar. Hatayı başka bir
 yolla çiziyorsanız (bant, toast) `SDKErrorConfig.shared.showsSDKPopup` false iken çizmeyin.
 
-Kendi kimlik ekranınızda otomatik çekimin hatasını popup'sız geçmek için `isSilent` verin:
+Kendi kimlik ekranınızda hata popup'ını şöyle bağlayın:
 
 ```swift
 .idErrorAlert($viewModel.errorMessage,
-              isSilent: { viewModel.lastError?.captureMode == .automatic },
               onDismiss: { viewModel.consumePendingAlertAction() })
 ```
 

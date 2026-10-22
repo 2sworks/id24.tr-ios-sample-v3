@@ -83,10 +83,8 @@ struct IdCardCustomView: View {
                 ProgressView().tint(.white).scaleEffect(1.3)
             }
         }
-        // Otomatik çekimin hatası popup açmaz; kullanıcı aynı yüzü yeniden tarar.
-        .idErrorAlert($viewModel.errorMessage,
-                      isSilent: { viewModel.lastError?.captureMode == .automatic },
-                      onDismiss: { viewModel.consumePendingAlertAction() })
+        // Otomatik çekimin hatası da popup açar: sessiz kalınca fotoğraf uyarısız siliniyordu.
+        .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
         .fullScreenCover(item: $scannerSide) { side in
             IdCardScannerCover(side: side) { document in
                 scannerSide = nil
