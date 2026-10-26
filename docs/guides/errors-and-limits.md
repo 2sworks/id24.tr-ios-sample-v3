@@ -53,9 +53,9 @@ viewModel.scanFront(document: document)
 
 Yalnız görüntüyle çağırıyorsanız şekli siz verirsiniz: `scanFront(image:captureMode:)`.
 
-Sunucu hatası her zaman gösterilir: otomatik çekimde de, elle çekimde de. Kullanıcı popup'ı
-kapatınca aynı yüzü yeniden tarar; hak bittiyse modül atlanır ya da akış biter. Hatayı kendiniz
-gösteriyorsanız `onError` içinde de sessiz geçmeyin.
+Sunucu hatası varsayılan olarak her zaman gösterilir: otomatik çekimde de, elle çekimde de.
+Kullanıcı popup'ı kapatınca aynı yüzü yeniden tarar; hak bittiyse modül atlanır ya da akış biter.
+Hatayı hiç göstermemek isterseniz `.none` seçin.
 
 Gösterimi siz seçersiniz:
 
@@ -63,6 +63,7 @@ Gösterimi siz seçersiniz:
 SDKErrorConfig.shared.presentation = .sdkPopup   // varsayılan: SDK'nın popup'ı
 SDKErrorConfig.shared.presentation = .custom     // SDK popup açmaz
 SDKErrorConfig.shared.presentation = .both       // ikisi birden
+SDKErrorConfig.shared.presentation = .none       // hiçbiri: hata gösterilmeden kapatılır
 
 SDKErrorConfig.shared.onError = { info, dismiss in
     // info.message metnini kendi popup'ınızda ya da ekranın herhangi bir yerinde gösterin.
@@ -73,7 +74,12 @@ SDKErrorConfig.shared.onError = { info, dismiss in
 
 `onError` ana kuyrukta çağrılır. `.custom` seçip `onError` vermezseniz hata görünmez
 kalmasın diye SDK popup'ı yine açılır. Görüntülü görüşme ekranındaki kırmızı hata bandı da
-`.custom` iken gösterilmez.
+`.custom` ve `.none` iken gösterilmez.
+
+`.none` seçilince SDK hatayı göstermez ve sesli okumaz. Hata hemen kapatılmış sayılır, akış
+"Tamam"a basılmış gibi sürer. Kimlikte reddedilen fotoğraf uyarısız silinir ve kullanıcı aynı
+yüzü yeniden tarar. `onError` verdiyseniz bilgi için yine çağrılır; `dismiss()` çağırmanız
+gerekmez.
 
 Kendi modül ekranınızı yazdıysanız `.idErrorAlert` bu ayara zaten uyar. Hatayı başka bir
 yolla çiziyorsanız (bant, toast) `SDKErrorConfig.shared.showsSDKPopup` false iken çizmeyin.
