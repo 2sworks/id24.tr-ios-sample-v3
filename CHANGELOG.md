@@ -7,6 +7,57 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### 3.2.1
+
+**Kırıcı değişiklik**
+- `CameraPermission`, `MicrophonePermission`, `SpeechRecognizerPermission` ya da `SwiftSignatureView` modülünü kendi kodunda import eden uygulama, paketi kendisi eklemezse derlenmez.
+- `SDKIconKey`'e `livenessStepDone` eklendi. Bu enum üzerinde `default` olmadan `switch` yazan uygulama derlenmez.
+- `idErrorAlert` artık `isSilent` parametresi almıyor, sunucu hatası her ekranda gösteriliyor. Bu parametreyi veren özel ekran derlenmez, parametreyi silmek yeterli.
+
+**Yeni**
+- Başka ülkelerin kimlik kartı taranabiliyor: `IdentifyManager.shared.idCardFormat`. Verilmezse TC kimlik kartı akışı değişmez.
+- Kimlik arka yüzündeki MRZ, ön yüzde okunanlarla karşılaştırılıyor: `ScannerConfiguration.expectedMRZValues`.
+- Kimlik tarayıcısına yeni yönergeler eklendi (yatay tutun, ters duruyor, eğik duruyor, okunamıyor). Yönergeler sesli okunabiliyor.
+- Kimlik tarayıcısında yönerge satırı, "Manuel Çek" düğmesi, alan kutuları, tarama çizgisi, karartma ve çerçeve renkleri ayarlanabiliyor.
+- NFC sonucuna `passportCorrectlySigned` alanı eklendi. SOD imzası ve kök sertifika zinciri doğrulanınca true döner. Kök listesi verilmezse false döner.
+- Canlılıkta adım süresi ve yanlış hareket denetimi ayarlanabiliyor: `SDKLivenessRules.default`.
+- Canlılıkta adımlar arasına 1 sn bekleme eklendi. Bu sürede onay işareti ve "Lütfen bekleyin" çıkar. `nextStepWait` ile kapatılabilir. Süre, yazı, ikon ve renk değiştirilebilir.
+- Kadrajda birden fazla yüz denetlenebiliyor: `SDKFaceConfig.shared`.
+- Hatalar kodu, kaynağı ve kalan hakkıyla tek noktaya geliyor: `SDKErrorConfig.shared.onError`. Gösterimi SDK, host ya da ikisi birden yapar.
+- Başlık çubuğundaki geri, yardım ve menü düğmeleri gizlenebiliyor, host kendi düğmesini ekleyebiliyor: `SDKTheme.shared.navBar.buttons`.
+- Görüşme sesi host'tan yönetiliyor: hoparlör ya da ahize seçimi, sesin çıktığı yer (kulaklık ve Bluetooth dahil), mikrofon seçimi ve sessize alma.
+- Görüşmede fener ve kamera değişiklikleri host'a bildiriliyor: `onTorchChange`, `onCameraChange`.
+- Sunucuya göre bağlantı hız testi yapılabiliyor: `startConnectionSpeedTest`.
+- Görüşme boyunca bağlantı kalitesi ölçülüp sunucuya gönderiliyor.
+- İşaret dili tercihi host'un kendi ekranından verilebiliyor: `setupSDK(signLangPreference:)`.
+- Destek akışı için `supportFlow` bayrağı eklendi. Açıkken sunucu oturum sonucunu NFC'den sonra değil, canlılık bitince yazar. Canlılık bitince `notifyLivenessCompleted` çağrılmalı.
+- Host kendi izin katmanını SDK'ya bağlayabiliyor: `SDKPermissionConfig.shared.provider`. İmza tuvali (`SDKSignatureCanvas`) host'un kendi ekranlarında da kullanılabiliyor.
+
+**Değişti**
+- SDK artık `PermissionsKit` ve `SwiftSignatureView` paketlerini getirmiyor. İzinler sistem API'leriyle soruluyor, imza PencilKit ile çiziliyor.
+- Deneme hakları (`SDKAttemptLimits.shared`) ve bağlantı kopma kuralları (`SDKConnectionPolicy`) tek yerde toplandı, modül bazında ayarlanıyor.
+- Canlılıkta adım süresi 10 sn oldu. Adım hatası hakkı her adım için ayrı sayılıyor.
+- NFC okuma hakkı dolunca modül atlanmıyor, anahtar düzeltme ekranı açılıyor.
+- Kimlik taramasında tarama animasyonu 1 sn sürüyor, `showsSweepLine = false` ile kapatılabiliyor.
+- Panel kararı artık statüye göre sınıflandırılıyor. Temsilci Sonlandır'a basmadan çıksa da karar `onFinished`'a geliyor. -3, -4 ve -5 karar sayılmıyor.
+- Oda dolu yanıtında yeniden deneme 6 kez ve artan aralıklarla yapılıyor, toplam 76 sn sürüyor. `roomSubscribeRetry` varsayılanı 3'ten 6'ya çıktı.
+- "Yeniden Bağlan" düğmesi internet yok görünürken de basılabiliyor. Wi-Fi'dan hücresel veriye geçişte artık kilitlenmiyor.
+- SDK'nın kimlik ve adres ekranlarında tarayıcı çerçevesi tema renginde çiziliyor.
+
+**Düzeltildi**
+- WebSocket bağlantısında sunucu sertifikası doğrulanıyor. Kendinden imzalı ya da süresi dolmuş sertifikalı `wss://` sunucusuna bağlanılmaz.
+- `setupSDK` önceki oturumun kimlik, MRZ ve KPS verisini siliyor. MRZ alanlarını elle dolduran entegrasyonlar bu değerleri `kpsData` ile vermeli.
+- Kimlik arka yüzünde MRZ'den belge tipi ve uyruk okunuyor. TCKN, belge no ve tarihler kontrol hanesiyle doğrulanıyor, tutmayan değer gönderilmiyor.
+- MRZ'deki dolgu işareti (`<`) harf olarak okunduğunda ad soyad panele yanlış gidiyordu.
+- IdCard modülünde elle çekilen kare de netlik kontrolünden geçiyor. Zorunlu elle çekimde yanlış belge reddediliyor.
+- Gölgede çekilen kartta alan okuma iyileşti.
+- Cevapsız çağrıda ön kamera açık kalıyordu. Artık kamera kapanıyor, zil duruyor.
+- Art arda iki bağlanma başlatılınca eski bekleme zamanlayıcısı durduruluyor.
+- Loglarda ve izleme kancasında kişisel veri maskeleniyor.
+- `coordinator.insert` ile eklenen ekranlar açıkken sonraki modül sunucuya erken bildiriliyordu. Araya eklenen ekran ilerlemek için `advanceExternal()` çağırmalı.
+- "Bağlantı kurulamadı" uyarısında Çıkış'a basılınca sonuç artık `cancelled / userExited` geliyor.
+- OCR ve NFC okumasında iyileştirmeler yapıldı.
+
 ### 3.2.0
 
 **Yeni**
