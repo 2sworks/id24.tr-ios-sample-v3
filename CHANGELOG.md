@@ -7,6 +7,11 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### Yayınlanmamış
+
+**Düzeltildi**
+- Sunucu kimlik fotoğrafını reddettiğinde panele başarılı yerine başarısız gidiyor.
+
 ### 3.2.1
 
 **Kırıcı değişiklik**
