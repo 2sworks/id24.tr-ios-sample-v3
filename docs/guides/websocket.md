@@ -297,7 +297,7 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 | 4104 | `reconnectCycle` | Yeniden bağlanmadan önce eski bağlantı kapatılıyor |
 | 4105 | `backgroundTimeout` | Uygulama arka planda izin verilen süreyi aştı (aşağıya bakın) |
 | 4106 | `callCompleted` | Görüşme tamamlandı, sonraki modüle geçiliyor (`disconnectSocket(reason:)`) |
-| 4107 | `pingTimeout` | Ayrılmış; bu sürümde ölü bağlantı 4109 ile tespit ediliyor |
+| 4107 | `pingTimeout` | Panel görüşmeyi `PING_TIMEOUT` sebebiyle kapattı. SDK'nın kendi tespit ettiği ölü bağlantı 4109 ile kapanır |
 | 4108 | `ringingTimeout` | Çağrı çaldı ama `ringingTimeout` süresince (varsayılan 300 sn) yanıtlanmadı |
 | 4109 | `heartbeatTimeout` | Üst üste 3 PING'e PONG gelmedi, bağlantı ölü sayıldı |
 
@@ -331,7 +331,7 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 | 4130 | `networkUnreachable` | Reachability: internet erişimi yok |
 | 4131 | `transportError` | SSL, proxy ya da firewall hatası |
 | 4132 | `unexpectedDrop` | Hata olmadan kopma; sunucu bağlantıyı sessizce kapattı |
-| 4133 | `connectTimeout` | Bağlantı verilen sürede kurulamadı (ilk bağlantıda 30 sn, yeniden bağlanmada 10 sn) |
+| 4133 | `connectTimeout` | Bağlantı verilen sürede kurulamadı (ilk bağlantıda 30 sn; yeniden bağlanmada görüşme sırasında 10 sn, görüşme dışında 30 sn) |
 
 ### 4140–4142 · TURN / ICE (WebRTC)
 

@@ -1144,8 +1144,10 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
 **üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
 
-Oda kaydı 20 sn içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı çıkar
-(`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Oda dolu
+Oda kaydı bekleme süresi içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı
+çıkar (`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Bekleme
+süresi, oda dolu yeniden denemelerinin toplam süresine 10 sn eklenerek bulunur, en az 20 sn.
+Varsayılan `roomSubscribeRetry` (6) ile 86 sn'dir. Oda dolu
 yeniden denemelerinde `roomWaitStatus` güncellenir. Ayrıntı:
 [Oturum Çıkışları → 4.4](docs/guides/session-exit.md#44-oturum-kurulamadı--sürdürülemedi).
 
@@ -1592,9 +1594,9 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `stabilityConfirmFrames` | 4 / 3 | Hızlı yol: keskin + geometrik stabil ardışık kare sayısı |
 | `minimumSharpnessScore` | 120 / 110 | Canlı kare keskinlik eşiği (Laplacian; 0 = kapalı) |
 | `captureSharpnessFloor` | 95 / 85 | Çekilen NİHAİ fotoğrafın keskinlik tabanı — altındaysa çekim atılır |
-| `focusSettleDelay` | 0.5 / 1.2 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
+| `focusSettleDelay` | 0.3 / 0.8 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
 | `quadMissResetThreshold` | 3 / 5 | Kaç kare belge kaybolursa ilerleme sıfırlanır (titreme önleyici) |
-| `manualCaptureHintDelay` | 5 s / 8 s | Manuel çekim butonunun görünme süresi |
+| `manualCaptureHintDelay` | 8 s / 8 s | Manuel çekim butonunun görünme süresi |
 | `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
 
