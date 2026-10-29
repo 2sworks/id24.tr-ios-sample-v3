@@ -86,6 +86,28 @@ SDKFlowHostView(coordinator: coordinator, registry: registry) {
 }
 ```
 
+### İzinleri kendi katmanınızdan sormak (3.2.1)
+
+SDK kamera, mikrofon ve konuşma tanıma iznini varsayılan olarak sistem API'leriyle sorar.
+Uygulamanızın kendi izin yöneticisi varsa SDK'yı ona bağlayın, `setupSDK`'dan önce:
+
+```swift
+final class HostPermissions: SDKPermissionProvider {
+    func status(for permission: SDKPermission) -> SDKPermissionStatus {
+        // .notDetermined / .authorized / .denied / .restricted
+    }
+    func request(_ permission: SDKPermission, completion: @escaping (SDKPermissionStatus) -> Void) {
+        // izni sorun, sonucu completion ile tam bir kez bildirin
+    }
+    // openSettings(for:) isteğe bağlı; vermezseniz Ayarlar'da uygulamanın sayfası açılır
+}
+
+SDKPermissionConfig.shared.provider = HostPermissions()
+```
+
+Varsayılan `SDKSystemPermissionProvider.shared`'dır. `SDKPermission` ileride yeni durum alabilir;
+`switch` yazarken `@unknown default` ekleyin.
+
 ---
 
 ## 2) Tema — `SDKTheme.shared`
@@ -739,6 +761,31 @@ Yaptıkları (hepsi otomatik):
 
 `ThankYouStatus`: `.completed` · `.missedCall` · `.notCompleted` (`.missedCall` rezervdir; cevapsız çağrı oturumu bitirmez)
 
+### Destek akışı: `supportFlow` (3.2.1)
+
+Destek akışında sunucu oturumun sonucunu canlılık bitince yazar (normalde NFC'den sonra yazar).
+Bayrağı `setupSDK` başarılı olduktan sonra, NFC okumasından önce açın:
+
+```swift
+IdentifyManager.shared.supportFlow = true
+```
+
+- `mobile/nfc_verify` isteğine `support_flow: true` eklenir.
+- Canlılık başarıyla bitince, oturumu kapatmadan önce `notifyLivenessCompleted` çağırın. SDK bunu
+  kendisi çağırmaz. İstek `mobile/liveness_completed` adresine gider:
+
+```swift
+IdentifyManager.shared.notifyLivenessCompleted(timeout: 5) {
+    // ana kuyrukta, tam bir kez çağrılır
+}
+```
+
+- `timeout` varsayılanı 5 sn. Cevap bu sürede gelmezse `completion` beklemeden çağrılır. Hata da
+  zaman aşımı da loga düşer, akış durmaz.
+- `supportFlow` `nil` ya da `false` iken istek gövdesi değişmez, `notifyLivenessCompleted` istek
+  atmadan `completion`'ı hemen çağırır.
+- Bayrak oturuma aittir: `setupSDK` ve oturumun kapanması onu sıfırlar. Her oturumda yeniden verin.
+
 ---
 
 ## 7) Ekran Değiştirme & Ekleme
@@ -931,7 +978,7 @@ IdentifyManager.shared.setupSDK(
     bigCustomerCam: Bool?,                  // true (vars.): temsilci tam ekran, kullanıcı küçük pencerede; false: tersi
     selectedModules: [SdkModules],          // vars. [] — backend sırası kullanılır
     idCardLang: IDLang?,                    // OCR belge dili: .TR / .AZ / .OTHER (vars. .TR)
-    needCertForNfc: Bool?,                  // NFC sertifika (CSCA) doğrulaması (vars. false)
+    needCertForNfc: Bool?,                  // şu an etkisiz; kök listesi setMasterListURL ile verilir (vars. false)
     turnKey: String,                        // zorunlu — TURN kimlik üretim anahtarı
     wsSecretKey: String?,                   // WebSocket token anahtarı
     showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. true) — false: ThankYou'suz kapanış, bkz. Akış Sonucu
@@ -974,6 +1021,26 @@ IdentifyManager.shared.setSDKLang(lang: .tr)    // .tr / .en / .de / .az / .ru
 
 `.idCard` (çipli kimlik) · `.passport` (pasaport) · `.oldSchool` (eski tip/diğer belgeler).
 `identCardType`'a verdiğiniz liste, kimlik ekranındaki tür seçim satırlarını belirler.
+
+### NFC imza doğrulaması: `passportCorrectlySigned` (3.2.1)
+
+NFC sonucu (`IdentifyCard`) çipin doğrulamasını iki alanla verir:
+
+| Alan | Ne söyler |
+|---|---|
+| `passiveAuth` | Okunan veri SOD'daki hash'lerle aynı. SOD'u kimin imzaladığına bakmaz |
+| `passportCorrectlySigned` | SOD imzası belgedeki sertifikayla tutuyor ve bu sertifika verdiğiniz kök listesine (CSCA) bağlanıyor |
+
+SDK kök listesi taşımaz. `passportCorrectlySigned`'ın true dönebilmesi için listeyi NFC okumasından
+önce verin. Liste uygulama açık kaldıkça geçerlidir, bir kez vermek yeter:
+
+```swift
+let url = Bundle.main.url(forResource: "masterList", withExtension: "pem")!
+IdentifyManager.shared.passportReader.setMasterListURL(url)
+```
+
+Liste verilmezse `passportCorrectlySigned` her zaman false döner. `setupSDK(needCertForNfc:)` şu an
+etkisizdir: SDK bu değeri okumaz, listeyi onun yerine vermez.
 
 ---
 
@@ -1077,8 +1144,10 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
 **üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
 
-Oda kaydı 20 sn içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı çıkar
-(`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Oda dolu
+Oda kaydı bekleme süresi içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı
+çıkar (`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Bekleme
+süresi, oda dolu yeniden denemelerinin toplam süresine 10 sn eklenerek bulunur, en az 20 sn.
+Varsayılan `roomSubscribeRetry` (6) ile 86 sn'dir. Oda dolu
 yeniden denemelerinde `roomWaitStatus` güncellenir. Ayrıntı:
 [Oturum Çıkışları → 4.4](docs/guides/session-exit.md#44-oturum-kurulamadı--sürdürülemedi).
 
@@ -1525,9 +1594,9 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `stabilityConfirmFrames` | 4 / 3 | Hızlı yol: keskin + geometrik stabil ardışık kare sayısı |
 | `minimumSharpnessScore` | 120 / 110 | Canlı kare keskinlik eşiği (Laplacian; 0 = kapalı) |
 | `captureSharpnessFloor` | 95 / 85 | Çekilen NİHAİ fotoğrafın keskinlik tabanı — altındaysa çekim atılır |
-| `focusSettleDelay` | 0.5 / 1.2 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
+| `focusSettleDelay` | 0.3 / 0.8 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
 | `quadMissResetThreshold` | 3 / 5 | Kaç kare belge kaybolursa ilerleme sıfırlanır (titreme önleyici) |
-| `manualCaptureHintDelay` | 5 s / 8 s | Manuel çekim butonunun görünme süresi |
+| `manualCaptureHintDelay` | 8 s / 8 s | Manuel çekim butonunun görünme süresi |
 | `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
 

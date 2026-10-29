@@ -150,9 +150,10 @@ Tablolardaki "Ekran" sütunu, `showThankYouPage: true` iken kullanıcının gör
 | `connectionLost` | `error` | Bağlantı kopukken akışın sonuna gelindi ya da oturum başka bir kodla kapandı | ThankYou | 4104–4142 | `closeCode` |
 
 Oda kaydı beklenirken sunucu odanın dolu olduğunu bildirirse her yeniden denemede
-`SDKFlowCoordinator.roomWaitStatus` güncellenir ("Oturum meşgul, yeniden deneniyor (1/3)").
-Sunucu 20 sn içinde ne onay ne ret gönderirse akış başlamaz ve "Bağlantı kurulamadı" uyarısı
-çıkar. Uyarının hangi durumdan doğduğunu `roomBlockKind` ile okursunuz:
+`SDKFlowCoordinator.roomWaitStatus` güncellenir ("Oturum meşgul, yeniden deneniyor (1/6)").
+İkinci sayı `roomSubscribeRetry` sınırıdır. SDK, bu yeniden denemelerin toplam süresine 10 sn
+ekleyip o kadar bekler, en az 20 sn. Varsayılan sınır 6 ile bu süre 86 sn'dir. Sunucu bu süre
+içinde ne onay ne ret gönderirse akış başlamaz ve "Bağlantı kurulamadı" uyarısı çıkar. Uyarının hangi durumdan doğduğunu `roomBlockKind` ile okursunuz:
 
 | `roomBlockKind` | Uyarı | Seçenekler |
 |---|---|---|
