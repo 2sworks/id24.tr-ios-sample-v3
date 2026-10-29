@@ -44,8 +44,7 @@ SwiftUI ekranlarını (DefaultUI) SDK'nın içine taşıyan farklı bir entegras
 2.x ile kaynak uyumlu değildir. Xcode'un varsayılan kuralı (*Up to Next Major*) en son
 etiketten başlar; 2.x kullanan bir projeye paketi varsayılanla eklerseniz 3.x çekilir ve
 proje derlenmez. `Exact Version` ayrıca sürüm yükseltmesini bilinçli bir karar hâline
-getirir: bağımlılık kümesi sürüme göre farklıdır (3.x ayrıca `PermissionsKit` ve
-`SwiftSignatureView` getirir) ve `Package.resolved` sessizce kaymaz.
+getirir: bağımlılık kümesi sürüme göre farklıdır ve `Package.resolved` sessizce kaymaz.
 
 | Sürüm | Etiket aralığı | Ne zaman |
 |---|---|---|
@@ -53,8 +52,10 @@ getirir: bağımlılık kümesi sürüme göre farklıdır (3.x ayrıca `Permiss
 | 2.x | `2.5.x` | Eski entegrasyon; ekranlar host uygulamada |
 
 Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto),
-`Starscream` (WebSocket), `WebRTC` (görüntülü görüşme), `PermissionsKit` ve
-`SwiftSignatureView` (3.x). 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
+`Starscream` (WebSocket) ve `WebRTC` (görüntülü görüşme). 3.2.1'den itibaren `PermissionsKit` ve
+`SwiftSignatureView` gelmez; bu paketlerin modüllerini (`CameraPermission`, `MicrophonePermission`,
+`SpeechRecognizerPermission`, `SwiftSignatureView`) kendi kodunuzda import ediyorsanız paketi
+uygulamanıza kendiniz ekleyin. 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
 uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa çözümleme başarısız olur.
 
 ### 2. İzinleri tanımlayın

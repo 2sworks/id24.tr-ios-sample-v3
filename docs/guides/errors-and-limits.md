@@ -194,7 +194,7 @@ SDK'nın kendi sınırları:
 | `livenessRecordingFailure` | 3 | Canlılık kaydı hatası (izin, başlatma, kesinti, boyut, yükleme) |
 | `multipleFacesFailure` | 3 | Çoklu yüz `.fail` hatası |
 | `livenessVideoUpload` | 3 | Canlılık videosu yükleme denemesi |
-| `roomSubscribeRetry` | 3 | Oda doluyken yeniden abone olma |
+| `roomSubscribeRetry` | 6 | Oda doluyken yeniden abone olma |
 | `speedTestBusyRetry` | 1 | Hız testinde sunucu meşgul yanıtı |
 
 Canlılık ve çoklu yüz sınırları dolunca modülün `onExhausted` kuralı uygulanır.
