@@ -11,6 +11,7 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 **Düzeltildi**
 - Sunucu kimlik fotoğrafını reddettiğinde panele başarılı yerine başarısız gidiyor.
+- Rehberler görüşmedeki kopmayı kodla aynı anlatıyor: ICE `disconnected` 5 sn bekler (4140), `failed` hemen biter (4141), soket kopunca medya ayaktaysa görüşme `signallessCallGracePeriod` (10 sn) boyunca sürer.
 
 ### 3.2.1
 

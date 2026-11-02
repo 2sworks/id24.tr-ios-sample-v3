@@ -1211,6 +1211,9 @@ let m = IdentifyManager.shared
 m.reconnectTimeoutSeconds     = 30
 m.callReconnectTimeoutSeconds = 10
 
+// Soket kopunca medya ayaktaysa görüşmenin sinyalsiz sürebileceği süre
+m.signallessCallGracePeriod   = 10
+
 // Bağlantı kopması kuralı: otomatik yeniden bağlanma (0 = kapalı, varsayılan) ve kopma sınırı
 SDKAttemptLimits.shared.connection = SDKConnectionPolicy(
     maxDrops: 3,                 // nil = sınırsız (varsayılan)
@@ -1231,8 +1234,16 @@ m.isBackgroundTimeoutEnabled = true
 m.ringingTimeout            = 300
 ```
 
-Görüşme sırasında sinyal ya da ICE koparsa **toparlanma beklenmez**: görüşme biter, tüm
-bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir. Yeniden bağlanma
+Görüşme sırasında kopmada:
+
+- ICE `.disconnected`: 5 sn (sabit) toparlanma beklenir, gelmezse görüşme 4140 ile biter.
+- ICE `.failed`: görüşme hemen 4141 ile biter.
+- WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez. Görüşme
+  `m.signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
+  gelmezse biter.
+
+Görüşme bitince tüm bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir.
+Görüşme dışındaki kopmada ekran hemen açılır; kurallarını `SDKConnectionPolicy` belirler. Yeniden bağlanma
 kullanıcı tetiklidir ve tam prosedürle çalışır (imOnline + getIdentStatus + subscribe +
 stepChanged); panel bir karar vermemişse müşteri bekleme odasına döner, vermişse ThankYou
 ekranı açılır. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).

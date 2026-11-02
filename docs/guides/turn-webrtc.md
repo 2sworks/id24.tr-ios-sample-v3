@@ -90,31 +90,44 @@ Agent'ın görüşme sırasında gönderebileceği komutların listesi:
 
 ## Kopma Durumunda WebRTC
 
-Görüşme sırasında ICE bağlantısı `.disconnected` ya da `.failed` olursa görüşme hemen sonlandırılır:
-`terminateCall("TURN_DISCONNECTED")` yayınlanır ve LostConnection/yeniden bağlanma akışı başlar.
-`.closed` durumu yalnızca loglanır. Üç durumun da birleşik kapanma kodu var: 4140
-`turnDisconnected` · 4141 `turnFailed` · 4142 `turnClosed`
-([WebSocket → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100)).
+Görüşme sırasında ICE durumuna göre:
+
+| ICE durumu | Ne olur | Kapanma kodu |
+|---|---|---|
+| `.disconnected` | 5 sn toparlanması beklenir. Bu sürede `.connected` olursa görüşme kesintisiz sürer. Olmazsa görüşme biter, `terminateCall("TURN_DISCONNECTED")` yayınlanır ve yeniden bağlanma akışı başlar. | 4140 `turnDisconnected` |
+| `.failed` | Görüşme hemen biter, akış `.disconnected`'daki gibi sürer. | 4141 `turnFailed` |
+| `.closed` | Loglanır. Sinyalsiz süren bir görüşmede medya hattı kapanırsa görüşme biter. | 4142 `turnClosed` |
+
+5 saniye sabittir, ayarlanamaz. Bekleme yalnızca medya hattı içindir, sokete mesaj gönderilmez.
+Kodlar: [WebSocket → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanma-kodları--sdksocketclosecode-4100).
 
 ### Sinyal (WebSocket) koptuğunda
 
-Görüşme sürüyor olsun ya da olmasın davranış aynıdır. Medya oturumu tamamen kapanır (peer
-connection kapanır, kamera ve mikrofon durur), soket kapatılır ve kullanıcı "Bağlantı Koptu"
-ekranını görür.
+Medya hattı ayaktaysa soket kopması görüşmeyi hemen bitirmez. Görüşme
+`IdentifyManager.shared.signallessCallGracePeriod` boyunca (varsayılan 10 sn) sinyalsiz sürer:
 
-### Neden toparlanma penceresi YOK?
+- Bu sürede soket yeniden bağlanırsa görüşme kesilmez.
+- Bağlanmazsa görüşme cihazda biter ve "Bağlantı Koptu" ekranı açılır. Sinyal yokken panelin
+  `endCall` / `terminateCall` komutları cihaza ulaşmaz, görüşme bu yüzden süresiz bırakılmaz.
+- Bu sürede ICE de koparsa görüşme yukarıdaki tabloya göre biter.
 
-Bir süre hem ICE hem WebSocket kopmaları için bir toparlanma penceresi vardı. Kopma anında görüşme
-askıya alınıyor, medya susturuluyor ama peer connection kapatılmıyor, SDK da arka planda sessizce
-yeniden bağlanmaya çalışıyordu. Sunucu ve panel bunu desteklemediği için bu yapı kaldırıldı:
+Görüşme dışındaki kopmada (ya da medya hattı zaten düşmüşse) medya oturumu tamamen kapanır, soket
+kapatılır ve "Bağlantı Koptu" ekranı açılır. Kopma sayısı sınırı ve otomatik yeniden bağlanma
+`SDKAttemptLimits.shared.connection` (`SDKConnectionPolicy`) ile ayarlanır.
+
+### Neden sessiz yeniden abonelik yok?
+
+Bir dönem kopma anında görüşme askıya alınıyor, SDK da arka planda odaya kendiliğinden yeniden
+abone oluyordu. Sunucu ve panel bunu desteklemediği için bu yapı kaldırıldı:
 
 - Sunucu askıdaki oturumu hâlâ açık saydığından sessiz yeniden abonelik `subRejected`
   ("Oda dolu") ile reddediliyordu.
 - Panel çağrı oturumunu kapatmıyor, süre saymaya devam ediyordu.
 - Cihaz testinde ident statüsü bu yüzden `Reddedildi` oldu.
 
-Şimdi tek bir davranış var: bağlantı kopunca her şey kapatılır, "Bağlantı Koptu" ekranı açılır,
-kullanıcı yeniden bağlanır ve prosedür baştan işler. Yeniden bağlanırken `imOnline`,
+Yukarıdaki iki bekleme süresi odaya abone olmaz, yalnızca bağlantının geri gelmesini bekler.
+Görüşme bittiğinde kullanıcı "Bağlantı Koptu" ekranından yeniden bağlanır ve prosedür baştan
+işler. Yeniden bağlanırken `imOnline`,
 `getIdentStatus`, `subscribe` ve `stepChanged` gönderilir. Panel henüz karar vermediyse (statü id
 `< 0`) müşteri bekleme odasına döner ve temsilci onu yeniden arayabilir. Karar verildiyse başarılı
 ya da başarısız ThankYou ekranı açılır.
