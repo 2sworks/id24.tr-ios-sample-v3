@@ -121,6 +121,10 @@ SDK kopmayı birbirinden bağımsız iki kaynaktan anlar:
 İki kaynak da aynı noktaya çıkar. `.connectionErr` yalnızca bir kez gönderilir, tekrarlar yok
 sayılır. Yeniden bağlantı başarılı olunca bayrak sıfırlanır.
 
+Görüşme sürerken ve medya hattı ayaktayken `.connectionErr` hemen gönderilmez. Görüşme
+`signallessCallGracePeriod` (varsayılan 10 sn) boyunca sürer, soket bu sürede geri gelmezse görüşme
+biter ve ekran açılır ([TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc)).
+
 ```
 internet gitti ──┐
                  ├──► emitConnectionLost() ──► .connectionErr ──► LostConnection overlay
@@ -337,15 +341,15 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 
 | Kod | Case | Kaynak | Davranış |
 |---|---|---|---|
-| 4140 | `turnDisconnected` | ICE `.disconnected` | Hemen `terminateCall("TURN_DISCONNECTED")` |
+| 4140 | `turnDisconnected` | ICE `.disconnected`, 5 sn içinde toparlanmadı | `terminateCall("TURN_DISCONNECTED")` |
 | 4141 | `turnFailed` | ICE `.failed` | Hemen `terminateCall("TURN_DISCONNECTED")` |
 | 4142 | `turnClosed` | ICE `.closed` | Log + event |
 
-> ICE ya da WebSocket koptuğu anda görüşme biter, bütün bağlantılar kapatılır ve kullanıcı
-> "Bağlantı Koptu" ekranını görür; toparlanma için beklenmez. Bir süre görüşmeyi askıya alıp
-> bekleyen bir yapı denendi ve geri alındı. Sunucu askıdaki oturumu hâlâ açık saydığı için yeniden
-> abonelik `subRejected` ("Oda dolu") ile reddediliyor, panel de çağrı oturumunu kapatmıyordu.
-> Ayrıntı: [TURN & WebRTC → Neden toparlanma penceresi YOK?](turn-webrtc.md).
+> ICE `.disconnected` olunca 5 sn (sabit) toparlanma beklenir, `.failed` görüşmeyi hemen bitirir.
+> WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez: görüşme
+> `signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
+> gelmezse biter. İki bekleme de odaya yeniden abone olmaz.
+> Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc).
 
 ### Arka Plan Zaman Aşımı (4105)
 
