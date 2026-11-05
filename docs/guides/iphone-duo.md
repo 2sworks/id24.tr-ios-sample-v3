@@ -158,17 +158,21 @@ func application(_ application: UIApplication,
     guard UIDevice.current.userInterfaceIdiom == .phone,
           let ekran = window?.windowScene?.screen.bounds.size,
           min(ekran.width, ekran.height) >= 600 else { return .portrait }
-    return .allButUpsideDown
+    return SDKLayout.supportedOrientations
 }
 ```
 
+`SDKLayout.supportedOrientations` kamera açan ekranlarda `.portrait`, diğerlerinde
+`.allButUpsideDown` döner. Kendi maskenizi döndürürseniz kamera ekranları yatayda açılır.
+
 Yatayda SDK ekranları şöyle davranır:
 
+- Kamera açan ekranlar dikey konuma kilitlenir: selfie, canlılık, kimlik tarama, video kaydı ve
+  görüntülü görüşme. Akış bu ekranlardan birine geçince SDK arayüzü dikeye döndürür. Cihaz yatay
+  tutuluyorsa ekran dikey bir sütun olarak çizilir.
+- Kamerasız ekranlar (hazırlık, NFC, adres, imza, ses tanıma, teşekkür) yatay da açılır. Kamera ekranından
+  çıkınca kilit kalkar.
 - Modül ekranları ölçüyü pencereden aldığı için yatay pencereye de yerleşir.
-- Kimlik okuma etkilenmez. Tarayıcı kareyi arayüzün yönünden bağımsız, sabit açıyla alır; okunan
-  alanlar görüntüdeki karta göre ölçülür.
-- Kimlik tarayıcının önizlemesi dikey konuma sabittir. İç ekran yatayken önizleme yan görünür.
-- Selfie ve video kaydı açıyı her yerleşimde yeniden okur, önizleme dik kalır.
 
 Okunabilir genişlik için iPad rehberindeki `.sdkReadableWidth()` aynı şekilde çalışır
 ([iPad Desteği](ipad-support.md)).
@@ -225,8 +229,8 @@ SDK ekranları bu sütuna göre yerleşir. İç ekranın tamamını kullanmak i�
 [Yönelim](#yönelim) bölümündeki yatay açılışa bakın.
 
 **Yatay yerleşim desteklemem gerekiyor mu?**
-Hayır. Dikey kilit yeterli. İç ekranda yatay açılış isteğe bağlı; açarsanız kimlik tarayıcının
-önizlemesi yatayda yan görünür, okuma yine çalışır.
+Hayır. Dikey kilit yeterli. İç ekranda yatay açılış isteğe bağlı; açarsanız kamera ekranları
+yine dikey açılır.
 
 **Dış ekranda alt metin düğmenin arkasında kalıyor.**
 Dış ekran düz bir iPhone'dan kısa. İçeriği `ScrollView` içine koyun.
