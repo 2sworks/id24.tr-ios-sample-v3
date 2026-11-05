@@ -15,7 +15,7 @@ anlatıyor.
 | Pencere | Pencereyi etkin sahneden alın: `SDKLayout.activeWindow` |
 | Ölçü | Genişliği ve yüksekliği pencereden alın: `SDKLayout.bounds` |
 | Güvenli alan | Dış ekranda durum çubuğu sağ kenarda durur, sağda yaklaşık 88 pt pay vardır |
-| Yönelim | Dikey kilit ve `UIRequiresFullScreen = YES`; iç ekranda uygulama ortada dikey bir sütun olarak açılır |
+| Yönelim | Dikey kilit ve `UIRequiresFullScreen = YES`; iç ekranda uygulama ortada dikey bir sütun olarak açılır. İsterseniz yalnız iç ekranda yatay açılış ekleyin |
 | Uzun içerik | Kısa dış ekranda taşabilecek içeriği `ScrollView` içine koyun |
 
 ---
@@ -125,8 +125,7 @@ gereken katmanlarda kullanılsın. Düğme ve metin güvenli alanın içinde kal
 
 ## Yönelim
 
-SDK ekranları dikey konuma kilitlidir. Host uygulamada da yalnız dikey konum tanımlı olsun ve
-`UIRequiresFullScreen` açık kalsın:
+SDK ekranları dikey konuma göre tasarlandı. En sade kurulum uygulamayı dikey kilitli bırakmak:
 
 ```
 UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
@@ -137,6 +136,39 @@ UIRequiresFullScreen = YES
 İç ekran yatayken sistem dikey kilitli uygulamayı ekranın ortasında dikey bir sütun olarak açar.
 SDK ekranları bu sütunda düzgün yerleşir. Kendi ekranlarınızda da pencere ölçüsüyle çalıştığınız
 sürece ek bir şey yapmanız gerekmez.
+
+### İç ekranda yatay açılış
+
+Örnek uygulama iç ekranda yatay da açılıyor; dış ekranda ve diğer iPhone'larda dikey kalıyor.
+Aynısını yapmak için Info.plist'te iPhone'a yatay yönleri ekleyin. iPad dikey kalsın,
+`UIRequiresFullScreen` da açık kalsın:
+
+```
+UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+UISupportedInterfaceOrientations~ipad = UIInterfaceOrientationPortrait
+UIRequiresFullScreen = YES
+```
+
+Yatay açılışı uygulama delegesinde iç ekranla sınırlayın. Bugünkü telefonlarda kısa kenarı 600 pt'yi
+geçen tek ekran Duo'nun iç ekranı ([AppDelegate.swift](../../IdentifySample/App/AppDelegate.swift)):
+
+```swift
+func application(_ application: UIApplication,
+                 supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+    guard UIDevice.current.userInterfaceIdiom == .phone,
+          let ekran = window?.windowScene?.screen.bounds.size,
+          min(ekran.width, ekran.height) >= 600 else { return .portrait }
+    return .allButUpsideDown
+}
+```
+
+Yatayda SDK ekranları şöyle davranır:
+
+- Modül ekranları ölçüyü pencereden aldığı için yatay pencereye de yerleşir.
+- Kimlik okuma etkilenmez. Tarayıcı kareyi arayüzün yönünden bağımsız, sabit açıyla alır; okunan
+  alanlar görüntüdeki karta göre ölçülür.
+- Kimlik tarayıcının önizlemesi dikey konuma sabittir. İç ekran yatayken önizleme yan görünür.
+- Selfie ve video kaydı açıyı her yerleşimde yeniden okur, önizleme dik kalır.
 
 Okunabilir genişlik için iPad rehberindeki `.sdkReadableWidth()` aynı şekilde çalışır
 ([iPad Desteği](ipad-support.md)).
@@ -188,12 +220,13 @@ Parlaklığı pencerenin bağlı olduğu ekrandan ayarlayın:
 `SDKLayout.activeWindow?.screen.brightness`. Ekrandan çıkarken eski değeri aynı ekrana geri yazın.
 
 **İç ekranda uygulama ortada dar bir sütun olarak açılıyor. Bu doğru mu?**
-Doğru. SDK dikey kilitli; iç ekran yatayken sistem uygulamayı dikey bir sütun olarak çizer.
-SDK ekranları bu sütuna göre yerleşir.
+Uygulama dikey kilitliyse doğru. İç ekran yatayken sistem uygulamayı dikey bir sütun olarak çizer,
+SDK ekranları bu sütuna göre yerleşir. İç ekranın tamamını kullanmak için
+[Yönelim](#yönelim) bölümündeki yatay açılışa bakın.
 
 **Yatay yerleşim desteklemem gerekiyor mu?**
-Hayır. Uygulamayı dikey kilitli bırakın ve `UIRequiresFullScreen = YES` tutun. SDK'nın kamera
-ekranları dikey konuma göre kuruluyor.
+Hayır. Dikey kilit yeterli. İç ekranda yatay açılış isteğe bağlı; açarsanız kimlik tarayıcının
+önizlemesi yatayda yan görünür, okuma yine çalışır.
 
 **Dış ekranda alt metin düğmenin arkasında kalıyor.**
 Dış ekran düz bir iPhone'dan kısa. İçeriği `ScrollView` içine koyun.

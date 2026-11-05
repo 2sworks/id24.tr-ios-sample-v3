@@ -256,7 +256,7 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.1.0 Değişiklikleri](docs/guides/migration-3.1.0.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
 | [iPad Desteği](docs/guides/ipad-support.md) | Cihaz yetenekleri (NFC / TrueDepth), modül ikamesi, yönelim ve tablet yerleşimi |
-| [iPhone Duo Desteği](docs/guides/iphone-duo.md) | Sahne yaşam döngüsü, pencere ölçüsü, dış ekranın güvenli alanı, katlama; SSS |
+| [iPhone Duo Desteği](docs/guides/iphone-duo.md) | Sahne yaşam döngüsü, pencere ölçüsü, dış ekranın güvenli alanı, yönelim ve iç ekranda yatay açılış; SSS |
 | [Lokalizasyon](docs/guides/localization.md) | 5 dil (TR/EN/DE/AZ/RU), metin override |
 | [Özelleştirme](docs/guides/customization.md) | Üç özelleştirme yöntemi derinlemesine + "bypass yok" kuralı |
 | [IdentityScanner](docs/guides/identity-scanner.md) | Gerçek zamanlı belge tarama motoru: profiller, alan OCR, TCKN/MRZ doğrulama, bağımsız kullanım |
