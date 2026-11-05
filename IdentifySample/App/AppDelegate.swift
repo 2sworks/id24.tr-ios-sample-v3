@@ -33,11 +33,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     // Kısa kenarı 600 pt'yi geçen telefon ekranında (iPhone Duo iç ekranı) yatay da açılır.
+    // Kamera açan modüllerde SDK dikey kilit ister.
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         guard UIDevice.current.userInterfaceIdiom == .phone,
               let ekran = window?.windowScene?.screen.bounds.size,
               min(ekran.width, ekran.height) >= 600 else { return .portrait }
-        return .allButUpsideDown
+        return SDKLayout.supportedOrientations
     }
 
     // iOS 27 SDK'sıyla derlenen uygulama sahne yaşam döngüsü olmadan açılmıyor.
