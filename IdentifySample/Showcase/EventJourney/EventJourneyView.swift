@@ -7,7 +7,7 @@
 //  hangi ekranda çıktı, oturum başarılı mı başarısız mı kapandı" sorularını görselleştirir.
 //
 //  Bu ekran gerçek entegrasyonu birebir yapar:
-//      IdentifyManager.shared.eventDelegate = recorder
+//      for await event in IdentifyManager.shared.events { ... }
 //  Gerçek bir oturumda olaylar otomatik akar. Rehber ortamında canlı oturum olmadığından,
 //  örnek senaryolar simüle edilerek olay örgüsü gösterilir.
 //
@@ -45,12 +45,7 @@ struct EventJourneyView: View {
             .padding(IDSpacing.md)
         }
         .background(IDColor.adaptiveBackground(for: colorScheme))
-        .onAppear { IdentifyManager.shared.eventDelegate = recorder }
-        .onDisappear {
-            if IdentifyManager.shared.eventDelegate === recorder {
-                IdentifyManager.shared.eventDelegate = nil
-            }
-        }
+        .task { await recorder.listen() }
     }
 
     // MARK: Outcome banner

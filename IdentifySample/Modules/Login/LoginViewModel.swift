@@ -29,6 +29,8 @@ final class LoginViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     let manager = IdentifyManager.shared
+    /// Kurulumu bekleyen görev. Yeni bağlantıda öncekinin beklemesi bırakılır.
+    private var setupTask: Task<Void, Never>?
 
     // MARK: - Ident ID
 
@@ -245,61 +247,69 @@ final class LoginViewModel: ObservableObject {
         // modulesControllersArray'i farklı instance'larla kurar ve modüller başlamaz.
         coordinator.prepareForSetup()
 
-        manager.setupSDK(
-            identId: resolveIdentId(),
-            baseApiUrl: selectedServer.apiUrl,
-            networkOptions: SDKNetworkOptions(
-                timeoutIntervalForRequest: 30,
-                timeoutIntervalForResource: 30,
-                useSslPinning: useSSLPinning
-            ),
-            kpsData: nil,
-            identCardType: [.idCard, .passport, .oldSchool],
-            signLangSupport: useSignLang,
-            nfcMaxErrorCount: 3,
-            logLevel: .online,
-            logOnlineSecretKey: "dGhpc19pc19qdXN0X2R1bW15X3NlY3JldF9mb3JfZGVtbw==",
-            bigCustomerCam: useBigCustomerCam,
-            selectedModules: selectedModules,
-            idCardLang: selectedIdLang,
-            turnKey: "AEdHh9OZu1kg+nSBSd2UNMu9y4Kc3xVfgTsvw+PTAic=",
-            wsSecretKey: "tgdRmdAABrWf9TCRJZIWoW3Bz0iPJpig5jtOkBN4pvU=",
-            showThankYouPage: true,
-            showNFCNotFoundPage: true,
-            supportU18: true,
-            AESKey: "SEATSJ8kk0v8+A1LeQsAMbOgL+fSj9pOaUKI5cDMITU=",
-            enableAutoRotateOCR: true,
-            // "Sesli Okuma (TTS)" tercihi (Ayarlar menüsündeki toggle). Hardcoded true iken
-            // setupSDK, kapalıyken bile defaultMode .off → .native yükseltip toggle'ı
-            // anlamsız kılıyordu. Artık gerçek tercih geçiliyor.
-            ttsEnabled: SDKReadAloudSetting.isEnabled,
-            // Oturum nasıl biterse bitsin burası tam bir kez çağrılır (panel kararı, kullanıcı
-            // çıkışı, modül hatası, bağlantı kurulamaması…). `showThankYouPage: false` verilirse
-            // teşekkür ekranı açılmaz; yönlendirme burada yapılır.
-            onFinished: { outcome in
-                switch outcome.result {
-                case .approved:     print("KYC onaylandı — \(outcome.reason.rawValue)")
-                case .rejected:     print("KYC reddedildi — \(outcome.terminateReason ?? "-")")
-                case .neutral:      print("KYC nötr sonuçlandı — \(outcome.terminateReason ?? "-")")
-                case .notCompleted: print("KYC tamamlanamadı — \(outcome.reason.rawValue), son modül: \(outcome.lastModule?.rawValue ?? "-")")
-                case .cancelled:    print("KYC iptal edildi — \(outcome.reason.rawValue)")
-                case .error:        print("KYC hatayla bitti — \(outcome.reason.rawValue) \(outcome.errorMessage ?? "")")
-                }
-            }
-        ) { [weak self] socketStats, apiResp, webErr in
+        setupTask?.cancel()
+        setupTask = Task { [weak self] in
             guard let self else { return }
-            Task { @MainActor in
-                self.isLoading = false
-                if let err = webErr, err.errorMessages != "" {
-                    self.errorMessage = err.errorMessages
-                    return
-                }
-                if socketStats?.isConnected == true && (apiResp.result ?? false) {
+            do {
+                let room = try await manager.setupSDK(
+                    identId: resolveIdentId(),
+                    baseApiUrl: selectedServer.apiUrl,
+                    networkOptions: SDKNetworkOptions(
+                        timeoutIntervalForRequest: 30,
+                        timeoutIntervalForResource: 30,
+                        useSslPinning: useSSLPinning
+                    ),
+                    kpsData: nil,
+                    identCardType: [.idCard, .passport, .oldSchool],
+                    signLangSupport: useSignLang,
+                    nfcMaxErrorCount: 3,
+                    logLevel: .online,
+                    logOnlineSecretKey: "dGhpc19pc19qdXN0X2R1bW15X3NlY3JldF9mb3JfZGVtbw==",
+                    bigCustomerCam: useBigCustomerCam,
+                    selectedModules: selectedModules,
+                    idCardLang: selectedIdLang,
+                    turnKey: "AEdHh9OZu1kg+nSBSd2UNMu9y4Kc3xVfgTsvw+PTAic=",
+                    wsSecretKey: "tgdRmdAABrWf9TCRJZIWoW3Bz0iPJpig5jtOkBN4pvU=",
+                    showThankYouPage: true,
+                    showNFCNotFoundPage: true,
+                    supportU18: true,
+                    AESKey: "SEATSJ8kk0v8+A1LeQsAMbOgL+fSj9pOaUKI5cDMITU=",
+                    enableAutoRotateOCR: true,
+                    // "Sesli Okuma (TTS)" tercihi (Ayarlar menüsündeki toggle). Hardcoded true iken
+                    // setupSDK, kapalıyken bile defaultMode .off → .native yükseltip toggle'ı
+                    // anlamsız kılıyordu. Artık gerçek tercih geçiliyor.
+                    ttsEnabled: SDKReadAloudSetting.isEnabled
+                )
+                isLoading = false
+                if room.result == true {
                     coordinator.start()
-                } else if socketStats?.isConnected == false {
-                    self.errorMessage = "Socket bağlantısı kurulamadı"
+                } else {
+                    errorMessage = "Oturum açılamadı"
                 }
+            } catch is CancellationError {
+                // Yalnız bekleme bitti; oturumu kapatmak için exitSDK() çağrılır.
+                isLoading = false
+                return
+            } catch {
+                isLoading = false
+                errorMessage = error.localizedDescription
             }
+            // Oturum nasıl biterse bitsin sonuç bir kez gelir (panel kararı, kullanıcı çıkışı,
+            // modül hatası, bağlantı kurulamaması). `showThankYouPage: false` verilirse teşekkür
+            // ekranı açılmaz; yönlendirme burada yapılır.
+            logOutcome(await manager.outcome())
+        }
+    }
+
+    private func logOutcome(_ outcome: SDKFlowOutcome) {
+        switch outcome.result {
+        case .approved:     print("KYC onaylandı — \(outcome.reason.rawValue)")
+        case .rejected:     print("KYC reddedildi — \(outcome.terminateReason ?? "-")")
+        case .neutral:      print("KYC nötr sonuçlandı — \(outcome.terminateReason ?? "-")")
+        case .notCompleted: print("KYC tamamlanamadı — \(outcome.reason.rawValue), son modül: \(outcome.lastModule?.rawValue ?? "-")")
+        case .cancelled:    print("KYC iptal edildi — \(outcome.reason.rawValue)")
+        case .error:        print("KYC hatayla bitti — \(outcome.reason.rawValue) \(outcome.errorMessage ?? "")")
+        @unknown default:   print("KYC sonucu — \(outcome.result.rawValue)")
         }
     }
 
