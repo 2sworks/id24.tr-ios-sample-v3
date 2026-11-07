@@ -63,6 +63,8 @@ nav:
       - Bağlantı Hız Testi: docs/guides/speed-test.md
       - Loglama: docs/guides/logging.md
       - Event Sistemi: docs/guides/events.md
+      - async/await API: docs/guides/async-await.md
+      - Thread Modeli ve Swift 6: docs/guides/concurrency.md
       - Oturum Çıkışları: docs/guides/session-exit.md
       - Tema: docs/guides/theming.md
       - 3.1.0 Değişiklikleri: docs/guides/migration-3.1.0.md
