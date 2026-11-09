@@ -72,7 +72,7 @@ IdentifyManager.shared.setupSDK(
 | `AESKey` | `String?` | `""` | Sunucudan şifreli gelen MRZ alanlarını çözen anahtar |
 | `enableAutoRotateOCR` | `Bool?` | `false` | Yamuk çekilmiş kimlik fotoğrafı düzeltilsin mi |
 | `ttsEnabled` | `Bool?` | `false` | Sesli okumayı açmanın kısa yolu (`defaultMode .off` ise `.native` yapar) |
-| `callback` | closure | — | `(WebSocket?, RoomResponse, SDKWebError?)` |
+| `callback` | closure | — | `(SDKWebSocket?, RoomResponse, SDKWebError?)` |
 
 ### Callback'te başarı kontrolü
 

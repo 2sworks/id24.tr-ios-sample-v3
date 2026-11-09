@@ -26,7 +26,6 @@
 		48420BA72A8B61840005250F /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 48420BA62A8B61840005250F /* WebRTC */; };
 		4843264BA582756F31BC049B /* VideoRecorderExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCC6A080892B339165DAEFE /* VideoRecorderExample.swift */; };
 		4857BFF82902D621001FE850 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 4857BFF72902D621001FE850 /* OpenSSL */; settings = {ATTRIBUTES = (Required, ); }; };
-		4857BFFB2902D636001FE850 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 4857BFFA2902D636001FE850 /* Starscream */; settings = {ATTRIBUTES = (Required, ); }; };
 		485C155C2907F3A7007B9ED0 /* SDKBundle+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485C15532907F3A7007B9ED0 /* SDKBundle+.swift */; };
 		486A111E2B07BED000A34623 /* CameraPermission in Frameworks */ = {isa = PBXBuildFile; productRef = 486A111D2B07BED000A34623 /* CameraPermission */; };
 		486A11202B07BED000A34623 /* MicrophonePermission in Frameworks */ = {isa = PBXBuildFile; productRef = 486A111F2B07BED000A34623 /* MicrophonePermission */; };
@@ -229,7 +228,6 @@
 				48420BA72A8B61840005250F /* WebRTC in Frameworks */,
 				4857BFF82902D621001FE850 /* OpenSSL in Frameworks */,
 				48171405294716830095A64F /* netfox in Frameworks */,
-				4857BFFB2902D636001FE850 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,7 +655,6 @@
 			name = IdentifyTR;
 			packageProductDependencies = (
 				4857BFF72902D621001FE850 /* OpenSSL */,
-				4857BFFA2902D636001FE850 /* Starscream */,
 				48AB73FE291A762100F591A4 /* SwiftSignatureView */,
 				48171404294716830095A64F /* netfox */,
 				48420BA62A8B61840005250F /* WebRTC */,
@@ -715,7 +712,6 @@
 			mainGroup = 483BDB0228F459CC00635BCC;
 			packageReferences = (
 				4857BFF62902D621001FE850 /* XCRemoteSwiftPackageReference "OpenSSL" */,
-				4857BFF92902D636001FE850 /* XCRemoteSwiftPackageReference "Starscream" */,
 				48AB73FD291A762100F591A4 /* XCRemoteSwiftPackageReference "SwiftSignatureView" */,
 				48171403294716830095A64F /* XCLocalSwiftPackageReference "Vendor/netfox" */,
 				48420BA52A8B61840005250F /* XCRemoteSwiftPackageReference "WebRTC" */,
@@ -1102,14 +1098,6 @@
 				minimumVersion = 1.1.1700;
 			};
 		};
-		4857BFF92902D636001FE850 /* XCRemoteSwiftPackageReference "Starscream" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/daltoniam/Starscream.git";
-			requirement = {
-				kind = exactVersion;
-				version = 3.1.1;
-			};
-		};
 		486A111C2B07BED000A34623 /* XCRemoteSwiftPackageReference "PermissionsKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sparrowcode/PermissionsKit";
@@ -1150,11 +1138,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4857BFF62902D621001FE850 /* XCRemoteSwiftPackageReference "OpenSSL" */;
 			productName = OpenSSL;
-		};
-		4857BFFA2902D636001FE850 /* Starscream */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4857BFF92902D636001FE850 /* XCRemoteSwiftPackageReference "Starscream" */;
-			productName = Starscream;
 		};
 		486A111D2B07BED000A34623 /* CameraPermission */ = {
 			isa = XCSwiftPackageProductDependency;

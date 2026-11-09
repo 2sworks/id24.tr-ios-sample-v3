@@ -23,7 +23,7 @@ ayrı tutulur.
 │  Modül hattı · oturum durumu · iş mantığı (OCR, NFC...) │
 ├──────────────┬──────────────────┬───────────────────────┤
 │  SDKNetwork  │  WebSocket       │  WebRTCClient         │
-│  (HTTP)      │  (Starscream)    │  (görüntülü görüşme)  │
+│  (HTTP)      │  (SDKWebSocket)  │  (görüntülü görüşme)  │
 └──────────────┴──────────────────┴───────────────────────┘
                         │
                  Identify Backend
