@@ -1,22 +1,13 @@
 {
-  "originHash" : "e8c49afbd008029a7b27e277bd7e7953f8e66b1347c32a8ca70bd2bb7167ddff",
+  "originHash" : "db39946ed7b9e12688282cacd847c236037c365cf5b016a5bb073f201b79b59a",
   "pins" : [
-    {
-      "identity" : "id24.tr-ios-sdk-spm",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/2sworks/id24.tr-ios-sdk-spm",
-      "state" : {
-        "revision" : "7ec8d6bd4ff7c6cd45f542ad4a321ae93bd47b99",
-        "version" : "3.2.0"
-      }
-    },
     {
       "identity" : "openssl",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzyzanowskim/OpenSSL.git",
       "state" : {
-        "revision" : "9429bf89fe0df2d2f25f3a9a51cbf7092e69640f",
-        "version" : "1.1.1700"
+        "revision" : "0a6149bff4fb00921ce0ec1811f726b166638095",
+        "version" : "3.6.5000"
       }
     },
     {
@@ -26,24 +17,6 @@
       "state" : {
         "revision" : "8d6b3d6db7d0654a4e4fe31bbf6556dec6fc3d13",
         "version" : "10.0.1"
-      }
-    },
-    {
-      "identity" : "starscream",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/daltoniam/Starscream.git",
-      "state" : {
-        "revision" : "e6b65c6d9077ea48b4a7bdda8994a1d3c6969c8d",
-        "version" : "3.1.1"
-      }
-    },
-    {
-      "identity" : "swift-nio-zlib-support",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-nio-zlib-support.git",
-      "state" : {
-        "revision" : "37760e9a52030bb9011972c5213c3350fa9d41fd",
-        "version" : "1.0.0"
       }
     },
     {
