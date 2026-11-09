@@ -9,6 +9,13 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ### Yayınlanmamış
 
+**Yeni**
+- async/await API: `setupSDK(...) async throws`, `outcome()`, `outcomes` ve `events` (`AsyncStream`), `quitSDK() async`. Mevcut closure API'leri değişmedi.
+- Rehberler: async/await API, thread modeli ve Swift 6 geçiş planı.
+
+**Değişti**
+- Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
+
 **Düzeltildi**
 - Sunucu kimlik fotoğrafını reddettiğinde panele başarılı yerine başarısız gidiyor.
 - Rehberler görüşmedeki kopmayı kodla aynı anlatıyor: ICE `disconnected` 5 sn bekler (4140), `failed` hemen biter (4141), soket kopunca medya ayaktaysa görüşme `signallessCallGracePeriod` (10 sn) boyunca sürer.
