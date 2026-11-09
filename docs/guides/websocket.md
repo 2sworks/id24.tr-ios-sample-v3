@@ -12,10 +12,10 @@ bulacaksınız.
 ## Bağlantının Kurulması
 
 Soket adresini (`ws_url`) siz vermezsiniz; `connectToRoom` cevabından gelir. İstemci olarak
-[Starscream](https://github.com/daltoniam/Starscream) WebSocket kullanılır.
+SDK'nın kendi WebSocket katmanı (`SDKWebSocket`) kullanılır.
 
 ```
-RoomResponse.ws_url ──► WebSocket(url:)
+RoomResponse.ws_url ──► SDKWebSocket(url:)
                           │  socket_auth == "1" ise: ws_url + "?token=<HMAC token>"
                           ▼
                         connect() ──► sendFirstSubscribe()   (odaya kayıt)
@@ -116,7 +116,7 @@ SDK kopmayı birbirinden bağımsız iki kaynaktan anlar:
 
 1. Reachability izleyicisi: oturum başlarken açılır. İnternet `.notReachable` olursa (ve KYC
    bitmemişse) devreye girer.
-2. Soket kopması: Starscream'in disconnect bildirimi.
+2. Soket kopması: `SDKWebSocket` disconnect bildirimi.
 
 İki kaynak da aynı noktaya çıkar. `.connectionErr` yalnızca bir kez gönderilir, tekrarlar yok
 sayılır. Yeniden bağlantı başarılı olunca bayrak sıfırlanır.

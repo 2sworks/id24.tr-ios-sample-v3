@@ -51,8 +51,8 @@ getirir: bağımlılık kümesi sürüme göre farklıdır ve `Package.resolved`
 | 3.x | `3.0.0` ve üzeri | Bu depodaki rehberlerin anlattığı sürüm — hazır ekranlar SDK'nın içinde |
 | 2.x | `2.5.x` | Eski entegrasyon; ekranlar host uygulamada |
 
-Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto),
-`Starscream` (WebSocket) ve `WebRTC` (görüntülü görüşme). 3.2.1'den itibaren `PermissionsKit` ve
+Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto) ve
+`WebRTC` (görüntülü görüşme). 3.2.1'den itibaren `PermissionsKit` ve
 `SwiftSignatureView` gelmez; bu paketlerin modüllerini (`CameraPermission`, `MicrophonePermission`,
 `SpeechRecognizerPermission`, `SwiftSignatureView`) kendi kodunuzda import ediyorsanız paketi
 uygulamanıza kendiniz ekleyin. 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;

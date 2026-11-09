@@ -988,7 +988,7 @@ IdentifyManager.shared.setupSDK(
     enableAutoRotateOCR: Bool?,             // OCR otomatik oryantasyon düzeltme (vars. false)
     ttsEnabled: Bool?,                      // sesli okumayı native modda aç (vars. false)
     onFinished: ((SDKFlowOutcome) -> Void)?, // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
-    callback: (WebSocket?, RoomResponse, SDKWebError?) -> ()
+    callback: (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()
 )
 ```
 
