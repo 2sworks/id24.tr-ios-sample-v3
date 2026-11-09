@@ -252,6 +252,8 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Bağlantı Hız Testi](docs/guides/speed-test.md) | Eski ve yeni hız testi, `useConnectionSpeedTest`, `blockIdent`, görüşme öncesi ölçüm senaryosu |
 | [Loglama](docs/guides/logging.md) | `SDKLog` facade'i, severity/kategori, online log, redaksiyon |
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
+| [async/await API](docs/guides/async-await.md) | async kurulum, `outcome()`, `events`, hata tipleri, iptal |
+| [Thread Modeli ve Swift 6](docs/guides/concurrency.md) | Hangi bildirim hangi thread'de gelir, Swift 6 geçiş planı |
 | [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.1.0 Değişiklikleri](docs/guides/migration-3.1.0.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
