@@ -97,13 +97,17 @@ Oturum sonlandı — son modül: Mrz & Nfc Screen, akış tamamlandı, sebep: 41
 | `errorMessage` | `String?` | `setupFailed` için hata metni |
 | `nfcVerification` | `SDKNFCVerification?` | Son NFC okumasının çip kontrolleri. Oturumda çip okunmadıysa `nil`. Bkz. [Çip doğrulama ayrıntısı](#çip-doğrulama-ayrıntısı) |
 | `sessionId` / `timestampMs` | | Oturum kimliği ve zaman |
-| `isSuccess` | `Bool` | Yalnızca `.approved` için `true` |
+| `isSuccess` | `Bool` | `.approved` için `true`. `IdentifyManager.shared.skipsCountAsFailure` açıksa atlanan modül olduğunda `false` |
+| `isFullyVerified` | `Bool` | Oturum onaylandıysa ve `skippedModules` boşsa `true` |
+| `verifiedModules` | `[SdkModules]` | `modules` listesinden `skippedModules` çıkarılmış hali. Yalnızca `.approved` oturumda anlamlıdır, yarıda kalan akışta hangi adımlara gelindiğini söylemez |
 | `toDictionary()` | | RN/Flutter için sözlük |
 
 > ⚠️ `approved` ile `skippedModules` birlikte gelebilir. Görüşmesiz bir akışta bütün modüller
 > geçildiğinde sonuç `approved / allModulesCompleted` olur; backend atlamaya izin verdiyse bir modül
-> atlanmış olsa bile. Her adımın doğrulanmış olması gerekiyorsa `skippedModules`'ın boş olduğunu
-> ayrıca kontrol edin. Nihai onay her durumda sunucudadır.
+> atlanmış olsa bile. Her adımın doğrulanmış olması gerekiyorsa, bankacılık entegrasyonlarında
+> olduğu gibi, `isFullyVerified` kullanın. Yalnızca `isSuccess`'e bakan bir entegrasyon için
+> `setupSDK` çağrısından önce `IdentifyManager.shared.skipsCountAsFailure = true` yazın.
+> Varsayılan değer `false`. Nihai onay her durumda sunucudadır.
 
 ### Çip doğrulama ayrıntısı
 
@@ -312,7 +316,7 @@ final class KycRouter: ObservableObject {
 
     func handle(_ outcome: SDKFlowOutcome) {
         switch outcome.result {
-        case .approved where outcome.skippedModules.isEmpty:
+        case .approved where outcome.isFullyVerified:
             destination = .identityVerified                 // ← bu senaryo
         case .approved:
             destination = .identityNotVerified
@@ -494,7 +498,7 @@ Durum aynı, ama panelde atlama açık:
 | `stepIndex` / `totalSteps` | `3` / `3` |
 
 ```swift
-case .approved where outcome.skippedModules.isEmpty:
+case .approved where outcome.isFullyVerified:
     router.show(.verified)
 case .approved:
     router.show(.pendingManualReview(missing: outcome.skippedModules))   // [.nfc]
@@ -681,7 +685,7 @@ Host'un yazacağı kod bütün modüllerde aynıdır. Modüle göre ayrımı `la
 ```swift
 onFinished: { outcome in
     switch outcome.result {
-    case .approved where outcome.skippedModules.isEmpty:
+    case .approved where outcome.isFullyVerified:
         router.show(.verified)
     case .approved:
         router.show(.pendingReview(unverified: outcome.skippedModules))   // hangi adımlar doğrulanmadı
@@ -954,7 +958,7 @@ final class KycCoordinator: IdentifyFlowResultListener {
 
     private func route(_ outcome: SDKFlowOutcome) {
         switch outcome.result {
-        case .approved where outcome.skippedModules.isEmpty:
+        case .approved where outcome.isFullyVerified:
             presenter?.navigationController?.pushViewController(SuccessViewController(), animated: true)
         case .approved, .rejected, .neutral, .notCompleted:
             presenter?.navigationController?.pushViewController(ReviewViewController(outcome: outcome), animated: true)
