@@ -65,9 +65,11 @@ uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa 
 | Kamera | `NSCameraUsageDescription` | Kimlik, Selfie, Canlılık, Video, Görüşme |
 | Mikrofon | `NSMicrophoneUsageDescription` | Görüşme, Video kayıt, Konuşma |
 | Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Konuşma (Speech) modülü |
-| NFC | `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
+| NFC | `NFCReaderUsageDescription` + `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
 | iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK portrait kilitlidir; bu anahtar olmadan App Store yüklemesi iPad çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
 | Sahne | `UIApplicationSceneManifest` + `SceneDelegate` | iOS 27 SDK'sıyla derlenen uygulama sahne kullanmıyorsa iPhone Duo'da açılmıyor ([iPhone Duo Desteği](docs/guides/iphone-duo.md)) |
+
+Modül başına tam liste: [Modül Gereksinimleri](docs/guides/module-requirements.md).
 
 ### 3. Akışı başlatın
 
@@ -254,6 +256,7 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
 | [async/await API](docs/guides/async-await.md) | async kurulum, `outcome()`, `events`, hata tipleri, iptal |
 | [Thread Modeli ve Swift 6](docs/guides/concurrency.md) | Hangi bildirim hangi thread'de gelir, Swift 6 geçiş planı |
+| [Modül Gereksinimleri](docs/guides/module-requirements.md) | Her modülün Info.plist anahtarları, ek ayarları ve kütüphaneleri |
 | [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.1.0 Değişiklikleri](docs/guides/migration-3.1.0.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
