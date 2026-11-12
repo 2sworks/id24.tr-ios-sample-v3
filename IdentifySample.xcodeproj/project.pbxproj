@@ -16,6 +16,7 @@
 		2F5C383CA1B02BFB928D69C8 /* PrepareHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480F245BECD28CA1A34D0EC9 /* PrepareHostViewModel.swift */; };
 		34BF094BF844734F730C3288 /* SpeechExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E589C63A7C9F2C216637D8 /* SpeechExample.swift */; };
 		36692AAE2F11120500A67DAB /* apiqa.identify.com.tr.cer in Resources */ = {isa = PBXBuildFile; fileRef = 36692AAD2F11120500A67DAB /* apiqa.identify.com.tr.cer */; };
+		C5CA0A5F2F7D000100A1B2C3 /* csca-masterlist.pem in Resources */ = {isa = PBXBuildFile; fileRef = C5CA0A5E2F7D000100A1B2C3 /* csca-masterlist.pem */; };
 		3F3D346B21B00A04573BEFA7 /* OvdHostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8845530D6D0CDF129A80AB /* OvdHostViewModel.swift */; };
 		480961182C64E70C00B9E6D5 /* v2api.identify.com.tr.cer in Resources */ = {isa = PBXBuildFile; fileRef = 48BFF0D02BBAF3940088D67E /* v2api.identify.com.tr.cer */; };
 		480C1E4F2BDB8B8D0076D28B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 480C1E4E2BDB8B8D0076D28B /* PrivacyInfo.xcprivacy */; };
@@ -127,6 +128,7 @@
 		2A57F8CBAD67C67E1AE6DEF4 /* SelfieExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SelfieExample.swift; sourceTree = "<group>"; };
 		323CD02657B616528C3DB18D /* CrossPlatformIntegrationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CrossPlatformIntegrationView.swift; sourceTree = "<group>"; };
 		36692AAD2F11120500A67DAB /* apiqa.identify.com.tr.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = apiqa.identify.com.tr.cer; sourceTree = "<group>"; };
+		C5CA0A5E2F7D000100A1B2C3 /* csca-masterlist.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = csca-masterlist.pem; sourceTree = "<group>"; };
 		38F1A7C84F376BAB8F7FB52A /* SignLangExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SignLangExample.swift; path = SignLang/SignLangExample.swift; sourceTree = "<group>"; };
 		41304A7BE43757905D04D5F1 /* OvdExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OvdExample.swift; path = IdCardOVD/OvdExample.swift; sourceTree = "<group>"; };
 		428C48EC43106C38A1B1CF96 /* ShowcaseCatalogView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShowcaseCatalogView.swift; sourceTree = "<group>"; };
@@ -462,6 +464,7 @@
 				480C1E4E2BDB8B8D0076D28B /* PrivacyInfo.xcprivacy */,
 				48BFF0D02BBAF3940088D67E /* v2api.identify.com.tr.cer */,
 				36692AAD2F11120500A67DAB /* apiqa.identify.com.tr.cer */,
+				C5CA0A5E2F7D000100A1B2C3 /* csca-masterlist.pem */,
 				489CBB1A28F586D500D22CC1 /* IdentifySample.entitlements */,
 				DF7BC1682D4A279600372CAB /* Env.xcdatamodeld */,
 				483BDB1728F459CC00635BCC /* Assets.xcassets */,
@@ -754,6 +757,7 @@
 				480961182C64E70C00B9E6D5 /* v2api.identify.com.tr.cer in Resources */,
 				483BDB1828F459CC00635BCC /* Assets.xcassets in Resources */,
 				36692AAE2F11120500A67DAB /* apiqa.identify.com.tr.cer in Resources */,
+				C5CA0A5F2F7D000100A1B2C3 /* csca-masterlist.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
