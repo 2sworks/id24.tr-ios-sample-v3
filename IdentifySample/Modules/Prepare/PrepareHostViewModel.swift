@@ -12,9 +12,6 @@ import IdentifySDK
 final class PrepareHostViewModel: HostModuleViewModel {
     let sdk = SDKPrepareViewModel()
 
-    /// Dışarıdan (env-config) ayarlanır: konuşma izni de zorunlu mu?
-    var requireSpeech: Bool = true
-
     override init() {
         super.init()
         bridge(sdk)
@@ -27,14 +24,13 @@ final class PrepareHostViewModel: HostModuleViewModel {
     var cameraAuthorized: Bool { sdk.cameraAuthorized }
     var micAuthorized: Bool { sdk.micAuthorized }
     var speechAuthorized: Bool { sdk.speechAuthorized }
-    var allPermissionsGranted: Bool {
-        requireSpeech ? sdk.allPermissionsGranted : (sdk.cameraAuthorized && sdk.micAuthorized)
-    }
+    var allPermissionsGranted: Bool { sdk.allPermissionsGranted }
 
     func checkPermissions() {
         log("check_permissions")
-        sdk.checkCamera(); sdk.checkMicrophone()
-        if requireSpeech { sdk.checkSpeech() }
+        if sdk.requiredPermissions.contains(.camera) { sdk.checkCamera() }
+        if sdk.requiredPermissions.contains(.microphone) { sdk.checkMicrophone() }
+        if sdk.requiredPermissions.contains(.speechRecognition) { sdk.checkSpeech() }
     }
     func complete() { sdk.completePrepare() }
 }

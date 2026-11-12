@@ -8,7 +8,7 @@ gösterir. Modül listesi oturum başında backend'den gelir, bu yüzden uygulam
 
 | Modül (`SdkModules`) | Info.plist anahtarı | Ek ayar | Paket | Sistem framework'ü |
 |---|---|---|---|---|
-| Hazırlık (`prepare`) | `NSCameraUsageDescription`, `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription` | | | `AVFoundation`, `Speech` |
+| Hazırlık (`prepare`) | Akıştaki modüllerin anahtarları | | | Akıştaki modüllerin çerçeveleri |
 | Kimlik (`idCard`) | `NSCameraUsageDescription` | | | `AVFoundation`, `Vision` |
 | Kimlik OVD (`idcard_w_ovd`) | `NSCameraUsageDescription` | | | `AVFoundation`, `Vision` |
 | NFC (`nfc`) | `NFCReaderUsageDescription`, `com.apple.developer.nfc.readersession.iso7816.select-identifiers` listesinde `A0000002471001` | Near Field Communication Tag Reading yeteneği: `com.apple.developer.nfc.readersession.formats` içinde `TAG` | `OpenSSL` | `CoreNFC` |
@@ -27,11 +27,14 @@ izni istemez.
 
 Canlılık modülü ekranı `ReplayKit` ile kaydeder. Mikrofon bu kayıtta kapalıdır.
 
-## Hazırlık ekranı üç izni birden ister
+## İzinler modül açılınca istenir
 
-Hazırlık modülü akıştaysa kamera, mikrofon ve konuşma tanıma izinlerinin üçü de verilmeden sonraki
-adıma geçilmez. Akışta konuşma modülü olmasa da bu böyledir. Hazırlık ekranını kullanan her uygulama
-`NSSpeechRecognitionUsageDescription` anahtarını da eklemelidir.
+Her modül kendi iznini ekranı açılırken ister. Kullanıcı izni vermezse ayarlara yönlendiren popup
+çıkar.
+
+Hazırlık modülü akıştaysa yalnız akıştaki modüllerin izinlerini listeler ve bunlar verilmeden sonraki
+adıma geçilmez. Akışta konuşma modülü yoksa konuşma tanıma izni istenmez,
+`NSSpeechRecognitionUsageDescription` anahtarı da gerekmez.
 
 İzinleri kendiniz yönetiyorsanız `SDKPermissionConfig.shared.provider` ile kendi izin katmanınızı
 bağlayabilirsiniz.

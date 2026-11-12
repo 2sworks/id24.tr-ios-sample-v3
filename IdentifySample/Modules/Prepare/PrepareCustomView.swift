@@ -39,7 +39,7 @@ struct PrepareCustomView: View {
     @State private var hasGoodConditions = false
 
     private var allChecklistSelected: Bool {
-        viewModel.cameraAuthorized && viewModel.micAuthorized && viewModel.speechAuthorized
+        viewModel.allPermissionsGranted
             && hasID && isAlone && hasGoodConditions
     }
 
@@ -97,14 +97,20 @@ struct PrepareCustomView: View {
                     }
 
                     VStack(spacing: IDSpacing.sm) {
-                        PrepareCheckRow(icon: .permCamera, title: String(.prepareCam), isChecked: viewModel.cameraAuthorized) {
-                            viewModel.checkCamera()
+                        if viewModel.requiredPermissions.contains(.camera) {
+                            PrepareCheckRow(icon: .permCamera, title: String(.prepareCam), isChecked: viewModel.cameraAuthorized) {
+                                viewModel.checkCamera()
+                            }
                         }
-                        PrepareCheckRow(icon: .permMic, title: String(.prepareMic), isChecked: viewModel.micAuthorized) {
-                            viewModel.checkMicrophone()
+                        if viewModel.requiredPermissions.contains(.microphone) {
+                            PrepareCheckRow(icon: .permMic, title: String(.prepareMic), isChecked: viewModel.micAuthorized) {
+                                viewModel.checkMicrophone()
+                            }
                         }
-                        PrepareCheckRow(icon: .permSpeech, title: String(.prepareSpeech), isChecked: viewModel.speechAuthorized) {
-                            viewModel.checkSpeech()
+                        if viewModel.requiredPermissions.contains(.speechRecognition) {
+                            PrepareCheckRow(icon: .permSpeech, title: String(.prepareSpeech), isChecked: viewModel.speechAuthorized) {
+                                viewModel.checkSpeech()
+                            }
                         }
                         PrepareCheckRow(icon: .permIdCard, title: String(.idNear), isChecked: hasID) { hasID.toggle() }
                         PrepareCheckRow(icon: .permAlone, title: String(.aloneForVerification), isChecked: isAlone) { isAlone.toggle() }
