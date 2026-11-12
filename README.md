@@ -266,6 +266,15 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Özelleştirme](docs/guides/customization.md) | Üç özelleştirme yöntemi derinlemesine + "bypass yok" kuralı |
 | [IdentityScanner](docs/guides/identity-scanner.md) | Gerçek zamanlı belge tarama motoru: profiller, alan OCR, TCKN/MRZ doğrulama, bağımsız kullanım |
 
+## Örnekler
+
+Sık sorulan özelleştirmeler için hazır kod:
+
+| Örnek | İçerik |
+|---|---|
+| [NFC Metinleri](docs/examples/nfc-texts.md) | NFC penceresindeki bilgi satırı, emoji ilerleme çubuğu, hazır ekran ve sesli metinler |
+| [Kimlik Tarama Yönlendirmeleri](docs/examples/scanner-guidance.md) | Yaklaştır, uzaklaştır, düz tut metinleri; metni ekranın üstünde gösterme |
+
 ---
 
 ## Ekranları Özelleştirme
