@@ -72,6 +72,9 @@ nav:
       - Lokalizasyon: docs/guides/localization.md
       - Özelleştirme: docs/guides/customization.md
       - IdentityScanner: docs/guides/identity-scanner.md
+  - Örnekler:
+      - NFC Metinleri: docs/examples/nfc-texts.md
+      - Kimlik Tarama Yönlendirmeleri: docs/examples/scanner-guidance.md
   - Modüller:
       - Genel Bakış: IdentifySample/Modules/Modules.md
       - Prepare: IdentifySample/Modules/Prepare/Prepare.md
