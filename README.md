@@ -374,5 +374,3 @@ SDK ve Sample App sürüm notlarının tamamı için: **[CHANGELOG.md](CHANGELOG
 | Azerbaycan | 17.04.2023 | 16.04.2028 | 12.07.2038 |
 
 Türkiye CSCA anahtarını 3 yılda, Azerbaycan 5 yılda bir değiştiriyor. Yeni CSCA listeye girmezse imza bitiş tarihinden sonra basılan belgeler doğrulanamaz. Türkiye için Mart 2027'den, Azerbaycan için Nisan 2028'den önce BSI listesine bakıp dosyayı yenileyin.
-
-Kaynak: [BSI German Master List](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/ElekAusweise/CSCA/GermanMasterList.html)
