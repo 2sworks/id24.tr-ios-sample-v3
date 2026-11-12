@@ -268,6 +268,9 @@ final class LoginViewModel: ObservableObject {
                     bigCustomerCam: useBigCustomerCam,
                     selectedModules: selectedModules,
                     idCardLang: selectedIdLang,
+                    // SDK'da CSCA listesi yok; çipteki belge sertifikası uygulamanın listesine bağlanır.
+                    needCertForNfc: true,
+                    nfcMasterList: Bundle.main.url(forResource: "csca-masterlist", withExtension: "pem"),
                     turnKey: "AEdHh9OZu1kg+nSBSd2UNMu9y4Kc3xVfgTsvw+PTAic=",
                     wsSecretKey: "tgdRmdAABrWf9TCRJZIWoW3Bz0iPJpig5jtOkBN4pvU=",
                     showThankYouPage: true,
