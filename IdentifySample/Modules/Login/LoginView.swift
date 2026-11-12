@@ -1367,10 +1367,11 @@ struct ModuleListView: View {
                                     isEditing: isEditing,
                                     isLast: index == activeModules.count - 1,
                                     onRemove: {
+                                        // Kaybolma animasyonundaki satıra ikinci dokunuş eski index'le gelir; modülle sil.
+                                        guard let i = activeModules.firstIndex(of: module) else { return }
                                         withAnimation {
-                                            let removed = activeModules[index]
-                                            activeModules.removeSubrange(index...index)
-                                            passiveModules.append(removed)
+                                            activeModules.remove(at: i)
+                                            passiveModules.append(module)
                                         }
                                     }
                                 )
@@ -1402,8 +1403,9 @@ struct ModuleListView: View {
                                         isEditing: isEditing,
                                         isLast: index == passiveModules.count - 1,
                                         onAdd: {
+                                            guard let i = passiveModules.firstIndex(of: module) else { return }
                                             withAnimation {
-                                                passiveModules.removeSubrange(index...index)
+                                                passiveModules.remove(at: i)
                                                 activeModules.append(module)
                                             }
                                         }
