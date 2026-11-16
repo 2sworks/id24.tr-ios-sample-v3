@@ -62,14 +62,14 @@ uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa 
 
 | İzin | Anahtar | Hangi modül için |
 |---|---|---|
-| Kamera | `NSCameraUsageDescription` | Kimlik, Selfie, Canlılık, Video, Görüşme |
-| Mikrofon | `NSMicrophoneUsageDescription` | Görüşme, Video kayıt, Konuşma |
-| Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Konuşma (Speech) modülü |
+| Kamera | `NSCameraUsageDescription` | Hazırlık, Kimlik, Selfie, Canlılık, Video, Görüşme |
+| Mikrofon | `NSMicrophoneUsageDescription` | Hazırlık, Görüşme, Video kayıt, Konuşma |
+| Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Hazırlık, Konuşma (Speech). Hazırlık ekranı akışta konuşma modülü olmasa da bu izni ister |
 | NFC | `NFCReaderUsageDescription` + `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
 | iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK portrait kilitlidir; bu anahtar olmadan App Store yüklemesi iPad çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
 | Sahne | `UIApplicationSceneManifest` + `SceneDelegate` | iOS 27 SDK'sıyla derlenen uygulama sahne kullanmıyorsa iPhone Duo'da açılmıyor ([iPhone Duo Desteği](docs/guides/iphone-duo.md)) |
 
-Modül başına tam liste: [Modül Gereksinimleri](docs/guides/module-requirements.md).
+Modül başına tam liste ve gereken cihaz yetenekleri (NFC, TrueDepth): [Modül Gereksinimleri](docs/guides/module-requirements.md).
 
 ### 3. Akışı başlatın
 
