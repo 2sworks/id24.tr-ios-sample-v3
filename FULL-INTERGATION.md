@@ -978,7 +978,8 @@ IdentifyManager.shared.setupSDK(
     bigCustomerCam: Bool?,                  // true (vars.): temsilci tam ekran, kullanıcı küçük pencerede; false: tersi
     selectedModules: [SdkModules],          // vars. [] — backend sırası kullanılır
     idCardLang: IDLang?,                    // OCR belge dili: .TR / .AZ / .OTHER (vars. .TR)
-    needCertForNfc: Bool?,                  // şu an etkisiz; kök listesi setMasterListURL ile verilir (vars. false)
+    needCertForNfc: Bool?,                  // true iken liste verilmezse uyarı loglanır (vars. false)
+    nfcMasterList: URL?,                    // CSCA listesi (PEM dosyası); verilmezse zincir kontrolü yok (vars. nil)
     turnKey: String,                        // zorunlu — TURN kimlik üretim anahtarı
     wsSecretKey: String?,                   // WebSocket token anahtarı
     showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. true) — false: ThankYou'suz kapanış, bkz. Akış Sonucu
@@ -1031,16 +1032,32 @@ NFC sonucu (`IdentifyCard`) çipin doğrulamasını iki alanla verir:
 | `passiveAuth` | Okunan veri SOD'daki hash'lerle aynı. SOD'u kimin imzaladığına bakmaz |
 | `passportCorrectlySigned` | SOD imzası belgedeki sertifikayla tutuyor ve bu sertifika verdiğiniz kök listesine (CSCA) bağlanıyor |
 
-SDK kök listesi taşımaz. `passportCorrectlySigned`'ın true dönebilmesi için listeyi NFC okumasından
-önce verin. Liste uygulama açık kaldıkça geçerlidir, bir kez vermek yeter:
+SDK kök listesi taşımaz. Listeyi her oturumda `setupSDK`'ya verin:
 
 ```swift
-let url = Bundle.main.url(forResource: "masterList", withExtension: "pem")!
-IdentifyManager.shared.passportReader.setMasterListURL(url)
+IdentifyManager.shared.setupSDK(
+    // ...
+    needCertForNfc: true,
+    nfcMasterList: Bundle.main.url(forResource: "csca-masterlist", withExtension: "pem"),
+    // ...
+)
 ```
 
-Liste verilmezse `passportCorrectlySigned` her zaman false döner. `setupSDK(needCertForNfc:)` şu an
-etkisizdir: SDK bu değeri okumaz, listeyi onun yerine vermez.
+- **Dosya biçimi:** Arka arkaya dizilmiş `-----BEGIN CERTIFICATE-----` blokları. `#` ile başlayan
+  açıklama satırları olabilir. Örnek uygulamadaki `SupportingFiles/csca-masterlist.pem` BSI CSCA
+  Master List'ten üretildi (387 kök), bağlantı (link) sertifikaları içinde yok.
+- **Kendi listeniz:** Örnek uygulamadaki dosyayı kullanabilir ya da kendi PEM dosyanızı verebilirsiniz.
+  SDK listeyi indirmez. Listeyi uygulama sürümü çıkarmadan güncellemek isterseniz uygulamanız dosyayı
+  indirsin ve yerel dosya yolunu `nfcMasterList`'e versin.
+- **Liste verilmezse:** zincir kontrolü yapılmaz, `passportCorrectlySigned` false,
+  `nfcVerification.certificateChain` `notPerformed` döner. `needCertForNfc: true` ise uyarı loglanır.
+- **Dosya okunamazsa:** hata loglanır, liste verilmemiş sayılır.
+- **Zincir tutmazsa:** okuma geçer, akış durmaz. Sonuç `nfcVerification.certificateChain` alanında
+  `failed` olur, karar panelde verilir. Kök listede yoksa `failureReasons` içinde `certificateNotFound`
+  gelir.
+- **Her oturum yeniden ayarlanır:** `setupSDK` önceki oturumun listesini taşımaz.
+  `passportReader.setMasterListURL(_:)` ile önceden verilen liste `setupSDK` çağrısında silinir;
+  listeyi `nfcMasterList` ile verin.
 
 ---
 

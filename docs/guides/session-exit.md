@@ -117,7 +117,7 @@ okumaya aittir, yeni okuma çip okuyamazsa `nil` olur. Her kontrol `passed`, `fa
 
 | Alan | Neye bakar | `notPerformed` ne zaman |
 |---|---|---|
-| `certificateChain` | Belge imzalama sertifikası güven listesine bağlanıyor mu | Güven listesi verilmediğinde. Bu sürümde liste verme yolu yok, alan hep `notPerformed` gelir |
+| `certificateChain` | Belge imzalama sertifikası güven listesine bağlanıyor mu | `setupSDK(nfcMasterList:)` ile liste verilmediğinde ya da dosya okunamadığında |
 | `documentSignature` | SOD, belge imzalama sertifikasıyla doğru imzalanmış mı | Hiç |
 | `dataIntegrity` | Okunan veri grupları SOD'daki özetlerle aynı mı | Hiç |
 | `chipAuthentication` | Çip, DG14'teki anahtarın gizli eşine sahip mi | `performChipAuthentication` kapalıysa ya da çipte DG14 yoksa |
