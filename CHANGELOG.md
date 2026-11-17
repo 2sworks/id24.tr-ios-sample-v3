@@ -15,6 +15,7 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 **Değişti**
 - Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
+- Örnek uygulama iPhone Duo iç ekranında da dikey açılıyor.
 
 **Düzeltildi**
 - Sunucu kimlik fotoğrafını reddettiğinde panele başarılı yerine başarısız gidiyor.
