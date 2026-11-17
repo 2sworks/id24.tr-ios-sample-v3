@@ -1,7 +1,7 @@
 # iPhone Duo Desteği
 
 iPhone Duo katlanan bir telefon: kapalıyken dar bir dış ekran, açıkken geniş bir iç ekran
-kullanılıyor. SDK'nın modül ekranları iki ekranda da dikey ve yatay duruşta yerine oturuyor. Bu
+kullanılıyor. SDK'nın modül ekranları iki ekranda da dikey açılıyor. Bu
 rehber, kendi ekranlarınızı ve uygulama kabuğunuzu Duo'ya hazırlarken dikkat etmeniz gerekenleri
 anlatıyor.
 
@@ -15,7 +15,7 @@ anlatıyor.
 | Pencere | Pencereyi etkin sahneden alın: `SDKLayout.activeWindow` |
 | Ölçü | Genişliği ve yüksekliği pencereden alın: `SDKLayout.bounds` |
 | Güvenli alan | Dış ekranda durum çubuğu sağ kenarda durur, sağda yaklaşık 88 pt pay vardır |
-| Yönelim | Dikey kilit ve `UIRequiresFullScreen = YES`; iç ekranda uygulama ortada dikey bir sütun olarak açılır. İsterseniz yalnız iç ekranda yatay açılış ekleyin |
+| Yönelim | Dikey kilit ve `UIRequiresFullScreen = YES`; iç ekranda uygulama ortada dikey bir sütun olarak açılır |
 | Uzun içerik | Kısa dış ekranda taşabilecek içeriği `ScrollView` içine koyun |
 
 ---
@@ -137,42 +137,9 @@ UIRequiresFullScreen = YES
 SDK ekranları bu sütunda düzgün yerleşir. Kendi ekranlarınızda da pencere ölçüsüyle çalıştığınız
 sürece ek bir şey yapmanız gerekmez.
 
-### İç ekranda yatay açılış
-
-Örnek uygulama iç ekranda yatay da açılıyor; dış ekranda ve diğer iPhone'larda dikey kalıyor.
-Aynısını yapmak için Info.plist'te iPhone'a yatay yönleri ekleyin. iPad dikey kalsın,
-`UIRequiresFullScreen` da açık kalsın:
-
-```
-UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
-UISupportedInterfaceOrientations~ipad = UIInterfaceOrientationPortrait
-UIRequiresFullScreen = YES
-```
-
-Yatay açılışı uygulama delegesinde iç ekranla sınırlayın. Bugünkü telefonlarda kısa kenarı 600 pt'yi
-geçen tek ekran Duo'nun iç ekranı ([AppDelegate.swift](../../IdentifySample/App/AppDelegate.swift)):
-
-```swift
-func application(_ application: UIApplication,
-                 supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-    guard UIDevice.current.userInterfaceIdiom == .phone,
-          let ekran = window?.windowScene?.screen.bounds.size,
-          min(ekran.width, ekran.height) >= 600 else { return .portrait }
-    return SDKLayout.supportedOrientations
-}
-```
-
-`SDKLayout.supportedOrientations` kamera açan ekranlarda `.portrait`, diğerlerinde
-`.allButUpsideDown` döner. Kendi maskenizi döndürürseniz kamera ekranları yatayda açılır.
-
-Yatayda SDK ekranları şöyle davranır:
-
-- Kamera açan ekranlar dikey konuma kilitlenir: selfie, canlılık, kimlik tarama, video kaydı ve
-  görüntülü görüşme. Akış bu ekranlardan birine geçince SDK arayüzü dikeye döndürür. Cihaz yatay
-  tutuluyorsa ekran dikey bir sütun olarak çizilir.
-- Kamerasız ekranlar (hazırlık, NFC, adres, imza, ses tanıma, teşekkür) yatay da açılır. Kamera ekranından
-  çıkınca kilit kalkar.
-- Modül ekranları ölçüyü pencereden aldığı için yatay pencereye de yerleşir.
+Uygulamaya yatay yön eklemeyin. Info.plist'te yatay yön açıkken telefon bir kez yan çevrilip
+yeniden dik tutulduğunda selfie önizlemesi ve çekilen fotoğraf yan çıkabiliyor. Örnek uygulama da
+iç ekranda dikey kalıyor.
 
 Okunabilir genişlik için iPad rehberindeki `.sdkReadableWidth()` aynı şekilde çalışır
 ([iPad Desteği](ipad-support.md)).
@@ -225,12 +192,11 @@ Parlaklığı pencerenin bağlı olduğu ekrandan ayarlayın:
 
 **İç ekranda uygulama ortada dar bir sütun olarak açılıyor. Bu doğru mu?**
 Uygulama dikey kilitliyse doğru. İç ekran yatayken sistem uygulamayı dikey bir sütun olarak çizer,
-SDK ekranları bu sütuna göre yerleşir. İç ekranın tamamını kullanmak için
-[Yönelim](#yönelim) bölümündeki yatay açılışa bakın.
+SDK ekranları bu sütuna göre yerleşir.
 
 **Yatay yerleşim desteklemem gerekiyor mu?**
-Hayır. Dikey kilit yeterli. İç ekranda yatay açılış isteğe bağlı; açarsanız kamera ekranları
-yine dikey açılır.
+Hayır. Uygulamayı dikey kilitli bırakın. Yatay yön açıkken selfie yan çıkabiliyor
+([Yönelim](#yönelim)).
 
 **Dış ekranda alt metin düğmenin arkasında kalıyor.**
 Dış ekran düz bir iPhone'dan kısa. İçeriği `ScrollView` içine koyun.
