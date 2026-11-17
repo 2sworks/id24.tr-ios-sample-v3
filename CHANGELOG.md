@@ -12,13 +12,16 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 **Yeni**
 - async/await API: `setupSDK(...) async throws`, `outcome()`, `outcomes` ve `events` (`AsyncStream`), `quitSDK() async`. Mevcut closure API'leri değişmedi.
 - Rehberler: async/await API, thread modeli ve Swift 6 geçiş planı.
+- Kimlik ekranını kendisi tasarlayan uygulamalarda da TC kimlik, SDK'nın kimlik ekranındaki gibi hızlı çekiliyor ve okunuyor; varsayılan açık, kapatmak için `ScannerConfiguration.fastIdCaptureEnabled = false`. Çerçeve kuralı: [Hızlı çekim ve çerçeve](docs/guides/identity-scanner.md#hızlı-çekim-ve-çerçeve).
 
 **Değişti**
 - Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
 - Örnek uygulama iPhone Duo iç ekranında da dikey açılıyor.
+- SDK'nın kimlik ekranında çerçevenin görünümünü ya da konumunu değiştirmek artık hızlı çekimi kapatmıyor (3.2.1'de `.fixedFrame(.idCard)`'dan farklı her çerçeve kapatıyordu); `stabilityConfirmFrames`'i 4'ün üstüne çıkarmak kapatıyor.
 
 **Düzeltildi**
 - Sunucu kimlik fotoğrafını reddettiğinde panele başarılı yerine başarısız gidiyor.
+- Hızlı çekimde kimliğin arka yüzü ters tutulunca kart çekilmiyor; ön yüzdeki gibi düz çevrilince çekiliyor.
 - Rehberler görüşmedeki kopmayı kodla aynı anlatıyor: ICE `disconnected` 5 sn bekler (4140), `failed` hemen biter (4141), soket kopunca medya ayaktaysa görüşme `signallessCallGracePeriod` (10 sn) boyunca sürer.
 
 ### 3.2.1
