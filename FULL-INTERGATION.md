@@ -1608,6 +1608,8 @@ ScannerGuidanceTexts.overridePassport = ...   // pasaport HUD seti
 ScannerGuidanceTexts.overrideDocument = ...   // belge HUD seti
 // Veya tüm konfigürasyonu:
 ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timing: myTiming)
+// frameMode verilmezse kimlik ön yüzü takip moduna geçer: sabit çerçeve ve TC kimlikte hızlı çekim
+// kapanır. Korumak için frameMode: .idCardDefault ekleyin (arka yüz overrideIDBack'e bakar).
 ```
 
 > Metinleri tek tek markalamak yerine dil sistemini kullanmak genelde yeterlidir:
@@ -1627,6 +1629,11 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `manualCaptureHintDelay` | 8 s / 8 s | Manuel çekim butonunun görünme süresi |
 | `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
+
+Tablodaki "hızlı yol" TC kimlikteki hızlı çekim değildir; o hızlı çekim `stabilityConfirmFrames`
+4'ün üstündeyse kapanır. Yükleme sürerken algılamayı durdurmak için `stabilityConfirmFrames`'i
+büyütmeyin, `IdentityScannerView(pausesDetection: true)` verin
+([IdentityScanner → Hızlı çekim ve çerçeve](docs/guides/identity-scanner.md#hızlı-çekim-ve-çerçeve)).
 
 **Otomatik davranışlar — `ScannerAutomation`** (`autoTorch` varsayılan kapalı, diğerleri açık):
 
