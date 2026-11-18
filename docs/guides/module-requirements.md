@@ -8,7 +8,7 @@ gösterir. Modül listesi oturum başında backend'den gelir, bu yüzden uygulam
 
 | Modül (`SdkModules`) | Info.plist anahtarı | Ek ayar | Paket | Sistem framework'ü |
 |---|---|---|---|---|
-| Hazırlık (`prepare`) | Akıştaki modüllerin anahtarları | | | Akıştaki modüllerin çerçeveleri |
+| Hazırlık (`prepare`) | `NSCameraUsageDescription`, `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription` | | | `AVFoundation`, `Speech` |
 | Kimlik (`idCard`) | `NSCameraUsageDescription` | | | `AVFoundation`, `Vision` |
 | Kimlik OVD (`idcard_w_ovd`) | `NSCameraUsageDescription` | | | `AVFoundation`, `Vision` |
 | NFC (`nfc`) | `NFCReaderUsageDescription`, `com.apple.developer.nfc.readersession.iso7816.select-identifiers` listesinde `A0000002471001` | Near Field Communication Tag Reading yeteneği: `com.apple.developer.nfc.readersession.formats` içinde `TAG` | `OpenSSL` | `CoreNFC` |
@@ -27,14 +27,17 @@ izni istemez.
 
 Canlılık modülü ekranı `ReplayKit` ile kaydeder. Mikrofon bu kayıtta kapalıdır.
 
-## İzinler modül açılınca istenir
+## Hazırlık ekranı üç izni birden ister
 
-Her modül kendi iznini ekranı açılırken ister. Kullanıcı izni vermezse ayarlara yönlendiren popup
-çıkar.
+Hazırlık modülü akıştaysa kamera, mikrofon ve konuşma tanıma izinlerinin üçü de verilmeden sonraki
+adıma geçilmez. Akışta konuşma modülü olmasa da bu böyledir. Hazırlık ekranını kullanan her uygulama
+`NSSpeechRecognitionUsageDescription` anahtarını da eklemelidir.
 
-Hazırlık modülü akıştaysa yalnız akıştaki modüllerin izinlerini listeler ve bunlar verilmeden sonraki
-adıma geçilmez. Akışta konuşma modülü yoksa konuşma tanıma izni istenmez,
-`NSSpeechRecognitionUsageDescription` anahtarı da gerekmez.
+## Modül açılınca izin istenir
+
+Her modül gereken izni ekranı açılırken ister; akışta Hazırlık modülü olmasa da bu böyledir. İzin verilmezse ayarlara yönlendiren popup çıkar. Kullanıcı "Vazgeç"e basarsa popup, izin verilene kadar uygulamaya her dönüşte yeniden çıkar.
+
+Sistem izin penceresindeki açıklama uygulamanın Info.plist dosyasından gelir. Uygulama birden fazla dil destekliyorsa bu metinleri `InfoPlist.strings` ya da `InfoPlist.xcstrings` ile her dile çevirin. Çevrilmezse pencere her dilde aynı metni gösterir.
 
 İzinleri kendiniz yönetiyorsanız `SDKPermissionConfig.shared.provider` ile kendi izin katmanınızı
 bağlayabilirsiniz.

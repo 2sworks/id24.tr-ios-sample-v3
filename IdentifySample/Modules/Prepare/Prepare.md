@@ -102,8 +102,7 @@ struct MyPrepareView: View {
 ### Hesaplanan
 | Üye | Anlam |
 |---|---|
-| `requiredPermissions` | Akıştaki modüllerin istediği izinler. Listede yalnız bunları gösterin |
-| `allPermissionsGranted` | `requiredPermissions` içindeki izinlerin hepsi verildi mi |
+| `allPermissionsGranted` | Tüm gerekli izinler verildi mi |
 | `needsSpeedTest` | Hız testi gerekli mi (`manager.needSpeedTest`) |
 
 ### Metotlar
