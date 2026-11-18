@@ -33,6 +33,12 @@ Hazırlık modülü akıştaysa kamera, mikrofon ve konuşma tanıma izinlerinin
 adıma geçilmez. Akışta konuşma modülü olmasa da bu böyledir. Hazırlık ekranını kullanan her uygulama
 `NSSpeechRecognitionUsageDescription` anahtarını da eklemelidir.
 
+## Modül açılınca izin istenir
+
+Her modül gereken izni ekranı açılırken ister; akışta Hazırlık modülü olmasa da bu böyledir. İzin verilmezse ayarlara yönlendiren popup çıkar. Kullanıcı "Vazgeç"e basarsa popup, izin verilene kadar uygulamaya her dönüşte yeniden çıkar.
+
+Sistem izin penceresindeki açıklama uygulamanın Info.plist dosyasından gelir. Uygulama birden fazla dil destekliyorsa bu metinleri `InfoPlist.strings` ya da `InfoPlist.xcstrings` ile her dile çevirin. Çevrilmezse pencere her dilde aynı metni gösterir.
+
 İzinleri kendiniz yönetiyorsanız `SDKPermissionConfig.shared.provider` ile kendi izin katmanınızı
 bağlayabilirsiniz.
 
