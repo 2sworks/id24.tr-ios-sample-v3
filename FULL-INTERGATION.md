@@ -86,6 +86,28 @@ SDKFlowHostView(coordinator: coordinator, registry: registry) {
 }
 ```
 
+### İzinleri kendi katmanınızdan sormak (3.2.1)
+
+SDK kamera, mikrofon ve konuşma tanıma iznini varsayılan olarak sistem API'leriyle sorar.
+Uygulamanızın kendi izin yöneticisi varsa SDK'yı ona bağlayın, `setupSDK`'dan önce:
+
+```swift
+final class HostPermissions: SDKPermissionProvider {
+    func status(for permission: SDKPermission) -> SDKPermissionStatus {
+        // .notDetermined / .authorized / .denied / .restricted
+    }
+    func request(_ permission: SDKPermission, completion: @escaping (SDKPermissionStatus) -> Void) {
+        // izni sorun, sonucu completion ile tam bir kez bildirin
+    }
+    // openSettings(for:) isteğe bağlı; vermezseniz Ayarlar'da uygulamanın sayfası açılır
+}
+
+SDKPermissionConfig.shared.provider = HostPermissions()
+```
+
+Varsayılan `SDKSystemPermissionProvider.shared`'dır. `SDKPermission` ileride yeni durum alabilir;
+`switch` yazarken `@unknown default` ekleyin.
+
 ---
 
 ## 2) Tema — `SDKTheme.shared`
@@ -739,6 +761,31 @@ Yaptıkları (hepsi otomatik):
 
 `ThankYouStatus`: `.completed` · `.missedCall` · `.notCompleted` (`.missedCall` rezervdir; cevapsız çağrı oturumu bitirmez)
 
+### Destek akışı: `supportFlow` (3.2.1)
+
+Destek akışında sunucu oturumun sonucunu canlılık bitince yazar (normalde NFC'den sonra yazar).
+Bayrağı `setupSDK` başarılı olduktan sonra, NFC okumasından önce açın:
+
+```swift
+IdentifyManager.shared.supportFlow = true
+```
+
+- `mobile/nfc_verify` isteğine `support_flow: true` eklenir.
+- Canlılık başarıyla bitince, oturumu kapatmadan önce `notifyLivenessCompleted` çağırın. SDK bunu
+  kendisi çağırmaz. İstek `mobile/liveness_completed` adresine gider:
+
+```swift
+IdentifyManager.shared.notifyLivenessCompleted(timeout: 5) {
+    // ana kuyrukta, tam bir kez çağrılır
+}
+```
+
+- `timeout` varsayılanı 5 sn. Cevap bu sürede gelmezse `completion` beklemeden çağrılır. Hata da
+  zaman aşımı da loga düşer, akış durmaz.
+- `supportFlow` `nil` ya da `false` iken istek gövdesi değişmez, `notifyLivenessCompleted` istek
+  atmadan `completion`'ı hemen çağırır.
+- Bayrak oturuma aittir: `setupSDK` ve oturumun kapanması onu sıfırlar. Her oturumda yeniden verin.
+
 ---
 
 ## 7) Ekran Değiştirme & Ekleme
@@ -931,7 +978,8 @@ IdentifyManager.shared.setupSDK(
     bigCustomerCam: Bool?,                  // true (vars.): temsilci tam ekran, kullanıcı küçük pencerede; false: tersi
     selectedModules: [SdkModules],          // vars. [] — backend sırası kullanılır
     idCardLang: IDLang?,                    // OCR belge dili: .TR / .AZ / .OTHER (vars. .TR)
-    needCertForNfc: Bool?,                  // NFC sertifika (CSCA) doğrulaması (vars. false)
+    needCertForNfc: Bool?,                  // true iken liste verilmezse uyarı loglanır (vars. false)
+    nfcMasterList: URL?,                    // CSCA listesi (PEM dosyası); verilmezse zincir kontrolü yok (vars. nil)
     turnKey: String,                        // zorunlu — TURN kimlik üretim anahtarı
     wsSecretKey: String?,                   // WebSocket token anahtarı
     showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. true) — false: ThankYou'suz kapanış, bkz. Akış Sonucu
@@ -941,7 +989,7 @@ IdentifyManager.shared.setupSDK(
     enableAutoRotateOCR: Bool?,             // OCR otomatik oryantasyon düzeltme (vars. false)
     ttsEnabled: Bool?,                      // sesli okumayı native modda aç (vars. false)
     onFinished: ((SDKFlowOutcome) -> Void)?, // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
-    callback: (WebSocket?, RoomResponse, SDKWebError?) -> ()
+    callback: (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()
 )
 ```
 
@@ -974,6 +1022,42 @@ IdentifyManager.shared.setSDKLang(lang: .tr)    // .tr / .en / .de / .az / .ru
 
 `.idCard` (çipli kimlik) · `.passport` (pasaport) · `.oldSchool` (eski tip/diğer belgeler).
 `identCardType`'a verdiğiniz liste, kimlik ekranındaki tür seçim satırlarını belirler.
+
+### NFC imza doğrulaması: `passportCorrectlySigned` (3.2.1)
+
+NFC sonucu (`IdentifyCard`) çipin doğrulamasını iki alanla verir:
+
+| Alan | Ne söyler |
+|---|---|
+| `passiveAuth` | Okunan veri SOD'daki hash'lerle aynı. SOD'u kimin imzaladığına bakmaz |
+| `passportCorrectlySigned` | SOD imzası belgedeki sertifikayla tutuyor ve bu sertifika verdiğiniz kök listesine (CSCA) bağlanıyor |
+
+SDK kök listesi taşımaz. Listeyi her oturumda `setupSDK`'ya verin:
+
+```swift
+IdentifyManager.shared.setupSDK(
+    // ...
+    needCertForNfc: true,
+    nfcMasterList: Bundle.main.url(forResource: "csca-masterlist", withExtension: "pem"),
+    // ...
+)
+```
+
+- **Dosya biçimi:** Arka arkaya dizilmiş `-----BEGIN CERTIFICATE-----` blokları. `#` ile başlayan
+  açıklama satırları olabilir. Örnek uygulamadaki `SupportingFiles/csca-masterlist.pem` BSI CSCA
+  Master List'ten üretildi (387 kök), bağlantı (link) sertifikaları içinde yok.
+- **Kendi listeniz:** Örnek uygulamadaki dosyayı kullanabilir ya da kendi PEM dosyanızı verebilirsiniz.
+  SDK listeyi indirmez. Listeyi uygulama sürümü çıkarmadan güncellemek isterseniz uygulamanız dosyayı
+  indirsin ve yerel dosya yolunu `nfcMasterList`'e versin.
+- **Liste verilmezse:** zincir kontrolü yapılmaz, `passportCorrectlySigned` false,
+  `nfcVerification.certificateChain` `notPerformed` döner. `needCertForNfc: true` ise uyarı loglanır.
+- **Dosya okunamazsa:** hata loglanır, liste verilmemiş sayılır.
+- **Zincir tutmazsa:** okuma geçer, akış durmaz. Sonuç `nfcVerification.certificateChain` alanında
+  `failed` olur, karar panelde verilir. Kök listede yoksa `failureReasons` içinde `certificateNotFound`
+  gelir.
+- **Her oturum yeniden ayarlanır:** `setupSDK` önceki oturumun listesini taşımaz.
+  `passportReader.setMasterListURL(_:)` ile önceden verilen liste `setupSDK` çağrısında silinir;
+  listeyi `nfcMasterList` ile verin.
 
 ---
 
@@ -1077,8 +1161,10 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç
 **üretmez**: kullanıcı yeniden bağlanır, oturum sürer.
 
-Oda kaydı 20 sn içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı çıkar
-(`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Oda dolu
+Oda kaydı bekleme süresi içinde onaylanmazsa akış başlamaz, "Bağlantı kurulamadı" uyarısı
+çıkar (`SDKFlowCoordinator.roomBlockKind == .waitTimeout`; Yeniden Bağlan / Çıkış). Bekleme
+süresi, oda dolu yeniden denemelerinin toplam süresine 10 sn eklenerek bulunur, en az 20 sn.
+Varsayılan `roomSubscribeRetry` (6) ile 86 sn'dir. Oda dolu
 yeniden denemelerinde `roomWaitStatus` güncellenir. Ayrıntı:
 [Oturum Çıkışları → 4.4](docs/guides/session-exit.md#44-oturum-kurulamadı--sürdürülemedi).
 
@@ -1142,6 +1228,9 @@ let m = IdentifyManager.shared
 m.reconnectTimeoutSeconds     = 30
 m.callReconnectTimeoutSeconds = 10
 
+// Soket kopunca medya ayaktaysa görüşmenin sinyalsiz sürebileceği süre
+m.signallessCallGracePeriod   = 10
+
 // Bağlantı kopması kuralı: otomatik yeniden bağlanma (0 = kapalı, varsayılan) ve kopma sınırı
 SDKAttemptLimits.shared.connection = SDKConnectionPolicy(
     maxDrops: 3,                 // nil = sınırsız (varsayılan)
@@ -1162,8 +1251,16 @@ m.isBackgroundTimeoutEnabled = true
 m.ringingTimeout            = 300
 ```
 
-Görüşme sırasında sinyal ya da ICE koparsa **toparlanma beklenmez**: görüşme biter, tüm
-bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir. Yeniden bağlanma
+Görüşme sırasında kopmada:
+
+- ICE `.disconnected`: 5 sn (sabit) toparlanma beklenir, gelmezse görüşme 4140 ile biter.
+- ICE `.failed`: görüşme hemen 4141 ile biter.
+- WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez. Görüşme
+  `m.signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
+  gelmezse biter.
+
+Görüşme bitince tüm bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir.
+Görüşme dışındaki kopmada ekran hemen açılır; kurallarını `SDKConnectionPolicy` belirler. Yeniden bağlanma
 kullanıcı tetiklidir ve tam prosedürle çalışır (imOnline + getIdentStatus + subscribe +
 stepChanged); panel bir karar vermemişse müşteri bekleme odasına döner, vermişse ThankYou
 ekranı açılır. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).
@@ -1511,6 +1608,8 @@ ScannerGuidanceTexts.overridePassport = ...   // pasaport HUD seti
 ScannerGuidanceTexts.overrideDocument = ...   // belge HUD seti
 // Veya tüm konfigürasyonu:
 ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timing: myTiming)
+// frameMode verilmezse kimlik ön yüzü takip moduna geçer: sabit çerçeve ve TC kimlikte hızlı çekim
+// kapanır. Korumak için frameMode: .idCardDefault ekleyin (arka yüz overrideIDBack'e bakar).
 ```
 
 > Metinleri tek tek markalamak yerine dil sistemini kullanmak genelde yeterlidir:
@@ -1525,11 +1624,16 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `stabilityConfirmFrames` | 4 / 3 | Hızlı yol: keskin + geometrik stabil ardışık kare sayısı |
 | `minimumSharpnessScore` | 120 / 110 | Canlı kare keskinlik eşiği (Laplacian; 0 = kapalı) |
 | `captureSharpnessFloor` | 95 / 85 | Çekilen NİHAİ fotoğrafın keskinlik tabanı — altındaysa çekim atılır |
-| `focusSettleDelay` | 0.5 / 1.2 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
+| `focusSettleDelay` | 0.3 / 0.8 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
 | `quadMissResetThreshold` | 3 / 5 | Kaç kare belge kaybolursa ilerleme sıfırlanır (titreme önleyici) |
-| `manualCaptureHintDelay` | 5 s / 8 s | Manuel çekim butonunun görünme süresi |
+| `manualCaptureHintDelay` | 8 s / 8 s | Manuel çekim butonunun görünme süresi |
 | `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
+
+Tablodaki "hızlı yol" TC kimlikteki hızlı çekim değildir; o hızlı çekim `stabilityConfirmFrames`
+4'ün üstündeyse kapanır. Yükleme sürerken algılamayı durdurmak için `stabilityConfirmFrames`'i
+büyütmeyin, `IdentityScannerView(pausesDetection: true)` verin
+([IdentityScanner → Hızlı çekim ve çerçeve](docs/guides/identity-scanner.md#hızlı-çekim-ve-çerçeve)).
 
 **Otomatik davranışlar — `ScannerAutomation`** (`autoTorch` varsayılan kapalı, diğerleri açık):
 

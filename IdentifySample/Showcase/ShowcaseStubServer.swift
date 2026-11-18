@@ -84,22 +84,26 @@ final class ShowcaseStubServer {
         baseURL = "http://127.0.0.1:\(port)/"
 
         print("[ShowcaseStub] Dummy API adresi: \(baseURL)")
-        IdentifyManager.shared.setupSDK(
-            identId: "showcase-dummy-session",
-            baseApiUrl: baseURL,
-            networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: 10,
-                                             timeoutIntervalForResource: 10,
-                                             useSslPinning: false),
-            kpsData: nil,
-            signLangSupport: false,
-            nfcMaxErrorCount: 5,
-            logLevel: .all,
-            turnKey: "showcase",
-            callback: { _, _, err in
+        let baseURL = baseURL
+        Task {
+            do {
+                _ = try await IdentifyManager.shared.setupSDK(
+                    identId: "showcase-dummy-session",
+                    baseApiUrl: baseURL,
+                    networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: 10,
+                                                     timeoutIntervalForResource: 10,
+                                                     useSslPinning: false),
+                    kpsData: nil,
+                    signLangSupport: false,
+                    nfcMaxErrorCount: 5,
+                    logLevel: .all,
+                    turnKey: "showcase"
+                )
+            } catch {
                 // Oda isteğinin başarısız olması beklenir; adres zaten atandı.
-                print("[ShowcaseStub] Dummy oturum yanıtı (beklenen hata): \(err?.errorMessages ?? "-")")
+                print("[ShowcaseStub] Dummy oturum yanıtı (beklenen hata): \(error.localizedDescription)")
             }
-        )
+        }
     }
 
     /// Sunucuyu kapatır ve BASE_URL'i geri yükler.

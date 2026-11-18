@@ -174,6 +174,8 @@ kullanıcıya yalnızca yol göstermez; kırpılıp sunucuya gönderilen görün
 sensörün küçük bir bölümü kullanılır ve OCR ile sunucu tarafındaki kalite düşer. Genişletirseniz
 kullanıcı belgeyi lensin netleyebildiği mesafeden daha yakına tutmak zorunda kalır ve otomatik
 çekim tetiklenmez. Telefonda bunun etkisi yoktur, çünkü ekran zaten dar.
+TC kimlikte `ScannerFixedFrame.maxWidth`'i 630'un üstüne çıkarmak ise telefonda da hızlı çekimi
+kapatır ([IdentityScanner → Hızlı çekim ve çerçeve](identity-scanner.md#hızlı-çekim-ve-çerçeve)).
 
 Selfie ve canlılık ekranlarındaki yüz ovali de aynı nedenle sınırlı. Ovalin boyutu pencere
 genişliğinden değil, `maxFaceGuideWidth` ile sınırlanmış referans genişlikten hesaplanır. Sınır

@@ -25,7 +25,7 @@ Dependency Rule'u `Exact Version` yapın (ör. `3.0.0`). 2.x ve 3.x aynı depoda
 Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış sürümü
 çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
-Paket çalışma zamanı bağımlılıklarını da beraberinde getirir: OpenSSL, Starscream, WebRTC,
+Paket çalışma zamanı bağımlılıklarını da beraberinde getirir: OpenSSL, WebRTC,
 SwiftSignatureView, PermissionsKit.
 
 ### CocoaPods (alternatif)

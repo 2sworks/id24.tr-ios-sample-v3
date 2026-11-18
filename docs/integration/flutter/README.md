@@ -14,7 +14,7 @@ Köprünün iskelet dosyaları bu klasörde.
 ### iOS native bağımlılığı
 `ios/Runner.xcworkspace` → **File → Add Packages** →
 `https://github.com/2sworks/id24.tr-ios-sdk-spm`
-(XCFramework + OpenSSL/Starscream/WebRTC/SwiftSignatureView/PermissionsKit).
+(XCFramework + OpenSSL/WebRTC/SwiftSignatureView/PermissionsKit).
 
 Dependency Rule'u `Exact Version` yapın (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
 Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış sürümü

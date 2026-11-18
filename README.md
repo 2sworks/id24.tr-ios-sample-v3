@@ -44,28 +44,31 @@ SwiftUI ekranlarını (DefaultUI) SDK'nın içine taşıyan farklı bir entegras
 2.x ile kaynak uyumlu değildir. Xcode'un varsayılan kuralı (*Up to Next Major*) en son
 etiketten başlar; 2.x kullanan bir projeye paketi varsayılanla eklerseniz 3.x çekilir ve
 proje derlenmez. `Exact Version` ayrıca sürüm yükseltmesini bilinçli bir karar hâline
-getirir: bağımlılık kümesi sürüme göre farklıdır (3.x ayrıca `PermissionsKit` ve
-`SwiftSignatureView` getirir) ve `Package.resolved` sessizce kaymaz.
+getirir: bağımlılık kümesi sürüme göre farklıdır ve `Package.resolved` sessizce kaymaz.
 
 | Sürüm | Etiket aralığı | Ne zaman |
 |---|---|---|
 | 3.x | `3.0.0` ve üzeri | Bu depodaki rehberlerin anlattığı sürüm — hazır ekranlar SDK'nın içinde |
 | 2.x | `2.5.x` | Eski entegrasyon; ekranlar host uygulamada |
 
-Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto),
-`Starscream` (WebSocket), `WebRTC` (görüntülü görüşme), `PermissionsKit` ve
-`SwiftSignatureView` (3.x). 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
+Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto) ve
+`WebRTC` (görüntülü görüşme). 3.2.1'den itibaren `PermissionsKit` ve
+`SwiftSignatureView` gelmez; bu paketlerin modüllerini (`CameraPermission`, `MicrophonePermission`,
+`SpeechRecognizerPermission`, `SwiftSignatureView`) kendi kodunuzda import ediyorsanız paketi
+uygulamanıza kendiniz ekleyin. 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
 uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa çözümleme başarısız olur.
 
 ### 2. İzinleri tanımlayın
 
 | İzin | Anahtar | Hangi modül için |
 |---|---|---|
-| Kamera | `NSCameraUsageDescription` | Kimlik, Selfie, Canlılık, Video, Görüşme |
-| Mikrofon | `NSMicrophoneUsageDescription` | Görüşme, Video kayıt, Konuşma |
-| Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Konuşma (Speech) modülü |
-| NFC | `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
+| Kamera | `NSCameraUsageDescription` | Hazırlık, Kimlik, Selfie, Canlılık, Video, Görüşme |
+| Mikrofon | `NSMicrophoneUsageDescription` | Hazırlık, Görüşme, Video kayıt, Konuşma |
+| Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Hazırlık, Konuşma (Speech). Hazırlık ekranı akışta konuşma modülü olmasa da bu izni ister |
+| NFC | `NFCReaderUsageDescription` + `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
 | iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK portrait kilitlidir; bu anahtar olmadan App Store yüklemesi iPad çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
+
+Modül başına tam liste ve gereken cihaz yetenekleri (NFC, TrueDepth): [Modül Gereksinimleri](docs/guides/module-requirements.md).
 
 ### 3. Akışı başlatın
 
@@ -250,6 +253,9 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Bağlantı Hız Testi](docs/guides/speed-test.md) | Eski ve yeni hız testi, `useConnectionSpeedTest`, `blockIdent`, görüşme öncesi ölçüm senaryosu |
 | [Loglama](docs/guides/logging.md) | `SDKLog` facade'i, severity/kategori, online log, redaksiyon |
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
+| [async/await API](docs/guides/async-await.md) | async kurulum, `outcome()`, `events`, hata tipleri, iptal |
+| [Thread Modeli ve Swift 6](docs/guides/concurrency.md) | Hangi bildirim hangi thread'de gelir, Swift 6 geçiş planı |
+| [Modül Gereksinimleri](docs/guides/module-requirements.md) | Her modülün Info.plist anahtarları, ek ayarları ve kütüphaneleri |
 | [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.1.0 Değişiklikleri](docs/guides/migration-3.1.0.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
@@ -257,6 +263,15 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Lokalizasyon](docs/guides/localization.md) | 5 dil (TR/EN/DE/AZ/RU), metin override |
 | [Özelleştirme](docs/guides/customization.md) | Üç özelleştirme yöntemi derinlemesine + "bypass yok" kuralı |
 | [IdentityScanner](docs/guides/identity-scanner.md) | Gerçek zamanlı belge tarama motoru: profiller, alan OCR, TCKN/MRZ doğrulama, bağımsız kullanım |
+
+## Örnekler
+
+Sık sorulan özelleştirmeler için hazır kod:
+
+| Örnek | İçerik |
+|---|---|
+| [NFC Metinleri](docs/examples/nfc-texts.md) | NFC penceresindeki bilgi satırı, emoji ilerleme çubuğu, hazır ekran ve sesli metinler |
+| [Kimlik Tarama Yönlendirmeleri](docs/examples/scanner-guidance.md) | Yaklaştır, uzaklaştır, düz tut metinleri; metni ekranın üstünde gösterme |
 
 ---
 
@@ -344,3 +359,14 @@ tüm akışı cihazda uçtan uca deneyimleyebilirsiniz (NFC ve görüşme için 
 ## Sürüm Geçmişi
 
 SDK ve Sample App sürüm notlarının tamamı için: **[CHANGELOG.md](CHANGELOG.md)**
+
+---
+
+## CSCA listesi
+
+`IdentifySample/SupportingFiles/csca-masterlist.pem`, BSI'nin 01.10.2026 tarihli master list'inden alındı. Bağlantı (link) sertifikaları dosyada yok.
+
+| Ülke | Şu anki CSCA'nın imzaya başladığı tarih | İmzayı bıraktığı tarih | İmzaladığı belgelerin doğrulanabileceği son tarih |
+|---|---|---|---|
+| Türkiye | 05.03.2024 | 05.03.2027 | 05.06.2037 |
+| Azerbaycan | 17.04.2023 | 16.04.2028 | 12.07.2038 |

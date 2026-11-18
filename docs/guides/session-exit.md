@@ -95,14 +95,48 @@ Oturum sonlandı — son modül: Mrz & Nfc Screen, akış tamamlandı, sebep: 41
 | `statusSummary` | `StatusSummary?` | Panel kararı: `id`, `type`, `name_tr` / `name_en` / `name_de` |
 | `closeCode` | `SDKSocketCloseCode?` | Sonuç üretildiği anda kayıtlı son socket kapanış kodu. Karar anında bildirilen yollarda genellikle boştur; kesin kod `IdentifyManager.shared.lastSocketCloseCode` içinde ve `sdk_logs`'taki `Oturum sonlandı` satırında bulunur |
 | `errorMessage` | `String?` | `setupFailed` için hata metni |
+| `nfcVerification` | `SDKNFCVerification?` | Son NFC okumasının çip kontrolleri. Oturumda çip okunmadıysa `nil`. Bkz. [Çip doğrulama ayrıntısı](#çip-doğrulama-ayrıntısı) |
 | `sessionId` / `timestampMs` | | Oturum kimliği ve zaman |
-| `isSuccess` | `Bool` | Yalnızca `.approved` için `true` |
+| `isSuccess` | `Bool` | `.approved` için `true`. `IdentifyManager.shared.skipsCountAsFailure` açıksa atlanan modül olduğunda `false` |
+| `isFullyVerified` | `Bool` | Oturum onaylandıysa ve `skippedModules` boşsa `true` |
+| `verifiedModules` | `[SdkModules]` | `modules` listesinden `skippedModules` çıkarılmış hali. Yalnızca `.approved` oturumda anlamlıdır, yarıda kalan akışta hangi adımlara gelindiğini söylemez |
 | `toDictionary()` | | RN/Flutter için sözlük |
 
 > ⚠️ `approved` ile `skippedModules` birlikte gelebilir. Görüşmesiz bir akışta bütün modüller
 > geçildiğinde sonuç `approved / allModulesCompleted` olur; backend atlamaya izin verdiyse bir modül
-> atlanmış olsa bile. Her adımın doğrulanmış olması gerekiyorsa `skippedModules`'ın boş olduğunu
-> ayrıca kontrol edin. Nihai onay her durumda sunucudadır.
+> atlanmış olsa bile. Her adımın doğrulanmış olması gerekiyorsa, bankacılık entegrasyonlarında
+> olduğu gibi, `isFullyVerified` kullanın. Yalnızca `isSuccess`'e bakan bir entegrasyon için
+> `setupSDK` çağrısından önce `IdentifyManager.shared.skipsCountAsFailure = true` yazın.
+> Varsayılan değer `false`. Nihai onay her durumda sunucudadır.
+
+### Çip doğrulama ayrıntısı
+
+`outcome.nfcVerification` ve `IdentifyManager.shared.nfcVerification` aynı sonucu verir. `await IdentifyManager.shared.outcome()` da aynı alanı döner, React Native ve Flutter köprülerinde `toDictionary()` sonucunda `nfcVerification` anahtarıyla gelir. Sonuç son
+okumaya aittir, yeni okuma çip okuyamazsa `nil` olur. Her kontrol `passed`, `failed` ya da
+`notPerformed` döner.
+
+| Alan | Neye bakar | `notPerformed` ne zaman |
+|---|---|---|
+| `certificateChain` | Belge imzalama sertifikası güven listesine bağlanıyor mu | `setupSDK(nfcMasterList:)` ile liste verilmediğinde ya da dosya okunamadığında |
+| `documentSignature` | SOD, belge imzalama sertifikasıyla doğru imzalanmış mı | Hiç |
+| `dataIntegrity` | Okunan veri grupları SOD'daki özetlerle aynı mı | Hiç |
+| `chipAuthentication` | Çip, DG14'teki anahtarın gizli eşine sahip mi | `performChipAuthentication` kapalıysa ya da çipte DG14 yoksa |
+| `activeAuthentication` | Çip, DG15'teki anahtarın gizli eşine sahip mi | Çipte DG15 yoksa |
+
+`failureReasons` kontrollerin neden kaldığını yazar:
+
+| Değer | Anlamı |
+|---|---|
+| `certificateNotFound` | Sertifika güven listesindeki bir köke bağlanmıyor |
+| `certificateExpired` | Zincirdeki bir sertifikanın süresi dolmuş |
+| `signatureInvalid` | SOD ya da sertifika imzası geçersiz |
+| `dataGroupHashMismatch` | Bir veri grubu SOD'daki özetle uyuşmuyor |
+| `securityObjectMissing` | Çipten SOD gelmedi |
+| `chipAuthenticationFailed` | Chip Authentication başarısız, çip ayrıntı vermiyor |
+| `activeAuthenticationFailed` | Active Authentication başarısız, çip ayrıntı vermiyor |
+| `other` | Bozuk SOD gibi diğer durumlar |
+
+Bu alanlar bilgi içindir. Sunucuya giden NFC gövdesi değişmez, nihai onay sunucudadır.
 
 ---
 
@@ -150,9 +184,10 @@ Tablolardaki "Ekran" sütunu, `showThankYouPage: true` iken kullanıcının gör
 | `connectionLost` | `error` | Bağlantı kopukken akışın sonuna gelindi ya da oturum başka bir kodla kapandı | ThankYou | 4104–4142 | `closeCode` |
 
 Oda kaydı beklenirken sunucu odanın dolu olduğunu bildirirse her yeniden denemede
-`SDKFlowCoordinator.roomWaitStatus` güncellenir ("Oturum meşgul, yeniden deneniyor (1/3)").
-Sunucu 20 sn içinde ne onay ne ret gönderirse akış başlamaz ve "Bağlantı kurulamadı" uyarısı
-çıkar. Uyarının hangi durumdan doğduğunu `roomBlockKind` ile okursunuz:
+`SDKFlowCoordinator.roomWaitStatus` güncellenir ("Oturum meşgul, yeniden deneniyor (1/6)").
+İkinci sayı `roomSubscribeRetry` sınırıdır. SDK, bu yeniden denemelerin toplam süresine 10 sn
+ekleyip o kadar bekler, en az 20 sn. Varsayılan sınır 6 ile bu süre 86 sn'dir. Sunucu bu süre
+içinde ne onay ne ret gönderirse akış başlamaz ve "Bağlantı kurulamadı" uyarısı çıkar. Uyarının hangi durumdan doğduğunu `roomBlockKind` ile okursunuz:
 
 | `roomBlockKind` | Uyarı | Seçenekler |
 |---|---|---|
@@ -281,7 +316,7 @@ final class KycRouter: ObservableObject {
 
     func handle(_ outcome: SDKFlowOutcome) {
         switch outcome.result {
-        case .approved where outcome.skippedModules.isEmpty:
+        case .approved where outcome.isFullyVerified:
             destination = .identityVerified                 // ← bu senaryo
         case .approved:
             destination = .identityNotVerified
@@ -463,7 +498,7 @@ Durum aynı, ama panelde atlama açık:
 | `stepIndex` / `totalSteps` | `3` / `3` |
 
 ```swift
-case .approved where outcome.skippedModules.isEmpty:
+case .approved where outcome.isFullyVerified:
     router.show(.verified)
 case .approved:
     router.show(.pendingManualReview(missing: outcome.skippedModules))   // [.nfc]
@@ -650,7 +685,7 @@ Host'un yazacağı kod bütün modüllerde aynıdır. Modüle göre ayrımı `la
 ```swift
 onFinished: { outcome in
     switch outcome.result {
-    case .approved where outcome.skippedModules.isEmpty:
+    case .approved where outcome.isFullyVerified:
         router.show(.verified)
     case .approved:
         router.show(.pendingReview(unverified: outcome.skippedModules))   // hangi adımlar doğrulanmadı
@@ -923,7 +958,7 @@ final class KycCoordinator: IdentifyFlowResultListener {
 
     private func route(_ outcome: SDKFlowOutcome) {
         switch outcome.result {
-        case .approved where outcome.skippedModules.isEmpty:
+        case .approved where outcome.isFullyVerified:
             presenter?.navigationController?.pushViewController(SuccessViewController(), animated: true)
         case .approved, .rejected, .neutral, .notCompleted:
             presenter?.navigationController?.pushViewController(ReviewViewController(outcome: outcome), animated: true)

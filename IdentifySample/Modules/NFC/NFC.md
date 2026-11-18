@@ -186,8 +186,10 @@ sonuç `setupSDK(onFinished:)`'a gelir:
   düzeltebilir; agent uzaktan da NFC düzeltme başlatabilir (`editNfcProcess` soket aksiyonu).
 - **Çipsiz belge:** `setupSDK(showNFCNotFoundPage: true)` ile "NFC bulunamadı" ekranı
   gösterilebilir; event akışında `notFound` durumu görülür ([Event Sistemi](../../../docs/guides/events.md)).
-- **Sertifika doğrulama:** `needCertForNfc: true` ile çip sertifika zinciri, gömülü CSCA
-  listesine karşı doğrulanır.
+- **Sertifika doğrulama:** SDK CSCA listesi taşımaz. Listeyi `setupSDK(nfcMasterList:)` ile
+  PEM dosyası olarak verin; çip sertifika zinciri bu listeye karşı doğrulanır. Liste yoksa
+  zincir kontrolü yapılmaz. Zincir tutmazsa okuma yine geçer, sonuç
+  `nfcVerification.certificateChain` alanında `failed` olarak raporlanır.
 - **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
   Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.nfc] = SDKNavBarButtons(showsHelp: false)`;
   işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

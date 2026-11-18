@@ -155,6 +155,12 @@ struct MyIdCardScanView: View {
 - Ön yüz yüklenince `vm.currentSide` kendiliğinden `.back` olur; arka yüz için tarayıcıyı
   yeniden açın. OCR ya da yükleme düşerse `vm.errorMessage` dolar, yüz değişmez.
 - Arka yüzde `configuration: .idBack` kullanın: arka yüz daha az dokulu, netlik eşikleri ayrı.
+- TC kimlikte 3.2.2'den itibaren SDK'nın kimlik ekranındaki hızlı çekim ve okuma burada da
+  çalışır: `doc.croppedImage`'ı değiştirmeden verin; arka yüzün MRZ'si ön yüzde okunanlarla
+  karşılaştırılır, uyuşmazsa otomatik çekim olmaz. Çerçeve sabit (takip modu değil) ve kart
+  oranında kalmalı, `maxWidth` / `maxHeightFraction` artırılmamalı. Önceki akışa dönmek için
+  `ScannerConfiguration.fastIdCaptureEnabled = false`
+  ([ayrıntı](../../../docs/guides/identity-scanner.md#hızlı-çekim-ve-çerçeve)).
 - Pasaport: `profile: .passport` + `configuration: .passport`.
 - `IdentityScannerView`'ı modifier olmadan kullanacaksanız mutlaka `fullScreenCover` içinde
   sunun: sonuç gelince kendini `dismiss()` eder, bir ekranın gövdesine gömülürse o ekranı kapatır.

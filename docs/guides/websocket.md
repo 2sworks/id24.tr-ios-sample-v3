@@ -12,10 +12,10 @@ bulacaksınız.
 ## Bağlantının Kurulması
 
 Soket adresini (`ws_url`) siz vermezsiniz; `connectToRoom` cevabından gelir. İstemci olarak
-[Starscream](https://github.com/daltoniam/Starscream) WebSocket kullanılır.
+SDK'nın kendi WebSocket katmanı (`SDKWebSocket`) kullanılır.
 
 ```
-RoomResponse.ws_url ──► WebSocket(url:)
+RoomResponse.ws_url ──► SDKWebSocket(url:)
                           │  socket_auth == "1" ise: ws_url + "?token=<HMAC token>"
                           ▼
                         connect() ──► sendFirstSubscribe()   (odaya kayıt)
@@ -116,10 +116,14 @@ SDK kopmayı birbirinden bağımsız iki kaynaktan anlar:
 
 1. Reachability izleyicisi: oturum başlarken açılır. İnternet `.notReachable` olursa (ve KYC
    bitmemişse) devreye girer.
-2. Soket kopması: Starscream'in disconnect bildirimi.
+2. Soket kopması: `SDKWebSocket` disconnect bildirimi.
 
 İki kaynak da aynı noktaya çıkar. `.connectionErr` yalnızca bir kez gönderilir, tekrarlar yok
 sayılır. Yeniden bağlantı başarılı olunca bayrak sıfırlanır.
+
+Görüşme sürerken ve medya hattı ayaktayken `.connectionErr` hemen gönderilmez. Görüşme
+`signallessCallGracePeriod` (varsayılan 10 sn) boyunca sürer, soket bu sürede geri gelmezse görüşme
+biter ve ekran açılır ([TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc)).
 
 ```
 internet gitti ──┐
@@ -297,7 +301,7 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 | 4104 | `reconnectCycle` | Yeniden bağlanmadan önce eski bağlantı kapatılıyor |
 | 4105 | `backgroundTimeout` | Uygulama arka planda izin verilen süreyi aştı (aşağıya bakın) |
 | 4106 | `callCompleted` | Görüşme tamamlandı, sonraki modüle geçiliyor (`disconnectSocket(reason:)`) |
-| 4107 | `pingTimeout` | Ayrılmış; bu sürümde ölü bağlantı 4109 ile tespit ediliyor |
+| 4107 | `pingTimeout` | Panel görüşmeyi `PING_TIMEOUT` sebebiyle kapattı. SDK'nın kendi tespit ettiği ölü bağlantı 4109 ile kapanır |
 | 4108 | `ringingTimeout` | Çağrı çaldı ama `ringingTimeout` süresince (varsayılan 300 sn) yanıtlanmadı |
 | 4109 | `heartbeatTimeout` | Üst üste 3 PING'e PONG gelmedi, bağlantı ölü sayıldı |
 
@@ -331,21 +335,21 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 | 4130 | `networkUnreachable` | Reachability: internet erişimi yok |
 | 4131 | `transportError` | SSL, proxy ya da firewall hatası |
 | 4132 | `unexpectedDrop` | Hata olmadan kopma; sunucu bağlantıyı sessizce kapattı |
-| 4133 | `connectTimeout` | Bağlantı verilen sürede kurulamadı (ilk bağlantıda 30 sn, yeniden bağlanmada 10 sn) |
+| 4133 | `connectTimeout` | Bağlantı verilen sürede kurulamadı (ilk bağlantıda 30 sn; yeniden bağlanmada görüşme sırasında 10 sn, görüşme dışında 30 sn) |
 
 ### 4140–4142 · TURN / ICE (WebRTC)
 
 | Kod | Case | Kaynak | Davranış |
 |---|---|---|---|
-| 4140 | `turnDisconnected` | ICE `.disconnected` | Hemen `terminateCall("TURN_DISCONNECTED")` |
+| 4140 | `turnDisconnected` | ICE `.disconnected`, 5 sn içinde toparlanmadı | `terminateCall("TURN_DISCONNECTED")` |
 | 4141 | `turnFailed` | ICE `.failed` | Hemen `terminateCall("TURN_DISCONNECTED")` |
 | 4142 | `turnClosed` | ICE `.closed` | Log + event |
 
-> ICE ya da WebSocket koptuğu anda görüşme biter, bütün bağlantılar kapatılır ve kullanıcı
-> "Bağlantı Koptu" ekranını görür; toparlanma için beklenmez. Bir süre görüşmeyi askıya alıp
-> bekleyen bir yapı denendi ve geri alındı. Sunucu askıdaki oturumu hâlâ açık saydığı için yeniden
-> abonelik `subRejected` ("Oda dolu") ile reddediliyor, panel de çağrı oturumunu kapatmıyordu.
-> Ayrıntı: [TURN & WebRTC → Neden toparlanma penceresi YOK?](turn-webrtc.md).
+> ICE `.disconnected` olunca 5 sn (sabit) toparlanma beklenir, `.failed` görüşmeyi hemen bitirir.
+> WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez: görüşme
+> `signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
+> gelmezse biter. İki bekleme de odaya yeniden abone olmaz.
+> Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc).
 
 ### Arka Plan Zaman Aşımı (4105)
 
