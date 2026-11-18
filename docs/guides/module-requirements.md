@@ -63,5 +63,4 @@ SDK projesindeki ve yayın betiğindeki sürümlerle aynı olmalı. Biri tutmazs
 
 ## Diğer ayarlar
 
-iPad hedefi ve sahne ayarları modülden bağımsızdır. Ayrıntı için [iPad Desteği](ipad-support.md) ve
-[iPhone Duo Desteği](iphone-duo.md) rehberlerine bakın.
+iPad hedefi modülden bağımsızdır. Ayrıntı için [iPad Desteği](ipad-support.md) rehberine bakın.

@@ -16,7 +16,6 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 **Değişti**
 - Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
-- Örnek uygulama iPhone Duo iç ekranında da dikey açılıyor.
 - SDK'nın kimlik ekranında çerçevenin görünümünü ya da konumunu değiştirmek artık hızlı çekimi kapatmıyor (3.2.1'de `.fixedFrame(.idCard)`'dan farklı her çerçeve kapatıyordu); `stabilityConfirmFrames`'i 4'ün üstüne çıkarmak kapatıyor.
 
 **Düzeltildi**
