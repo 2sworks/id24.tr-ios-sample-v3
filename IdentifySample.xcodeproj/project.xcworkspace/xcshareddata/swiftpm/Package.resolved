@@ -1,6 +1,15 @@
 {
-  "originHash" : "db39946ed7b9e12688282cacd847c236037c365cf5b016a5bb073f201b79b59a",
+  "originHash" : "fdf7cd8e83c55415fd1a0dede504aca4a25907bd790e405758606ed18be36f32",
   "pins" : [
+    {
+      "identity" : "id24.tr-ios-sdk-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/2sworks/id24.tr-ios-sdk-spm",
+      "state" : {
+        "revision" : "b138a197d26c7551101d594db4a357a5185f8978",
+        "version" : "3.3.0"
+      }
+    },
     {
       "identity" : "openssl",
       "kind" : "remoteSourceControl",
