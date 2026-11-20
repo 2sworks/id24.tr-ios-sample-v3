@@ -440,6 +440,28 @@ enum ShowcaseScenarios {
                               get: { m.incomingCallVibrationEnabled }, set: { m.incomingCallVibrationEnabled = $0 })
                       ]),
 
+                .init(title: "Arka kamera odağı",
+                      note: "Görüşmede arka kameraya geçilince devreye girer; ayarlar görüşme başlamadan verilir.",
+                      controls: [
+                        .flag(title: "backCameraFocusEnabled",
+                              note: "Açıkken arka kamera yakına sürekli odaklanır. Kapalıyken kameranın kendi odağı kalır.",
+                              get: { m.backCameraFocusEnabled }, set: { m.backCameraFocusEnabled = $0 }),
+                        .flag(title: "tapToFocusEnabled",
+                              note: "Açıkken görüntüye dokununca o noktaya odaklanır. Kapalıyken dokunuşu uygulama karşılar.",
+                              get: { m.tapToFocusEnabled }, set: { m.tapToFocusEnabled = $0 }),
+                        .flag(title: "swapsLayoutOnBackCamera",
+                              note: "Açıkken arka kamerada kullanıcının görüntüsü büyük ekrana geçer.",
+                              get: { m.swapsLayoutOnBackCamera }, set: { m.swapsLayoutOnBackCamera = $0 }),
+                        .flag(title: "showsFocusIndicator",
+                              note: "SDKTheme.shared.capture.showsFocusIndicator. Kapalıyken odak çalışır, kare çizilmez.",
+                              get: { SDKTheme.shared.capture.showsFocusIndicator ?? true },
+                              set: { SDKTheme.shared.capture.showsFocusIndicator = $0 }),
+                        .action(title: "focusBackCameraAtCenter()",
+                                note: "Arka kamerayı ortaya odaklar. Ön kamerada bir şey yapmaz.",
+                                reloads: false,
+                                run: { _ = m.focusBackCameraAtCenter() })
+                      ]),
+
                 .init(title: "Bekleme → görüşme akışı",
                       note: "Sırayla uygulayın; her adım socket'ten gelen aksiyonun aynısıdır.",
                       controls: [
@@ -586,6 +608,29 @@ enum ShowcaseScenarios {
                                 note: "Hak tükenmiş senaryosu.",
                                 run: { m.ocrComparisonCount = 0 })
                       ]),
+
+                .init(title: "Yönerge satırı",
+                      note: "ScannerConfiguration.guidancePositionDefault. Çerçeve konumları yalnız sabit çerçevede çalışır.",
+                      controls: [
+                        .action(title: ".bottom (varsayılan)",
+                                note: "Ekranın altında.",
+                                run: { ScannerConfiguration.guidancePositionDefault = .bottom }),
+                        .action(title: ".insideFrame",
+                                note: "Çerçevenin ortasında, yarı saydam zeminde.",
+                                run: { ScannerConfiguration.guidancePositionDefault = .insideFrame }),
+                        .action(title: ".aboveFrame",
+                                note: "Çerçevenin hemen üstünde.",
+                                run: { ScannerConfiguration.guidancePositionDefault = .aboveFrame })
+                      ]),
+
+                .init(title: "Arka yüz okuması",
+                      note: "SDKOcrConfig.shared.",
+                      controls: [
+                        .flag(title: "readsParentNames",
+                              note: "Kapalıyken anne ve baba adı okunmaz, sunucuya boş gider; kart bu yüzden reddedilmez.",
+                              get: { SDKOcrConfig.shared.readsParentNames },
+                              set: { SDKOcrConfig.shared.readsParentNames = $0 })
+                      ]),
                 limitGroup(.idCard),
             ]
 
@@ -654,6 +699,17 @@ enum ShowcaseScenarios {
                         .flag(title: "performChipAuthentication",
                               note: "Chip Authentication (DG14) denenir; çipte yoksa atlanır.",
                               get: { m.performChipAuthentication }, set: { m.performChipAuthentication = $0 })
+                      ]),
+
+                .init(title: "Kart koparsa",
+                      note: "nfcCardReturnTimeout: kart çekilince geri konması için beklenen süre. Süre dolunca okuma hatayla biter.",
+                      controls: [
+                        .action(title: "10 sn (varsayılan)",
+                                note: "Kart 10 sn içinde geri konmazsa deneme hakkından düşer.",
+                                run: { m.nfcCardReturnTimeout = 10 }),
+                        .action(title: "nil (süre yok)",
+                                note: "Okumayı yalnız iOS'un oturum sınırı keser.",
+                                run: { m.nfcCardReturnTimeout = nil })
                       ]),
 
                 .init(title: "NFC deneme hakkı",
