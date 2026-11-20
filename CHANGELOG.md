@@ -42,6 +42,7 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 - NFC: kart bir an yanıt vermezse okuma düşmüyor, kaldığı yerden sürüyor. Kart geri konmazsa `nfcCardReturnTimeout` (varsayılan 10 sn) sonunda bitiyor.
 - NFC: okuma telefonun hem ön hem arka yüzünden yapılabiliyor; yönerge ve sesli yönlendirmeler beş dilde arka yüz için de yazıldı.
 - Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
+- Örnek uygulamanın showcase panelinde 3.3.0 ayarları deneniyor: arka kamera odağı, yönerge yazısının yeri, anne ve baba adı okuması ve `nfcCardReturnTimeout`.
 
 **Düzeltildi**
 - Kurulum sürerken `exitSDK` çağrılırsa `setupSDK` askıda kalmıyor.
