@@ -163,6 +163,18 @@ public enum SDKCallNetworkQuality { case none, /* ... */ good, poor }
 | `remoteVideoView: UIView?` | Uzak (temsilci) video katmanı |
 | `localVideoView: UIView?` | Yerel (kullanıcı) video katmanı |
 
+### Arka kamera odağı (3.3.0)
+| Üye | Tip | Anlam |
+|---|---|---|
+| `isBackCameraFocusAvailable` | `Bool` (`@Published`) | Arka kamera açık ve odak kullanılabilir mi |
+| `focusMark` | `SDKFocusMark?` | Son dokunulan nokta (`point`, önizlemeye oranla 0...1). Odak karesini çizmek için |
+| `isBackCameraActive` | `Bool` | Arka kamera açık mı |
+| `agentIsLarge` | `Bool` | Büyük ekranda temsilci mi var |
+| `focusBackCameraAtCenter()` | `Bool` | Görüntünün ortasına bir kez odaklar |
+| `focusBackCamera(at:)` | `Bool` | Verilen noktaya odaklar, (0,0) sol üst. Arka kamera kapalıysa `false` |
+
+Ayrıntı: [Arka Kamera Odağı](#arka-kamera-odağı-330).
+
 ### Metotlar
 | Metot | Etki |
 |---|---|
@@ -278,6 +290,56 @@ SDKSpeechConfig.shared.setMode(.customAudio, for: .waitScreen)    // dosya yoksa
 
 Metni ezmek: `SDKLocalization.shared.setOverride(key: .callScreenTts, language: .tr, value: "...")`
 · Tüm ayrıntı: [ReadAloud](../ReadAloud.md)
+
+## Arka Kamera Odağı (3.3.0)
+
+Temsilci kullanıcıdan belgeyi arka kameraya göstermesini istediğinde kamera yakına odaklanır.
+Sürekli otomatik odak açıktır. Önizlemeye dokunulunca o noktaya odaklanılır ve sarı bir kare
+çıkar. Arka kamera açıkken kullanıcının görüntüsü büyük ekrana geçer, temsilci küçük pencereye
+iner. Ön kameraya dönülünce `bigCustomerCam` ile seçilen yerleşim geri gelir.
+
+Üç ayar var, üçü de varsayılan açık:
+
+```swift
+let m = IdentifyManager.shared
+m.backCameraFocusEnabled = true    // false: kameranın kendi odağı, dokunma ve focusBackCamera çalışmaz
+m.tapToFocusEnabled = true         // false: dokunmayı host yakalar, focusBackCamera(at:) ile odaklar
+m.swapsLayoutOnBackCamera = true   // false: arka kamerada yerleşim değişmez (görüşmeden önce verin)
+```
+
+`backCameraFocusEnabled` görüşme sırasında `false` yapılırsa hemen eski odağa dönülür. `true`
+yapılırsa arka kamera bir sonraki açılışta odaklanır.
+
+Odağı host'tan istemek ve durumu izlemek için:
+
+```swift
+m.onBackCameraFocusAvailabilityChanged = { available in
+    focusButton.isHidden = !available      // ön kamera, kamera kapalı ya da odak kapalıysa false
+}
+m.onBackCameraFocusTapped = { point in
+    // dokunulan nokta, kullanıcının görüntüsüne oranla (0...1)
+}
+m.focusBackCameraAtCenter()                       // ortaya bir kez odaklanır, sonra sürekli odağa döner
+m.focusBackCamera(at: CGPoint(x: 0.5, y: 0.3))    // görüntü dışı ya da ön kamerada false döner
+```
+
+Bu üyeler `@MainActor` üzerindedir. Anlık durum için `m.isBackCameraFocusAvailable` okunur.
+
+Odak karesinin görünümü temadan değişir:
+
+```swift
+SDKTheme.shared.setFocusIndicator { size in       // size varsayılan 68, küçük önizlemede daha küçük
+    Circle().stroke(.white, lineWidth: 2).frame(width: size, height: size)
+}
+SDKTheme.shared.resetFocusIndicator()             // varsayılan sarı kare
+SDKTheme.shared.capture.focusIndicatorColor = .green  // yalnız rengi değiştirmek için
+SDKTheme.shared.capture.showsFocusIndicator = false   // kare çizilmez, odak yine çalışır
+```
+
+Görüşme sırasında kamera durursa görüntü kendiliğinden yeniden açılır. Kullanıcıya uyarı
+çıkmaz.
+
+---
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 

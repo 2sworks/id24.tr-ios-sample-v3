@@ -419,6 +419,40 @@ Duruma bağlı yedi metin daha vardır. Boş bırakılan gösterilmez:
 
 `orientation`, `upsideDown` ve `tilted` duruş uyarısıdır ve yaklaştır/uzaklaştır uyarısından önce gelir.
 
+#### Yönerge satırının yeri (3.3.0)
+
+Yönerge satırı varsayılan olarak ekranın altındadır. Yeri `guidancePosition` ile değişir:
+
+```swift
+ScannerConfiguration.guidancePositionDefault = .aboveFrame   // bütün profiller için
+
+var cfg = ScannerConfiguration.default
+cfg.guidancePosition = .insideFrame                          // yalnız bu yapılandırma için
+```
+
+| Değer | Yer |
+|---|---|
+| `.bottom` | Ekranın altı (varsayılan) |
+| `.insideFrame` | Belge çerçevesinin ortası, yarı saydam zeminle; kart görünür kalır |
+| `.aboveFrame` | Belge çerçevesinin hemen üstü |
+
+Çerçeve konumları sabit çerçeveyle (`.fixedFrame`) çalışır. `.dynamicQuad` modunda izlenecek
+çerçeve olmadığı için satır altta kalır.
+
+#### Anne ve baba adı okuması (3.3.0)
+
+TC kimliğin arka yüzünde anne ve baba adı varsayılan olarak okunur. Kapatmak için kimlik kamerası
+açılmadan önce:
+
+```swift
+SDKOcrConfig.shared.readsParentNames = false
+```
+
+Kapalıyken arka yüz taraması bu iki adı beklemez ve okumaz. Adlar sunucuya boş gider
+(`idMotherNameOcr`, `idFatherNameOcr`), kart bunlar eksik diye reddedilmez. MRZ, ön yüz ve veren
+makam eskisi gibi okunur. Ayar SDK'nın kimlik ekranında ve TC kimlik arka yüz profiliyle
+kullanılan `IdentityScannerView`'da geçerlidir.
+
 #### Yönergelerin seslendirilmesi
 
 Ekrandaki yönerge her değiştiğinde sesli okunur (`ScannerAutomation.guidanceSpeech`,

@@ -123,6 +123,63 @@ bunlardır: agent'ın ne gönderdiğini ve SDK'nın ne cevap verdiğini sırası
 
 ---
 
+## Modül Tanı Raporu — `[SONUÇ]` (3.3.0)
+
+Her modül ekranı kapanırken loga tek bir blok yazar. Blok `[SONUÇ] <modül>: <sonuç>`
+satırıyla başlar. Sonuç `geçti`, `başarısız`, `atlandı` ya da `yarıda kaldı` olur. Kullanıcı
+ekrandan geri dönerse ya da uygulama kapanırsa `yarıda kaldı` yazılır. `geçti` dışındaki
+sonuçlar `warning`, `geçti` ise `info` seviyesiyle gider.
+
+Rapor ekran ziyareti başına bir kez yazılır, aynı ziyaretteki yeniden denemeler aynı rapora
+eklenir. Ayrıca bir şey açmanız gerekmez.
+
+| Madde | İçerik |
+|---|---|
+| 1. Süre | Ekranda geçen süre ve ilk uygun karenin geldiği an |
+| 2. Cihaz | Model, iOS sürümü, uygulama sürümü |
+| 3. Yol | Modülün çalıştığı yol (ör. ARKit, standart) |
+| 4. İzin | Modülün istediği izinler ve durumları. İzin istemeyen modülde `gerekmiyor` |
+| 5. Kesinti | Arka plana geçiş, ekranın yeniden açılması gibi kesintiler |
+| 6. Mesajlar | Ekranda çıkan yönergeler ve ne kadar kaldıkları |
+| 7. Engeller | Aşılamayan koşullar ve ölçüleri |
+| 8. Tutma | Kararlı tutmanın kaç kez başladığı ve bozulduğu |
+| 9. Gevşetme | Devreye giren yedek kurallar |
+| 10. Sunucu | Sunucudan dönen sonuçlar |
+| 11. Gösterilen hata | Kullanıcıya gösterilen hata metinleri |
+| 12. Modül | Modülün kendi ölçüleri (aşağıdaki tablo) |
+
+| Modül | 12. maddede |
+|---|---|
+| Selfie | Kare koşulu sayıları, yüz bulunamadı, çoklu yüz, telefonun yan tutulması, sunucu sonucu |
+| Selfie + canlılık | Son kare (oval, uzaklık, merkez sapması, eğim), ısınma kare sayısı, büyük ovale geçiş |
+| Canlılık | Her adımın sonucu ve süresi, takıldığı adım, adımın en yüksek ölçüsü ve eşiği, ARKit yüz takibi kaybı |
+| Kimlik | Yüz başına tarama sayısı, son tarama, kare ölçüleri (netlik, parlama, titreme, MRZ okunan kare), eksik alan, OCR hatası, sunucu sonucu |
+| Kimlik OVD | Adım süreleri, belge türü, takıldığı adım, hologram en yüksek ölçüsü ve eşikleri |
+| NFC | Okuma başladı mı, her deneme (PACE/BAC, aşama, okunan gruplar, hata, sistem kodu), pasif doğrulama, anahtar düzeltme ekranı |
+| Okuma testi | Kayıt süresi ve sınırı, mikrofon engeli, okuma eşleşmesi (skor, eşik, metinler), sunucu sonucu |
+| Konuşma | Dinleme sayısı, son eşleşme (beklenen ve tanınan metin) |
+| İmza | Çizim ve temizleme sayısı, imzanın boş olup olmadığı, sunucu sonucu |
+| Adres onayı | Belge türü ve boyutu, PDF okunamadı, PDF boyut sınırı, eksik alan, sunucu sonucu |
+| İşaret dili | Tercih (talep edildi / edilmedi) |
+| Görüntülü görüşme | İlk çağrı ve ilk bağlantı süresi, son durum, ağ kalitesi sayıları, kopma sayısı ve son kopma nedeni, yeniden bağlanma, cevapsız çağrı, kapanış nedeni, kamera ve ARKit yeniden başlatma |
+
+Örnek:
+
+```
+[SONUÇ] İşaret dili: geçti
+1. Süre: 4.2 sn, ilk uygun kare: hiç gelmedi
+...
+11. Gösterilen hata: yok
+12. Modül:
+   - işaret dili: talep edildi
+```
+
+Görüşmedeki ağ kalitesi panelin gönderdiği değerdir, SDK kendisi ölçmez. NFC denemeleri oturum
+başında sıfırlanır; aynı oturumda NFC ekranına ikinci kez gelinirse önceki denemeler de rapora
+girer.
+
+---
+
 ## Log mu Event mi?
 
 - Log serbest metindir ve geliştirici içindir. Sorun ayıklarken okunur.

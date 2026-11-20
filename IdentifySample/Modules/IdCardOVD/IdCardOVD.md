@@ -279,6 +279,7 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .idCardOVDTts, language: .
   tutun (ör. 15–30 fps yeterli).
 - **Skorlar takılıyorsa:** Işık koşulları kritik — kullanıcıya parlamayı azaltacak yönerge
   verin; gerekirse `forceCapture` ile kilitlemeyi kırın.
-- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
-  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.idCardOVD] = SDKNavBarButtons(showsHelp: false)`;
+- **Yardım (?) düğmesi:** 3.3.0'dan beri varsayılan kapalı. Yalnız bu ekranda açmak için
+  `SDKTheme.shared.navBar.routeButtons[.idCardOVD] = SDKNavBarButtons(showsHelp: true)`. SDK düğmeye işlev
+  bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz;
   işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).
