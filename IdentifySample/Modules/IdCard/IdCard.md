@@ -292,6 +292,12 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .idCardTts, language: .tr,
   seçildiğinde gerekir; tek MRZ sayfası yeterlidir. Kabul edilen tipleri
   `setupSDK(identCardType:)` belirler.
 - **Yamuk çekimler:** `setupSDK(enableAutoRotateOCR: true)` fotoğrafı otomatik döndürür.
+- **Anne ve baba adı istenmiyorsa (3.3.0):** `SDKOcrConfig.shared.readsParentNames = false`.
+  Adlar boş gider, kart bunlar yüzünden reddedilmez. Ayrıntı:
+  [Anne ve baba adı okuması](../../../docs/guides/identity-scanner.md#anne-ve-baba-adı-okuması-330).
+- **Yönerge satırının yeri (3.3.0):** `ScannerConfiguration.guidancePositionDefault`
+  (`.bottom`, `.insideFrame`, `.aboveFrame`). Ayrıntı:
+  [Yönerge satırının yeri](../../../docs/guides/identity-scanner.md#yönerge-satırının-yeri-330).
 - **OCR nerede çalışır?** Tamamen cihazda; ağ yalnızca `uploadIdPhoto` için kullanılır.
 - **Tarama motoru:** Hazır ekranın altındaki gerçek zamanlı tarayıcı (dörtgen yakalama,
   bölgesel OCR, TCKN/MRZ doğrulama) bağımsız bir bileşen olarak da kullanılabilir —

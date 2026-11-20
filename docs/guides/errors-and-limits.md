@@ -81,6 +81,13 @@ kalmasın diye SDK popup'ı yine açılır. Görüntülü görüşme ekranındak
 yüzü yeniden tarar. `onError` verdiyseniz bilgi için yine çağrılır; `dismiss()` çağırmanız
 gerekmez.
 
+**Kamera durursa (3.3.0).** Selfie, canlılık, kimlik ve video kaydı ekranlarında kamera durursa
+uyarı çıkar, "Tamam"dan sonra kamera yeniden açılır. Video kaydında uyarı kameranın mı
+mikrofonun mu durduğunu söyler. iOS medya servisi sıfırlanınca kamera önce uyarısız yeniden
+açılmayı dener, açılmazsa uyarı çıkar. `.none` seçiliyse uyarı çıkmaz, kamera yine kendiliğinden
+açılır. `onError` verdiyseniz hata `cameraFailed` koduyla gelir. Görüntülü görüşmede kamera
+durursa uyarı hiç çıkmaz, görüntü kendiliğinden yeniden açılır.
+
 Kendi modül ekranınızı yazdıysanız `.idErrorAlert` bu ayara zaten uyar. Hatayı başka bir
 yolla çiziyorsanız (bant, toast) `SDKErrorConfig.shared.showsSDKPopup` false iken çizmeyin.
 

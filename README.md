@@ -37,7 +37,7 @@ Xcode → *File → Add Package Dependencies* →
 https://github.com/2sworks/id24.tr-ios-sdk-spm
 ```
 
-**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.0.0`).
+**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.3.0`).
 
 Sebebi: **2.x ve 3.x aynı depodan dağıtılır.** Bunlar iki ayrı sürüm ailesidir — 3.x, hazır
 SwiftUI ekranlarını (DefaultUI) SDK'nın içine taşıyan farklı bir entegrasyon modelidir ve
@@ -52,7 +52,9 @@ getirir: bağımlılık kümesi sürüme göre farklıdır ve `Package.resolved`
 | 2.x | `2.5.x` | Eski entegrasyon; ekranlar host uygulamada |
 
 Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto) ve
-`WebRTC` (görüntülü görüşme). 3.2.1'den itibaren `PermissionsKit` ve
+`WebRTC` (görüntülü görüşme). 3.3.0'dan itibaren OpenSSL `exact: "3.6.5000"` ile sabitlidir ve
+`Starscream` gelmez; soket katmanı SDK'nın içindedir (`SDKWebSocket`). `Starscream` import eden
+kodu güncelleyin. 3.2.1'den itibaren `PermissionsKit` ve
 `SwiftSignatureView` gelmez; bu paketlerin modüllerini (`CameraPermission`, `MicrophonePermission`,
 `SpeechRecognizerPermission`, `SwiftSignatureView`) kendi kodunuzda import ediyorsanız paketi
 uygulamanıza kendiniz ekleyin. 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
