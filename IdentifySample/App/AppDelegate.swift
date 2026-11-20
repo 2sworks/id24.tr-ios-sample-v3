@@ -29,18 +29,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NotificationCenter.default.addObserver(forName: .sdkNetworkDebugShake, object: nil, queue: .main) { _ in
             NFX.sharedInstance().show()
         }
-        startSwiftUIScreen()
         return true
     }
 
-    // MARK: - SwiftUI Entry Point
-
-    func startSwiftUIScreen() {
-        self.window = SDKWindow(frame: UIScreen.main.bounds)
-        // Tüm akış SDK'dan gelir: SDKFlowHostView(coordinator:registry:) { LoginView() }
-        let hostingVC = UIHostingController(rootView: RootView())
-        self.window?.rootViewController = hostingVC
-        self.window?.makeKeyAndVisible()
+    // iOS 27 SDK'sıyla derlenen uygulama sahne yaşam döngüsü olmadan açılmıyor.
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        config.delegateClass = SceneDelegate.self
+        return config
     }
 
     // MARK: - Core Data Stack
@@ -65,5 +61,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
+    }
+}
+
+// MARK: - Scene
+
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+        let window = SDKWindow(windowScene: windowScene)
+        // Tüm akış SDK'dan gelir: SDKFlowHostView(coordinator:registry:) { LoginView() }
+        window.rootViewController = UIHostingController(rootView: RootView())
+        self.window = window
+        // SDK 3.2.0 ve öncesi uyarı penceresini uygulama delegesinden okuyor.
+        (UIApplication.shared.delegate as? AppDelegate)?.window = window
+        window.makeKeyAndVisible()
     }
 }

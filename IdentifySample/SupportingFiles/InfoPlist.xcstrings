@@ -1,0 +1,146 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NFCReaderUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "az": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şəxsiyyət vəsiqənizdəki çipi oxumaq üçün NFC lazımdır."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NFC wird benötigt, um den Chip Ihres Ausweises zu lesen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NFC is used to read the chip in your ID card."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NFC нужен, чтобы прочитать чип вашего удостоверения личности."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimlik kartınızdaki çipi okumak için NFC gerekiyor."
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "az": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şəxsiyyət vəsiqənizi skan etmək, üzünüzü yoxlamaq və görüntülü zəng etmək üçün kamera lazımdır."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Kamera wird benötigt, um Ihren Ausweis zu scannen, Ihr Gesicht zu prüfen und den Videoanruf zu führen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is used to scan your ID, verify your face and make the video call."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Камера нужна, чтобы отсканировать документ, проверить лицо и провести видеозвонок."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimliğinizi taramak, yüzünüzü doğrulamak ve görüntülü görüşme yapmak için kamera gerekiyor."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "az": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görüntülü zəng və video yazısı üçün mikrofon lazımdır."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Mikrofon wird für den Videoanruf und die Videoaufnahme benötigt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone is used for the video call and video recording."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Микрофон нужен для видеозвонка и записи видео."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görüntülü görüşme ve video kaydı için mikrofon gerekiyor."
+          }
+        }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "az": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danışıq testində dediklərinizi tanımaq üçün nitq tanıma lazımdır."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Spracherkennung wird benötigt, um im Sprechtest Ihre Worte zu erkennen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speech recognition is used to recognize what you say in the speech test."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Распознавание речи нужно, чтобы понять, что вы говорите во время речевого теста."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konuşma testinde söylediklerinizi tanımak için konuşma tanıma gerekiyor."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

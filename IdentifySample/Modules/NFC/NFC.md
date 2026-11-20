@@ -182,12 +182,22 @@ sonuç `setupSDK(onFinished:)`'a gelir:
 - **Simülatörde çalışmaz** — CoreNFC gerçek cihaz ister; NFC'yi test etmeden yayına çıkmayın.
 - **Okuma başarısız oluyor:** Kılıfı çıkartın, belgeyi telefonun **üst-arka** kısmına tutun,
   okuma bitene kadar oynatmayın. Hata sayısı `setupSDK(nfcMaxErrorCount:)` ile sınırlanır.
+- **Kart bir an koparsa (3.3.0):** okuma düşmez, kart geri konunca kaldığı yerden sürer. Kart
+  geri konmazsa okuma `IdentifyManager.shared.nfcCardReturnTimeout` (varsayılan 10 sn) sonunda
+  hatayla biter ve deneme hakkından düşer. `nil` verilirse süre işlemez, okumayı yalnız iOS'un
+  oturum sınırı keser (iPhone 16 Pro Max'te 64,5 sn ölçüldü).
+- **KPS ile okuma (3.3.0):** anahtar doğruyken okuma koparsa anahtar düzeltme ekranı açılmaz.
+  Çip anahtarı kabul ettiyse ya da oturum çipe ulaşmadan kapandıysa hata, okuma sınırına ve
+  anahtar hakkına sayılmaz.
 - **MRZ yanlış okunmuşsa:** `showEditScreen = true` + `saveManualDates()` ile kullanıcı
   düzeltebilir; agent uzaktan da NFC düzeltme başlatabilir (`editNfcProcess` soket aksiyonu).
 - **Çipsiz belge:** `setupSDK(showNFCNotFoundPage: true)` ile "NFC bulunamadı" ekranı
   gösterilebilir; event akışında `notFound` durumu görülür ([Event Sistemi](../../../docs/guides/events.md)).
-- **Sertifika doğrulama:** `needCertForNfc: true` ile çip sertifika zinciri, gömülü CSCA
-  listesine karşı doğrulanır.
-- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
-  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.nfc] = SDKNavBarButtons(showsHelp: false)`;
+- **Sertifika doğrulama:** SDK CSCA listesi taşımaz. Listeyi `setupSDK(nfcMasterList:)` ile
+  PEM dosyası olarak verin; çip sertifika zinciri bu listeye karşı doğrulanır. Liste yoksa
+  zincir kontrolü yapılmaz. Zincir tutmazsa okuma yine geçer, sonuç
+  `nfcVerification.certificateChain` alanında `failed` olarak raporlanır.
+- **Yardım (?) düğmesi:** 3.3.0'dan beri varsayılan kapalı. Yalnız bu ekranda açmak için
+  `SDKTheme.shared.navBar.routeButtons[.nfc] = SDKNavBarButtons(showsHelp: true)`. SDK düğmeye işlev
+  bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz;
   işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

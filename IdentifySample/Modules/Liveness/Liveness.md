@@ -218,6 +218,7 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
   `stepFeedbackIntensity` (0…1, vars. 0.6) ile şiddeti ayarlanır.
 - **iPad:** Face ID'li iPad Pro'da derinlikli, A12+ Touch ID'li iPad'lerde (iPad 8+, mini 5+, Air 3+) derinliksiz çalışır. Yüz ovali tablette pencereyle
   birlikte büyümez; `SDKLayout.maxFaceGuideWidth` ile sınırlanır.
-- **Yardım (?) düğmesi:** üst çubuktaki bu düğmeye SDK bir işlev bağlamaz, basılınca bir şey olmaz.
-  Yalnız bu ekrandan kaldırmak için `SDKTheme.shared.navBar.routeButtons[.liveness] = SDKNavBarButtons(showsHelp: false)`;
+- **Yardım (?) düğmesi:** 3.3.0'dan beri varsayılan kapalı. Yalnız bu ekranda açmak için
+  `SDKTheme.shared.navBar.routeButtons[.liveness] = SDKNavBarButtons(showsHelp: true)`. SDK düğmeye işlev
+  bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz;
   işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).

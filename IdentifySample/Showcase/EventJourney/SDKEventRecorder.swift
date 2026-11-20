@@ -2,13 +2,14 @@
 //  SDKEventRecorder.swift
 //  IdentifySample
 //
-//  SDK'nın birleşik olay akışını (SDKEventListener) dinleyip bir zaman çizelgesine
-//  toplayan host-tarafı kaydedici. "Olay Örgüsü / Telemetri" ekranı bunu görselleştirir.
+//  SDK'nın birleşik olay akışını (`IdentifyManager.shared.events`) dinleyip bir zaman
+//  çizelgesine toplayan host-tarafı kaydedici. "Olay Örgüsü / Telemetri" ekranı bunu
+//  görselleştirir.
 //
 //  Gerçek entegrasyonda developer tam olarak bunu yapar:
-//      IdentifyManager.shared.eventDelegate = recorder
-//  ve onSDKEvent(_:) içinde olayları kendi analytics/loglama sistemine iletir
-//  (Firebase, Sentry, kendi backend'i vb.).
+//      for await event in IdentifyManager.shared.events { ... }
+//  ve olayları kendi analytics/loglama sistemine iletir (Firebase, Sentry, kendi
+//  backend'i vb.). Olaylar main thread'de gelir.
 //
 
 import Foundation
@@ -16,20 +17,18 @@ import Combine
 import IdentifySDK
 
 @MainActor
-final class SDKEventRecorder: ObservableObject, SDKEventListener {
+final class SDKEventRecorder: ObservableObject {
 
     /// Gelen tüm olaylar (en eskiden en yeniye).
     @Published private(set) var events: [SDKEvent] = []
 
-    // MARK: SDKEventListener
+    // MARK: Olay akışı
 
-    /// SDK olayları arka plan (socket) thread'inden gelebilir → ana akışa taşı.
-    nonisolated func onSDKEvent(_ event: SDKEvent) {
-        Task { @MainActor in self.append(event) }
-    }
-
-    private func append(_ event: SDKEvent) {
-        events.append(event)
+    /// Akışı dinler. Çağıran görev iptal edilince (ekran kapanınca) akış kapanır.
+    func listen() async {
+        for await event in IdentifyManager.shared.events {
+            events.append(event)
+        }
     }
 
     func reset() {

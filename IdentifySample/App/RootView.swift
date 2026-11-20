@@ -29,16 +29,16 @@
 //  AKIŞ SIRASI (LoginViewModel.connect):
 //
 //    coordinator.prepareForSetup()       // 1) ZORUNLU ve setupSDK'dan ÖNCE
-//    IdentifyManager.shared.setupSDK(    // 2) oturum: identId, sunucu, seçenekler, onFinished
-//        identId:..., baseApiUrl:..., networkOptions:..., ..., onFinished: { outcome in ... }
-//    ) { socket, response, error in
-//        if socket?.isConnected == true, response.result == true {
-//            coordinator.start()         // 3) sunucunun modül listesiyle ilk ekranı açar
-//        }
+//    let room = try await IdentifyManager.shared.setupSDK(   // 2) oturum: identId, sunucu, seçenekler
+//        identId:..., baseApiUrl:..., networkOptions:..., ...)
+//    if room.result == true {
+//        coordinator.start()             // 3) sunucunun modül listesiyle ilk ekranı açar
 //    }
+//    let outcome = await IdentifyManager.shared.outcome()   // 4) oturumun sonucu
 //
 //  Sonra her şey SDK içinde akar: ekran → ViewModel → yükleme → coordinator.advanceToNextModule()
-//  → sıradaki modül. Oturum nasıl biterse bitsin `onFinished` bir kez çağrılır (SDKFlowOutcome).
+//  → sıradaki modül. Oturum nasıl biterse bitsin `outcome()` aynı sonucu döner (SDKFlowOutcome).
+//  Kurulum hatası `SDKSetupError` olarak fırlar. Closure'lı eski API de aynen çalışır.
 //
 //  ───────────────────────────────────────────────────────────────────────────────────────
 //  ÖZELLEŞTİRME KATMANLARI (hafiften ağıra):

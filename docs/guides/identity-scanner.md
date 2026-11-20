@@ -122,6 +122,9 @@ Anahtarlar `documentNumber`, `tckn`, `birthDate` ve `expirationDate` (YYAAGG), `
 çevrilerek karşılaştırılır (Ş→S, İ→I). Boş ya da verilmeyen anahtar karşılaştırılmaz, değer
 MRZ'den gelir. SDK'nın kimlik ekranı arka yüzde buraya ön yüzde okunanları koyar; uyuşmazsa
 otomatik çekim olmaz, "Kimlik bilgileri okunamıyor" çıkar, Manuel Çek açık kalır.
+3.2.2'den itibaren kendi kimlik ekranınızdaki `IdentityScannerView` da, bu değeri vermediyseniz, TC
+kimlik arka yüzünde aynısını yapar ([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve));
+`ScannerConfiguration.fastIdCaptureEnabled = false` bunu kapatır.
 
 ```swift
 var configuration = ScannerConfiguration.idBack
@@ -355,7 +358,12 @@ Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 | `dismissesOnResult` | Sonuçtan sonra ortamın `dismiss`'i çağrılsın mı (varsayılan `true`). Tarayıcıyı bir ekranın parçası olarak gömüyorsanız `false` verin, yoksa ekranın kendisi kapanır |
 | `keepsCameraRunning` | Başarılı çekimden sonra kamera açık kalsın mı (varsayılan `false`). `true` verirseniz yalnızca kare işleme durur, önizleme canlı kalır |
 | `scanSession` | Değeri değişince tarayıcı kamerayı yeniden kurmadan güncel `profile`/`configuration` ile yeni çekime hazırlanır (ön yüzden arka yüze geçerken). `keepsCameraRunning` ile birlikte anlamlıdır |
+| `pausesDetection` | `true` iken kamera açık kalır ama tarayıcı algılamaz ve çekmez (ör. yükleme sürerken); `false` olunca algılama sıfırdan başlar. Algılamayı `stabilityConfirmFrames`'i büyüterek durdurmayın: TC kimlikte hızlı çekim kapanır |
 | `onResult` | `Result<RecognizedDocument, Error>` |
+
+TC kimlikte hızlı çekim kararı `frameMode:` parametresine değil `configuration.frameMode`'a bakar;
+çerçeveyi değiştirecekseniz `configuration` içinde verin
+([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
 Şu an değiştiremedikleriniz: tarayıcının kendi HUD'u gizlenemez. Talimat metninin konumu ve yazı
 stili, elle çekim ve iptal düğmeleri yerinde kalır; yalnızca metinleri değiştirebilirsiniz.
@@ -393,6 +401,9 @@ ScannerConfiguration.overrideDefault = cfg
 
 Çekim hızı, odak davranışı ve elle çekim düğmesinin gecikmesi `timing` altında ayarlanır
 (`ScannerTimingConfig`).
+TC kimlikte `sweepPassDuration`'ı değiştirmek (kısaltmak da), `capturesPhotoAtSweepStart`'ı açmak ya
+da `stabilityConfirmFrames`'i 4'ün üstüne çıkarmak hızlı çekimi kapatır
+([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
 Duruma bağlı yedi metin daha vardır. Boş bırakılan gösterilmez:
 
@@ -407,6 +418,40 @@ Duruma bağlı yedi metin daha vardır. Boş bırakılan gösterilmez:
 | `unreadable` | Kart çerçeveye oturmuş, net ve sabitken zorunlu bir alan ya da zorunlu MRZ 2 saniye boyunca okunamazsa. Profilde zorunlu alan yoksa gösterilmez. Duruş, mesafe, parlama ve odak uyarılarından sonra gelir. | Kimlik bilgileri okunamıyor |
 
 `orientation`, `upsideDown` ve `tilted` duruş uyarısıdır ve yaklaştır/uzaklaştır uyarısından önce gelir.
+
+#### Yönerge satırının yeri (3.3.0)
+
+Yönerge satırı varsayılan olarak ekranın altındadır. Yeri `guidancePosition` ile değişir:
+
+```swift
+ScannerConfiguration.guidancePositionDefault = .aboveFrame   // bütün profiller için
+
+var cfg = ScannerConfiguration.default
+cfg.guidancePosition = .insideFrame                          // yalnız bu yapılandırma için
+```
+
+| Değer | Yer |
+|---|---|
+| `.bottom` | Ekranın altı (varsayılan) |
+| `.insideFrame` | Belge çerçevesinin ortası, yarı saydam zeminle; kart görünür kalır |
+| `.aboveFrame` | Belge çerçevesinin hemen üstü |
+
+Çerçeve konumları sabit çerçeveyle (`.fixedFrame`) çalışır. `.dynamicQuad` modunda izlenecek
+çerçeve olmadığı için satır altta kalır.
+
+#### Anne ve baba adı okuması (3.3.0)
+
+TC kimliğin arka yüzünde anne ve baba adı varsayılan olarak okunur. Kapatmak için kimlik kamerası
+açılmadan önce:
+
+```swift
+SDKOcrConfig.shared.readsParentNames = false
+```
+
+Kapalıyken arka yüz taraması bu iki adı beklemez ve okumaz. Adlar sunucuya boş gider
+(`idMotherNameOcr`, `idFatherNameOcr`), kart bunlar eksik diye reddedilmez. MRZ, ön yüz ve veren
+makam eskisi gibi okunur. Ayar SDK'nın kimlik ekranında ve TC kimlik arka yüz profiliyle
+kullanılan `IdentityScannerView`'da geçerlidir.
 
 #### Yönergelerin seslendirilmesi
 
@@ -464,6 +509,7 @@ ScannerFrameMode.passportDefault = .fixedFrame(.passport)   // pasaport
 ScannerFrameMode.documentDefault = .fixedFrame(.document)   // serbest belge
 
 // Takip moduna dönmek: tek satır
+// (TC kimlikte hızlı çekimi de kapatır)
 ScannerFrameMode.idCardDefault = .dynamicQuad
 
 // Çerçevenin ölçüsü de ayarlanabilir — ölçüler EKRAN NOKTASI cinsinden
@@ -484,6 +530,8 @@ yaklaşık 790 pt'lik bir çerçeve çizilirdi ve kullanıcının 85 mm'lik kart
 sınırından daha yakına getirmesi gerekirdi. Belge çerçeveyi hiç dolduramaz, otomatik çekim de
 tetiklenmezdi. Değeri düşürmenin de bir bedeli var: kırpılıp gönderilen bölge çerçevedir, onu
 yarıya indirirseniz OCR'a giden piksel sayısı dörtte bire düşer.
+TC kimlikte `maxWidth`'i 630'un, `maxHeightFraction`'ı 0.72'nin üstüne çıkarmak, telefonda çerçeveyi
+değiştirmese de hızlı çekimi kapatır.
 
 > Çerçeve önce ekran noktasında ölçülür, sonra kamera koordinatına çevrilir. Kamera tamponuna göre
 > ölçmek daha sezgisel görünse de yanlış sonuç verir. Önizleme ekranı doldurmak için tamponu
@@ -495,12 +543,88 @@ Sabit modda lens ve kamera geçişi kapalıdır. Geçişin tek amacı kaybolan t
 çerçevede kurtarılacak bir tespit yok, ama geçiş kadrajı yine kaydırırdı. Otomatik çekim iki modda
 da aynı işler: alanlar eşleşince tarama çizgisi başlar ve iki aday görüntüden en keskini teslim
 edilir.
+TC kimlikteki hızlı çekim ise yalnız sabit çerçevede açılır
+([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
 Teslim edilen görüntü çerçeveye göre değil, belgeye göre kırpılır. Sabit çerçeve kullanıcıyı
 yönlendirir ve OCR bölgesini belirler. Çekim anında çerçevenin içinde belgenin gerçek kenarları
 aranır ve kırpma bunlara göre yapılır; dinamik modda da davranış aynıdır. Kenarlar bulunamazsa ya
 da bulunan şekil belgeye benzemezse çerçeve kırpması teslim edilir. Yani bu deneme sonucu hiçbir
 durumda kötüleştirmez.
+
+#### Hızlı çekim ve çerçeve
+
+TC kimlik kartının ön ve arka yüzünde (`.turkishIDFront`, `.turkishIDBack` ve
+[kopyaları](#hazır-profili-değiştirmek--kopya-yardımcıları)) zorunlu alanlar canlı karelerde
+kilitlenince tarayıcı daha az kare bekler, fotoğrafı tarama animasyonunun başında çeker ve
+animasyonu kısaltır. Bu hızlı çekim varsayılan olarak açıktır: SDK'nın kimlik ekranında
+3.2.1'den, kendi kimlik ekranınızda ya da KYC dışında kullandığınız `IdentityScannerView`'da
+(`.documentScanner` dahil) 3.2.2'den itibaren. Pasaportta, eski tip belgede (`.oldSchool`),
+`idCardFormat` ile verilen kartta ve `idCardLang` `.TR` değilken açılmaz; bu belgeler aşağıdaki
+ayardan bağımsız olarak önceki akışla çekilip okunur.
+
+Hızlı çekimi kapatıp önceki akışa dönmek için kimlik taraması başlamadan, ör. uygulama açılışında:
+
+```swift
+// 3.2.2+, varsayılan true. SDK'nın kimlik ekranı dahil bütün TC kimlik taramaları için
+ScannerConfiguration.fastIdCaptureEnabled = false
+```
+
+Bu ayarla TC kimlik, SDK'nın kimlik ekranı dahil hızlı çekimden önceki akışla çekilir (SDK'nın
+kimlik ekranındaki MRZ karşılaştırması 3.2.1'deki gibi sürer). 3.2.1'de bu ayar yoktur; orada
+hızlı çekim yalnız SDK'nın kimlik ekranında açılır.
+
+Ayar açıkken kendi ekranınızda iki şey daha SDK'nın kimlik ekranındaki gibi çalışır. Aşağıdaki
+tablodaki ayarlar bunları kapatmaz, yalnız bu ayar kapatır:
+
+- `expectedMRZValues` vermediyseniz arka yüzün MRZ'si ön yüzde okunanlarla karşılaştırılır;
+  uyuşmazsa otomatik çekim olmaz
+  ([MRZ karşılaştırması](#neyin-çekimi-beklettiğine-profil-karar-verir)). Ön ve arka yüzü tek
+  tarayıcıda çekiyorsanız (`keepsCameraRunning` + `scanSession`) bu değerler `scanSession`
+  değiştiği anda alınır; `scanSession`'ı ön yüz yüklendikten sonra (`vm.currentSide == .back`
+  olunca) artırın.
+- Sonucun görüntüsünü (`croppedImage`) değiştirmeden `vm.scanFront(image:)` / `scanBack(image:)`'a
+  ya da `IdentifyManager.shared.startFrontIdOcr` / `startBackIdOcr`'a verirseniz okuma, SDK'nın
+  kimlik ekranındaki gibi canlı karelerin okumalarıyla birlikte yapılır. Kopyalanan, küçültülen ya
+  da döndürülen görüntü eskisi gibi okunur.
+
+Çerçevenin görünümünü ve konumunu değiştirmek hızlı çekimi kapatmaz: `QuadrilateralStyle` (çizgi,
+renk, köşe stili, karartma), `cornerRadius`, `horizontalPadding`, `verticalOffset`,
+`captureFitTolerance`, `overflowTolerance`. Tarayıcıya verdiğiniz yapılandırmada şunlar hızlı
+çekimi kapatır; global varsayılanlarla verilince (`ScannerFrameMode.idCardDefault`,
+`ScannerTimingConfig.default` / `.idBack`, `ScannerAutomation.default`,
+`ScannerConfiguration.showsSweepLineDefault` ve `.overrideDefault` / `.overrideIDBack`) SDK'nın
+kimlik ekranında da:
+
+| Ayar | Kapatan değer |
+|---|---|
+| `frameMode` | `.dynamicQuad` (takip modu). `ScannerConfiguration(texts:timing:)` ile kurulan yapılandırmada `frameMode` verilmezse bu olur |
+| `ScannerFixedFrame.aspect` | Yaklaşık 1.46–1.71 dışı (kart oranı 1.585 ± %8) |
+| `ScannerFixedFrame.maxWidth` / `maxHeightFraction` | 630'dan / 0.72'den büyük; telefonda çerçeve değişmese de |
+| `timing.stabilityConfirmFrames` (onay serisi) | 4'ten büyük; küçültmek kapatmaz |
+| `timing.sweepPassDuration` / `timing.capturesPhotoAtSweepStart` | `0.5` dışında (kısaltmak da) / `true` |
+| `automation.fieldLocking` / `showsSweepLine` | `false` |
+
+Hızlı çekim tarama süresini ve fotoğraf anını kendisi seçtiği için `sweepPassDuration`'a ya da
+`capturesPhotoAtSweepStart`'a dokunan tarama önceki akışta kalır. Yükleme sürerken algılamayı
+durdurmak için onay serisini büyütmeyin (ör. `stabilityConfirmFrames = .max`),
+`pausesDetection: true` verin.
+
+Hızlı çekim kararı yapılandırmadaki `frameMode`'a bakar. `IdentityScannerView(frameMode:)`
+parametresi çizimi ve taramayı değiştirir ama karara girmez: takip modunu parametreyle verirseniz
+hızlı çekim açık kalır, sabit çerçeveyi parametreyle verip yapılandırmada takip modu bırakırsanız
+açılmaz. Çerçeveyi yapılandırmada verin:
+
+```swift
+// Hazır geometriden türetin: oran, boyut sınırı ve documentWidthMM (odak yakınlaştırması) korunur
+var frame = ScannerFixedFrame.idCard
+frame.verticalOffset = -60   // konum serbest
+var config = ScannerConfiguration.default
+config.frameMode = .fixedFrame(frame)
+IdentityScannerView(profile: .turkishIDFront, configuration: config) { result in … }
+```
+
+Kendi ekranınızda hızlı çekimin açık olup olmadığı ve kapatan neden SDK loguna yazılır.
 
 ### Mesafe kapısı — "çerçeveye oturmadan çekmez"
 
@@ -520,6 +644,8 @@ arasındaki fark (kamera ya da belge hareketi) ve cihazın IMU'su birlikte sakin
 0.5 sn daha beklenir. Amaç kullanıcıyı kıpırdamaz hale getirmek değil, bulanık kare yüklenmesini
 önlemektir. Mesafe kararında histerezis var; belge bir kez oturduktan sonra yönerge sınırda
 "yaklaştırın" ile "uzaklaştırın" arasında gidip gelmez.
+TC kimlikte hızlı çekim açıkken zorunlu alanlar canlıda kilitlendiyse iki net ve sabit kare (çok
+net ve sabitte bir) ve 0.1 sn bekleme yeter ([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
 Ölçüyü `ScannerFixedFrame` ile ayarlarsınız:
 
@@ -601,6 +727,8 @@ ScannerAutomation.default.fieldLocking = false
 ```
 
 Pasaportta ve `imageOnly` profillerde kilitleme yoktur.
+TC kimlikte kilitlemeyi kapatmak hızlı çekimi de kapatır
+([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
 #### Düşük ışık eşikleri
 
@@ -677,6 +805,10 @@ Kural tarayıcıyı kullanmanızı yasaklamaz; yasak olan, sonucu kendiniz yükl
 görüntünün nereden geldiğini bilmez. İki yol arasındaki kalite farkı da
 buradan doğar. Örnek ve iki yolun karşılaştırması:
 [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md#kendi-tasarımınızla-override).
+
+3.2.2'den itibaren TC kimlikte bir istisna var: tarayıcının `croppedImage`'ını değiştirmeden
+`vm.scanFront(image:)` / `scanBack(image:)`'a verirseniz okuma `document:` yolundaki gibi yapılır
+([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
 Akış dışında (form ön-doldurma, belge arşivleme, şube içi araçlar) tarayıcıyı tek başına
 kullanabilirsiniz.

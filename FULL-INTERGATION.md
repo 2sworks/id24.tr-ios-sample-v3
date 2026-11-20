@@ -343,16 +343,16 @@ SDKTheme.shared.navBar.titleMode  = .brandWithModule
 ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır.
 
 **Düğmeler.** Geri, yardım (?) ve menü düğmeleri kaldırılabilir, sağ tarafa kendi düğmeniz
-eklenebilir. Yardım düğmesi kamera üstü ekranlarda çizilir ve SDK ona işlev bağlamaz; `onHelp`
-vermezseniz basılınca bir şey olmaz.
+eklenebilir. Yardım düğmesi 3.3.0'dan beri varsayılan kapalı. Açılırsa kamera üstü ekranlarda
+çizilir; SDK ona işlev bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz.
 
 ```swift
-SDKTheme.shared.navBar.buttons.showsHelp = false                          // her ekranda kaldır
-SDKTheme.shared.navBar.buttons.onHelp = { route in openHelp(for: route) } // ya da işlev ver
+SDKTheme.shared.navBar.buttons.showsHelp = true                           // her ekranda aç
+SDKTheme.shared.navBar.buttons.onHelp = { route in openHelp(for: route) } // işlev ver
 SDKTheme.shared.navBar.buttons.trailing = [
     SDKNavBarButton(id: "chat", icon: Image(systemName: "message")) { openChat() }
 ]
-SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false) // tek ekran
+SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: true)  // tek ekran
 ```
 
 Ayrıntı: [Başlık Çubuğu Düğmeleri](IdentifySample/Modules/Modules.md#başlık-çubuğu-düğmeleri).
@@ -892,6 +892,13 @@ public API ile yazılmış birebir kopyasıdır (bölüm 7-A).
 > profiller, alan OCR'ı, TCKN/MRZ doğrulama: [IdentityScanner Rehberi](docs/guides/identity-scanner.md).
 > Tarayıcı HUD metinleri de lokalizasyon sisteminden geçer (`scanner*` key'leri, bölüm 4).
 
+### Görüşmede arka kamera odağı (3.3.0)
+
+Görüşmede arka kamera belgeye odaklanır, önizlemeye dokununca o noktaya odaklanıp kare
+gösterir. Ayarlar (`backCameraFocusEnabled`, `tapToFocusEnabled`, `swapsLayoutOnBackCamera`),
+host'tan odak isteme ve odak karesinin görünümü:
+[CallScreen → Arka Kamera Odağı](IdentifySample/Modules/CallScreen/CallScreen.md#arka-kamera-odağı-330).
+
 ---
 
 ## 9) Ortak UI Bileşenleri
@@ -978,7 +985,8 @@ IdentifyManager.shared.setupSDK(
     bigCustomerCam: Bool?,                  // true (vars.): temsilci tam ekran, kullanıcı küçük pencerede; false: tersi
     selectedModules: [SdkModules],          // vars. [] — backend sırası kullanılır
     idCardLang: IDLang?,                    // OCR belge dili: .TR / .AZ / .OTHER (vars. .TR)
-    needCertForNfc: Bool?,                  // şu an etkisiz; kök listesi setMasterListURL ile verilir (vars. false)
+    needCertForNfc: Bool?,                  // true iken liste verilmezse uyarı loglanır (vars. false)
+    nfcMasterList: URL?,                    // CSCA listesi (PEM dosyası); verilmezse zincir kontrolü yok (vars. nil)
     turnKey: String,                        // zorunlu — TURN kimlik üretim anahtarı
     wsSecretKey: String?,                   // WebSocket token anahtarı
     showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. true) — false: ThankYou'suz kapanış, bkz. Akış Sonucu
@@ -988,7 +996,7 @@ IdentifyManager.shared.setupSDK(
     enableAutoRotateOCR: Bool?,             // OCR otomatik oryantasyon düzeltme (vars. false)
     ttsEnabled: Bool?,                      // sesli okumayı native modda aç (vars. false)
     onFinished: ((SDKFlowOutcome) -> Void)?, // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
-    callback: (WebSocket?, RoomResponse, SDKWebError?) -> ()
+    callback: (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()
 )
 ```
 
@@ -1031,16 +1039,32 @@ NFC sonucu (`IdentifyCard`) çipin doğrulamasını iki alanla verir:
 | `passiveAuth` | Okunan veri SOD'daki hash'lerle aynı. SOD'u kimin imzaladığına bakmaz |
 | `passportCorrectlySigned` | SOD imzası belgedeki sertifikayla tutuyor ve bu sertifika verdiğiniz kök listesine (CSCA) bağlanıyor |
 
-SDK kök listesi taşımaz. `passportCorrectlySigned`'ın true dönebilmesi için listeyi NFC okumasından
-önce verin. Liste uygulama açık kaldıkça geçerlidir, bir kez vermek yeter:
+SDK kök listesi taşımaz. Listeyi her oturumda `setupSDK`'ya verin:
 
 ```swift
-let url = Bundle.main.url(forResource: "masterList", withExtension: "pem")!
-IdentifyManager.shared.passportReader.setMasterListURL(url)
+IdentifyManager.shared.setupSDK(
+    // ...
+    needCertForNfc: true,
+    nfcMasterList: Bundle.main.url(forResource: "csca-masterlist", withExtension: "pem"),
+    // ...
+)
 ```
 
-Liste verilmezse `passportCorrectlySigned` her zaman false döner. `setupSDK(needCertForNfc:)` şu an
-etkisizdir: SDK bu değeri okumaz, listeyi onun yerine vermez.
+- **Dosya biçimi:** Arka arkaya dizilmiş `-----BEGIN CERTIFICATE-----` blokları. `#` ile başlayan
+  açıklama satırları olabilir. Örnek uygulamadaki `SupportingFiles/csca-masterlist.pem` BSI CSCA
+  Master List'ten üretildi (387 kök), bağlantı (link) sertifikaları içinde yok.
+- **Kendi listeniz:** Örnek uygulamadaki dosyayı kullanabilir ya da kendi PEM dosyanızı verebilirsiniz.
+  SDK listeyi indirmez. Listeyi uygulama sürümü çıkarmadan güncellemek isterseniz uygulamanız dosyayı
+  indirsin ve yerel dosya yolunu `nfcMasterList`'e versin.
+- **Liste verilmezse:** zincir kontrolü yapılmaz, `passportCorrectlySigned` false,
+  `nfcVerification.certificateChain` `notPerformed` döner. `needCertForNfc: true` ise uyarı loglanır.
+- **Dosya okunamazsa:** hata loglanır, liste verilmemiş sayılır.
+- **Zincir tutmazsa:** okuma geçer, akış durmaz. Sonuç `nfcVerification.certificateChain` alanında
+  `failed` olur, karar panelde verilir. Kök listede yoksa `failureReasons` içinde `certificateNotFound`
+  gelir.
+- **Her oturum yeniden ayarlanır:** `setupSDK` önceki oturumun listesini taşımaz.
+  `passportReader.setMasterListURL(_:)` ile önceden verilen liste `setupSDK` çağrısında silinir;
+  listeyi `nfcMasterList` ile verin.
 
 ---
 
@@ -1181,6 +1205,14 @@ Severity sıralı ve karşılaştırılabilir; kategoriler (`SDKLogCategory`) so
 media/lifecycle vb. akışları ayrıştırır. Base64 gibi hassas içerikler otomatik redakte
 edilir. Ayrıntı: [Loglama Rehberi](docs/guides/logging.md).
 
+### Modül tanı raporu (3.3.0)
+
+Her modül ekranı kapanırken loga `[SONUÇ] <modül>: <sonuç>` ile başlayan tek bir blok yazar:
+süre, cihaz, izinler, kesintiler, ekranda kalan yönergeler, aşılamayan engeller, sunucu
+sonuçları, gösterilen hatalar ve modülün kendi ölçüleri. Kullanıcının nerede takıldığını tek
+kayıttan görmek içindir, açmanız gerekmez. Maddeler ve modüllere göre içerik:
+[Loglama Rehberi → Modül Tanı Raporu](docs/guides/logging.md#modül-tanı-raporu--sonuç-330).
+
 ---
 
 ## 13) Global Bağlantı Kopması Katmanı
@@ -1211,6 +1243,12 @@ let m = IdentifyManager.shared
 m.reconnectTimeoutSeconds     = 30
 m.callReconnectTimeoutSeconds = 10
 
+// Soket kopunca medya ayaktaysa görüşmenin sinyalsiz sürebileceği süre
+m.signallessCallGracePeriod   = 10
+
+// NFC'de kart koptuktan sonra geri konması için beklenen süre (3.3.0); nil = yalnız iOS sınırı
+m.nfcCardReturnTimeout        = 10
+
 // Bağlantı kopması kuralı: otomatik yeniden bağlanma (0 = kapalı, varsayılan) ve kopma sınırı
 SDKAttemptLimits.shared.connection = SDKConnectionPolicy(
     maxDrops: 3,                 // nil = sınırsız (varsayılan)
@@ -1231,8 +1269,16 @@ m.isBackgroundTimeoutEnabled = true
 m.ringingTimeout            = 300
 ```
 
-Görüşme sırasında sinyal ya da ICE koparsa **toparlanma beklenmez**: görüşme biter, tüm
-bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir. Yeniden bağlanma
+Görüşme sırasında kopmada:
+
+- ICE `.disconnected`: 5 sn (sabit) toparlanma beklenir, gelmezse görüşme 4140 ile biter.
+- ICE `.failed`: görüşme hemen 4141 ile biter.
+- WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez. Görüşme
+  `m.signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
+  gelmezse biter.
+
+Görüşme bitince tüm bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir.
+Görüşme dışındaki kopmada ekran hemen açılır; kurallarını `SDKConnectionPolicy` belirler. Yeniden bağlanma
 kullanıcı tetiklidir ve tam prosedürle çalışır (imOnline + getIdentStatus + subscribe +
 stepChanged); panel bir karar vermemişse müşteri bekleme odasına döner, vermişse ThankYou
 ekranı açılır. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).
@@ -1580,6 +1626,13 @@ ScannerGuidanceTexts.overridePassport = ...   // pasaport HUD seti
 ScannerGuidanceTexts.overrideDocument = ...   // belge HUD seti
 // Veya tüm konfigürasyonu:
 ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timing: myTiming)
+// frameMode verilmezse kimlik ön yüzü takip moduna geçer: sabit çerçeve ve TC kimlikte hızlı çekim
+// kapanır. Korumak için frameMode: .idCardDefault ekleyin (arka yüz overrideIDBack'e bakar).
+
+// Yönerge satırının yeri (3.3.0): .bottom (varsayılan), .insideFrame, .aboveFrame
+ScannerConfiguration.guidancePositionDefault = .aboveFrame
+// TC kimlik arka yüzünde anne/baba adı okunmasın (3.3.0): adlar boş gider, kart reddedilmez
+SDKOcrConfig.shared.readsParentNames = false
 ```
 
 > Metinleri tek tek markalamak yerine dil sistemini kullanmak genelde yeterlidir:
@@ -1599,6 +1652,11 @@ ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timi
 | `manualCaptureHintDelay` | 8 s / 8 s | Manuel çekim butonunun görünme süresi |
 | `maxAutoCaptureFails` | 3 | Bu kadar başarısız otomatik denemeden sonra Elle çek düğmesi çıkar (otomatik çekim sürer) |
 | `lensSwitchStruggleDelay` | 3.5–4 s | Ultra-geniş lense geçmeden önceki "odaklanamıyorum" süresi |
+
+Tablodaki "hızlı yol" TC kimlikteki hızlı çekim değildir; o hızlı çekim `stabilityConfirmFrames`
+4'ün üstündeyse kapanır. Yükleme sürerken algılamayı durdurmak için `stabilityConfirmFrames`'i
+büyütmeyin, `IdentityScannerView(pausesDetection: true)` verin
+([IdentityScanner → Hızlı çekim ve çerçeve](docs/guides/identity-scanner.md#hızlı-çekim-ve-çerçeve)).
 
 **Otomatik davranışlar — `ScannerAutomation`** (`autoTorch` varsayılan kapalı, diğerleri açık):
 

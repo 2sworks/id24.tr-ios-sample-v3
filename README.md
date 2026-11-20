@@ -37,7 +37,7 @@ Xcode → *File → Add Package Dependencies* →
 https://github.com/2sworks/id24.tr-ios-sdk-spm
 ```
 
-**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.0.0`).
+**Dependency Rule olarak mutlaka `Exact Version` seçin** ve sürümü elle yazın (ör. `3.3.0`).
 
 Sebebi: **2.x ve 3.x aynı depodan dağıtılır.** Bunlar iki ayrı sürüm ailesidir — 3.x, hazır
 SwiftUI ekranlarını (DefaultUI) SDK'nın içine taşıyan farklı bir entegrasyon modelidir ve
@@ -51,8 +51,10 @@ getirir: bağımlılık kümesi sürüme göre farklıdır ve `Package.resolved`
 | 3.x | `3.0.0` ve üzeri | Bu depodaki rehberlerin anlattığı sürüm — hazır ekranlar SDK'nın içinde |
 | 2.x | `2.5.x` | Eski entegrasyon; ekranlar host uygulamada |
 
-Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto),
-`Starscream` (WebSocket) ve `WebRTC` (görüntülü görüşme). 3.2.1'den itibaren `PermissionsKit` ve
+Paket, SDK ile birlikte çalışma zamanı bağımlılıklarını da getirir: `OpenSSL` (NFC kripto) ve
+`WebRTC` (görüntülü görüşme). 3.3.0'dan itibaren OpenSSL `exact: "3.6.5000"` ile sabitlidir ve
+`Starscream` gelmez; soket katmanı SDK'nın içindedir (`SDKWebSocket`). `Starscream` import eden
+kodu güncelleyin. 3.2.1'den itibaren `PermissionsKit` ve
 `SwiftSignatureView` gelmez; bu paketlerin modüllerini (`CameraPermission`, `MicrophonePermission`,
 `SpeechRecognizerPermission`, `SwiftSignatureView`) kendi kodunuzda import ediyorsanız paketi
 uygulamanıza kendiniz ekleyin. 3.1.1'den itibaren WebRTC `exact: "153.0.0"` ile sabitlidir;
@@ -62,11 +64,13 @@ uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa 
 
 | İzin | Anahtar | Hangi modül için |
 |---|---|---|
-| Kamera | `NSCameraUsageDescription` | Kimlik, Selfie, Canlılık, Video, Görüşme |
-| Mikrofon | `NSMicrophoneUsageDescription` | Görüşme, Video kayıt, Konuşma |
-| Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Konuşma (Speech) modülü |
-| NFC | `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
+| Kamera | `NSCameraUsageDescription` | Hazırlık, Kimlik, Selfie, Canlılık, Video, Görüşme |
+| Mikrofon | `NSMicrophoneUsageDescription` | Hazırlık, Görüşme, Video kayıt, Konuşma |
+| Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Hazırlık, Konuşma (Speech). Hazırlık ekranı akışta konuşma modülü olmasa da bu izni ister |
+| NFC | `NFCReaderUsageDescription` + `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
 | iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK portrait kilitlidir; bu anahtar olmadan App Store yüklemesi iPad çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
+
+Modül başına tam liste ve gereken cihaz yetenekleri (NFC, TrueDepth): [Modül Gereksinimleri](docs/guides/module-requirements.md).
 
 ### 3. Akışı başlatın
 
@@ -134,7 +138,7 @@ Kaynak dosya kopyalamanız gerekmez — tek isteğe bağlı dosya, projenize ekl
 | Buton biçimi | tümü: `SDKTheme.shared.buttons.base.corner = .radius(12)`, `buttons.base.height = 54` · tek stil: `SDKTheme.shared.buttons[.secondary].borderWidth = 1` |
 | Başlık çubuğu tasarımı | `SDKTheme.shared.navBar.preset = .centered` (`classic / centered / minimal / prominent`) |
 | Başlık çubuğunda marka adı | `SDKTheme.shared.navBar.brandTitle = "Acme Bank"` + `navBar.titleMode = .brandWithModule` |
-| Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsHelp = false` (`showsBack`, `showsMenu`) · yardıma işlev: `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: false)` |
+| Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsBack = false` (`showsMenu`) · yardımı aç (varsayılan kapalı): `buttons.showsHelp = true` + `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: true)` |
 | Logo / geri / yardım / menü ikonu | `SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))` — anahtarlar `SDKIconKey`; geri al: `resetIcon(_:)` |
 | Titreşim | `SDKHapticConfig.shared.stepFeedbackEnabled = false` · per-modül `setEnabled(false, for: .selfie)` · hepsi `setEnabledForAll(false)` |
 | Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın |
@@ -251,6 +255,9 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Bağlantı Hız Testi](docs/guides/speed-test.md) | Eski ve yeni hız testi, `useConnectionSpeedTest`, `blockIdent`, görüşme öncesi ölçüm senaryosu |
 | [Loglama](docs/guides/logging.md) | `SDKLog` facade'i, severity/kategori, online log, redaksiyon |
 | [Event Sistemi](docs/guides/events.md) | `SDKEvent`, `IdentifyTrackingListener`, analitik entegrasyonu |
+| [async/await API](docs/guides/async-await.md) | async kurulum, `outcome()`, `events`, hata tipleri, iptal |
+| [Thread Modeli ve Swift 6](docs/guides/concurrency.md) | Hangi bildirim hangi thread'de gelir, Swift 6 geçiş planı |
+| [Modül Gereksinimleri](docs/guides/module-requirements.md) | Her modülün Info.plist anahtarları, ek ayarları ve kütüphaneleri |
 | [Oturum Çıkışları](docs/guides/session-exit.md) | SDK nasıl kapandı (`onFinished` / `SDKFlowOutcome`), tüm çıkış yolları, kapanış sonrası yönlendirme |
 | [Tema](docs/guides/theming.md) | `SDKTheme` — renk/font/ikon/metrik/bileşen override, rol renkleri, JSON ile tema |
 | [3.1.0 Değişiklikleri](docs/guides/migration-3.1.0.md) | Tema paketiyle gelen yenilikler, değişenler ve geçiş adımları |
@@ -258,6 +265,15 @@ Modüllerin altında yatan sistemleri anlamak için:
 | [Lokalizasyon](docs/guides/localization.md) | 5 dil (TR/EN/DE/AZ/RU), metin override |
 | [Özelleştirme](docs/guides/customization.md) | Üç özelleştirme yöntemi derinlemesine + "bypass yok" kuralı |
 | [IdentityScanner](docs/guides/identity-scanner.md) | Gerçek zamanlı belge tarama motoru: profiller, alan OCR, TCKN/MRZ doğrulama, bağımsız kullanım |
+
+## Örnekler
+
+Sık sorulan özelleştirmeler için hazır kod:
+
+| Örnek | İçerik |
+|---|---|
+| [NFC Metinleri](docs/examples/nfc-texts.md) | NFC penceresindeki bilgi satırı, emoji ilerleme çubuğu, hazır ekran ve sesli metinler |
+| [Kimlik Tarama Yönlendirmeleri](docs/examples/scanner-guidance.md) | Yaklaştır, uzaklaştır, düz tut metinleri; metni ekranın üstünde gösterme |
 
 ---
 
@@ -345,3 +361,16 @@ tüm akışı cihazda uçtan uca deneyimleyebilirsiniz (NFC ve görüşme için 
 ## Sürüm Geçmişi
 
 SDK ve Sample App sürüm notlarının tamamı için: **[CHANGELOG.md](CHANGELOG.md)**
+
+---
+
+## CSCA listesi
+
+`IdentifySample/SupportingFiles/csca-masterlist.pem`, BSI'nin 01.10.2026 tarihli master list'inden alındı. Bağlantı (link) sertifikaları dosyada yok.
+
+BSI listesinde T.C. kimlik kartının kökleri yok. Dosyanın sonuna İçişleri Bakanlığı'nın üç seyahat belgesi kökü eklendi: kimlik kartı Sürüm 1 ve Sürüm 2, Mavi Kart Sürüm 1.
+
+| Ülke | Şu anki CSCA'nın imzaya başladığı tarih | İmzayı bıraktığı tarih | İmzaladığı belgelerin doğrulanabileceği son tarih |
+|---|---|---|---|
+| Türkiye | 05.03.2024 | 05.03.2027 | 05.06.2037 |
+| Azerbaycan | 17.04.2023 | 16.04.2028 | 12.07.2038 |

@@ -104,7 +104,10 @@ bütün çıkış yolları ve yönlendirme için [Oturum Çıkışları](session
 | `terminateReason`, `statusSummary`, `statusId` | Oturumu panel kapattıysa panelin gönderdiği değerler |
 | `lastScreen`, `lastModule`, `stepIndex`, `totalSteps` | Oturumun bittiği yer |
 | `skippedModules` | Doğrulanmadan geçilen modüller, virgülle ayrılmış (hiç yoksa anahtar gelmez) |
+| `isFullyVerified` | `"true"` ya da `"false"`: oturum onaylandı ve atlanan modül yok |
 | `closeCode`, `errorMessage` | Son kapanış kodu ve setup hatası |
+| `nfcCertificateChain`, `nfcDocumentSignature`, `nfcDataIntegrity`, `nfcChipAuthentication`, `nfcActiveAuthentication` | Son NFC okumasının çip kontrolleri: `passed` · `failed` · `notPerformed` (çip okunmadıysa anahtar gelmez). NFC modülünün `nfcModuleCompleted` ve `nfcModuleFailed` olaylarında da gelir |
+| `nfcFailureReasons` | Kontrollerin kalma nedenleri, virgülle ayrılmış (neden yoksa anahtar gelmez). Bkz. [Çip doğrulama ayrıntısı](session-exit.md#çip-doğrulama-ayrıntısı) |
 
 > 3.0.0'da `session.completed` ve `session.failed` her `terminateCall`'da gönderiliyordu. Başarı
 > da statünün içinde `success` ya da `approve` aranarak belirleniyordu. Panel `positive`

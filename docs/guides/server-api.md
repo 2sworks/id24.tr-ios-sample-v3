@@ -62,7 +62,8 @@ IdentifyManager.shared.setupSDK(
 | `bigCustomerCam` | `Bool?` | `true` | `true`: temsilci tam ekran, kullanıcının kamerası küçük pencerede. `false`: tersi |
 | `selectedModules` | `[SdkModules]` | `[]` | Boşsa backend'in sırası, doluysa yalnızca bu modüller |
 | `idCardLang` | `IDLang?` | `.TR` | OCR'a belgenin dilini söyler |
-| `needCertForNfc` | `Bool?` | `false` | Şu an etkisiz: SDK bu değeri okumuyor. Sertifika zinciri doğrulaması için kök listesini `passportReader.setMasterListURL(_:)` ile verin → [NFC imza doğrulaması](../../FULL-INTERGATION.md#nfc-imza-doğrulaması-passportcorrectlysigned-321) |
+| `needCertForNfc` | `Bool?` | `false` | `true` iken `nfcMasterList` verilmezse uyarı loglanır. Zincir kontrolü yalnız liste verilince yapılır |
+| `nfcMasterList` | `URL?` | `nil` | Güvenilen CSCA sertifikalarını içeren PEM dosyası. Çipteki belge sertifikası bu listeye bağlanır, sonuç `nfcVerification.certificateChain`'de. Zincir tutmazsa okuma geçer, sonuç `failed` olur → [NFC imza doğrulaması](../../FULL-INTERGATION.md#nfc-imza-doğrulaması-passportcorrectlysigned-321) |
 | `turnKey` | `String` | — | TURN kimliklerinin anahtarı → [TURN & WebRTC](turn-webrtc.md) |
 | `wsSecretKey` | `String?` | `nil` | `socket_auth` açıksa soket token anahtarı → [WebSocket](websocket.md) |
 | `showThankYouPage` | `Bool?` | `true` | Akış sonunda SDK'nın sonuç ekranı gösterilsin mi. `false` verirseniz sonuç ekranı açılmaz, SDK aşağı kayarak kapanır ve sonuç `onFinished`'a gelir |
@@ -72,7 +73,7 @@ IdentifyManager.shared.setupSDK(
 | `AESKey` | `String?` | `""` | Sunucudan şifreli gelen MRZ alanlarını çözen anahtar |
 | `enableAutoRotateOCR` | `Bool?` | `false` | Yamuk çekilmiş kimlik fotoğrafı düzeltilsin mi |
 | `ttsEnabled` | `Bool?` | `false` | Sesli okumayı açmanın kısa yolu (`defaultMode .off` ise `.native` yapar) |
-| `callback` | closure | — | `(WebSocket?, RoomResponse, SDKWebError?)` |
+| `callback` | closure | — | `(SDKWebSocket?, RoomResponse, SDKWebError?)` |
 
 ### Callback'te başarı kontrolü
 

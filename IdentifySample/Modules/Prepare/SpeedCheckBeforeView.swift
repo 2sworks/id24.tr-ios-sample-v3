@@ -23,6 +23,7 @@ struct SpeedCheckBeforeView: View {
 
     @State private var isMeasuring = false
     @State private var isBlocked = false
+    @State private var measureTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -49,14 +50,20 @@ struct SpeedCheckBeforeView: View {
             .sdkReadableWidth()
         }
         .onAppear(perform: measure)
-        .onDisappear { IdentifyManager.shared.cancelConnectionSpeedTest() }
+        .onDisappear {
+            measureTask?.cancel()
+            IdentifyManager.shared.cancelConnectionSpeedTest()
+        }
     }
 
     private func measure() {
         guard !isMeasuring else { return }
         isMeasuring = true
-        IdentifyManager.shared.startConnectionSpeedTest { result in
+        measureTask = Task {
+            let result = try? await IdentifyManager.shared.startConnectionSpeedTest()
             isMeasuring = false
+            // Ekran kapanınca görev iptal edilir; o zaman karar verilmez.
+            guard let result else { return }
             // Karar yalnızca blockIdent'ten okunur; atlanan test kullanıcıyı durdurmaz.
             if result.blockIdent {
                 isBlocked = true
