@@ -194,8 +194,8 @@ IdentifySdk.resetTheme();   // SDK varsayılanlarına dön
 native tarafta yapılır; var olan görseller arasında geçişi ve bütün renk ve ölçü ayarlarını ise
 JS'ten yaparsınız.
 
-Başlık çubuğundaki geri, yardım ("?") ve menü düğmelerini `navBar.buttons` ile gizleyebilirsiniz
-(`showsBack`, `showsHelp`, `showsMenu`). Kendi düğmenizi eklemek ve yardım düğmesine iş bağlamak
+Başlık çubuğundaki geri ve menü düğmelerini `navBar.buttons` ile gizleyebilir, varsayılan kapalı
+yardım ("?") düğmesini açabilirsiniz (`showsBack`, `showsMenu`, `showsHelp`). Kendi düğmenizi eklemek ve yardım düğmesine iş bağlamak
 Swift closure'ı gerektirdiği için `IdentifySdkModule.swift` içinde yapılır. Ayrıntı:
 [Tema Rehberi → Başlık Çubuğu Düğmeleri](../../guides/theming.md#başlık-çubuğu-düğmeleri).
 
