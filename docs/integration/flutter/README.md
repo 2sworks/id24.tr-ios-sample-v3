@@ -159,8 +159,8 @@ Bütün anahtarlar: [Tema Rehberi](../../guides/theming.md) ·
 > Başlık çubuğundaki marka işaretinin anahtarı `icons.headerLogo`. `icons.logo` giriş ekranında
 > ve kamera ekranlarının üstündeki başlıkta kullanılır.
 
-Başlık çubuğundaki geri, yardım ("?") ve menü düğmelerini `navBar.buttons` ile gizleyebilirsiniz
-(`showsBack`, `showsHelp`, `showsMenu`). Kendi düğmenizi eklemek ve yardım düğmesine iş bağlamak
+Başlık çubuğundaki geri ve menü düğmelerini `navBar.buttons` ile gizleyebilir, varsayılan kapalı
+yardım ("?") düğmesini açabilirsiniz (`showsBack`, `showsMenu`, `showsHelp`). Kendi düğmenizi eklemek ve yardım düğmesine iş bağlamak
 Swift closure'ı gerektirdiği için `IdentifySdkPlugin.swift` içinde yapılır. Ayrıntı:
 [Tema Rehberi → Başlık Çubuğu Düğmeleri](../../guides/theming.md#başlık-çubuğu-düğmeleri).
 

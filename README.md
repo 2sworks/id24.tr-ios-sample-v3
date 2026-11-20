@@ -136,7 +136,7 @@ Kaynak dosya kopyalamanız gerekmez — tek isteğe bağlı dosya, projenize ekl
 | Buton biçimi | tümü: `SDKTheme.shared.buttons.base.corner = .radius(12)`, `buttons.base.height = 54` · tek stil: `SDKTheme.shared.buttons[.secondary].borderWidth = 1` |
 | Başlık çubuğu tasarımı | `SDKTheme.shared.navBar.preset = .centered` (`classic / centered / minimal / prominent`) |
 | Başlık çubuğunda marka adı | `SDKTheme.shared.navBar.brandTitle = "Acme Bank"` + `navBar.titleMode = .brandWithModule` |
-| Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsHelp = false` (`showsBack`, `showsMenu`) · yardıma işlev: `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: false)` |
+| Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsBack = false` (`showsMenu`) · yardımı aç (varsayılan kapalı): `buttons.showsHelp = true` + `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: true)` |
 | Logo / geri / yardım / menü ikonu | `SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))` — anahtarlar `SDKIconKey`; geri al: `resetIcon(_:)` |
 | Titreşim | `SDKHapticConfig.shared.stepFeedbackEnabled = false` · per-modül `setEnabled(false, for: .selfie)` · hepsi `setEnabledForAll(false)` |
 | Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın |
@@ -365,6 +365,8 @@ SDK ve Sample App sürüm notlarının tamamı için: **[CHANGELOG.md](CHANGELOG
 ## CSCA listesi
 
 `IdentifySample/SupportingFiles/csca-masterlist.pem`, BSI'nin 01.10.2026 tarihli master list'inden alındı. Bağlantı (link) sertifikaları dosyada yok.
+
+BSI listesinde T.C. kimlik kartının kökleri yok. Dosyanın sonuna İçişleri Bakanlığı'nın üç seyahat belgesi kökü eklendi: kimlik kartı Sürüm 1 ve Sürüm 2, Mavi Kart Sürüm 1.
 
 | Ülke | Şu anki CSCA'nın imzaya başladığı tarih | İmzayı bıraktığı tarih | İmzaladığı belgelerin doğrulanabileceği son tarih |
 |---|---|---|---|
