@@ -258,12 +258,12 @@ JSON temada: `"navBar": { "brandTitle": "Acme Bank", "titleMode": "brandWithModu
 
 ### Başlık Çubuğu Düğmeleri
 
-Geri, yardım (?) ve menü düğmelerini kaldırabilir, sağ tarafa kendi düğmelerinizi
-ekleyebilirsiniz:
+Geri ve menü düğmelerini kaldırabilir, kapalı gelen yardım (?) düğmesini açabilir, sağ tarafa
+kendi düğmelerinizi ekleyebilirsiniz:
 
 ```swift
-SDKTheme.shared.navBar.buttons.showsHelp = false          // yardım düğmesi hiçbir ekranda yok
-SDKTheme.shared.navBar.buttons.onHelp = { route in        // ya da işlev verin
+SDKTheme.shared.navBar.buttons.showsHelp = true           // yardım düğmesi varsayılan kapalı
+SDKTheme.shared.navBar.buttons.onHelp = { route in        // açtıysanız işlev verin
     showHelp(for: route)                                  // route: .selfie, .nfc …
 }
 SDKTheme.shared.navBar.buttons.trailing = [
@@ -275,18 +275,18 @@ SDKTheme.shared.navBar.buttons.trailing = [
 Tek bir ekrana ayrı ayar verebilirsiniz. Kaydı olan ekranda genel `buttons` yerine bu kullanılır:
 
 ```swift
-SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false)
+SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: true)
 ```
 
 | Alan | Varsayılan | Not |
 |---|---|---|
 | `showsBack` | `true` | Kapatılırsa kullanıcı ekrandan geri dönemez |
-| `showsHelp` | `true` | Yardım düğmesi kamera ekranlarında çizilir (selfie, canlılık, NFC, hologram, video) |
+| `showsHelp` | `false` | Açılırsa yardım düğmesi kamera ekranlarında çizilir (selfie, canlılık, NFC, hologram, video) |
 | `showsMenu` | `true` | `.login` stilindeki menü düğmesi |
 | `onHelp` | `nil` | Verilmezse yardım düğmesi bir şey yapmaz |
 | `trailing` | `[]` | Ekranın kendi düğmesinden (ör. fener) sonra çizilir |
 
-JSON temada yalnızca görünürlük ayarlanır: `"navBar": { "buttons": { "showsHelp": false } }`.
+JSON temada yalnızca görünürlük ayarlanır: `"navBar": { "buttons": { "showsHelp": true } }`.
 
 ---
 
