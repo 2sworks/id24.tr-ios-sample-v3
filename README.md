@@ -366,6 +366,8 @@ SDK ve Sample App sürüm notlarının tamamı için: **[CHANGELOG.md](CHANGELOG
 
 `IdentifySample/SupportingFiles/csca-masterlist.pem`, BSI'nin 01.10.2026 tarihli master list'inden alındı. Bağlantı (link) sertifikaları dosyada yok.
 
+BSI listesinde T.C. kimlik kartının kökleri yok. Dosyanın sonuna İçişleri Bakanlığı'nın üç seyahat belgesi kökü eklendi: kimlik kartı Sürüm 1 ve Sürüm 2, Mavi Kart Sürüm 1.
+
 | Ülke | Şu anki CSCA'nın imzaya başladığı tarih | İmzayı bıraktığı tarih | İmzaladığı belgelerin doğrulanabileceği son tarih |
 |---|---|---|---|
 | Türkiye | 05.03.2024 | 05.03.2027 | 05.06.2037 |
