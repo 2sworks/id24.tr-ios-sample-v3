@@ -7,20 +7,57 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
-### Yayınlanmamış
+### 3.3.0
+
+**Kırıcı değişiklik**
+- Starscream bağımlılığı kaldırıldı, soket katmanı SDK'nın içinde. `setupSDK` geri çağrısındaki soketin ve `IdentifyManager.socket` alanının tipi `SDKWebSocket` oldu. `Starscream` import eden kod güncellenmeli.
+- OpenSSL `exact: "3.6.5000"` ile sabitlendi. Uygulamada OpenSSL'in başka bir sürümünü isteyen paket varsa paket çözümlemesi hata verebilir.
+- Gömülü Alamofire'dan `JSONResponseSerializer` ve `responseJSON` kaldırıldı.
+- NFC için CSCA listesi `setupSDK`'nın `nfcMasterList` parametresiyle veriliyor. `passportReader.setMasterListURL` ile verilen liste `setupSDK` çağrılınca siliniyor.
 
 **Yeni**
 - async/await API: `setupSDK(...) async throws`, `outcome()`, `outcomes` ve `events` (`AsyncStream`), `quitSDK() async`. Mevcut closure API'leri değişmedi.
-- Rehberler: async/await API, thread modeli ve Swift 6 geçiş planı.
+- Oturum sonucunda tam doğrulama bilgisi: `SDKFlowOutcome.isFullyVerified`, `verifiedModules` ve `verificationWarnings`.
 - Kimlik ekranını kendisi tasarlayan uygulamalarda da TC kimlik, SDK'nın kimlik ekranındaki gibi hızlı çekiliyor ve okunuyor; varsayılan açık, kapatmak için `ScannerConfiguration.fastIdCaptureEnabled = false`. Çerçeve kuralı: [Hızlı çekim ve çerçeve](docs/guides/identity-scanner.md#hızlı-çekim-ve-çerçeve).
+- SDK hatayı göstermeden akışı sürdürebiliyor: `SDKErrorConfig.shared.presentation = .none`.
+- Kimlik taramasında yönerge yazısının yeri seçilebiliyor: `ScannerConfiguration.guidancePositionDefault` ([Yönerge satırının yeri](docs/guides/identity-scanner.md#yönerge-satırının-yeri-330)).
+- Kimlik arka yüzünde anne ve baba adı okuması kapatılabiliyor: `SDKOcrConfig.shared.readsParentNames = false`.
+- Her modül ekranı çıkışta loga tek bloklu bir tanı raporu yazıyor: kullanıcının nerede takıldığı, gösterilen hatalar ve modülün kendi ölçüleri ([Modül Tanı Raporu](docs/guides/logging.md#modül-tanı-raporu--sonuç-330)).
+- dSYM dosyaları XCFramework içinde ve release'te ayrı zip olarak geliyor.
+- NFC: çipin her kontrolünün sonucu ayrı bildiriliyor (sertifika zinciri, belge imzası, veri bütünlüğü, Chip Authentication, Active Authentication). Sonuçlar `IdentifyManager.shared.nfcVerification` alanında. Kontrollerden biri kalırsa `isFullyVerified` `false` döner.
+- NFC: çipteki belge sertifikası `setupSDK(nfcMasterList:)` ile verilen CSCA listesine göre doğrulanıyor. Liste verilmezse oturum sonucunda `nfcCertificateChainNotChecked` uyarısı geliyor.
+- Görüşme: arka kamera belgeye odaklanıyor, önizlemeye dokununca o noktaya odaklanıp kare gösteriyor. Arka kamera açıkken kullanıcının görüntüsü büyük ekrana geçiyor ([Arka Kamera Odağı](IdentifySample/Modules/CallScreen/CallScreen.md#arka-kamera-odağı-330)).
+- Görüşme: arka kamera odağı host'tan yönetiliyor. `IdentifyManager` üzerinde `backCameraFocusEnabled`, `tapToFocusEnabled`, `swapsLayoutOnBackCamera`, `focusBackCameraAtCenter()`, `focusBackCamera(at:)`, `isBackCameraFocusAvailable`, `onBackCameraFocusAvailabilityChanged` ve `onBackCameraFocusTapped`; `SDKCallScreenViewModel` üzerinde `focusMark`, `isBackCameraActive` ve `agentIsLarge`.
+- Görüşme: odak karesinin görünümü `SDKTheme.shared.setFocusIndicator(_:)` ile değişiyor, `resetFocusIndicator()` ile varsayılana dönüyor. `SDKTheme.shared.capture.showsFocusIndicator = false` kareyi gizliyor.
+- Rehberler: async/await API, thread modeli ve Swift 6 geçiş planı.
 
 **Değişti**
-- Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
+- OpenSSL 1.1.1'den 3.6.5'e, gömülü Alamofire 5.9.0'dan 5.12.2'ye yükseltildi.
+- SDK Swift 6 dil moduyla derleniyor. Swift 5 ile derlenen uygulamalar değişiklik yapmadan kullanmaya devam ediyor.
+- Modüller gereken izni ekran açılırken istiyor. Hazırlık ekranı kamera, mikrofon ve konuşma tanıma izinlerini eskisi gibi birlikte istiyor.
+- `startSpeedTest(repeatCount: n)` tam `n` ölçümü sırayla yapıyor, sonuç main thread'de geliyor.
+- `killSDKByUser`, `acceptCall`, `twoFacesCompare`, `getNextLivenessTest` ve `smsVerification` her durumda sonuç ya da hata dönüyor.
+- Başlık çubuğundaki yardım (?) düğmesi varsayılan olarak kapalı. Açmak için `SDKTheme.shared.navBar.buttons.showsHelp = true` (gerekirse `onHelp` ile birlikte).
 - SDK'nın kimlik ekranında çerçevenin görünümünü ya da konumunu değiştirmek artık hızlı çekimi kapatmıyor (3.2.1'de `.fixedFrame(.idCard)`'dan farklı her çerçeve kapatıyordu); `stabilityConfirmFrames`'i 4'ün üstüne çıkarmak kapatıyor.
+- NFC: kart bir an yanıt vermezse okuma düşmüyor, kaldığı yerden sürüyor. Kart geri konmazsa `nfcCardReturnTimeout` (varsayılan 10 sn) sonunda bitiyor.
+- NFC: okuma telefonun hem ön hem arka yüzünden yapılabiliyor; yönerge ve sesli yönlendirmeler beş dilde arka yüz için de yazıldı.
+- Örnek uygulama SDK'yı async/await API'siyle kullanıyor: kurulum, sonuç, olaylar ve bağlantı hız testi.
 
 **Düzeltildi**
+- Kurulum sürerken `exitSDK` çağrılırsa `setupSDK` askıda kalmıyor.
 - Sunucu kimlik fotoğrafını reddettiğinde panele başarılı yerine başarısız gidiyor.
 - Hızlı çekimde kimliğin arka yüzü ters tutulunca kart çekilmiyor; ön yüzdeki gibi düz çevrilince çekiliyor.
+- Takip olaylarında `idCardModuleCompleted` arka yüz de yüklenince gidiyor (önceden ön yüz yüklenince gidiyordu).
+- İzin verilmediğinde ayarlara yönlendiren popup her durumda çıkıyor. "Vazgeç"e basılırsa izin verilene kadar uygulamaya her dönüşte yeniden çıkıyor.
+- Selfie, canlılık, kimlik ve video kaydı ekranlarında kamera durursa uyarı çıkıyor, "Tamam"dan sonra kamera yeniden açılıyor. Video kaydında uyarı kameranın mı mikrofonun mu durduğunu söylüyor. Uyarı istenmezse `SDKErrorConfig.shared.presentation = .none`; `onError` verilmişse hata `cameraFailed` koduyla geliyor.
+- NFC: NFC'si olmayan cihazda "NFC yok" bildirimi ve NFC okuma sonucu, soket bağlanmadan gönderilirse panele ulaşmıyordu. Artık bağlantı kurulunca gönderiliyor.
+- NFC: KPS anahtarı doğruyken okuma kopunca anahtar düzeltme ekranı açılmıyor. Çip anahtarı kabul ettiyse ya da oturum çipe ulaşmadan kapandıysa hata, okuma sınırına ve anahtar hakkına sayılmıyor.
+- NFC: BAC yanıtı ve Secure Messaging MAC'i doğrulanıyor. Loglar oturum anahtarlarını ve MRZ anahtarını yazmıyor.
+- Görüşme: panel aynı görüşme için iki kez `terminateCall` gönderirse sonuç bir kez bildiriliyor.
+- Görüşme: müşteri görüşmeyi kendisi bitirince `videoCallModuleFailed` gidiyor.
+- Görüşme: simülatörde ve sunucu turn adresi göndermediğinde oluşan çökme giderildi.
+- Görüşme: başlarken ses açılamazsa nedeni loga yazılıyor.
+- Görüşme: kamera durursa görüntü kendiliğinden yeniden açılıyor, kullanıcıya uyarı çıkmıyor.
 - Rehberler görüşmedeki kopmayı kodla aynı anlatıyor: ICE `disconnected` 5 sn bekler (4140), `failed` hemen biter (4141), soket kopunca medya ayaktaysa görüşme `signallessCallGracePeriod` (10 sn) boyunca sürer.
 
 ### 3.2.1

@@ -106,8 +106,9 @@ struct MySwlView: View {
 
 **Tema** ekran yazmadan da çalışır ([Tema rehberi](../../../docs/guides/theming.md)).
 
-Üst çubuktaki yardım (?) düğmesine SDK bir işlev bağlamaz, basılınca bir şey olmaz. Bu ekrandan
-kaldırmak için `SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false)`;
+Üst çubuktaki yardım (?) düğmesi 3.3.0'dan beri varsayılan kapalı. Bu ekranda açmak için
+`SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: true)`. SDK düğmeye
+işlev bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz;
 işlev vermek ya da kendi düğmenizi eklemek için [Başlık Çubuğu Düğmeleri](../Modules.md#başlık-çubuğu-düğmeleri).
 
 ## TrueDepth Modu

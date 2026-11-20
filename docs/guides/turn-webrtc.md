@@ -85,6 +85,9 @@ Agent'ın görüşme sırasında gönderebileceği komutların listesi:
 | `agent_view_scale` | `RoomResponse` | Agent görüntüsünün ölçeği (dikey gösterim dahil) |
 | `hide_call_answer_screen` | `RoomResponse` | Çağrı cevaplama ekranı atlanır |
 | `signLangSupport` | `setupSDK` parametresi | Görüşmeden önce işaret dili tercihi sorulur ([SignLang](../../IdentifySample/Modules/SignLang/SignLang.md)) |
+| `backCameraFocusEnabled` | `IdentifyManager` (3.3.0) | `true` (varsayılan): arka kamera yakına sürekli odaklanır. `false`: kameranın kendi odağı |
+| `tapToFocusEnabled` | `IdentifyManager` (3.3.0) | `true` (varsayılan): önizlemeye dokununca o noktaya odaklanır. `false`: dokunmayı host yakalar |
+| `swapsLayoutOnBackCamera` | `IdentifyManager` (3.3.0) | `true` (varsayılan): arka kamerada kullanıcının görüntüsü büyük ekrana geçer. Ayrıntı: [Arka Kamera Odağı](../../IdentifySample/Modules/CallScreen/CallScreen.md#arka-kamera-odağı-330) |
 
 ---
 

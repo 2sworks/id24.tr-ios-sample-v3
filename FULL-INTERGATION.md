@@ -343,16 +343,16 @@ SDKTheme.shared.navBar.titleMode  = .brandWithModule
 ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır.
 
 **Düğmeler.** Geri, yardım (?) ve menü düğmeleri kaldırılabilir, sağ tarafa kendi düğmeniz
-eklenebilir. Yardım düğmesi kamera üstü ekranlarda çizilir ve SDK ona işlev bağlamaz; `onHelp`
-vermezseniz basılınca bir şey olmaz.
+eklenebilir. Yardım düğmesi 3.3.0'dan beri varsayılan kapalı. Açılırsa kamera üstü ekranlarda
+çizilir; SDK ona işlev bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz.
 
 ```swift
-SDKTheme.shared.navBar.buttons.showsHelp = false                          // her ekranda kaldır
-SDKTheme.shared.navBar.buttons.onHelp = { route in openHelp(for: route) } // ya da işlev ver
+SDKTheme.shared.navBar.buttons.showsHelp = true                           // her ekranda aç
+SDKTheme.shared.navBar.buttons.onHelp = { route in openHelp(for: route) } // işlev ver
 SDKTheme.shared.navBar.buttons.trailing = [
     SDKNavBarButton(id: "chat", icon: Image(systemName: "message")) { openChat() }
 ]
-SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: false) // tek ekran
+SDKTheme.shared.navBar.routeButtons[.selfieWithLiveness] = SDKNavBarButtons(showsHelp: true)  // tek ekran
 ```
 
 Ayrıntı: [Başlık Çubuğu Düğmeleri](IdentifySample/Modules/Modules.md#başlık-çubuğu-düğmeleri).
@@ -892,6 +892,13 @@ public API ile yazılmış birebir kopyasıdır (bölüm 7-A).
 > profiller, alan OCR'ı, TCKN/MRZ doğrulama: [IdentityScanner Rehberi](docs/guides/identity-scanner.md).
 > Tarayıcı HUD metinleri de lokalizasyon sisteminden geçer (`scanner*` key'leri, bölüm 4).
 
+### Görüşmede arka kamera odağı (3.3.0)
+
+Görüşmede arka kamera belgeye odaklanır, önizlemeye dokununca o noktaya odaklanıp kare
+gösterir. Ayarlar (`backCameraFocusEnabled`, `tapToFocusEnabled`, `swapsLayoutOnBackCamera`),
+host'tan odak isteme ve odak karesinin görünümü:
+[CallScreen → Arka Kamera Odağı](IdentifySample/Modules/CallScreen/CallScreen.md#arka-kamera-odağı-330).
+
 ---
 
 ## 9) Ortak UI Bileşenleri
@@ -1198,6 +1205,14 @@ Severity sıralı ve karşılaştırılabilir; kategoriler (`SDKLogCategory`) so
 media/lifecycle vb. akışları ayrıştırır. Base64 gibi hassas içerikler otomatik redakte
 edilir. Ayrıntı: [Loglama Rehberi](docs/guides/logging.md).
 
+### Modül tanı raporu (3.3.0)
+
+Her modül ekranı kapanırken loga `[SONUÇ] <modül>: <sonuç>` ile başlayan tek bir blok yazar:
+süre, cihaz, izinler, kesintiler, ekranda kalan yönergeler, aşılamayan engeller, sunucu
+sonuçları, gösterilen hatalar ve modülün kendi ölçüleri. Kullanıcının nerede takıldığını tek
+kayıttan görmek içindir, açmanız gerekmez. Maddeler ve modüllere göre içerik:
+[Loglama Rehberi → Modül Tanı Raporu](docs/guides/logging.md#modül-tanı-raporu--sonuç-330).
+
 ---
 
 ## 13) Global Bağlantı Kopması Katmanı
@@ -1230,6 +1245,9 @@ m.callReconnectTimeoutSeconds = 10
 
 // Soket kopunca medya ayaktaysa görüşmenin sinyalsiz sürebileceği süre
 m.signallessCallGracePeriod   = 10
+
+// NFC'de kart koptuktan sonra geri konması için beklenen süre (3.3.0); nil = yalnız iOS sınırı
+m.nfcCardReturnTimeout        = 10
 
 // Bağlantı kopması kuralı: otomatik yeniden bağlanma (0 = kapalı, varsayılan) ve kopma sınırı
 SDKAttemptLimits.shared.connection = SDKConnectionPolicy(
@@ -1610,6 +1628,11 @@ ScannerGuidanceTexts.overrideDocument = ...   // belge HUD seti
 ScannerConfiguration.overrideDefault = ScannerConfiguration(texts: myTexts, timing: myTiming)
 // frameMode verilmezse kimlik ön yüzü takip moduna geçer: sabit çerçeve ve TC kimlikte hızlı çekim
 // kapanır. Korumak için frameMode: .idCardDefault ekleyin (arka yüz overrideIDBack'e bakar).
+
+// Yönerge satırının yeri (3.3.0): .bottom (varsayılan), .insideFrame, .aboveFrame
+ScannerConfiguration.guidancePositionDefault = .aboveFrame
+// TC kimlik arka yüzünde anne/baba adı okunmasın (3.3.0): adlar boş gider, kart reddedilmez
+SDKOcrConfig.shared.readsParentNames = false
 ```
 
 > Metinleri tek tek markalamak yerine dil sistemini kullanmak genelde yeterlidir:
