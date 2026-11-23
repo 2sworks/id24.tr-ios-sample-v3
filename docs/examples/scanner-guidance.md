@@ -133,6 +133,105 @@ struct KimlikTaramaEkrani: View {
   döndürün.
 - Sesli yönlendirme bu ayardan etkilenmez.
 
+## Süre dolunca uyarı penceresi (3.2.1+)
+
+Kimlik belirli bir sürede çekilemezse (çoğu zaman parlama ya da gölge yüzünden) uygulama kendi
+penceresini açabilir. Süreyi uygulama tutar; SDK yalnız taramanın başladığını ve çekimin
+yapıldığını bildirir. Çalışan örnek SampleApp'te `IdentifySample/Modules/IdCard/IdScanAlert.swift`
+dosyasında, ayarlar menüsündeki "Kimlik Taramasında Uyarı" anahtarıyla açılır.
+
+**SDK'nın kimlik ekranıyla.** `onGuidance` içinde iki duruma bakılır: `"preparing"` tarayıcı açıldı,
+`"locked"` fotoğraf çekildi. İlkinde süre başlar, ikincisinde durur. Süre dolunca pencere
+tarayıcının üstünde açılır.
+
+```swift
+@MainActor
+final class KimlikSuresi {
+    static let shared = KimlikSuresi()
+    private var gorev: Task<Void, Never>?
+
+    func kur() {
+        SDKErrorConfig.shared.onGuidance = { info in
+            MainActor.assumeIsolated {        // SDK ana thread'de çağırır
+                guard info.module == .idCard else { return }
+                switch info.state {
+                case "preparing": KimlikSuresi.shared.baslat()
+                case "locked":    KimlikSuresi.shared.durdur()
+                default:          break
+                }
+            }
+        }
+    }
+
+    func baslat() {
+        gorev?.cancel()
+        gorev = Task {
+            try? await Task.sleep(nanoseconds: 10_000_000_000)     // 10 saniye
+            guard !Task.isCancelled else { return }
+            pencereyiAc()
+        }
+    }
+
+    func durdur() {
+        gorev?.cancel()
+        gorev = nil
+    }
+
+    private func pencereyiAc() {
+        // En üstteki ekranın üstünde kendi pencerenizi açın; "Tekrar Dene" baslat() çağırır.
+    }
+}
+```
+
+Pencere açıkken tarayıcı çalışmayı sürdürür. Kullanıcı pencereyi kapatmadan kimlik okunursa
+`"locked"` gelir ve süre durur; pencereyi kapatmak sizin işiniz.
+
+**Kendi tarama ekranınızla.** Kimlik ekranını `SDKViewRegistry` ile değiştirdiyseniz süreyi ekranın
+kendisi tutar. `pausesDetection: true` kamerayı açık bırakır, taramayı bekletir; `false` olunca
+tarama baştan başlar.
+
+```swift
+struct KimlikEkrani: View {
+    let onDocument: (RecognizedDocument) -> Void
+
+    @State private var duraklat = false
+    @State private var pencere = false
+    @State private var deneme = 0
+    @State private var cekildi = false
+
+    var body: some View {
+        IdentityScannerView(profile: .turkishIDFront, pausesDetection: duraklat) { sonuc in
+            if case .success(let belge) = sonuc {
+                cekildi = true
+                onDocument(belge)
+            }
+        }
+        .task(id: deneme) {
+            try? await Task.sleep(nanoseconds: 10_000_000_000)     // 10 saniye
+            guard !Task.isCancelled, !cekildi else { return }
+            duraklat = true
+            pencere = true
+        }
+        .idAlert(isPresented: $pencere, alert: IDAlertModel(
+            type: .error,
+            title: "Kimlik Doğrulanamadı",
+            message: "Kimliğinin üzerinde parlama veya gölge olmadığından "
+                + "ve bilgilerin net bir şekilde göründüğünden emin ol.",
+            actions: [IDAlertAction(title: "Tekrar Dene") {
+                duraklat = false
+                deneme += 1
+            }]
+        ))
+    }
+}
+```
+
+- `onGuidance` tek fonksiyon tutar. Yukarıdaki "metni üstte gösterme" örneğini de kullanıyorsanız
+  iki işi aynı fonksiyonda yapın.
+- Pencereyi SDK'nın `idAlert` bileşeniyle açmak, uyarının SDK ekranlarıyla aynı görünmesini sağlar.
+- Parlama kontrolünün kendisi (`glareGate`, `texts.glare`) için
+  [IdentityScanner rehberine](../guides/identity-scanner.md) bakın.
+
 ## Notlar
 
 - Override'ları tarama başlamadan önce, örneğin uygulama açılışında tanımlayın.
