@@ -148,6 +148,7 @@ tarayıcının üstünde açılır.
 @MainActor
 final class KimlikSuresi {
     static let shared = KimlikSuresi()
+    var sure: TimeInterval = 10                   // pencere kaç saniye sonra açılsın
     private var gorev: Task<Void, Never>?
 
     func kur() {
@@ -166,7 +167,7 @@ final class KimlikSuresi {
     func baslat() {
         gorev?.cancel()
         gorev = Task {
-            try? await Task.sleep(nanoseconds: 10_000_000_000)     // 10 saniye
+            try? await Task.sleep(nanoseconds: UInt64(sure * 1_000_000_000))
             guard !Task.isCancelled else { return }
             pencereyiAc()
         }
@@ -193,6 +194,7 @@ tarama baştan başlar.
 ```swift
 struct KimlikEkrani: View {
     let onDocument: (RecognizedDocument) -> Void
+    var sure: TimeInterval = 10                   // pencere kaç saniye sonra açılsın
 
     @State private var duraklat = false
     @State private var pencere = false
@@ -207,7 +209,7 @@ struct KimlikEkrani: View {
             }
         }
         .task(id: deneme) {
-            try? await Task.sleep(nanoseconds: 10_000_000_000)     // 10 saniye
+            try? await Task.sleep(nanoseconds: UInt64(sure * 1_000_000_000))
             guard !Task.isCancelled, !cekildi else { return }
             duraklat = true
             pencere = true
@@ -225,6 +227,27 @@ struct KimlikEkrani: View {
     }
 }
 ```
+
+**Süre.** 10 saniye örnek değer. Süre uygulamanın kodunda durur, `sure` ile istediğiniz değeri
+verin. Tarayıcının kendi süreleri ayrıdır ve ekran açılmadan önce `ScannerTimingConfig` ile
+değiştirilir. Kimliğin ön yüzü `ScannerTimingConfig.default`, arka yüzü `ScannerTimingConfig.idBack`
+ayarını kullanır; ikisinde de aynı süre isteniyorsa ikisini de ayarlayın.
+
+| Tarayıcıda | Varsayılan | Ayar |
+|---|---|---|
+| "Kimlik tespit edilemedi" yönergesi | 4 sn | `notDetectedDelay` |
+| "Manuel Çek" düğmesi | 8 sn | `manualCaptureHintDelay` |
+| Zorla elle çekime geçiş | 3 başarısız otomatik çekim | `maxAutoCaptureFails` |
+| "Kimlik bilgileri okunamıyor" yönergesi | 2 sn | Sabit, değiştirilemez |
+
+```swift
+ScannerTimingConfig.default.manualCaptureHintDelay = 12
+ScannerTimingConfig.idBack.manualCaptureHintDelay = 12
+```
+
+Varsayılanlarla "Manuel Çek" düğmesi 8. saniyede çıkar, 10 saniyelik pencere ondan sonra açılır.
+Pencerenin önce açılması isteniyorsa `sure`'yi 8'in altında tutun ya da `manualCaptureHintDelay`'i
+yükseltin.
 
 - `onGuidance` tek fonksiyon tutar. Yukarıdaki "metni üstte gösterme" örneğini de kullanıyorsanız
   iki işi aynı fonksiyonda yapın.
