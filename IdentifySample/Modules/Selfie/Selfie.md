@@ -58,7 +58,7 @@ registry.override(.selfie) { MySelfieView() }
 struct MySelfieView: View {
     @EnvironmentObject var coordinator: SDKFlowCoordinator
     @StateObject private var vm = SDKSelfieViewModel()
-    let camera = MyFrontCamera()
+    @State private var camera = MyFrontCamera()   // let değil: görünüm yeniden kurulunca kamera değişmesin
 
     var body: some View {
         GeometryReader { geo in
@@ -92,6 +92,8 @@ struct MySelfieView: View {
   siler, `onDismiss` bekleyen işi çalıştırır. Hatayı kendiniz çiziyorsanız kapatırken
   `vm.dismissError()` çağırın (3.2.0+; önceki sürümlerde önce `vm.errorMessage = nil`, sonra
   `vm.consumePendingAlertAction()`). Ayrıntı: [Kendi ekranınızı yazdıysanız](../../../docs/guides/errors-and-limits.md#8-kendi-ekranınızı-yazdıysanız).
+- Kamerayı `@State` ile tutun. `let` ile tutulan nesne, üst görünüm her yeniden çizildiğinde baştan
+  oluşur; `onAppear`'da kurulan `onPixelBuffer` yeni nesnede olmaz, kare gelmez, otomatik çekim başlamaz.
 - Yüz bulunamaz ya da yükleme düşerse fotoğraf `selfieImage`'da kalır, otomatik çekim durur.
   Tekrar Çek / Onayla bu yüzden `awaitingConfirmation`'a değil fotoğrafa bağlı.
 - Oval, `updatePreviewSize` ile verilen ölçüye göre hesaplanır; önizlemeniz ekranı
