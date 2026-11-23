@@ -19,6 +19,7 @@ struct LoginView: View {
     @State private var showServerList = false
     @State private var showModuleList = false
     @State private var showHamburgerMenu = false
+    @State private var hamburgerMenuHeight: CGFloat = 470
     @State private var showLangPicker = false
     @State private var showShowcase = false
     @State private var showDebugView = false
@@ -242,22 +243,22 @@ struct LoginView: View {
             pendingNavigation = nil
         }) {
             if #available(iOS 16.4, *) {
-                HamburgerMenuSheet { item in
+                HamburgerMenuSheet(contentHeight: $hamburgerMenuHeight) { item in
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
-                .presentationDetents([.height(470)])
+                .presentationDetents([.height(hamburgerMenuHeight)])
                 .presentationDragIndicator(.visible)
                 .presentationBackground(.ultraThinMaterial)
             } else if #available(iOS 16.0, *) {
-                HamburgerMenuSheet { item in
+                HamburgerMenuSheet(contentHeight: $hamburgerMenuHeight) { item in
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
-                .presentationDetents([.height(470)])
+                .presentationDetents([.height(hamburgerMenuHeight)])
                 .presentationDragIndicator(.visible)
             } else {
-                HamburgerMenuSheet { item in
+                HamburgerMenuSheet(contentHeight: $hamburgerMenuHeight) { item in
                     pendingNavigation = item
                     showHamburgerMenu = false
                 }
@@ -776,9 +777,14 @@ private struct ToggleOptionRow: View {
 // MARK: - HamburgerMenuSheet
 
 private struct HamburgerMenuSheet: View {
+    /// Sheet yüksekliği içerik kadar olsun diye ölçülen yükseklik.
+    @Binding var contentHeight: CGFloat
     let onSelect: (HamburgerMenuItem) -> Void
+    @State private var quickSettingsExpanded = false
+    @State private var customizationExpanded = false
     @ObservedObject private var nfxState = NFXDebugState.shared
     @AppStorage("sdkReadAloudEnabled") private var readAloudEnabled = false
+    @AppStorage("idScanAlertEnabled") private var idScanAlertEnabled = false
     @State private var livenessStepWait = SDKLivenessRules.default.nextStepWait
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
@@ -802,13 +808,20 @@ private struct HamburgerMenuSheet: View {
             .padding(.bottom, IDSpacing.md)
             
             VStack(spacing: IDSpacing.sm) {
-                MenuOptionRow(icon: Image(systemName: "books.vertical.fill"),
-                              title: "SDK Modül Rehberi") {
-                    onSelect(.showcase)
-                }
-                MenuOptionRow(icon: Image(systemName: "paintbrush.pointed.fill"),
-                              title: "Tam Özel Ekranlar") {
-                    onSelect(.customScreens)
+                MenuOptionRow(
+                    icon: Image(systemName: "slider.horizontal.3"),
+                    title: "Modül Özelleştirme",
+                    isExpanded: $customizationExpanded
+                )
+                if customizationExpanded {
+                    MenuOptionRow(icon: Image(systemName: "books.vertical.fill"),
+                                  title: "SDK Modül Rehberi") {
+                        onSelect(.showcase)
+                    }
+                    MenuOptionRow(icon: Image(systemName: "paintbrush.pointed.fill"),
+                                  title: "Tam Özel Ekranlar") {
+                        onSelect(.customScreens)
+                    }
                 }
                 MenuOptionRow(icon: .init(.icCubeFocus), title: "Modül Seçme Ekranı") {
                     onSelect(.moduleList)
@@ -828,30 +841,55 @@ private struct HamburgerMenuSheet: View {
                     )
                 )
                 MenuOptionRow(
-                    icon: Image(systemName: "timer"),
-                    title: "Canlılık Adım Arası Bekleme",
-                    isOn: Binding(
-                        get: { livenessStepWait },
-                        set: { newValue in
-                            livenessStepWait = newValue
-                            SDKLivenessRules.default.nextStepWait = newValue
-                        }
-                    )
-                )
-                MenuOptionRow(
                     icon: Image(systemName: "ladybug.fill"),
                     title: "Network Debug (Netfox)",
                     isOn: $nfxState.isEnabled
                 )
-                MenuOptionRow(icon: Image(systemName: "wrench.and.screwdriver.fill"),
-                              title: "Debug Değerleri") {
-                    onSelect(.debugView)
+                MenuOptionRow(
+                    icon: Image(systemName: "switch.2"),
+                    title: "Hızlı Ayarlar",
+                    isExpanded: $quickSettingsExpanded
+                )
+                if quickSettingsExpanded {
+                    MenuOptionRow(
+                        icon: Image(systemName: "exclamationmark.bubble.fill"),
+                        title: "Kimlik Taramasında Uyarı",
+                        isOn: Binding(
+                            get: { idScanAlertEnabled },
+                            set: { newValue in
+                                idScanAlertEnabled = newValue
+                                IdScanAlert.apply()
+                            }
+                        )
+                    )
+                    MenuOptionRow(
+                        icon: Image(systemName: "timer"),
+                        title: "Canlılık Adım Arası Bekleme",
+                        isOn: Binding(
+                            get: { livenessStepWait },
+                            set: { newValue in
+                                livenessStepWait = newValue
+                                SDKLivenessRules.default.nextStepWait = newValue
+                            }
+                        )
+                    )
+                    MenuOptionRow(icon: Image(systemName: "wrench.and.screwdriver.fill"),
+                                  title: "Debug Değerleri") {
+                        onSelect(.debugView)
+                    }
                 }
             }
             .padding(.horizontal, IDSpacing.xl)
-            
-            Spacer()
+            .padding(.bottom, IDSpacing.lg)
         }
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { contentHeight = geo.size.height }
+                    .onChange(of: geo.size.height) { contentHeight = $0 }
+            }
+        )
+        .frame(maxHeight: .infinity, alignment: .top)
         .background(IDColor.adaptiveBackground(for: colorScheme).ignoresSafeArea())
     }
 }
@@ -936,6 +974,12 @@ private struct DebugSettingsView: View {
                         }
 
                         DebugSection(title: "Selfie + Canlılık") {
+                            DebugToggleRow(
+                                title: "Yön paneli (HUD)",
+                                subtitle: "Cihaz ve ekran yönü, eğim, çekim açısı ve çekilen fotoğrafın boyutuyla yönü.",
+                                isOn: $debug.swlDiagnostics
+                            )
+                            Divider().padding(.leading, IDSpacing.md)
                             VStack(alignment: .leading, spacing: IDSpacing.sm) {
                                 Text("TrueDepth modu")
                                     .font(IDFont.bodySmall(.semibold))
@@ -1040,6 +1084,7 @@ private struct MenuOptionRow: View {
     let icon: Image
     let title: String
     private let isOn: Binding<Bool>?
+    private var isExpanded: Binding<Bool>?
     private let onTap: (() -> Void)?
     @Environment(\.colorScheme) private var colorScheme
     
@@ -1057,9 +1102,21 @@ private struct MenuOptionRow: View {
         self.onTap = nil
     }
     
+    /// Altındaki satırları açıp kapatan grup başlığı.
+    init(icon: Image, title: String, isExpanded: Binding<Bool>) {
+        self.icon = icon
+        self.title = title
+        self.isOn = nil
+        self.isExpanded = isExpanded
+        self.onTap = nil
+    }
+    
     var body: some View {
         Button {
             if let isOn { isOn.wrappedValue.toggle() }
+            else if let isExpanded {
+                withAnimation(.easeInOut(duration: 0.25)) { isExpanded.wrappedValue.toggle() }
+            }
             else { onTap?() }
         } label: {
             HStack(spacing: IDSpacing.md) {
@@ -1076,6 +1133,11 @@ private struct MenuOptionRow: View {
                         .labelsHidden()
                         .tint(IDColor.primary)
                         .allowsHitTesting(false)
+                } else if let isExpanded {
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(IDColor.inkLight)
+                        .rotationEffect(.degrees(isExpanded.wrappedValue ? 180 : 0))
                 } else {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 13, weight: .medium))

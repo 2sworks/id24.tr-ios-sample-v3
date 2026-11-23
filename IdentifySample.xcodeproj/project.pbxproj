@@ -40,6 +40,7 @@
 		6EB04625C6C181E062318D3B /* OvdExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41304A7BE43757905D04D5F1 /* OvdExample.swift */; };
 		73B1B512BC274857621CBFC6 /* AddressConfirmExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2EA1D1725FD5B313D46D172 /* AddressConfirmExample.swift */; };
 		8129E6C8B3CDBC929051CB6F /* IdCardExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244665EDEBB483AC83A5250C /* IdCardExample.swift */; };
+		7A1D5C3E9B204F6A8C1E0D21 /* IdScanAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1D5C3E9B204F6A8C1E0D22 /* IdScanAlert.swift */; };
 		85F7CAB3920EA35AF9F2E7C3 /* ShowcaseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0403CFDF0DB438E924B42014 /* ShowcaseSupport.swift */; };
 		8AB276BB2F749D5100A764F1 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB276BA2F749D5100A764F1 /* LoginViewModel.swift */; };
 		8AB276D52F749D9600A764F1 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB276D42F749D9600A764F1 /* LoginView.swift */; };
@@ -125,6 +126,7 @@
 		1F9E3D331273419983B367F0 /* LostConnectionExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LostConnectionExample.swift; path = LostConnection/LostConnectionExample.swift; sourceTree = "<group>"; };
 		229C1F0653291C93F4CF6203 /* IdCard.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = IdCard.md; sourceTree = "<group>"; };
 		244665EDEBB483AC83A5250C /* IdCardExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdCardExample.swift; sourceTree = "<group>"; };
+		7A1D5C3E9B204F6A8C1E0D22 /* IdScanAlert.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IdScanAlert.swift; sourceTree = "<group>"; };
 		25E3D1CED1B9A1A164715AF1 /* LostConnection.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = LostConnection.md; path = LostConnection/LostConnection.md; sourceTree = "<group>"; };
 		2A57F8CBAD67C67E1AE6DEF4 /* SelfieExample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SelfieExample.swift; sourceTree = "<group>"; };
 		323CD02657B616528C3DB18D /* CrossPlatformIntegrationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CrossPlatformIntegrationView.swift; sourceTree = "<group>"; };
@@ -374,6 +376,7 @@
 				C37EA1A9369FD0504EA85B0A /* IdCardCustomView.swift */,
 				A1D0C0DE5EED100000000002 /* IdCardSingleScreenCustomView.swift */,
 				244665EDEBB483AC83A5250C /* IdCardExample.swift */,
+				7A1D5C3E9B204F6A8C1E0D22 /* IdScanAlert.swift */,
 				057317BDAFB60877C85A3684 /* IdCardHostViewModel.swift */,
 				229C1F0653291C93F4CF6203 /* IdCard.md */,
 			);
@@ -806,6 +809,7 @@
 				20A7BD14F8A4E7E5D199F8EC /* PrepareExample.swift in Sources */,
 				9BD45CE3D0D66FF246AFBBF8 /* SelfieExample.swift in Sources */,
 				8129E6C8B3CDBC929051CB6F /* IdCardExample.swift in Sources */,
+				7A1D5C3E9B204F6A8C1E0D21 /* IdScanAlert.swift in Sources */,
 				CA16FF7AA9C5A08D529E418F /* NfcExample.swift in Sources */,
 				B6189A4A6FAA4C19F953A76D /* LivenessExample.swift in Sources */,
 				34BF094BF844734F730C3288 /* SpeechExample.swift in Sources */,
