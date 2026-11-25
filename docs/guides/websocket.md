@@ -124,7 +124,7 @@ SDK kopmayı birbirinden bağımsız üç kaynaktan anlar:
 3. Heartbeat: görüntülü görüşme modülünde (bekleme odası ve görüşme) SDK `heartbeatIntervalSeconds`
    (varsayılan 10 sn) aralıkla PING gönderir. Üst üste 4 PING cevapsız kalırsa bağlantı ölü sayılır
    ve soket 4109 ile kapanır; varsayılan aralıkla bu yaklaşık 40 sn sürer. Log satırı ve kapanış
-   nedeni bu durumda "3 ardışık PING için PONG alınamadı" yazar, cevapsız PING sayısı yine 4'tür.
+   nedeni bu durumda "4 ardışık PING için PONG alınamadı" yazar.
    Kapatmak için `isHeartbeatEnabled = false`.
 
 Üç kaynak da aynı noktaya çıkar. `.connectionErr` yalnızca bir kez gönderilir, tekrarlar yok

@@ -104,8 +104,9 @@ Seviye `.online` olsa bile şu durumlarda satır kuyruğa girmez:
 | Log gönderiminin kendi hata satırları | Gönderim katmanına hiç girmez, aşağıya bakın |
 
 `.onlineSilent`'te de `logOnlineSecretKey` boşsa satır kuyruğa girmez, ama konsola uyarı da
-basılmaz: loglar sessizce düşer. `lastKeyReport` bu seviyede anahtarı `.notRequired` (GEREKMİYOR)
-gösterir. `verifyKeysOnServer()` da sunucuya sormaz, aynı raporu döndürür.
+basılmaz: loglar sessizce düşer. Eksik anahtar `lastKeyReport`'ta görünür: durum `.missing`
+(SAĞLANMADI), `hasProblem` `true`. `verifyKeysOnServer()` bu durumda sunucuya sormaz, aynı raporu
+döndürür.
 
 Kuyruğa giren satır hemen gitmez. Gönderim her yeni satırdan sonra 0,25 sn bekler,
 `flushLogsNow()` da aynı beklemeyle çalışır. `closeSDK` kuyruğu bu süre dolmadan kapattığı için

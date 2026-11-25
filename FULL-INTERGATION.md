@@ -558,7 +558,7 @@ Ana gruplar:
 | Video kayıt + sesli doğrulama | `recordVideo`, `readingTestTitle/Desc`, `sentenceToReadLabel`, `voiceVerifying`, `youSaidLabel`, `speechNoMatchTitle`, `similarityLabel` |
 | Konuşma tanıma (KYC modülü) | `speechInfoTitle/Text`, `spokenWordLabel`, `soundRecogOk/Fail`, `speechNotRecognized` |
 | İmza | `signatureTitle`, `signatureInfo(Title/Desc)`, `coreDelSig`, `signatureUploadFailed` |
-| Adres | `addressVerifyTitle/Desc`, `choosePhoto`, `chooseFile`, `uploadFile`, `pdfMaxSizeFmt`, `docAddressDesc`, `addressFileFormats` (biçim satırı; metin 15 MB yazar, gerçek sınır yalnız PDF için ve 5 MB) |
+| Adres | `addressVerifyTitle/Desc`, `choosePhoto`, `chooseFile`, `uploadFile`, `pdfMaxSizeFmt`, `docAddressDesc`, `addressFileFormats` (biçim satırı; PDF sınırını yazar: en fazla 5 MB) |
 | Görüşme (Call) | `callTitle/Description`, `callConnectingInfo`, `callEndCall`, `callQueuePositionFmt`, `callEstimatedWaitFmt`, `missedCallTitle` |
 | ThankYou | `thankU`, `thankYouMissedTitle`, `thankYouFailedTitle`, `thankYouCompletedDesc`, `resultWillBeNotified` |
 | Bağlantı | `coreNoInternet(Desc)`, `coreReConnect`, `coreReconnecting`, `connectionLostTitle/Desc`, `checkMyConn`, `connectionGood` |
