@@ -24,8 +24,11 @@ Gereksinim: iOS 15+.
 Uygulama açılırken profilleri ve doğrulayıcıları kaydedin:
 
 ```swift
-IdentityScanner.setup()   // built-in profiller + TCKN/MRZ doğrulayıcıları kaydedilir
+IdentityScanner.setup()   // profiller + TCKN/MRZ doğrulayıcıları (turkishIDFront/Back id ile kaydedilmez)
 ```
+
+Kayıt arka planda yapılır, `setup()` bitmesini beklemez. Hemen ardından başlayan bir
+`scan(profileID:)` çağrısı `.profileNotFound` alabilir.
 
 ## Hızlı Başlangıç
 
@@ -34,10 +37,10 @@ IdentityScannerView(profile: .turkishIDFront) { result in
     switch result {
     case .success(let doc):
         let tckn = doc.fields["tckn"]?.value          // alan bazlı erişim
-        let cropped = doc.croppedImage                 // perspektif düzeltilmiş görsel
+        let cropped = doc.croppedImage                 // köşeler bulunduysa perspektif düzeltilmiş
         print("Geçerli mi:", doc.isValid)              // TCKN checksum vb. doğrulamalar
     case .failure(let error):
-        // ScanningError.cancelled dahil hata durumları
+        print("Tarama hatası:", error)                 // kamera izni yok ya da kamera açılamadı
     }
 }
 ```
@@ -54,13 +57,14 @@ kapısı.
 
 | Profil | Strateji | Ne yapar |
 |---|---|---|
-| `.turkishIDFront` | `visionText` | TC kimlik ön yüz: TCKN, soyad, ad, doğum tarihi, belge no. Alanlar bölgesel OCR ile okunur |
+| `.turkishIDFront` | `visionText` | TC kimlik ön yüz: TCKN, soyad, ad, doğum tarihi, belge no, son geçerlilik tarihi. Alanlar bölgesel OCR ile okunur |
 | `.turkishIDBack` | `mrzTurkishID` | TC kimlik arka yüz: anne adı, baba adı ve veren makam basılı etiketlerine göre bulunur (`labelAnchor`); MRZ kuralı `.td1`, zorunlu, `.presence` |
-| `.turkishID` | — | Ön ve arka yüzün birleşik anahtar kelime kümesi |
-| `.passport` | `mrzPassport` | Pasaport veri sayfası (TD3 MRZ); pasaport dik tutulursa "yana çevirin" yönergesi çıkar |
+| `.turkishID` | `mrzTurkishID` | Ön ve arka yüzün birleşik anahtar kelime kümesi. MRZ'yi ayrıştırır; TCKN, soyad ve ad zorunlu |
+| `.passport` | `mrzPassport` | Pasaport veri sayfası (TD3 MRZ); iki yönde de tutulabilir, yön uyarısı çıkmaz |
 | `.turkishDrivingLicense` | `visionText` | TR ehliyet |
 | `.bankCard` | `visionText` | Banka kartı |
-| `.a4Document` / `.generic` | `imageOnly` | Serbest belge. Alan çıkarmaz, düzgün kırpılmış görsel verir (AddressConfirm bunu kullanır) |
+| `.a4Document` | `visionText` | A4 sayfa. Bütün metni okur, alan çıkarmaz |
+| `.generic` | `imageOnly` | Serbest belge. Alan çıkarmaz, düzgün kırpılmış görsel verir (AddressConfirm bunu kullanır) |
 
 Anahtar kelime kapısı (keyword gating): profildeki `keywordSet` içindeki ibareler ("TÜRKİYE
 CUMHURİYETİ / KİMLİK KARTI" gibi) görünmeden çekim yapılmaz. Böylece masadaki rastgele bir
@@ -83,7 +87,7 @@ let profile = DocumentProfile(
                         isRequired: true,
                         regionOfInterest: FieldRegion(x: 0.05, y: 0.60, width: 0.5, height: 0.15))
     ],
-    keywordSet: DocumentKeywordSet(keywords: [DocumentKeyword(text: "PERSONEL")])
+    keywordSet: DocumentKeywordSet(keywords: [DocumentKeyword(variants: ["PERSONEL"])])
 )
 // veya: try DocumentProfile(decoding: jsonData)
 ```
@@ -122,7 +126,7 @@ Anahtarlar `documentNumber`, `tckn`, `birthDate` ve `expirationDate` (YYAAGG), `
 çevrilerek karşılaştırılır (Ş→S, İ→I). Boş ya da verilmeyen anahtar karşılaştırılmaz, değer
 MRZ'den gelir. SDK'nın kimlik ekranı arka yüzde buraya ön yüzde okunanları koyar; uyuşmazsa
 otomatik çekim olmaz, "Kimlik bilgileri okunamıyor" çıkar, Manuel Çek açık kalır.
-3.2.2'den itibaren kendi kimlik ekranınızdaki `IdentityScannerView` da, bu değeri vermediyseniz, TC
+3.3.0'dan itibaren kendi kimlik ekranınızdaki `IdentityScannerView` da, bu değeri vermediyseniz, TC
 kimlik arka yüzünde aynısını yapar ([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve));
 `ScannerConfiguration.fastIdCaptureEnabled = false` bunu kapatır.
 
@@ -130,6 +134,15 @@ kimlik arka yüzünde aynısını yapar ([Hızlı çekim ve çerçeve](#hızlı-
 var configuration = ScannerConfiguration.idBack
 configuration.expectedMRZValues = ["tckn": "11717252118", "birthDate": "940107"]
 ```
+
+TC kimlikte MRZ karşılaştırmasının iki istisnası vardır:
+
+- Bütün kontrol hanelerinden geçen MRZ, verilen değerden belge no, doğum ya da son geçerlilik
+  tarihinde tek karakterle ayrılıyorsa ve o alanın kontrol hanesi verilen değeri reddediyorsa yine
+  okunmuş sayılır (ön yüz yanlış okunmuştur). MRZ'deki değer geçerli olur, fark loga yazılır.
+- Otomatik çekimde MRZ'nin kontrol haneleri ve TC kimlik no sağlaması tutuyorsa belge no, TCKN ve
+  iki tarih yeter; adlar uyuşmasa da MRZ okunmuş sayılır. Bu durumda ad, cinsiyet ve uyruk MRZ'den
+  alınmaz.
 
 Kesin MRZ okuması çekimden sonra yapılır. Canlı kural yalnızca çekimin ne zaman yapılacağına
 karar verir.
@@ -154,6 +167,10 @@ let back = DocumentProfile.turkishIDBack
 
 IdentityScannerView(profile: back) { result in … }
 ```
+
+`settingMRZRequired(_:)` `format` ve `level`'ı korur ama `issuingState`'i `"TUR"`'a döndürür; MRZ'de
+TC kimlik no sağlaması da aranır. Türkiye dışındaki bir kartın profilinde kuralı ülke koduyla
+yeniden verin: `.settingMRZ(MRZRequirement(format: .td1, isRequired: false, issuingState: "AZE"))`.
 
 Kopya iki yerde geçerli olur: kendi ekranınızdaki `IdentityScannerView(profile:)` içinde ya da
 aynı `id` ile `DocumentProfileRegistry.shared.register(_:)` çağrıldıktan sonra `DocumentScanner`
@@ -258,12 +275,17 @@ Format verildiğinde:
   adı) çalışmaz. Profilin okuduğu alanlar aşağıdaki anahtarlarla sunucuya giden modele yazılır.
 - `isRequired` bir alan okunamadıysa ya da bir doğrulayıcı tutmadıysa çekim yüklenmez, kullanıcı
   aynı yüzü yeniden çeker. Elle çekimde de böyledir.
+- `IdentityScanner.setup()` çağrıldıysa `MRZValidator` her çekimde koşar. Bir yüzde `surname`,
+  `givenNames`, `documentNumber`, `birthDate` ya da `expirationDate` okunmadıysa o yüz yüklenmez.
+  Yukarıdaki örneğin ön yüzünde `expirationDate` alanı yok; `setup()` çağırıyorsanız ekleyin.
 - Arka yüzde ön yüzle karşılaştırılan MRZ alanları: belge no, doğum tarihi, geçerlilik tarihi,
   soyad, ad. Tarihler ön yüzde `gg.aa.yyyy` okunduysa karşılaştırılır.
 - Pasaport ve "diğer" belge formattan etkilenmez.
 
-`setupSDK`'da `idCardLang` değerini `.TR` bırakmayın (`.AZ` ya da `.OTHER` verin): NFC
-anahtarının elle düzeltilmesinde belge numarası `.TR` iken TC kimlik kartı biçimine göre denetlenir.
+`setupSDK`'da `idCardLang` değerini `.TR` bırakmayın (`.AZ` ya da `.OTHER` verin). `.TR` iken NFC
+her başladığında arka yüz MRZ'sindeki belge numarası TC kimlik kartı biçimine göre denetlenir;
+uymazsa yerine ön yüzde okunan seri no kullanılır. NFC bilgi düzeltme ekranı dilden bağımsız
+olarak kimlikte 1 harf ve 8 harf/rakam ister (ör. A32R17869).
 
 Sunucuya giden alanlar (`SDKIdCardFormat.Key`):
 
@@ -314,7 +336,9 @@ Sınırlar:
 Kayıtlı doğrulayıcılar sonuçlarını `validationResults`'a yazar. `doc.isValid` bunların özetidir.
 
 - `TCKNValidator`: TC kimlik numarasının checksum kontrolü
-- `MRZValidator`: MRZ satırlarının check-digit kontrolü
+- `MRZValidator`: MRZ satırlarının check-digit kontrolü. Profile bakmadan her belgede
+  `surname`, `givenNames`, `documentNumber`, `birthDate` ve `expirationDate` alanlarını da arar;
+  biri yoksa `isValid` `false` olur (ör. `.generic`, `.bankCard`, `.a4Document`).
 
 Kendi kuralınız için `DocumentValidator` protokolünü uygulayın:
 
@@ -328,17 +352,21 @@ struct AgeValidator: DocumentValidator {
 Task { await DocumentValidatorRegistry.shared.register(AgeValidator()) }
 ```
 
+Her doğrulayıcının `key`'i farklı olmalı. Aynı `key` ile yapılan kayıt öncekinin yerine geçer;
+hazır doğrulayıcılar `"tckn"` ve `"mrz"` adını kullanır. Doğrulayıcıların koşma sırası ve
+`validationResults`'taki sıra belirsizdir, sonuçları `field` adıyla okuyun.
+
 ---
 
 ## Sonuç Modeli — `RecognizedDocument`
 
 | Alan | Anlam |
 |---|---|
-| `croppedImage` | Kırpılmış, perspektifi düzeltilmiş belge görseli |
+| `croppedImage` | Belge görseli. Kart köşeleri bulunduysa kenarlardan kırpılır ve perspektifi düzeltilir, bulunmadıysa kılavuz çerçeveden kırpılır |
 | `fields` | Alan sözlüğü (`FieldDescriptor.key` → `DocumentField`) |
 | `rawText` | Belgeden okunan tüm ham metin |
 | `validationResults` | Alan bazlı doğrulama sonuçları |
-| `isValid` | Tüm zorunlu doğrulamalar geçti mi |
+| `isValid` | Kayıtlı doğrulayıcıların bütün sonuçları geçti mi. Doğrulayıcılar profile bakmaz; `MRZValidator` ad, soyad, belge numarası ve tarih alanları olmayan belgeyi geçersiz sayar |
 | `profileID` | Sonucu üreten profil |
 
 ## Görünüm ve Davranış Ayarları
@@ -365,8 +393,12 @@ TC kimlikte hızlı çekim kararı `frameMode:` parametresine değil `configurat
 çerçeveyi değiştirecekseniz `configuration` içinde verin
 ([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
-Şu an değiştiremedikleriniz: tarayıcının kendi HUD'u gizlenemez. Talimat metninin konumu ve yazı
-stili, elle çekim ve iptal düğmeleri yerinde kalır; yalnızca metinleri değiştirebilirsiniz.
+Yönerge satırını `showsGuidance` ile gizleyebilirsiniz. 3.3.0'dan itibaren yerini
+`guidancePosition` ile seçersiniz: alt, çerçevenin içi ya da çerçevenin hemen üstü
+([Yönerge satırının yeri](#yönerge-satırının-yeri-330)). Satırın yazı tipi temayı izler; boyutu ve
+rengi değişmez. "Manuel Çek" düğmesini `automation.manualCaptureFallback = false` kapatır
+([Otomatik Davranışlar](#otomatik-davranışlar--scannerautomation)). Tarayıcıda iptal düğmesi
+yoktur; sunumu siz kapatırsanız `onResult` çağrılmaz.
 Çerçevenin içine host içeriği (ör. kart çizimi) koyamazsınız. Fener, kapat düğmesi ya da adım
 göstergesi gibi öğeleri tarayıcının üstüne `ZStack` ile kendiniz çizebilirsiniz.
 
@@ -382,22 +414,27 @@ ve arka yüzü aynı kamera oturumunda çekmek için `keepsCameraRunning: true` 
 
 Tarayıcının bütün yönerge metinleri (`idle`, `focusing`, `reading`, `locked`, `tooClose`,
 `tooFar`, `centreDocument`, `align`, `glare`, `manualCapture`...) aktif SDK diline
-göre hazır gelir ve her biri tek tek değiştirilebilir. `glare` metnini boş verirseniz yalnızca
+göre hazır gelir ve her biri tek tek değiştirilebilir. `ScannerGuidanceTexts` init'inde `cancel`
+ve `manualCaptureTitle` da zorunludur, ama hiçbir ekran bu ikisini göstermez. `glare` metnini boş verirseniz yalnızca
 metin kaybolur, parlama kontrolü çalışmaya devam eder (kontrolü kapatmak için
 [Otomatik Davranışlar](#otomatik-davranışlar--scannerautomation) bölümüne bakın).
 
-Üç hazır kompozisyon var ve her birinin global override kancası bulunuyor:
+Dört hazır kompozisyon var ve her birinin global override kancası bulunuyor:
 
 ```swift
-ScannerConfiguration.default    // kimlik kartı (override: .overrideDefault)
-ScannerConfiguration.passport   // pasaport      (override: .overridePassport)
-ScannerConfiguration.document   // serbest belge (override: .overrideDocument)
+ScannerConfiguration.default    // kimlik ön yüz   (override: .overrideDefault)
+ScannerConfiguration.idBack     // kimlik arka yüz (override: .overrideIDBack)
+ScannerConfiguration.passport   // pasaport        (override: .overridePassport)
+ScannerConfiguration.document   // serbest belge   (override: .overrideDocument)
 
-// Örnek: tüm kimlik taramalarında bekleme metnini değiştir
-var cfg = ScannerConfiguration.default
-cfg.texts.idle = "Kimliğinizi çerçeveye yerleştirin"
-ScannerConfiguration.overrideDefault = cfg
+// Örnek: kimlikte bekleme metnini değiştir (ön ve arka yüz)
+SDKLocalization.shared.setOverride(key: .scannerIdleId, language: .tr,
+                                   value: "Kimliğinizi çerçeveye yerleştirin")
 ```
+
+Override kancası yapılandırmayı verildiği haliyle dondurur. `overrideDefault` yalnız ön yüzü
+değiştirir; metni dil değişince güncellenmez, sonradan yapılan `ScannerTimingConfig.default` ayarı
+da uygulanmaz. Yalnız metni değiştirmek için `SDKLocalization` kullanın.
 
 Çekim hızı, odak davranışı ve elle çekim düğmesinin gecikmesi `timing` altında ayarlanır
 (`ScannerTimingConfig`).
@@ -405,7 +442,7 @@ TC kimlikte `sweepPassDuration`'ı değiştirmek (kısaltmak da), `capturesPhoto
 da `stabilityConfirmFrames`'i 4'ün üstüne çıkarmak hızlı çekimi kapatır
 ([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 
-Duruma bağlı yedi metin daha vardır. Boş bırakılan gösterilmez:
+Duruma bağlı dokuz metin daha vardır. Boş bırakılan gösterilmez:
 
 | Metin | Ne zaman | Kimlik için varsayılan |
 |---|---|---|
@@ -416,6 +453,8 @@ Duruma bağlı yedi metin daha vardır. Boş bırakılan gösterilmez:
 | `upsideDown` | Sabit çerçevede belge baş aşağı tutulursa. Kare 180° çevrilip anahtar kelimeler yeniden aranır; iki yüzde de çalışır. Pasaportta gösterilmez. | Kimlik ters duruyor, düzeltin |
 | `tilted` | Sabit çerçevede belge 12° ve üstü eğik tutulursa. Pasaportta gösterilmez. | Kimlik eğik duruyor, düzeltin |
 | `unreadable` | Kart çerçeveye oturmuş, net ve sabitken zorunlu bir alan ya da zorunlu MRZ 2 saniye boyunca okunamazsa. Profilde zorunlu alan yoksa gösterilmez. Duruş, mesafe, parlama ve odak uyarılarından sonra gelir. | Kimlik bilgileri okunamıyor |
+| `turnToFront` | Ön yüz taranırken kartın arka yüzü çerçevede kalırsa. Yalnız hızlı çekimde. | Kartın arka yüzü görünüyor. Lütfen kartı çevirip ön yüzünü gösterin. |
+| `turnToBack` | Arka yüz taranırken ön yüz çerçevede kalırsa. Yalnız hızlı çekimde. | Kartın ön yüzü görünüyor. Lütfen kartı çevirip arka yüzünü gösterin. |
 
 `orientation`, `upsideDown` ve `tilted` duruş uyarısıdır ve yaklaştır/uzaklaştır uyarısından önce gelir.
 
@@ -497,16 +536,16 @@ Tarayıcı belgenin karedeki yerini iki yoldan biriyle bulur:
 
 | Mod | Nasıl çalışır |
 |---|---|
-| `.fixedFrame(ScannerFixedFrame)` | Ekrana sabit bir çerçeve çizilir, kullanıcı belgeyi ona hizalar. OCR yalnızca çerçevenin içini okur. Varsayılan budur. |
-| `.dynamicQuad` | Belge canlı dikdörtgen tespitiyle takip edilir ve perspektifi düzeltilir. |
+| `.fixedFrame(ScannerFixedFrame)` | Ekrana sabit bir çerçeve çizilir, kullanıcı belgeyi ona hizalar. OCR yalnızca çerçevenin içini okur. Kimlik ve pasaportta varsayılan budur. |
+| `.dynamicQuad` | Belge canlı dikdörtgen tespitiyle takip edilir ve perspektifi düzeltilir. Serbest belgede varsayılan budur. |
 
 Mod her belge türü için ayrı seçilir. `ScannerConfiguration` presetleri de zaten türe göre ayrıdır:
 
 ```swift
-// Varsayılanlar — üçü de sabit çerçeve
+// Varsayılanlar: kimlik ve pasaport sabit çerçeve, serbest belge takip modu
 ScannerFrameMode.idCardDefault   = .fixedFrame(.idCard)     // kimlik
 ScannerFrameMode.passportDefault = .fixedFrame(.passport)   // pasaport
-ScannerFrameMode.documentDefault = .fixedFrame(.document)   // serbest belge
+ScannerFrameMode.documentDefault = .dynamicQuad             // serbest belge
 
 // Takip moduna dönmek: tek satır
 // (TC kimlikte hızlı çekimi de kapatır)
@@ -559,14 +598,14 @@ TC kimlik kartının ön ve arka yüzünde (`.turkishIDFront`, `.turkishIDBack` 
 kilitlenince tarayıcı daha az kare bekler, fotoğrafı tarama animasyonunun başında çeker ve
 animasyonu kısaltır. Bu hızlı çekim varsayılan olarak açıktır: SDK'nın kimlik ekranında
 3.2.1'den, kendi kimlik ekranınızda ya da KYC dışında kullandığınız `IdentityScannerView`'da
-(`.documentScanner` dahil) 3.2.2'den itibaren. Pasaportta, eski tip belgede (`.oldSchool`),
+(`.documentScanner` dahil) 3.3.0'dan itibaren. Pasaportta, eski tip belgede (`.oldSchool`),
 `idCardFormat` ile verilen kartta ve `idCardLang` `.TR` değilken açılmaz; bu belgeler aşağıdaki
 ayardan bağımsız olarak önceki akışla çekilip okunur.
 
 Hızlı çekimi kapatıp önceki akışa dönmek için kimlik taraması başlamadan, ör. uygulama açılışında:
 
 ```swift
-// 3.2.2+, varsayılan true. SDK'nın kimlik ekranı dahil bütün TC kimlik taramaları için
+// 3.3.0+, varsayılan true. SDK'nın kimlik ekranı dahil bütün TC kimlik taramaları için
 ScannerConfiguration.fastIdCaptureEnabled = false
 ```
 
@@ -706,8 +745,8 @@ IdentityScannerView(profile: .turkishIDFront, configuration: cfg) { … }
 `fieldLocking` açıkken tarayıcı her alanı bir kez geçerli okuyunca kilitler ve o alanı yeniden
 aramaz. Gölgede ya da titrek elde bir alanın arada bir okunamaması çekimi geciktirmez.
 
-- TC no sağlamasından geçtiği için tek okumada kilitlenir. Diğer alanlar ve MRZ aynı değer
-  iki kez okununca kilitlenir.
+- TC no ve MRZ kontrol hanesinden geçtiği için aynı değer iki kez okununca kilitlenir. Diğer
+  alanlar için üç okuma gerekir.
 - Kilit süreyle düşmez. Kart çerçeveden çıkınca ya da kadraj büyük oynayınca düşer; eşik
   `ScannerTimingConfig.fieldLockDropMotion` (varsayılan `15`).
 - Çekimden sonra fotoğraftan okunan değerler kilitlenenlerle karşılaştırılır. Harf büyüklüğü,
@@ -746,8 +785,10 @@ Varsayılanlar aşağıdaki gibidir.
 
 ```swift
 // Gölgede daha erken ve daha güçlü aydınlat
-ScannerConfiguration.default.timing.exposureBoostISO = 500
-ScannerConfiguration.default.timing.exposureBoostEV = 1.0
+ScannerTimingConfig.default.exposureBoostISO = 500
+ScannerTimingConfig.default.exposureBoostEV = 1.0
+ScannerTimingConfig.idBack.exposureBoostISO = 500   // arka yüz kendi ayarını kullanır
+ScannerTimingConfig.idBack.exposureBoostEV = 1.0
 ```
 
 #### Fener düğmesi
@@ -765,8 +806,8 @@ var cfg = ScannerConfiguration.default
 cfg.showsTorchButton = false
 ```
 
-İki davranış kapatılamaz: loş ışıkta pozlamanın fark ettirmeden artırılması ve kontrast destekli
-ikinci tespit geçişi. İkisi de ekranda görünmez, yalnızca tespiti kurtarır. Çekim titreşimini
+Kontrast destekli ikinci tespit geçişi kapatılamaz; ekranda görünmez, yalnızca tespiti kurtarır.
+Pozlama artışını `exposureBoost` kapatır. Çekim titreşimini
 `SDKHapticConfig` ile (modül bazında da) kapatabilirsiniz. `.fixedFrame` modunda lens hiç değişmez;
 iki lens anahtarının yalnızca `.dynamicQuad` modunda bir etkisi vardır.
 
@@ -787,7 +828,6 @@ Tarayıcı her zaman geniş lensle açılır.
 - Dokunarak odaklama (sarı odak göstergesi). Sabit çerçevede belge oturunca odak bir kez daha
   tetiklenir; nokta değişmediği için sürekli AF'e aynı noktayı ikinci kez yazmak hiçbir işe
   yaramıyordu.
-- Pasaport dik tutulursa "yana çevirin" yönergesi çıkar.
 
 ---
 
@@ -806,7 +846,7 @@ görüntünün nereden geldiğini bilmez. İki yol arasındaki kalite farkı da
 buradan doğar. Örnek ve iki yolun karşılaştırması:
 [IdCard rehberi](../../IdentifySample/Modules/IdCard/IdCard.md#kendi-tasarımınızla-override).
 
-3.2.2'den itibaren TC kimlikte bir istisna var: tarayıcının `croppedImage`'ını değiştirmeden
+3.3.0'dan itibaren TC kimlikte bir istisna var: tarayıcının `croppedImage`'ını değiştirmeden
 `vm.scanFront(image:)` / `scanBack(image:)`'a verirseniz okuma `document:` yolundaki gibi yapılır
 ([Hızlı çekim ve çerçeve](#hızlı-çekim-ve-çerçeve)).
 

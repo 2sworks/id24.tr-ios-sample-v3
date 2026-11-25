@@ -56,7 +56,7 @@ IdentifyManager.shared.setupSDK(
 | `IdentifyManager.shared.flowResultDelegate` | UIKit / delegate tarzı mimari (`IdentifyFlowResultListener`). Referans **weak** tutulur, nesneyi siz saklayın |
 | `eventDelegate` → `session.finished` | Analitik, React Native / Flutter köprüleri (metadata ile) |
 | `IdentifyManager.shared.lastFlowOutcome` | Sonradan okumak için (ör. sonuç ekranı override'ında); bir sonraki `setupSDK`'ya kadar durur |
-| `sdk_logs` → `Akış sonucu — …` satırı | Sunucu tarafında destek ve inceleme için. Host'un dinleyici bağlaması gerekmez |
+| `sdk_logs` → `Akış sonucu — …` satırı | Sunucu tarafında destek ve inceleme için. Host'un dinleyici bağlaması gerekmez. Satır kapanıştan hemen önce yazıldıysa o oturumda gitmeyebilir, aynı cihazda açılan sonraki oturumla gider ([Loglama](logging.md)) |
 
 Üç kanal (`onFinished`, `onFlowFinished`, `flowResultDelegate`) aynı `SDKFlowOutcome`'u alır ve
 birlikte kullanılabilir.
@@ -75,9 +75,12 @@ IdentifyManager.shared.flowResultDelegate = resultHandler    // setupSDK'dan ÖN
 Aynı sonuç sunucu logunda şöyle görünür:
 
 ```
-Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz & Nfc Screen, adım: 1/1.
+Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz & Nfc Screen, adım: 1/1, tam doğrulandı: evet, NFC zincir: passed, imza: passed, veri: passed, CA: passed, AA: notPerformed.
 Oturum sonlandı — son modül: Mrz & Nfc Screen, akış tamamlandı, sebep: 4100 (flowCompleted): Akış tamamlandı — bağlantı normal kapatıldı
 ```
+
+NFC kısmı yalnız çip okunduysa yazılır. Sertifika zinciri kontrol edilmediyse (`notPerformed`)
+arkasına `uyarı: CSCA listesi verilmedi, sertifika zinciri kontrol edilmedi` eklenir.
 
 ---
 
@@ -89,7 +92,7 @@ Oturum sonlandı — son modül: Mrz & Nfc Screen, akış tamamlandı, sebep: 41
 | `reason` | `SDKFlowEndReason` | Hangi yoldan çıkıldığı (bkz. [Tüm çıkış yolları](#4-tüm-çıkış-yolları)) |
 | `lastModule` | `SdkModules?` | Oturumun bittiği modül (henüz modül açılmadıysa `nil`) |
 | `modules` | `[SdkModules]` | Bu oturumda akışa alınan modüller (cihazda çalışamayanlar hariç) |
-| `skippedModules` | `[SdkModules]` | Doğrulanmadan geçilen modüller: atlananlar, cihazda ya da belgede bulunamayanlar, NFC hata sınırına takılanlar |
+| `skippedModules` | `[SdkModules]` | Doğrulanmadan geçilen modüller: atlananlar, cihazda çalışamayanlar (NFC donanımı ya da yüz takibi yok), anahtar düzeltme hakkı (`nfcKeyEntry`) biten NFC |
 | `stepIndex` / `totalSteps` | `Int` | Adım sayacı |
 | `terminateReason` | `String?` | Panel kapattıysa sebep, olduğu gibi |
 | `statusSummary` | `StatusSummary?` | Panel kararı: `id`, `type`, `name_tr` / `name_en` / `name_de` |
@@ -97,8 +100,9 @@ Oturum sonlandı — son modül: Mrz & Nfc Screen, akış tamamlandı, sebep: 41
 | `errorMessage` | `String?` | `setupFailed` için hata metni |
 | `nfcVerification` | `SDKNFCVerification?` | Son NFC okumasının çip kontrolleri. Oturumda çip okunmadıysa `nil`. Bkz. [Çip doğrulama ayrıntısı](#çip-doğrulama-ayrıntısı) |
 | `sessionId` / `timestampMs` | | Oturum kimliği ve zaman |
-| `isSuccess` | `Bool` | `.approved` için `true`. `IdentifyManager.shared.skipsCountAsFailure` açıksa atlanan modül olduğunda `false` |
-| `isFullyVerified` | `Bool` | Oturum onaylandıysa ve `skippedModules` boşsa `true` |
+| `isSuccess` | `Bool` | `.approved` için `true`. `IdentifyManager.shared.skipsCountAsFailure` açıksa `isFullyVerified` ile aynıdır: atlanan modül ya da başarısız çip kontrolü varsa `false` |
+| `isFullyVerified` | `Bool` | Oturum onaylandıysa, `skippedModules` boşsa ve hiçbir çip kontrolü başarısız olmadıysa `true`. Yapılmayan kontrol (`notPerformed`) sonucu bozmaz |
+| `verificationWarnings` | `[SDKVerificationWarning]` | Yapılmayan ama oturumu bozmayan kontroller, yoksa boş. Şu an tek değer `nfcCertificateChainNotChecked`: çip okundu, `certificateChain` `notPerformed` (bkz. [Çip doğrulama ayrıntısı](#çip-doğrulama-ayrıntısı)) |
 | `verifiedModules` | `[SdkModules]` | `modules` listesinden `skippedModules` çıkarılmış hali. Yalnızca `.approved` oturumda anlamlıdır, yarıda kalan akışta hangi adımlara gelindiğini söylemez |
 | `toDictionary()` | | RN/Flutter için sözlük |
 
@@ -136,14 +140,16 @@ okumaya aittir, yeni okuma çip okuyamazsa `nil` olur. Her kontrol `passed`, `fa
 | `activeAuthenticationFailed` | Active Authentication başarısız, çip ayrıntı vermiyor |
 | `other` | Bozuk SOD gibi diğer durumlar |
 
-Bu alanlar bilgi içindir. Sunucuya giden NFC gövdesi değişmez, nihai onay sunucudadır.
+Bu alanlar bilgi içindir; başarısız bir kontrol `isFullyVerified`'ı `false` yapar. Sunucuya giden
+NFC gövdesi değişmez, nihai onay sunucudadır.
 
 ---
 
 ## 4) Tüm çıkış yolları
 
 Tablolardaki "Ekran" sütunu, `showThankYouPage: true` iken kullanıcının gördüğü ekrandır.
-`false` iken hiçbir yolda sonuç ekranı açılmaz; SDK bulunduğu ekrandan aşağı kayarak kapanır.
+`false` iken sonuç ekranı açılmaz; SDK bulunduğu ekrandan aşağı kayarak kapanır. Tek istisna
+`quitSDK`: ThankYou ekranını yine döndürür, göstermeyin (`hostQuit` satırı).
 "Kapanış" sütunu, `sdk_logs`'ta ve `lastSocketCloseCode`'da görünen socket kodudur.
 
 ### 4.1 Akış tamamlandı / panel karar verdi
@@ -156,11 +162,14 @@ Tablolardaki "Ekran" sütunu, `showThankYouPage: true` iken kullanıcının gör
 | `agentDecision` | `neutral` | Panel `terminateCall` + `neutral` statü | ThankYou, tamamlanamadı | 4103 | `terminateReason`, `statusSummary` |
 | `agentDecision` | `approved` | Bağlantı koptu, yeniden bağlanıldı ve panelde kayıtlı statü `positive` çıktı | ThankYou, başarılı | 4103 | `statusSummary` (`terminateReason` yok) |
 
+Statü id'si `-3`, `-4` ya da `-5` olan (tipi ne olursa olsun) ya da sorunlu bir kapanış sebebiyle
+gelen `terminateCall` karar sayılmaz ve sonuç üretmez, bkz. [4.5](#45-sonuç-üretmeyenler-oturum-sürer).
+
 ### 4.2 Akış tamamlanamadı
 
 | `reason` | `result` | Tetikleyen | Ekran | Kapanış | Dolu gelen alanlar |
 |---|---|---|---|---|---|
-| `moduleFailed` | `notCompleted` | Bir modülün (Selfie, Kimlik, OVD, NFC, Canlılık, Selfie+Canlılık) karşılaştırma hakkı bitti ve backend atlamaya izin vermiyor | ThankYou, tamamlanamadı | 4101 | `lastModule` = başarısız modül |
+| `moduleFailed` | `notCompleted` | Bir modülün (Selfie, Kimlik, OVD, NFC, Canlılık, Selfie+Canlılık) hakkı bitti (karşılaştırma, canlılık adımı ya da kaydı, çoklu yüz) ve atlama kapalı (panel ayarı ya da `SDKAttemptLimits` `onExhausted`). NFC anahtar düzeltme hakkında panel ayarına bakılmaz: akış yalnız NFC için `onExhausted: .fail` verildiyse burada biter, verilmediyse modül doğrulanmadan geçer | ThankYou, tamamlanamadı | 4101 | `lastModule` = başarısız modül |
 | `userEndedCall` | `notCompleted` | Kullanıcı "Görüşmeyi bitir"e bastı | ThankYou, tamamlanamadı | 4101 | `lastModule` |
 | `userEndedCall` | `notCompleted` | Görüşme `terminateCall` gelmeden kapandı (`endCall`) ve akış sona ulaştı | ThankYou, tamamlanamadı | 4100 | `lastModule` |
 
@@ -170,7 +179,7 @@ Tablolardaki "Ekran" sütunu, `showThankYouPage: true` iken kullanıcının gör
 |---|---|---|---|---|
 | `userExited` | `cancelled` | İlk ekranda geri butonu (`coordinator.popBack()`) | Host'un kök ekranı | 4102 |
 | `userExited` | `cancelled` | `IdentifyManager.shared.killSDKByUser` (panele `quitSDKOnMobile` gider) | — | 4101 |
-| `hostQuit` | `cancelled` | Host `quitSDK(callback:)` çağırdı (önceden sonuç üretilmediyse) | callback'teki controller | 4101 |
+| `hostQuit` | `cancelled` | Host `quitSDK(callback:)` çağırdı (önceden sonuç üretilmediyse) | callback'teki controller: `showThankYouPage`'e bakılmadan ThankYou döner, `false` verdiyseniz göstermeyin | 4101 |
 | `hostExit` | `cancelled` | Host `exitSDK()` çağırdı | — | 4102 |
 | `hostForceQuit` | `cancelled` | Host `forceQuitSDK()` çağırdı | — | 4103 |
 | `appTerminated` | `cancelled` | Oturum açıkken uygulama kapatıldı (sistem izin verdiği ölçüde; log bir sonraki oturumda gönderilir) | — | — |
@@ -207,7 +216,7 @@ host'larda uyarı yoktur, `roomOccupied` ret anında gelir.
 | Bağlantı kopması (ağ, heartbeat 4109, ping 4107, TURN 4140–4142) | Bağlantı Koptu | Yeniden bağlanınca modül baştan başlar |
 | Uygulama 30 sn'den uzun arka planda kaldı (4105) | Dönüşte Bağlantı Koptu | Aynı |
 | Çağrı yanıtlanmadı (4108) / `missedCall` | Bekleme odası | Sıraya devam edilir |
-| Karar içermeyen `terminateCall` (statü yok, id `-3`, sorunlu kapanış sebepleri) | Bağlantı Koptu, ardından bekleme odası | Temsilci yeniden arayabilir |
+| Karar içermeyen `terminateCall` (statü yok; statü id'si `-3`, `-4` ya da `-5`; sorunlu kapanış sebepleri) | Bağlantı Koptu, ardından bekleme odası | Temsilci yeniden arayabilir |
 | Modül atlandı (hak tükendi, atlama izinli) | Sıradaki modül | Modül `skippedModules`'a eklenir |
 
 Kullanıcı bu durumlardan hiç dönmezse sonuç, host'un sonraki `exitSDK` / `forceQuitSDK`
@@ -227,7 +236,7 @@ yoldan işler. Her modülün kendine özgü çıkışları için:
 
 ### 5.1 Başlangıç
 
-- Panelde akışa yalnızca NFC eklendi (`RoomResponse.modules = ["nfc"]`).
+- Panelde akışa yalnızca NFC eklendi (`RoomResponse.data?.modules = ["nfc"]`).
 - Host uygulama `setupSDK`'yı `showThankYouPage: false` ve `onFinished` ile çağırıyor; sonuç
   ekranını kendisi gösterecek.
 
@@ -241,6 +250,7 @@ IdentifyManager.shared.setupSDK(
         KycRouter.shared.handle(outcome)            // ← çıkışın yakalandığı tek yer
     }
 ) { socket, room, error in
+    if let message = error?.errorMessages, !message.isEmpty { return }   // setupFailed onFinished'a da gelir
     if socket?.isConnected == true, room.result == true { coordinator.start() }
 }
 ```
@@ -261,7 +271,7 @@ olmadığı için SDK oturumu kapatır. Sıra şöyle:
 | # | Ne olur | Nerede görünür |
 |---|---|---|
 | 1 | Akışın sonuna gelindi, sonuç üretilir: `approved / allModulesCompleted` | — |
-| 2 | Sonuç sunucu loguna yazılır | `sdk_logs`: `Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz & Nfc Screen, adım: 1/1.` |
+| 2 | Sonuç sunucu loguna yazılır | `sdk_logs`: `Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz & Nfc Screen, adım: 1/1, tam doğrulandı: evet, NFC zincir: passed, imza: passed, veri: passed, CA: passed, AA: notPerformed.` |
 | 3 | `session.finished` ve `session.completed` olayları yayınlanır | `eventDelegate`, RN/Flutter köprüsü |
 | 4 | **`onFinished(outcome)` çağrılır** (main thread), ardından `onFlowFinished` ve `flowResultDelegate` | Sizin kodunuz |
 | 5 | Socket 4100 (`flowCompleted`) ile kapatılır; panel oturumun normal bittiğini görür | `lastSocketCloseCode` |
@@ -271,6 +281,10 @@ olmadığı için SDK oturumu kapatır. Sıra şöyle:
 
 `showThankYouPage: true` olsaydı 6. adımda ThankYou "başarılı" açılır, kullanıcı butona basınca
 akış kök ekrana dönerdi. `onFinished` yine 4. adımda, ThankYou açılırken gelirdi.
+
+2. ve 7. adımdaki satırlar kapanıştan hemen önce yazılır, o oturumda sunucuya gitmeyebilir.
+Gitmezse cihazda saklanır ve aynı cihazda açılan sonraki oturumla, kendi oturum kimliğiyle
+gönderilir. 30 dakika içinde yeni oturum açılmazsa silinir ([Loglama](logging.md)).
 
 ### 5.4 Developer çıkışı nerede görüyor, hangi verilerle?
 
@@ -381,8 +395,9 @@ Başlangıç aynı, ama müşteri NFC'yi başarıyla tamamlayamazsa:
 | Çip ile belge verisi uyuşmadı, hak var | Çağrılmaz. Uyarı çıkar, NFC ekranında tekrar denenir | | |
 | Karşılaştırma hakkı bitti, atlama izinli | `approved / allModulesCompleted` | `[nfc]` | 4100 |
 | Karşılaştırma hakkı bitti, atlama kapalı | `notCompleted / moduleFailed` | `[]` | 4101 |
-| Çip okunamadı, `nfcMaxErrorCount` sınırı | `approved / allModulesCompleted` | `[nfc]` | 4100 |
-| Manuel MRZ düzeltmesi üst üste başarısız | `approved / allModulesCompleted` | `[nfc]` | 4100 |
+| Çip okunamadı, `nfcMaxErrorCount` sınırı | Çağrılmaz. Anahtar düzeltme ekranı açılır | | |
+| Anahtar düzeltmesi 3 kez başarısız (`nfcKeyEntry`) | `approved / allModulesCompleted` | `[nfc]` | 4100 |
+| Aynısı, NFC için `onExhausted: .fail` | `notCompleted / moduleFailed` | `[]` | 4101 |
 | Cihazda NFC yok (`showNFCNotFoundPage: false`) | `approved / allModulesCompleted`, `modules = []` | `[nfc]` | 4100 |
 | NFC ekranında geri butonu | `cancelled / userExited` | `[]` | 4102 |
 | Uygulama kapatıldı | `cancelled / appTerminated` | `[]` | — |
@@ -392,7 +407,7 @@ Atlama izinli yolda log şöyle görünür:
 
 ```
 Modül sonucu — Mrz & Nfc Screen: atlandı.
-Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz & Nfc Screen, adım: 1/1, atlanan modüller: Mrz & Nfc Screen.
+Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Mrz & Nfc Screen, adım: 1/1, atlanan modüller: Mrz & Nfc Screen, tam doğrulandı: hayır, NFC zincir: passed, imza: passed, veri: passed, CA: passed, AA: notPerformed.
 ```
 
 ---
@@ -407,7 +422,7 @@ bittiğini `lastModule` ve `stepIndex / totalSteps`, hangi adımların doğrulan
 ### 6.1 Başlangıç
 
 - Panelde akış sırası: Kimlik (`idCard`) → NFC (`nfc`) → Selfie (`selfie`). Sırayı panel belirler,
-  SDK `RoomResponse.modules` sırasını izler.
+  SDK `RoomResponse.data?.modules` sırasını izler.
 - Host kodu Senaryo 1'deki ile aynı; modül sayısı entegrasyonu değiştirmez:
 
 ```swift
@@ -418,6 +433,7 @@ IdentifyManager.shared.setupSDK(
     showThankYouPage: false,
     onFinished: { outcome in KycRouter.shared.handle(outcome) }
 ) { socket, room, error in
+    if let message = error?.errorMessages, !message.isEmpty { return }   // setupFailed onFinished'a da gelir
     if socket?.isConnected == true, room.result == true { coordinator.start() }
 }
 ```
@@ -451,7 +467,7 @@ kaynaklar bırakılır.
 | `stepIndex` / `totalSteps` | `3` / `3` |
 
 ```
-Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Selfie, adım: 3/3.
+Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Selfie, adım: 3/3, tam doğrulandı: evet, NFC zincir: passed, imza: passed, veri: passed, CA: passed, AA: notPerformed.
 Oturum sonlandı — son modül: Selfie, akış tamamlandı, sebep: 4100 (flowCompleted): Akış tamamlandı — bağlantı normal kapatıldı
 ```
 
@@ -474,7 +490,7 @@ Panelde "sonuca rağmen modülü atla" ayarı kapalı.
 | `skippedModules` | `[]` |
 
 ```
-Akış sonucu — sonuç: notCompleted, sebep: moduleFailed, son modül: Mrz & Nfc Screen, adım: 2/3.
+Akış sonucu — sonuç: notCompleted, sebep: moduleFailed, son modül: Mrz & Nfc Screen, adım: 2/3, tam doğrulandı: hayır, NFC zincir: passed, imza: passed, veri: passed, CA: passed, AA: notPerformed.
 ```
 
 ```swift
@@ -597,9 +613,9 @@ Temsilci panelde olumlu statüyü seçip görüşmeyi kapatır. Soketten şu gel
 | `statusSummary` | `id`, `type = "positive"`, `name_tr` … (panelde seçilen statü) |
 
 ```
-Akış sonucu — sonuç: approved, sebep: agentDecision, son modül: Call Wait Screen, adım: 3/3, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: positive (id …).
+Akış sonucu — sonuç: approved, sebep: agentDecision, son modül: Call Wait Screen, adım: 3/3, tam doğrulandı: evet, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: positive (id …).
 Görüşme sonlandırma bildirimi alındı — sebep: NORMAL_CLOSE_BY_AGENT, panel statüsü: positive (id …)
-Sonlandırma sonucu: temsilci normal kapattı, oturum panelin statüsüyle bitiriliyor (positive)
+Sonlandırma sonucu: panel karar gönderdi (positive), oturum bitiriliyor
 ```
 
 ### 7.4 Görüşmenin diğer sonları
@@ -674,8 +690,8 @@ Modüller iki gruba ayrılır:
 
 - Karşılaştırmalı modüller: Kimlik, OVD, NFC, Selfie, Canlılık, Selfie + Canlılık. Sunucu sonucu
   belgeyle ya da önceki verilerle karşılaştırır. Bu modüllerin karşılaştırma hakkı vardır. Hak
-  biterse paneldeki "sonuca rağmen modülü atla" ayarına göre modül atlanır ya da oturum
-  `moduleFailed` ile biter.
+  biterse paneldeki "sonuca rağmen modülü atla" ayarına (ya da `SDKAttemptLimits` `onExhausted`
+  değerine) göre modül atlanır ya da oturum `moduleFailed` ile biter.
 - Karşılaştırmasız modüller: Hazırlık, Video kayıt, İmza, Konuşma, Adres. Hata olursa kullanıcıya
   mesaj gösterilir ve aynı ekranda tekrar denenir. Bu modüller oturumu kendiliğinden bitirmez.
 
@@ -717,7 +733,7 @@ sunucuda karşılaştırılır.
 | İlk ekranda (belge türü seçimi) geri | `cancelled / userExited` | `[]` | Kök ekran | 4102 |
 
 ```
-Akış sonucu — sonuç: notCompleted, sebep: moduleFailed, son modül: Id Card, adım: 1/1.
+Akış sonucu — sonuç: notCompleted, sebep: moduleFailed, son modül: Id Card, adım: 1/1, tam doğrulandı: hayır.
 ```
 
 ### 8.2 Kimlik OVD (`idcard_w_ovd`) — log adı `Id Card OVD`
@@ -743,8 +759,9 @@ Ayrıntılı anlatım Senaryo 1'de: [5.7 NFC'de işler farklı giderse](#57-nfcd
 | Veri uyuşmadı, hak var | Çağrılmaz. Önceki adıma dönülür (NFC ilk ekransa ekranda kalınır) | | |
 | Hak bitti, atlama izinli | `approved / allModulesCompleted` | `[nfc]` | 4100 |
 | Hak bitti, atlama kapalı | `notCompleted / moduleFailed` | `[]` | 4101 |
-| Çip okunamadı, `nfcMaxErrorCount` sınırı | `approved / allModulesCompleted` | `[nfc]` | 4100 |
-| Manuel MRZ düzeltmesi üst üste başarısız | `approved / allModulesCompleted` | `[nfc]` | 4100 |
+| Çip okunamadı, `nfcMaxErrorCount` sınırı | Çağrılmaz. Anahtar düzeltme ekranı açılır | | |
+| Anahtar düzeltmesi 3 kez başarısız (`nfcKeyEntry`) | `approved / allModulesCompleted` | `[nfc]` | 4100 |
+| Aynısı, NFC için `onExhausted: .fail` | `notCompleted / moduleFailed` | `[]` | 4101 |
 | Cihazda NFC yok | Modül akışa alınmaz. Akışta başka modül yoksa `approved`, `modules = []` | `[nfc]` | 4100 |
 
 ### 8.4 Selfie (`selfie`) — log adı `Selfie`
@@ -761,7 +778,7 @@ Müşteri yüzünü çeker ve yüz, belgedeki vesikalıkla karşılaştırılır
 
 ```
 Modül sonucu — Selfie: atlandı.
-Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Selfie, adım: 1/1, atlanan modüller: Selfie.
+Akış sonucu — sonuç: approved, sebep: allModulesCompleted, son modül: Selfie, adım: 1/1, atlanan modüller: Selfie, tam doğrulandı: hayır.
 ```
 
 ### 8.5 Canlılık (`livenessDetection`) — log adı `Liveness Detection`
@@ -772,7 +789,11 @@ yüz karşılaştırması yapılır. Modül ARKit yüz takibi ister.
 | Ne oldu | Tek/son modülse `onFinished` | `skippedModules` | Ekran | Kapanış |
 |---|---|---|---|---|
 | Adımlar, kayıt ve karşılaştırma geçti | `approved / allModulesCompleted` | `[]` | ThankYou, başarılı | 4100 |
-| Kayıt izni yok / kayıt başlamadı / kesildi / yüklenemedi | Çağrılmaz. Uyarı çıkar, test baştan başlar | | | |
+| Adım süresi doldu ya da yanlış hareket, hak var | Çağrılmaz. Aynı adım yeniden istenir | | | |
+| Adım hakkı bitti (`livenessStepFailure`, 3) | Hak bitti satırları geçerli | | | |
+| Kayıt izni yok / kayıt başlamadı | Çağrılmaz. Uyarı çıkar, kayıt yeniden denenir | | | |
+| Kayıt kesildi / durdurulamadı / boyutu aştı / yüklenemedi | Çağrılmaz. Uyarı çıkar, test baştan başlar | | | |
+| Kayıt hatası 3. kez (`livenessRecordingFailure`) | Hak bitti satırları geçerli | | | |
 | Yüz uyuşmadı, hak var | Çağrılmaz. Tekrar denenir | | | |
 | Hak bitti, atlama izinli | `approved / allModulesCompleted` | `[livenessDetection]` | ThankYou, başarılı | 4100 |
 | Hak bitti, atlama kapalı | `notCompleted / moduleFailed` | `[]` | ThankYou, tamamlanamadı | 4101 |
@@ -795,7 +816,7 @@ Derinlik kullanımını `selfieWithLivenessTrueDepth` ile seçersiniz (`.automat
 | Hak bitti, atlama izinli | `approved / allModulesCompleted` | `[selfieWithLiveness]` | ThankYou, başarılı | 4100 |
 | Hak bitti, atlama kapalı | `notCompleted / moduleFailed` | `[]` | ThankYou, tamamlanamadı | 4101 |
 | Cihaz seçilen modu desteklemiyor (akış kurulurken anlaşıldı) | `faceTrackingFallback`'e göre Selfie gelir ya da modül çıkar | `[selfieWithLiveness]` | | |
-| Cihazın desteklemediği ekranın içinde anlaşıldı | Uyarıdan sonra ekran kapanır: ilk ekransa `cancelled / userExited`, değilse önceki modüle dönülür | `[]` | | 4102 |
+| Cihazın desteklemediği, ekranın içinde anlaşıldı | Uyarıdan sonra modül atlanır, akış sıradaki modülle sürer. Tek/son modülse `approved / allModulesCompleted` | `[selfieWithLiveness]` | ThankYou, başarılı | 4100 |
 
 ### 8.7 Hazırlık (`prepare`) — log adı `Prepare`
 
@@ -933,6 +954,7 @@ onFinished: { outcome in
 ### 9.3 UIKit
 
 ```swift
+@MainActor
 final class KycCoordinator: IdentifyFlowResultListener {
     private weak var presenter: UIViewController?
     private var host: UIViewController?
@@ -1005,15 +1027,15 @@ Köprüler `eventDelegate`'i dinler; sonuç `session.finished` olayıyla gelir:
 ```ts
 IdentifySdk.addEventListener((event) => {
   if (event.name !== 'session.finished') return;
-  const { result, endReason, skippedModules, terminateReason, statusId } = event.metadata;
-  navigation.replace(result === 'approved' && !skippedModules ? 'KycSuccess' : 'KycReview',
-                     { result, endReason, terminateReason, statusId });
+  const { result, endReason, isFullyVerified, skippedModules, terminateReason, statusId } = event.metadata;
+  navigation.replace(isFullyVerified === 'true' ? 'KycSuccess' : 'KycReview',
+                     { result, endReason, skippedModules, terminateReason, statusId });
 });
 ```
 
-`skippedModules` metadata'da virgülle ayrılmış metin olarak gelir; atlanan modül yoksa anahtar hiç
-bulunmaz. SDK'yı `<Modal>` içinde sunuyorsanız `showThankYouPage: false` verin ve bu olayda
-`Modal`'ı kapatın.
+Metadata değerleri metindir: `isFullyVerified` `"true"` ya da `"false"` gelir, `skippedModules`
+virgülle ayrılmış bir listedir ve atlanan modül yoksa anahtarı hiç bulunmaz. SDK'yı `<Modal>`
+içinde sunuyorsanız `showThankYouPage: false` verin ve bu olayda `Modal`'ı kapatın.
 
 ---
 

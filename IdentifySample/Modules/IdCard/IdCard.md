@@ -1,9 +1,9 @@
 # IdCard — Kimlik Tarama (OCR)
 
 Akışın en temel adımı: kullanıcı kimlik kartının (veya pasaportunun) fotoğrafını çeker,
-SDK yazıları **cihaz üzerinde** okur (OCR) ve görseli sunucuya yükler. İnternete yalnızca
-yükleme için ihtiyaç vardır — okuma tamamen cihazda gerçekleşir, kimlik verisi ham fotoğraf
-dışında hiçbir yere gitmez.
+SDK yazıları **cihaz üzerinde** okur (OCR) ve görseli sunucuya yükler. Okuma için internet
+gerekmez. Okunan alanlar fotoğrafla aynı istekte (`ocr`) sunucuya gider; kimliğin ön yüzünde
+ve pasaportta yüz bulunursa kırpılmış yüz de yüklenir.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -18,13 +18,13 @@ dışında hiçbir yere gitmez.
 | Drop-in view | `SDKIdCardView` |
 | ViewModel | `SDKIdCardViewModel` |
 | Dış dünya | Cihazda OCR + **HTTP** (`uploadIdPhoto`) |
-| Ses anahtarı | `IdCardTts` |
+| Ses anahtarı | `IdCardTypeSelectTts` (seçim ekranı), `IdCardFrontTts` / `IdCardBackTts` / `PassportTts` (tarama) |
 
 ## Kullanıcı Ne Yaşar?
 
-1. (Birden fazla belge tipi izinliyse) belge tipini seçer: kimlik kartı / pasaport / eski tip.
+1. (Birden fazla belge tipi izinliyse) belge tipini seçer: çipli kimlik / pasaport / diğer.
 2. Ön yüzü çerçeveye hizalar, fotoğraf çekilir; SDK okur ve yükler.
-3. Aynısını arka yüz için yapar (pasaportta tek MRZ sayfası yeter).
+3. Aynısını arka yüz için yapar (pasaportta tek MRZ sayfası yeter; "Diğer" belgede arka yüz çekilmez).
 4. Okuma başarısızsa tekrar dener; deneme hakkı tükenir ve atlamaya izin varsa adım atlanabilir.
 
 Burada okunan MRZ alanları (seri no, doğum tarihi, geçerlilik) sonraki **NFC** adımının
@@ -77,7 +77,7 @@ hiçbir şeye dokunmadan gider. Ekran atlandığında bu ekranın sesli yönerge
 
 > **Çalışan tam örnek:** [IdCardCustomView.swift](IdCardCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.idCard) { IdCardCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 > **İkinci örnek — tek ekranda ön + arka yüz:** [IdCardSingleScreenCustomView.swift](IdCardSingleScreenCustomView.swift).
 > Kamera modül açılır açılmaz tam ekran çalışır; ön yüz çekilip sunucuda onaylanınca aynı ekranda
@@ -106,6 +106,8 @@ aldığınıza göre iki yol vardır:
 > **Arka yüzde neyin zorunlu olduğunu değiştirmek:** `DocumentProfile.turkishIDBack`
 > `.settingRequired(false, for: "fatherName")` / `.settingMRZRequired(false)` ile kopyalanıp
 > `IdentityScannerView(profile:)`'a verilir; ayrıntı [IdentityScanner rehberi](../../../docs/guides/identity-scanner.md#neyin-çekimi-beklettiğine-profil-karar-verir).
+> `settingMRZRequired` `issuingState`'i `"TUR"`'a döndürür; özel kimlik formatının
+> (`idCardFormat`) profilinde onun yerine `settingMRZ(_:)` ile ülke kodlu bir kural verin.
 >
 > **Otomatik fener, lens geçişi, Elle çek düğmesi, parlama kapısı** `ScannerAutomation` ile
 > ayarlanır. Otomatik fener varsayılan kapalı; açmak için
@@ -155,7 +157,7 @@ struct MyIdCardScanView: View {
 - Ön yüz yüklenince `vm.currentSide` kendiliğinden `.back` olur; arka yüz için tarayıcıyı
   yeniden açın. OCR ya da yükleme düşerse `vm.errorMessage` dolar, yüz değişmez.
 - Arka yüzde `configuration: .idBack` kullanın: arka yüz daha az dokulu, netlik eşikleri ayrı.
-- TC kimlikte 3.2.2'den itibaren SDK'nın kimlik ekranındaki hızlı çekim ve okuma burada da
+- TC kimlikte 3.3.0'dan itibaren SDK'nın kimlik ekranındaki hızlı çekim ve okuma burada da
   çalışır: `doc.croppedImage`'ı değiştirmeden verin; arka yüzün MRZ'si ön yüzde okunanlarla
   karşılaştırılır, uyuşmazsa otomatik çekim olmaz. Çerçeve sabit (takip modu değil) ve kart
   oranında kalmalı, `maxWidth` / `maxHeightFraction` artırılmamalı. Önceki akışa dönmek için
@@ -208,7 +210,7 @@ coordinator.insert(["idcard_success"], after:  .idCard)
 
 ### Tip
 ```swift
-public enum IdCardSide: String, Identifiable, Hashable { case front, back }
+public enum IdCardSide: String, Identifiable, Hashable, Sendable { case front, back, passport }
 ```
 
 ### State
@@ -232,9 +234,11 @@ public enum IdCardSide: String, Identifiable, Hashable { case front, back }
 ### Metotlar
 | Metot | Etki |
 |---|---|
-| `selectCardType(_ type: CardType)` | Belge tipini seçer (`manager.selectedCardType`) |
-| `scanFront(image: UIImage)` | Ön yüz OCR (`startFrontIdOcr`) → `uploadIdPhoto` |
-| `scanBack(image: UIImage)` | Arka yüz OCR (`startBackIdOcr`) → `uploadIdPhoto`; bitince akış ilerler |
+| `notifyDocumentSelectionShown()` | Seçim ekranı görününce çağrılır; `stepChanged` / `location: "documentSelection"` gider |
+| `selectCardType(_ type: CardType)` | Belge tipini seçer (`manager.selectedCardType`); tipin konumu (`stepChanged`) ve `setDocType` gider. Tip değiştiyse çekimler sıfırlanır |
+| `scanFront(image: UIImage, captureMode: SDKCaptureMode? = nil)` | Ön yüz OCR (`startFrontIdOcr`) → `uploadIdPhoto`. Pasaport seçiliyse `scanPassport`'a geçer |
+| `scanBack(image: UIImage, captureMode: SDKCaptureMode? = nil)` | Arka yüz OCR (`startBackIdOcr`) → `uploadIdPhoto`; bitince `canContinue` `true` olur |
+| `scanFront(document:)` / `scanBack(document:)` | `image:` sürümleriyle aynı iş; girdi tarayıcının verdiği `RecognizedDocument`. Özel kimlik formatı (`IdentifyManager.shared.idCardFormat`) yalnız tarayıcı sonucuyla çalışır |
 | `scanPassport(image:comingData:)` | Pasaport MRZ okuma (`startPassportMrzKey`) |
 
 ### Closure'lar
@@ -245,7 +249,7 @@ public enum IdCardSide: String, Identifiable, Hashable { case front, back }
 ## Sinyal Zinciri — Perde Arkası
 
 ```
-selectCardType(_:)                       → manager.selectedCardType (cihazda)
+selectCardType(_:)                       → manager.selectedCardType → stepChanged + setDocType [SOKET]
 scanFront(image:)  → startFrontIdOcr (cihazda OCR) → uploadIdPhoto [HTTP] → sendStep idFront=true [SOKET]
 scanBack(image:)   → startBackIdOcr  (cihazda OCR) → uploadIdPhoto [HTTP] → sendStep idBack=true [SOKET]
                    → (deneme hakkı tükendi & skip izinli) → onSkipRequested?()
@@ -274,23 +278,27 @@ final class IdCardHostViewModel: HostModuleViewModel {
 
 ## Sesli Okuma (Read-Aloud)
 
-Ekran açıldığında yönerge otomatik seslendirilebilir (`SDKFlowHostView` yapar, kod gerekmez).
+Seçim ekranının yönergesi (`IdCardTypeSelectTts`) ekran açılınca otomatik okunur (`SDKFlowHostView`
+yapar, kod gerekmez). Tarayıcıda hazır ekran yüze göre `IdCardFrontTts`, `IdCardBackTts` ya da
+`PassportTts` okur. Kendi ekranınızda bu anahtarı `IdentityScannerView(speechKey:speechModule:)`
+ile verin; `.documentScanner` modifier'ı ses anahtarı almaz.
 
 ```swift
 SDKSpeechConfig.shared.setMode(.native, for: .idCard)         // Siri/sistem sesi
-// veya kendi kaydınız: bundle'a IdCardTts.m4a koyun →
+// veya kendi kaydınız: bundle'a IdCardTypeSelectTts.m4a, IdCardFrontTts.m4a vb. koyun →
 SDKSpeechConfig.shared.audioBundle = Bundle.main
 SDKSpeechConfig.shared.setMode(.customAudio, for: .idCard)    // dosya yoksa native'e düşer
 ```
 
-Metni ezmek: `SDKLocalization.shared.setOverride(key: .idCardTts, language: .tr, value: "...")`
+Metni ezmek: `SDKLocalization.shared.setOverride(key: .idCardFrontTts, language: .tr, value: "...")`
+(diğerleri `.idCardTypeSelectTts`, `.idCardBackTts`, `.passportTts`)
 · Tüm ayrıntı: [ReadAloud](../ReadAloud.md)
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
-- **Pasaport?** `scanPassport(image:comingData:)` yalnızca belge tipi `.passport`
-  seçildiğinde gerekir; tek MRZ sayfası yeterlidir. Kabul edilen tipleri
-  `setupSDK(identCardType:)` belirler.
+- **Pasaport?** Belge tipi `.passport` seçiliyse `scanFront(image:)` ve `scanFront(document:)`
+  pasaport MRZ akışına (`scanPassport`) kendisi geçer; tek MRZ sayfası yeterlidir. Kabul edilen
+  tipleri `setupSDK(identCardType:)` belirler.
 - **Yamuk çekimler:** `setupSDK(enableAutoRotateOCR: true)` fotoğrafı otomatik döndürür.
 - **Anne ve baba adı istenmiyorsa (3.3.0):** `SDKOcrConfig.shared.readsParentNames = false`.
   Adlar boş gider, kart bunlar yüzünden reddedilmez. Ayrıntı:
@@ -298,7 +306,7 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .idCardTts, language: .tr,
 - **Yönerge satırının yeri (3.3.0):** `ScannerConfiguration.guidancePositionDefault`
   (`.bottom`, `.insideFrame`, `.aboveFrame`). Ayrıntı:
   [Yönerge satırının yeri](../../../docs/guides/identity-scanner.md#yönerge-satırının-yeri-330).
-- **OCR nerede çalışır?** Tamamen cihazda; ağ yalnızca `uploadIdPhoto` için kullanılır.
+- **OCR nerede çalışır?** Cihazda. Okunan alanlar `uploadIdPhoto` isteğinde fotoğrafla birlikte sunucuya gider.
 - **Tarama motoru:** Hazır ekranın altındaki gerçek zamanlı tarayıcı (dörtgen yakalama,
   bölgesel OCR, TCKN/MRZ doğrulama) bağımsız bir bileşen olarak da kullanılabilir —
   [IdentityScanner rehberi](../../../docs/guides/identity-scanner.md).

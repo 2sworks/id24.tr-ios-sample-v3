@@ -14,6 +14,8 @@
 //      registry.override(.thankYou(.missedCall))   { ThankYouCustomView(status: .missedCall) }
 //      registry.override(.thankYou(.notCompleted)) { ThankYouCustomView(status: .notCompleted) }
 //
+//  SDK 3.3.0 `.missedCall` rotasını açmaz; cevapsız çağrı kullanıcıyı bekleme odasına döndürür.
+//
 //  ViewModel kullanımı:
 //    init(status:)             bitiş durumu (ViewModel oluşturulurken KYC tamamlandı olarak işaretlenir)
 //    isSelfieIdentification    selfie ile kimlik doğrulama akışıysa "sonuç bildirilecek" satırı

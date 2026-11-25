@@ -92,15 +92,16 @@ SDKSpeechConfig.shared.setMode(.customAudio, for: .selfie)
 ### Dile özel klip — `<rawValue>_<dil>.<uzantı>`
 
 Bir klibi yalnızca belirli bir dilde çalmak için dosya adına dil son eki ekle
-(`SDKLang` rawValue'ları: `tr`/`eng`/`de`/`az`/`ru`): önce `<rawValue>_<aktifDil>.<uzantı>`,
-yoksa dilsiz `<rawValue>.<uzantı>` aranır. Örn. `SelfieTts_tr.m4a` yalnız TR'de çalar;
-`SelfieTts.m4a` her dilde çalar.
+(`SDKLang` rawValue'ları: `tr`/`en`/`de`/`az`/`ru`; İngilizcede eski `_eng` eki de aranır):
+önce `<rawValue>_<aktifDil>.<uzantı>`, yoksa dilsiz `<rawValue>.<uzantı>` aranır.
+Örn. `SelfieTts_tr.m4a` yalnız TR'de çalar; `SelfieTts.m4a` her dilde çalar.
 
 > **Not:** Adres modülü için SDK, kendi bundle'ında hazır **Türkçe** bir klip taşır
 > (`AddressConfirmTts_tr.mp3`). Sesli okuma açıkken, host `.addressConf` için açıkça mod
 > atamadıkça SDK bu klibi otomatik kullanır: dil TR ise klip çalar, diğer dillerde native
-> okunur. Host kendi `AddressConfirmTts[_<dil>].<uzantı>` dosyasını
-> `audioBundle`/`Bundle.main`'e koyarsa o öncelik kazanır;
+> okunur. Host kendi `AddressConfirmTts[_<dil>].<uzantı>` dosyasını `audioBundle`'a koyarsa
+> TR'de o çalar. `audioBundle` boşken `Bundle.main` SDK bundle'ından sonra aranır, TR'de hazır
+> klip çalar. Başka dilde kendi klibinizin çalması için `.addressConf`'a `.customAudio` atayın.
 > `setMode(.native, for: .addressConf)` hazır klibi tamamen kapatır.
 
 Örnek bundle içeriği:
@@ -120,7 +121,7 @@ uzantı serbest, `mp3`/`wav`/`caf`/`aac`/`aiff` de otomatik bulunur):
 | `.prepare` | `PrepareTts.m4a` |
 | `.selfie` | `SelfieTts.m4a` |
 | `.selfieWithLiveness` | `SelfieWithLivenessTts.m4a` |
-| `.idCard` | `IdCardTts.m4a` |
+| `.idCard` (tip seçimi) | `IdCardTypeSelectTts.m4a` |
 | `.idCard` (ön yüz) | `IdCardFrontTts.m4a` |
 | `.idCard` (arka yüz) | `IdCardBackTts.m4a` |
 | `.idCard` (pasaport) | `PassportTts.m4a` |
@@ -131,7 +132,7 @@ uzantı serbest, `mp3`/`wav`/`caf`/`aac`/`aiff` de otomatik bulunur):
 | `.addressConf` | `AddressConfirmTts.m4a` (SDK bundle'ında hazır `AddressConfirmTts_tr.mp3` var — yalnız TR'de çalar) |
 | `.signature` | `SignatureTts.m4a` |
 | `.videoRecord` (düz video) | `VideoRecorderTts.m4a` |
-| `.videoRecord` (okuma testi) | — (dinamik cümle, yalnız native) |
+| `.videoRecord` (okuma testi) | `VideoRecorderReadingTts.m4a` (cümlenin kendisi okunmaz) |
 | `.waitScreen` | `CallScreenTts.m4a` |
 | `.thankU` | `ThankYouTts.m4a` |
 
@@ -160,13 +161,14 @@ SDKLocalization.shared.registerOverrides([
 ])
 ```
 
-**3) Modül VM'inden tetikle** (moda göre native metin ya da `NfcRetryTts.<uzantı>`):
+**3) Okut** (modülün moduna göre; kendi key'inizin klibi çalınmaz, `.customAudio`'da native metne düşer):
 ```swift
-speak(.nfcRetryTts, in: .nfc)
+SDKSpeechService.shared.speak(text: SDKLocalization.shared.string(forKey: "NfcRetryTts"),
+                              in: .nfc, action: .error)
 ```
 
-`speak(_:in:)` verilen modülün moduna bakar; `.customAudio` ise `<rawValue>.<uzantı>`
-klibini çalar, yoksa native metne düşer.
+`speak(_:in:)` yalnız SDK'nın kendi key'lerini (`SDKKeyword`) alır. Verilen modülün moduna
+bakar; `.customAudio` ise `<rawValue>.<uzantı>` klibini çalar, yoksa native metne düşer.
 
 ---
 
@@ -214,9 +216,10 @@ döner. Okumanın sürüp sürmediğini öğrenmek için `isSpeaking` kullanın.
 zorla temizler. Gecikmeli işler (kamera-erteleme, watchdog) bir kuşak sayacı taşır; modül
 değiştiyse sessizce çekilir, yanlış ekranda konuşmaz.
 
-**Yumuşak gate'ler (kilit değil):** Selfie'de yönerge okunurken **otomatik** çekim bekler
-(kullanıcı manuel çekebilir), OVD'de bitiş mesajı duyulsun diye otomatik ilerleme en fazla
-6 sn bekler. VideoRecorder'da kayıt başlarken okuma susturulur ki TTS sesi videoya karışmasın.
+**Yumuşak gate'ler (kilit değil):** Selfie'nin otomatik çekimi okumayı beklemez; kendi
+ekranınızda bekletmek için `SDKSelfieViewModel.isCaptureSuspended` var. OVD'de bitiş mesajı
+duyulsun diye otomatik ilerleme en fazla 6 sn bekler. VideoRecorder'da kayıt başlarken okuma
+susturulur ki TTS sesi videoya karışmasın.
 
 **Neden thread değil?** `AVSpeechSynthesizer` / `AVAudioPlayer` zaten **asenkron** çalar;
 main thread'i bloklamaz. Kesilme bir yaşam-döngüsü kararıdır, eşzamanlılık sorunu değil.
@@ -229,8 +232,10 @@ başlatan modüllerde okuma **hemen değil, kamera hazır olunca** başlar. Kame
 (`AVCaptureSession`) başlarken ses oturumunu yeniden kurar ve okumayı yarıda keserdi; bu yüzden
 `SDKSpeechService`, sistemin `AVCaptureSession.didStartRunningNotification` sinyalini dinleyip
 okumayı o ana erteler (modül başına wiring yok). Kamera hiç başlamazsa (izin yok / ARKit)
-2 sn'lik fallback ile okuma yine de yapılır. `SDKModuleRoute.usesCamera` bunu belirler;
-`IdentityScannerView` ise `speak(..., whenCameraReady: true)` ile aynı davranışı alır.
+2 sn'lik fallback ile okuma yine de yapılır. Selfie, Liveness ve SelfieWithLiveness'ta bunu
+`SDKModuleRoute.usesCamera` belirler. VideoRecorder, OVD'nin çekim aşaması ve
+`IdentityScannerView` kendi yönergesini `speak(..., whenCameraReady: true)` ile okur. OVD'nin
+belge seçimi ekranı kamera açmadığı için hemen okunur.
 
 ### VideoRecorder — iki mod, iki farklı metin
 VideoRecorder'ın seslendirmesi çalışma anındaki `readingText`'e göre **dinamik**tir (bu yüzden
@@ -238,7 +243,7 @@ route'un statik `ttsKey`'i kapalıdır; view kendi seslendirir):
 
 | Durum | Okunan |
 |---|---|
-| **Okuma testi** (`readingText` dolu) | `VideoRecorderReadingTts` formatı + cümle → *"Kayıt düğmesine basın ve ekrandaki şu cümleyi kameraya bakarak yüksek sesle okuyun: {cümle}"* (dinamik metin → yalnız native) |
+| **Okuma testi** (`readingText` dolu) | `.videoRecorderReadingTts` → *"Kayıt düğmesine basın ve ekrandaki şu cümleyi kameraya bakarak yüksek sesle okuyun"* (cümlenin kendisi okunmaz; modül moduna göre native/customAudio) |
 | **Düz video** (`readingText` boş) | `.videoRecorderTts` → *"Sizden kısa bir video kaydı alacağız. Kayıt düğmesine basın, kameraya bakın ve doğal bir şekilde bekleyin."* (modül moduna göre native/customAudio) |
 
 Her iki durumda da kamera hazır olunca okunur (`whenCameraReady`).
@@ -281,7 +286,7 @@ ile metinleri veya `.customAudio` modunda `IdCardFrontTts.<uzantı>` / `IdCardBa
 `PassportTts.<uzantı>` ses dosyalarını değiştirebilir. Genel `.idCardTts` (yön belirtmeyen) hâlâ
 mevcuttur; standalone `IdentityScannerView` kullananlar dilediği key'i geçebilir.
 
-> idCard modülünde yönerge iki anda okunur: modül seçim ekranına girişte (`.idCardTts`) ve
+> idCard modülünde yönerge iki anda okunur: modül seçim ekranına girişte (`.idCardTypeSelectTts`) ve
 > tarayıcı tarama anında (yüze özel key). İkincisi birincisini keser.
 
 ---
@@ -300,9 +305,9 @@ etmelidir. Bunun için `SDKSpeechService` üç ayrı giriş noktası sunar.
 `announce` kendini kısıtladığı için **kamera karesi başına** çağrılabilir.
 
 **Anons ≠ yönerge.** `isAnnouncing`, o an okunanın geçici bir durum anonsu olduğunu söyler.
-Yumuşak gate'ler yalnızca **yönergede** durur: Selfie'nin otomatik çekimi açılış yönergesi
-okunurken bekler, ama "Hareketsiz kalın" anonsu okunurken **beklemez** — aksi hâlde tam da
-hazır olunduğunda çalan anons çekimi kendi kendine engellerdi.
+SDK ekranlarında bu ayrıma bakan bir bekleme yok; Selfie'nin otomatik çekimi okumayı hiç
+beklemez. Kendi ekranınızda yalnız yönergeyi beklemek için `isSpeaking && !isAnnouncing`
+koşulunu kullanın.
 
 ### Modül modül
 
@@ -323,8 +328,8 @@ ekran kendi seslendirir.
 (`SDKSelfieViewModel.guidanceKey(for:)`), böylece ayrışmazlar: yüz uzaksa *"Biraz öne gelin"*,
 ortam karanlıksa *"Ortam çok karanlık…"*, her şey uygunsa *"Hareketsiz kalın…"*.
 
-**Canlılık** — açılışta hazırlık yönergesi (`LivenessTts` → *"Yüzünüzü çerçevenin içinde sabit
-tutun."*), sonra her adım değişiminde o adımın komutu. İlk adımın komutu hazırlık yönergesini
+**Canlılık** — açılışta hazırlık yönergesi (`LivenessTts` → *"Lütfen ekrana bakın ve başınızı
+sabit tutun."*), sonra her adım değişiminde o adımın komutu. İlk adımın komutu hazırlık yönergesini
 bölmez, arkasına sıraya girer.
 
 | Adım | Key | Durum |
@@ -375,4 +380,4 @@ func stop()
 // VM köprüsü (SDKBaseModuleViewModel): speak(_:in:), speak(_:), stopSpeech()
 ```
 
-Canlı demo: Örnek uygulamada **Rehber → Sesli Okuma → Sesli Okuma (Read-Aloud)**.
+Canlı demo: Örnek uygulamada hamburger menü → **Modül Özelleştirme → SDK Modül Rehberi → Sesli Okuma → Sesli Okuma (Read-Aloud)**.

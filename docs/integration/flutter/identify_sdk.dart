@@ -123,6 +123,9 @@ class SetupOptions {
   final bool showNFCNotFoundPage;
   final bool supportU18;
 
+  /// true ise .cer dosyaları uygulama paketinde olmalı.
+  final bool useSslPinning;
+
   const SetupOptions({
     required this.identId,
     required this.baseApiUrl,
@@ -134,6 +137,7 @@ class SetupOptions {
     this.showThankYouPage = false,
     this.showNFCNotFoundPage = false,
     this.supportU18 = false,
+    this.useSslPinning = false,
   });
 
   Map<String, dynamic> toMap() => {
@@ -147,6 +151,7 @@ class SetupOptions {
         'showThankYouPage': showThankYouPage,
         'showNFCNotFoundPage': showNFCNotFoundPage,
         'supportU18': supportU18,
+        'useSslPinning': useSslPinning,
       };
 }
 
@@ -174,10 +179,11 @@ class IdentifySdk {
 
   /// SDK'nın hazır ekranlarının temasını uygular; native derleme gerekmez.
   ///
-  /// Renk değeri '#RRGGBB' ya da {'light': ..., 'dark': ...}; köşe 'capsule' ya da sayı.
+  /// Renk değeri '#RRGGBB'; rol renkleri ile fields/sheets renkleri {'light': ..., 'dark': ...}
+  /// de alır. Köşe 'capsule' ya da sayı.
   /// Dönen liste tanınmayan (yazım hatası olan) anahtarları içerir.
   ///
-  ///   await IdentifySdk.instance.setTheme({
+  ///   await sdk.setTheme({
   ///     'colors': {'primary': '#0F172A', 'pageBackground': {'light': '#F8FAFC', 'dark': '#0B1120'}},
   ///     'navBar': {'preset': 'centered'},
   ///     'buttons': {'corner': 12},
@@ -187,12 +193,13 @@ class IdentifySdk {
     return (res?['unknownKeys'] as List?)?.cast<String>() ?? const [];
   }
 
-  /// Tüm görünüm override'larını siler (SDK varsayılanlarına döner).
+  /// Renk, yazı tipi, ölçü ve bileşen ayarlarını varsayılana döndürür. `icons` ile
+  /// verilen görseller kalır.
   Future<void> resetTheme() {
     return _methods.invokeMethod('resetTheme');
   }
 
-  /// Kullanıcı SDK'yı açıkça kapatınca terk olayı tetiklemek için.
+  /// `session.abandoned` olayını yayar. Oturumu kapatmaz.
   Future<void> reportAbandoned([String? reason]) {
     return _methods.invokeMethod('reportAbandoned', {'reason': reason});
   }

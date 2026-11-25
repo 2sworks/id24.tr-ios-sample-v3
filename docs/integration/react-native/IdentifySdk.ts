@@ -65,6 +65,8 @@ export interface SetupOptions {
   showThankYouPage?: boolean;
   showNFCNotFoundPage?: boolean;
   supportU18?: boolean;
+  /** .cer dosyaları uygulama paketinde olmalı. */
+  useSslPinning?: boolean;
 }
 
 // MARK: - Public API
@@ -84,19 +86,20 @@ export const IdentifySdk = {
    * SDK'nın hazır ekranlarının temasını uygular. Native derleme GEREKMEZ —
    * JS reload yeterlidir, bu yüzden renk/logo denemesi saniyeler sürer.
    *
-   * Renk değeri "#RRGGBB" ya da { light, dark } olabilir; köşe "capsule" ya da sayıdır.
+   * Renk değeri "#RRGGBB"; rol renkleri ile fields/sheets renkleri { light, dark } de alır.
+   * Köşe "capsule" ya da sayıdır.
    * Dönen `unknownKeys` yazım hatası olan anahtarları listeler.
    */
   setTheme(theme: SDKThemeConfig): Promise<{ result: boolean; unknownKeys: string[] }> {
     return IdentifySdkModule.setTheme(theme);
   },
 
-  /** Tüm görünüm override'larını siler (SDK varsayılanlarına döner). */
+  /** Renk, yazı tipi, ölçü ve bileşen ayarlarını varsayılana döndürür. `icons` ile verilen görseller kalır. */
   resetTheme(): void {
     IdentifySdkModule.resetTheme();
   },
 
-  /** Kullanıcı SDK'yı açıkça kapatınca terk olayı tetiklemek için. */
+  /** `session.abandoned` olayını yayar. Oturumu kapatmaz. */
   reportAbandoned(reason?: string): void {
     IdentifySdkModule.reportAbandoned(reason ?? null);
   },
@@ -134,10 +137,10 @@ export interface SDKButtonThemeConfig {
 
 export interface SDKThemeConfig {
   colors?: {
-    // Marka paleti
-    primary?: SDKColorValue; primaryDark?: SDKColorValue; primaryLight?: SDKColorValue;
-    success?: SDKColorValue; successBright?: SDKColorValue; error?: SDKColorValue;
-    accentWarning?: SDKColorValue; divider?: SDKColorValue;
+    // Marka paleti: tek renk ("#RRGGBB"), dark verilirse yok sayılır
+    primary?: string; primaryDark?: string; primaryLight?: string;
+    success?: string; successBright?: string; error?: string;
+    accentWarning?: string; divider?: string;
     // Rol renkleri (light/dark ayrı verilebilir)
     pageBackground?: SDKColorValue; moduleBackground?: SDKColorValue; surface?: SDKColorValue;
     title?: SDKColorValue; subtitle?: SDKColorValue; border?: SDKColorValue;
@@ -161,6 +164,9 @@ export interface SDKThemeConfig {
     titleFont?: SDKFontValue; subtitleFont?: SDKFontValue;
     progressHeight?: number; progressSpacing?: number; progressCorner?: SDKCornerValue;
     overlayGradientOpacity?: number; showsDivider?: boolean;
+    brandTitle?: string; brandSubtitle?: string;
+    titleMode?: 'module' | 'brand' | 'brandWithModule';
+    buttons?: { showsBack?: boolean; showsHelp?: boolean; showsMenu?: boolean };
   };
   selection?: {
     cornerRadius?: number; rowMinHeight?: number; checkboxSize?: number;
@@ -186,6 +192,8 @@ export interface SDKThemeConfig {
     maskOpacity?: number; guideStrokeColor?: string; guideLockedColor?: string;
     guideLineWidth?: number; faceAlignedColor?: string; faceIdleColor?: string;
     overlayButtonFill?: string; overlayButtonBorder?: string;
+    maskColor?: string; scanLineColor?: string; focusIndicatorColor?: string;
+    showsFocusIndicator?: boolean;
   };
   controls?: {
     shutterSize?: number; shutterRingWidth?: number; shutterFill?: string;

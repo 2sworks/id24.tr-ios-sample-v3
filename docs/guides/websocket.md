@@ -15,10 +15,10 @@ Soket adresini (`ws_url`) siz vermezsiniz; `connectToRoom` cevabından gelir. İ
 SDK'nın kendi WebSocket katmanı (`SDKWebSocket`) kullanılır.
 
 ```
-RoomResponse.ws_url ──► SDKWebSocket(url:)
-                          │  socket_auth == "1" ise: ws_url + "?token=<HMAC token>"
-                          ▼
-                        connect() ──► sendFirstSubscribe()   (odaya kayıt)
+RoomResponse.data?.ws_url ──► SDKWebSocket(url:)
+                                │  socket_auth == "1" ise: ws_url + "?token=<HMAC token>"
+                                ▼
+                              connect() ──► sendFirstSubscribe()   (odaya kayıt)
 ```
 
 Bağlantı yaklaşık 30 saniye içinde kurulamazsa `setupSDK` callback'ine hata döner.
@@ -64,7 +64,7 @@ ilgilendiğiniz aksiyonları dinlersiniz.
 | `openNfcRemote(...)` | Agent uzaktan NFC adımını başlattı |
 | `editNfcProcess` | Agent NFC verisinde düzeltme istedi |
 | `startTransfer` | Görüşme başka bir agent'a aktarılıyor |
-| `networkQuality(String)` | Bağlantı kalitesi bildirimi |
+| `networkQuality(String)` | SDK'nın ölçtüğü bağlantı kalitesi (panele de gönderilir) |
 | `disableEndCallButton` | Müşterinin "Görüşmeyi bitir" butonu kilitlendi |
 | `imOffline` | Karşı taraf çevrimdışı |
 | `connectionErr` | Bağlantı koptu (aşağıya bakın) |
@@ -95,14 +95,17 @@ bildirir:
 
 | Sinyal | Ne zaman gider |
 |---|---|
-| `sendStep()` | Modül adımı tamamlandığında ya da konum değiştiğinde |
+| `stepChanged` (konum) | Her modül ekranı açıldığında (kimlikte belge türü seçilince); bekleme odası, ThankYou ve giriş hariç |
+| `sendStep()` | Bekleme odasına girişte ve dönüşte, işaret dili seçiminden sonra, yeniden bağlanmada (akışta bekleme odası varsa). Location `Call Wait Screen`, adım listesiyle |
 | `sendPreparetatus(isCompleted:)` | Hazırlık modülünün sonucu |
 | `sendSpeechStatus(isCompleted:)` | Konuşma modülünün sonucu |
-| `modulePresented` (adım bildirimi) | `advanceToNextModule()` içinde |
+
+`…ModulePresented` olayları sunucuya gitmez, host'a giden takip olaylarıdır.
 
 `stepChanged` gövdesindeki `steps.sign_language` alanı işaret dili tercihini taşır.
 `signLangSupport: true` iken bekleme ekranındaki `stepChanged`, kullanıcı işaret dili sorusunu
-geçene kadar gönderilmez. Ayrıntı: [SignLang](../../IdentifySample/Modules/SignLang/SignLang.md#sunucuya-giden-veri).
+geçene kadar gönderilmez. Tercihi `signLangPreference` ile siz verdiyseniz soru açılmaz,
+`stepChanged` beklemeden gider. Ayrıntı: [SignLang](../../IdentifySample/Modules/SignLang/SignLang.md#sunucuya-giden-veri).
 
 Custom ekranların SDK VM metotlarını kullanması bu yüzden şart. Kendi geçişlerinizi yaparsanız bu
 sinyaller gitmez ve agent panelinde akış takılmış gibi görünür.
@@ -112,29 +115,36 @@ Ayrıntı: [Özelleştirme → bypass yok kuralı](customization.md#bypass-yok-k
 
 ## Bağlantı Kopması ve Toparlanma
 
-SDK kopmayı birbirinden bağımsız iki kaynaktan anlar:
+SDK kopmayı birbirinden bağımsız üç kaynaktan anlar:
 
 1. Reachability izleyicisi: oturum başlarken açılır. İnternet `.notReachable` olursa (ve KYC
    bitmemişse) devreye girer.
-2. Soket kopması: `SDKWebSocket` disconnect bildirimi.
+2. Soket kopması: `SDKWebSocket` disconnect bildirimi. Sunucunun normal kapanışı (4110, 4111,
+   4112) yalnızca görüşme sürerken ve medya hattı düşmüşse kopma sayılır, diğer durumlarda loglanır.
+3. Heartbeat: görüntülü görüşme modülünde (bekleme odası ve görüşme) SDK `heartbeatIntervalSeconds`
+   (varsayılan 10 sn) aralıkla PING gönderir. Üst üste 4 PING cevapsız kalırsa bağlantı ölü sayılır
+   ve soket 4109 ile kapanır; varsayılan aralıkla bu yaklaşık 40 sn sürer. Log satırı ve kapanış
+   nedeni bu durumda "3 ardışık PING için PONG alınamadı" yazar, cevapsız PING sayısı yine 4'tür.
+   Kapatmak için `isHeartbeatEnabled = false`.
 
-İki kaynak da aynı noktaya çıkar. `.connectionErr` yalnızca bir kez gönderilir, tekrarlar yok
+Üç kaynak da aynı noktaya çıkar. `.connectionErr` yalnızca bir kez gönderilir, tekrarlar yok
 sayılır. Yeniden bağlantı başarılı olunca bayrak sıfırlanır.
 
 Görüşme sürerken ve medya hattı ayaktayken `.connectionErr` hemen gönderilmez. Görüşme
-`signallessCallGracePeriod` (varsayılan 10 sn) boyunca sürer, soket bu sürede geri gelmezse görüşme
-biter ve ekran açılır ([TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc)).
+`signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, süre dolunca biter ve ekran
+açılır. Sunucu soketi normal kapattıysa (4110-4112) bu süre işlemez; görüşme medya hattı kapanınca
+biter ([TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc)).
 
 ```
 internet gitti ──┐
-                 ├──► emitConnectionLost() ──► .connectionErr ──► LostConnection overlay
-soket koptu   ───┘         (tek sefer)
+soket koptu   ───┼──► emitConnectionLost() ──► .connectionErr ──► LostConnection overlay
+4 PONG gelmedi ──┘         (tek sefer)
                                                     │ kullanıcı "Tekrar Bağlan"
                                                     ▼
                                           reconnectToSocket()
                                             ├─ socket_auth ise yeni token üret
-                                            ├─ sendImOnline + sendReconnectSubscribe
-                                            ├─ (görüşme ekranındaysa) WebRTC yeniden kur + sendStep
+                                            ├─ getIdentStatus + subscribe (sendReconnectSubscribe)
+                                            ├─ (akışta bekleme odası varsa) WebRTC yeniden kur + sendStep
                                             └─ kaldığı modülden devam
 ```
 
@@ -182,12 +192,13 @@ Varsayılan görüşme ekranı da `onFinished` da aynı kuralı kullanır.
 | # | `terminateReason` | Koşul | SDK ne yapar | Ekran | `onFinished` |
 |---|---|---|---|---|---|
 | 1 | `TURN_DISCONNECTED` · `RINGING_TIMEOUT` | Bu değerleri panel değil SDK üretir (medya bağlantısı düştü / çağrı yanıtlanmadı) | Yeniden bağlanma ekranı; socket 4104 / 4108 ile kapanır | Bağlantı Koptu | Yok (oturum sürer) |
-| 2 | `NORMAL_CLOSE_BY_AGENT` | `type` bir karar (`positive` · `negative` · `neutral`) ve `id ≠ -3` | Oturum biter, SDK kapanır (4103) | ThankYou: `positive` → başarılı, diğerleri → tamamlanamadı. `showThankYouPage: false` ise ekran yok | `approved` · `rejected` · `neutral` |
-| 3 | `NORMAL_CLOSE_BY_AGENT` | `id == -3` ("Durum Seçilmedi") ya da statü yok / `type` tanınmıyor | Karar yok: yeniden bağlanma → bekleme odası | Bağlantı Koptu | Yok |
-| 4 | `ADMIN_DISCONNECTED_TURN` · `AGENT_SOCKET_NETWORK_PROBLEM` · `AGENT_FORCE_DISCONNECT_FOR_AUTO_CLOSE` · `UNKNOW` / `UNKNOWN` | Statü ne olursa olsun (panelin kendiliğinden yazdığı `negative` tipli `id 8` "Müşteri cevap vermedi" dahil) | Temsilci karar vermemiştir: yeniden bağlanma → bekleme odası | Bağlantı Koptu | Yok |
-| 5 | `CLIENT_IS_DISCONNECTED` | Socket açıksa | Panelin yanlış alarmı sayılır, görüşme sürer | Değişmez | Yok |
-| | | Socket kapalıysa | Yeniden bağlanma | Bağlantı Koptu | Yok |
-| 6 | Diğer bütün değerler (ör. `PING_TIMEOUT`) | `type` bir kararsa | Oturum biter (2. satırdaki gibi) | ThankYou | `approved` · `rejected` · `neutral` |
+| 2 | `NORMAL_CLOSE_BY_AGENT` | `type` bir karar (`positive` · `negative` · `neutral`) ve `id` -3, -4, -5 değil | Oturum biter, SDK kapanır (4103) | ThankYou: `positive` → başarılı, diğerleri → tamamlanamadı. `showThankYouPage: false` ise ekran yok | `approved` · `rejected` · `neutral` |
+| 3 | `NORMAL_CLOSE_BY_AGENT` | `id` -3, -4 ya da -5 (aşağıdaki tablo), ya da statü yok / `type` tanınmıyor | Karar yok: yeniden bağlanma → bekleme odası | Bağlantı Koptu | Yok |
+| 4 | `ADMIN_DISCONNECTED_TURN` · `AGENT_SOCKET_NETWORK_PROBLEM` · `UNKNOW` / `UNKNOWN` | Statü ne olursa olsun (panelin kendiliğinden yazdığı `negative` tipli `id 8` "Müşteri cevap vermedi" dahil) | Temsilci karar vermemiştir: yeniden bağlanma → bekleme odası | Bağlantı Koptu | Yok |
+| 5 | `CLIENT_IS_DISCONNECTED` | Karar yok, socket açık | Panelin yanlış alarmı sayılır, görüşme sürer | Değişmez | Yok |
+| | | Karar yok, socket kapalı | Yeniden bağlanma | Bağlantı Koptu | Yok |
+| | | Karar var | Oturum biter (2. satırdaki gibi) | ThankYou | `approved` · `rejected` · `neutral` |
+| 6 | Diğer bütün değerler (ör. `PING_TIMEOUT`, `AGENT_FORCE_DISCONNECT_FOR_AUTO_CLOSE`) | `type` bir karar ve `id` -3, -4, -5 değil | Oturum biter (2. satırdaki gibi) | ThankYou | `approved` · `rejected` · `neutral` |
 | | | Karar yoksa | Yeniden bağlanma (`PING_TIMEOUT` → 4107, diğerleri 4104) | Bağlantı Koptu | Yok |
 
 Sabit statü id'leri:
@@ -195,13 +206,14 @@ Sabit statü id'leri:
 | `id` | Anlamı | SDK'nın yorumu |
 |---|---|---|
 | `-3` | Durum Seçilmedi | Karar sayılmaz; `type` gelse bile oturumu bitirmez |
-| `-4` | Auto Approved | `positive` tipinde gelir; yeniden bağlanmadan sonra da oturumu bitirir |
+| `-4` | Auto Approved | `positive` gelir ama karar sayılmaz, oturumu bitirmez |
+| `-5` | Sunucu adımı reddetti | Karar sayılmaz |
 | `8` | Müşteri cevap vermedi | Panelin kendiliğinden yazdığı etiket; 4. satırdaki sebeplerle gelirse karar sayılmaz |
 
 Yeniden bağlandıktan sonra panelde kayıtlı statü sorgulanır (`SendIdentStatusInfo`). Bu bir karar
-değil, sorgudur: oturumu yalnızca `positive` bitirir (`onFinished` → `approved`). `negative`,
-`neutral` ve `-3` müşteriyi bekleme odasına döndürür. Olumsuz bir karar vermek için panel
-`terminateCall` göndermelidir.
+değil, sorgudur: oturumu yalnızca `positive` bitirir (`onFinished` → `approved`); id -3, -4 ve -5
+bunun dışındadır. `negative`, `neutral` ve bu üç id müşteriyi bekleme odasına döndürür. Olumsuz
+bir karar vermek için panel `terminateCall` göndermelidir.
 
 Kapanışla ilgili diğer aksiyonlar:
 
@@ -236,11 +248,14 @@ SDK şunları yapar (tablodaki 2. satır):
 4. `sdk_logs`'a sebep, statü ve id yazılır:
 
    ```
-   Akış sonucu — sonuç: rejected, sebep: agentDecision, son modül: Call Wait Screen, adım: 5/5, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12).
+   Akış sonucu — sonuç: rejected, sebep: agentDecision, son modül: Call Wait Screen, adım: 5/5, tam doğrulandı: hayır, panel sebebi: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12).
    Görüşme sonlandırma bildirimi alındı — sebep: NORMAL_CLOSE_BY_AGENT, panel statüsü: negative (id 12)
-   Sonlandırma sonucu: temsilci normal kapattı, oturum panelin statüsüyle bitiriliyor (negative)
+   Sonlandırma sonucu: panel karar gönderdi (negative), oturum bitiriliyor
    Oturum sonlandı — son modül: Call Wait Screen, akış tamamlandı, sebep: 4103 (forceQuit): forceQuitSDK — zorla kapatma
    ```
+
+   Son satır ("Oturum sonlandı") kapanış anında yazılır. O oturumda sunucuya gitmezse aynı
+   cihazda açılan sonraki oturumla gider ([Loglama](logging.md)).
 
 Host tarafında şüpheli kapanışı diğer retlerden statü id'siyle ayırın. Statü adları dile göre
 değişir ve panelden düzenlenebilir; `type` ise yalnızca kararın yönünü söyler:
@@ -285,8 +300,11 @@ IdentifyManager.shared.lastSocketCloseCode          // SDKSocketCloseCode?
 IdentifyManager.shared.lastSocketCloseCode?.rawValue // örn. 4105
 ```
 
-Her kapanışta ayrıca `socket.closed` (TURN için `turn.dropped`) SDKEvent'i gönderilir. Metadata'da
-`code`, `case`, `category`, `deliberate` ve varsa `reason` bulunur.
+Kapanışta `socket.closed` SDKEvent'i gönderilir. Medya hattı kapanınca (4142) olayın adı
+`turn.dropped` olur. Metadata'da `code`, `case`, `category`, `deliberate` ve varsa `reason` bulunur.
+SDK'nın kendi tespit ettiği sebepler (4108, 4119, 4133, 4140, 4141) `sdk.detected` olayıyla gelir;
+metadata'sında `code`, `case`, `category` ve `reason` bulunur. Sinyalsiz süren görüşmenin medya
+hattı kapanırsa 4142 iki olay da üretir: `turn.dropped` ve `sdk.detected`.
 Ayrıntı: [Event Sistemi](events.md).
 
 ### 4100–4109 · Bilinçli kapanışlar
@@ -300,10 +318,10 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 | 4103 | `forceQuit` | `forceQuitSDK()` |
 | 4104 | `reconnectCycle` | Yeniden bağlanmadan önce eski bağlantı kapatılıyor |
 | 4105 | `backgroundTimeout` | Uygulama arka planda izin verilen süreyi aştı (aşağıya bakın) |
-| 4106 | `callCompleted` | Görüşme tamamlandı, sonraki modüle geçiliyor (`disconnectSocket(reason:)`) |
+| 4106 | `callCompleted` | Host görüşmeden sonra soketi `disconnectSocket(reason: .callCompleted)` ile kapatırsa gider. SDK bu kodu kendisi kullanmaz |
 | 4107 | `pingTimeout` | Panel görüşmeyi `PING_TIMEOUT` sebebiyle kapattı. SDK'nın kendi tespit ettiği ölü bağlantı 4109 ile kapanır |
 | 4108 | `ringingTimeout` | Çağrı çaldı ama `ringingTimeout` süresince (varsayılan 300 sn) yanıtlanmadı |
-| 4109 | `heartbeatTimeout` | Üst üste 3 PING'e PONG gelmedi, bağlantı ölü sayıldı |
+| 4109 | `heartbeatTimeout` | Heartbeat 4 tur boyunca PONG alamadı (varsayılan aralıkla yaklaşık 40 sn), bağlantı ölü sayıldı |
 
 > ⚠️ Sürüm notu: `4106` önceden `heartbeatTimeout` idi. Heartbeat zaman aşımı 4109'a taşındı,
 > 4106 artık `callCompleted`. Sunucu tarafındaki eşlemeyi güncelleyin.
@@ -312,9 +330,9 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 
 | Kod | Case | Kaynak | Davranış |
 |---|---|---|---|
-| 4110 | `serverNormal` | 1000 | Yalnızca log |
-| 4111 | `serverGoingAway` | 1001 | Yalnızca log |
-| 4112 | `noStatusReceived` | 1005 | Yalnızca log |
+| 4110 | `serverNormal` | 1000 | Yalnızca log. Görüşme sürerken geldiyse: medya hattı düşmüşse yeniden bağlanma ekranı açılır; ayaktaysa sinyalsiz bekleme süresi başlamaz, görüşme medya hattı kapanınca biter |
+| 4111 | `serverGoingAway` | 1001 | 4110 ile aynı |
+| 4112 | `noStatusReceived` | 1005 | 4110 ile aynı |
 | 4113 | `protocolError` | 1002 | Dinleyiciye `.connectionErr` |
 | 4114 | `unsupportedFrame` | 1003 | Dinleyiciye `.connectionErr` |
 | 4115 | `encodingError` | 1007 | Dinleyiciye `.connectionErr` |
@@ -328,6 +346,13 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 > kopmada `.connectionErr` gönderiliyor ve arkada açık kalan WebSocket/WebRTC bağlantıları elle
 > kapatılıyor.
 
+### 4120 · Oda reddi
+Bu kapanışı SDK kendisi yapar ve kod close frame ile sunucuya da gider.
+
+| Kod | Case | Ne zaman |
+|---|---|---|
+| 4120 | `roomOccupied` | Sunucu odaya kaydı yeniden denemelerden sonra da reddetti (`subRejected`, ör. odada başka bir oturum açık). Oturum biter, `onFinished` `result = .error`, `reason = .roomOccupied` ile gelir |
+
 ### 4130–4133 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler
 
 | Kod | Case | Kaynak |
@@ -335,7 +360,7 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 | 4130 | `networkUnreachable` | Reachability: internet erişimi yok |
 | 4131 | `transportError` | SSL, proxy ya da firewall hatası |
 | 4132 | `unexpectedDrop` | Hata olmadan kopma; sunucu bağlantıyı sessizce kapattı |
-| 4133 | `connectTimeout` | Bağlantı verilen sürede kurulamadı (ilk bağlantıda 30 sn; yeniden bağlanmada görüşme sırasında 10 sn, görüşme dışında 30 sn) |
+| 4133 | `connectTimeout` | Bağlantı verilen sürede kurulamadı (ilk bağlantıda 30 sn; yeniden bağlanmada görüşme, çalan çağrı ve bekleme odasında `callReconnectTimeoutSeconds`, varsayılan 10 sn; diğer yerlerde `reconnectTimeoutSeconds`, varsayılan 30 sn) |
 
 ### 4140–4142 · TURN / ICE (WebRTC)
 
@@ -343,12 +368,13 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 |---|---|---|---|
 | 4140 | `turnDisconnected` | ICE `.disconnected`, 5 sn içinde toparlanmadı | `terminateCall("TURN_DISCONNECTED")` |
 | 4141 | `turnFailed` | ICE `.failed` | Hemen `terminateCall("TURN_DISCONNECTED")` |
-| 4142 | `turnClosed` | ICE `.closed` | Log + event |
+| 4142 | `turnClosed` | ICE `.closed` | Log + event. Sinyalsiz süren görüşmede `terminateCall("TURN_DISCONNECTED")` |
 
 > ICE `.disconnected` olunca 5 sn (sabit) toparlanma beklenir, `.failed` görüşmeyi hemen bitirir.
 > WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez: görüşme
-> `signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
-> gelmezse biter. İki bekleme de odaya yeniden abone olmaz.
+> `signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer ve süre dolunca biter.
+> Sunucunun normal kapanışında (4110-4112) bu süre işlemez, görüşme medya hattı kapanınca biter.
+> İki bekleme de odaya yeniden abone olmaz.
 > Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](turn-webrtc.md#kopma-durumunda-webrtc).
 
 ### Arka Plan Zaman Aşımı (4105)
@@ -374,6 +400,10 @@ ve `session.foreground` (arka planda geçen süre).
 
 ## Soket Trafiğini İzleme
 
-Gelen ve giden bütün soket mesajları log altyapısına `socket` kategorisiyle yazılır (`SocketLog`:
-`incoming`/`outgoing`). Konsolda görmek için `logLevel: .all` yeterli; online'a da göndermek için
-`.online` kullanın. Ayrıntı: [Loglama](logging.md).
+Giden soket mesajları `socket`, gelenler `general` kategorisiyle yazılır. Satırda yön ➡️ (giden) ve
+⬅️ (gelen) ile görünür. Yönü `incoming`/`outgoing` olarak tutan kayıt
+`IdentifyManager.shared.getSocketLogs()`'tadır. Bu dökümde kişisel veri maskelenmez, yalnız uzun
+Base64 blokları kısaltılır. SDP ve ICE aday mesajları IP adresleriyle tam metin durur. Döküm
+uygulama süreci boyunca birikir, oturum kapanınca temizlenmez. Sessiz gönderilen mesajlar yalnız
+konsola basılır, online kuyruğa ve `getSocketLogs()`'a girmez. Konsolda görmek için `logLevel: .all` yeterli;
+online'a da göndermek için `.online` kullanın. Ayrıntı: [Loglama](logging.md).

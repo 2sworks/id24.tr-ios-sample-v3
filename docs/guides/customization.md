@@ -48,14 +48,23 @@ struct MyCustomSelfieView: View {
             MyBrandedCameraView { captured in
                 vm.processSelfie(image: captured)    // ✅ yüz tespiti + upload SDK'da
             }
-            if let err = vm.errorMessage { Text(err) }
             Button("Devam") { coordinator.advanceToNextModule() }  // ✅ adım sinyali SDK'da
                 .disabled(!vm.canContinue)
         }
-        .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
+        .onAppear {
+            vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed = { coordinator.finishFlowAsFailed() }
+        }
+        .idErrorAlert($vm.errorMessage, onDismiss: { vm.consumePendingAlertAction() })   // ✅ zorunlu
     }
 }
 ```
+
+Hatayı göstermek ve kapatmak zorunlu. Hak bitince modülü atlama (`onSkipRequested`) ya da
+akışı bitirme (`onFlowFailed`) mesaj kapanınca çalışır: `.idErrorAlert` kapanınca mesajı siler,
+`onDismiss` bekleyen işi çalıştırır. Hatayı kendiniz çiziyorsanız kapatırken `vm.dismissError()`
+çağırın (3.2.0+; önceki sürümlerde önce `vm.errorMessage = nil`, sonra
+`vm.consumePendingAlertAction()`). Ayrıntı: [Kendi ekranınızı yazdıysanız](errors-and-limits.md#8-kendi-ekranınızı-yazdıysanız).
 
 Her modülün VM API'si (state, metotlar, closure'lar) o modülün rehberinde tablo olarak duruyor.
 [Modül Kataloğu](../../README.md#modül-kataloğu)'ndan ilgili modüle geçebilirsiniz.
@@ -71,27 +80,34 @@ dosyanın üzerinde yaparsınız.
 
 | Rota | Dosya | Ek bağımlılık |
 |---|---|---|
-| `.prepare` | `Modules/Prepare/PrepareCustomView.swift` | — |
+| `.prepare` | `Modules/Prepare/PrepareCustomView.swift` | CustomKit (`CustomComponents.swift`, başarı banner'ı) |
 | `.selfie` | `Modules/Selfie/SelfieCustomView.swift` | CustomKit |
 | `.selfieWithLiveness` | `Modules/SelfieWithLiveness/SelfieWithLivenessCustomView.swift` | CustomKit + `SelfieCameraController` (Vision yolu) |
 | `.idCard` | `Modules/IdCard/IdCardCustomView.swift` | — (`documentScanner` modifier SDK'da) |
-| `.idCard` (tek ekran) | `Modules/IdCard/IdCardSingleScreenCustomView.swift` | ön ve arka yüz tek tam ekranda; `keepsCameraRunning` + `scanSession` |
+| `.idCard` (tek ekran) | `Modules/IdCard/IdCardSingleScreenCustomView.swift` | — (ön ve arka yüz aynı ekranda; `keepsCameraRunning` ve `scanSession` SDK'da) |
 | `.idCardOVD` | `Modules/IdCardOVD/IdCardOVDCustomView.swift` | CustomKit |
 | `.nfc` | `Modules/NFC/NfcCustomView.swift` | — |
 | `.liveness` | `Modules/Liveness/LivenessCustomView.swift` | CustomKit (ARKit) |
-| `.speech` | `Modules/Speech/SpeechCustomView.swift` | — |
+| `.speech` | `Modules/Speech/SpeechCustomView.swift` | CustomKit (`CustomComponents.swift`, başarı banner'ı) |
 | `.addressConfirm` | `Modules/AddressConfirm/AddressConfirmCustomView.swift` | — |
 | `.signature` | `Modules/Signature/SignatureCustomView.swift` | — (PencilKit) |
 | `.videoRecorder` | `Modules/VideoRecorder/VideoRecorderCustomView.swift` | CustomKit |
-| `.callScreen` | `Modules/CallScreen/CallScreenCustomView.swift` | `SignLangCustomView`, `LostConnectionCustomView` |
+| `.callScreen` | `Modules/CallScreen/CallScreenCustomView.swift` | CustomKit (`CustomComponents.swift`, `CustomScreens.swift`), `SignLangCustomView`, `LostConnectionCustomView` |
 | `.thankYou(_)` | `Modules/ThankYou/ThankYouCustomView.swift` | — |
 | (görüşme içi) | `Modules/SignLang/SignLangCustomView.swift` | — |
 | (katman) | `Modules/LostConnection/LostConnectionCustomView.swift` | — |
 
-CustomKit iki dosyadan oluşuyor: `Modules/CustomKit/CustomCameraPreview.swift` ve
-`CustomComponents.swift`. Kamera kullanan ekranların ortak önizleme katmanı (iOS 17
-`RotationCoordinator` ile dikey açı düzeltmesi), oval ve çerçeve maskeleri ve yardımcılar
-buradadır. Kamera kullanan bir `CustomView`'ı kopyalarken bu iki dosyayı da kopyalayın.
+CustomKit `Modules/CustomKit/` altında dört dosyadan oluşuyor:
+
+- `CustomCameraPreview.swift`: kamera kullanan ekranların ortak önizlemesi (iOS 17
+  `RotationCoordinator` ile dikey açı düzeltmesi).
+- `CustomComponents.swift`: daire düğme, başarı banner'ı, alt panel şekli, görüşme video görünümü.
+- `CustomScreens.swift`: `registry.override` kayıtları ve `CustomScreens.pendingThankYouStatus`.
+- `CustomScreensView.swift`: örnek uygulamanın "Tam Özel Ekranlar" sayfası.
+
+Bir `CustomView`'ı kopyalarken hangi dosyaların gerektiğine o dosyanın başındaki "Kopyalanacak
+dosyalar" listesinden bakın. Örneğin görüşme ekranı `CustomComponents.swift` ile birlikte
+`CustomScreens.swift`'i de ister.
 
 Kullanım:
 
@@ -102,7 +118,7 @@ registry.override(.selfie) { SelfieCustomView() }     // dosya olduğu gibi proj
 Her `XxxCustomView.swift` dosyasının başında hangi işin VM'de, hangisinin dosyada yapıldığı,
 ViewModel'in nasıl kullanıldığı ve hangi dosyaların kopyalanacağı yazıyor.
 
-Çalışırken görmek için örnek uygulamada hamburger menüden **Tam Özel Ekranlar**'ı açın. Anahtar
+Çalışırken görmek için örnek uygulamada hamburger menüden **Modül Özelleştirme → Tam Özel Ekranlar**'ı açın. Anahtar
 açıkken akıştaki her ekran `XxxCustomView` ile çizilir (`registry.override` çağrılarının hepsi
 `CustomKit/CustomScreens.swift`'te); kapalıyken SDK ekranları çalışır. Aynı ekrandaki listeden her
 modülün özel sürümünü akışa girmeden tek tek önizleyebilirsiniz.
@@ -180,14 +196,16 @@ Akışta iki tür ekran vardır ve ikisi farklı metotla ilerler:
 SDK modül ekranı (Selfie, NFC, override edilenler dahil) ──> advanceToNextModule()
 Araya eklenen ekran (insert / showExternalScreen)         ──> advanceExternal()
 
-Araya eklenen ekranda advanceToNextModule() çağrılırsa:
+insert ile eklenen ekranda advanceToNextModule() çağrılırsa:
     çağrı yok sayılır + konsola uyarı düşer, kullanıcı ekranda kalır
+showExternalScreen ile açılan ekranda çağrılırsa:
+    akış ilerler
 ```
 
-`advanceToNextModule()` modüle geçmeden önce "sıradaki modülün önüne eklenmiş ekran var mı" diye
-bakar, varsa onu açar. Araya eklenen ekranın içinden çağrılırsa aynı ekranı yeniden bulur ve akış
-ilerlemez. `advanceExternal()` bu yüzden ayrıdır: bekleyen ekranların listesini tutar, liste
-bitince sunucuya asıl geçişi yapar.
+`advanceToNextModule()` sıradaki modüle geçmeden önce etkin modülün arkasına (`after:`) ve
+sıradaki modülün önüne (`before:`) eklenen ekranlara bakar, varsa ilkini açar. Bu ekranlar
+açıkken gelen `advanceToNextModule()` çağrısı yok sayılır. `advanceExternal()` bu yüzden ayrıdır:
+kuyruktaki sonraki ekranı açar, kuyruk bitince sunucuya asıl geçişi yapar.
 
 `advanceExternal()` her çağrıldığında durumdan birini seçer:
 
@@ -276,8 +294,9 @@ ile eklenen ekranlar ile sıradaki modülün önüne `before:` ile eklenenler ay
 
 - Araya eklenen ekranın ileri giden her yolu (buton, otomatik geçiş, zamanlayıcı)
   `advanceExternal()` çağırır.
-- Bu ekranlarda `advanceToNextModule()` çağırmayın. Çağrı yok sayılır ve konsola uyarı düşer;
-  kullanıcı ekranda kalır.
+- Bu ekranlarda `advanceToNextModule()` çağırmayın. `insert` ile eklenen ekranda çağrı yok sayılır
+  ve konsola uyarı düşer; kullanıcı ekranda kalır. `showExternalScreen` ile açılan ekranda iki çağrı
+  da akışı ilerletir.
 - `registry.override` ile değiştirdiğiniz SDK modül ekranları araya eklenen ekran sayılmaz.
   Onlar `advanceToNextModule()` ile ilerler.
 - `advanceExternal()` hiç çağrılmazsa akış o ekranda durur ve sunucu önceki modülü görmeye devam
@@ -300,11 +319,16 @@ SDK'nın VM'ini kendi VM'inizle sarın:
 @MainActor
 final class SelfieHostViewModel: HostModuleViewModel {
     let sdk = SDKSelfieViewModel()
+    weak var coordinator: SDKFlowCoordinator?          // ekran onAppear'da verir
 
     override init() {
         super.init()
         bridge(sdk)                                    // child'ın objectWillChange'ini yukarı ilet
-        sdk.onSkipRequested = { [weak self] in self?.log("selfie_skip") }
+        sdk.onSkipRequested = { [weak self] in
+            self?.log("selfie_skip")
+            self?.coordinator?.skipCurrentModule()
+        }
+        sdk.onFlowFailed = { [weak self] in self?.coordinator?.finishFlowAsFailed() }
     }
 
     var canContinue: Bool { sdk.canContinue }          // state'i dışarı aç
@@ -320,17 +344,20 @@ final class SelfieHostViewModel: HostModuleViewModel {
 > VM'i sarıp izlersiniz. Bunu bilerek böyle yaptık: iş mantığı dışarıdan değiştirilirse sunucudaki
 > akışla uyumsuzluk çıkar.
 
-Sample App'teki her `XxxHostViewModel` bu yöntemin çalışan bir örneği.
+Sarılan VM'i SDK ekranına verirseniz (`SDKSelfieView(viewModel: host.sdk)`), ekran
+`onSkipRequested` ve `onFlowFailed`'ı onAppear'da kendisi bağlar ve sizin kapanışlarınız ezilir.
+
+Sample App'teki `XxxHostViewModel` dosyaları yöntemi gösterir, akışa bağlı değildir.
 
 ---
 
 ## "Bypass Yok" Kuralı
 
 Custom ekran yazarken tarama, yükleme ve sonraki modüle geçme gibi her adım işini SDK'nın VM
-metotlarıyla yapmalısınız. Her VM metodu işin yanında backend'e ilerleme sinyali de gönderir
-(`sendStep`, `modulePresented`). Kendi HTTP isteğinizi atıp kendi geçişinizi yaparsanız ekranda
-her şey aynı görünür ama sunucudaki akış ilerlemez ve agent panelinde müşteri takılmış gibi
-görünür.
+metotlarıyla yapmalısınız. SDK bu işlerin yanında sunucuya durum da bildirir: modül açılınca
+`stepChanged`, yükleme bitince sonucu (ör. `uploadSelfie`, `uploadIdFront`). Kendi HTTP isteğinizi
+atıp kendi geçişinizi yaparsanız ekranda her şey aynı görünür ama sunucudaki akış ilerlemez ve
+agent panelinde müşteri takılmış gibi görünür.
 
 | ✅ Doğru | ❌ Bypass |
 |---|---|
@@ -348,7 +375,7 @@ B yöntemindeki pasif ekranlar bu kuralın dışında kalır, çünkü hiçbir V
 - [ ] Ekran ilgili `XxxCustomView.swift`'ten başlatıldı (sıfırdan yazılmadı) ve dosyanın başındaki "Kopyalanacak dosyalar" listesindeki her şey projede
 - [ ] Ekran iş adımlarında yalnızca SDK VM metotlarını çağırıyor
 - [ ] Geçişler `coordinator` üzerinden yapılıyor (`advanceToNextModule` / `advanceExternal` / `skipCurrentModule`)
-- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya gösteriliyor
-- [ ] Modülün closure'ları bağlandı (`onSkipRequested` vb., modül rehberine bakın)
+- [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya gösteriliyor; hata kapanınca `vm.consumePendingAlertAction()` çağrılıyor (`.idErrorAlert`'in `onDismiss`'i ya da 3.2.0+ `vm.dismissError()`)
+- [ ] Modülün closure'ları bağlandı (`onSkipRequested`, `onFlowFailed` vb., modül rehberine bakın)
 - [ ] Deneme hakkının bittiği durum test edildi (comparison count'lar sunucudan gelir)
 - [ ] Akış gerçek cihazda baştan sona denendi (NFC ve görüşme simülatörde çalışmaz)
