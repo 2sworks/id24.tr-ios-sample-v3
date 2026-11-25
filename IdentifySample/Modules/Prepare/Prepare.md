@@ -26,8 +26,10 @@ en sık düşülen kötü deneyim daha en başta engellenir.
 ## Kullanıcı Ne Yaşar?
 
 1. Ekranda izin satırları görür (kamera, mikrofon, konuşma) — her birine dokunup izni verir.
-2. Gerekliyse kısa bir bağlantı hız testi koşar.
-3. Hepsi yeşile dönünce "Devam" aktifleşir; dokunduğunda akışın ilk gerçek adımına geçilir.
+2. Altındaki üç satırı da işaretler: "Kimliğim yanımda", "Kimlik doğrulamak için tek başımayım",
+   "Uygun ışık ve ses koşullarındayım". Altı satırın hepsi işaretlenince düğme aktifleşir.
+3. Hız testi gerekiyorsa düğmede önce "Bağlantı Kalitemi Ölç ve Devam Et" yazar; dokununca test koşar.
+   "Devam Et"e dokunduğunda akışın ilk gerçek adımına geçilir.
 4. Bir izni reddederse, onu Ayarlar'a yönlendiren bir uyarı görür.
 
 ---
@@ -42,7 +44,7 @@ Görünümü markanıza uydurmak için [Tema rehberi](../../../docs/guides/themi
 
 > **Çalışan tam örnek:** [PrepareCustomView.swift](PrepareCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.prepare) { PrepareCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 UI tamamen sizin; izin isteme, hız testi ve "hazırım" sinyali SDK VM'inde kalır:
@@ -59,6 +61,7 @@ struct MyPrepareView: View {
             // kendi izin/hız UI'ınız — vm.cameraAuthorized, vm.measuredSpeed... okuyun
             PermissionRow("Kamera", granted: vm.cameraAuthorized) { vm.checkCamera() }
             PermissionRow("Mikrofon", granted: vm.micAuthorized) { vm.checkMicrophone() }
+            PermissionRow("Konuşma", granted: vm.speechAuthorized) { vm.checkSpeech() }   // allPermissionsGranted bunu da ister
 
             Button("Devam") {
                 vm.completePrepare()                  // ✅ sendPreparetatus (soket)

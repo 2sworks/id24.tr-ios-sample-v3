@@ -18,14 +18,14 @@ Altyapıyı anlamak için: [TURN & WebRTC](../../../docs/guides/turn-webrtc.md) 
 |---|---|
 | Backend key | `SdkModules.waitScreen` |
 | Rota | `SDKModuleRoute.callScreen` |
-| Drop-in view | `SDKCallScreenView` (+ `SDKVideoFeedRepresentable`) |
+| Drop-in view | `SDKCallScreenView` |
 | ViewModel | `SDKCallScreenViewModel` |
 | Dış dünya | **WebRTC** + **soket** (çağrı aksiyonları) + HTTP |
 | Ses anahtarı | `CallScreenTts` |
 
 > Önemli: Bu modül çalışırken **soket dinleyicisini coordinator'dan devralır.** Ekrandan
-> ayrılırken `coordinator.restoreSocketListener()` ile geri verilir (terminate akışında
-> otomatik yapılır).
+> ayrılırken `coordinator.restoreSocketListener()` ile geri verilir. SDK ekranı bunu
+> `onDisappear` içinde yapar; kendi ekranınızda bu çağrıyı siz yaparsınız.
 
 ## Kullanıcı Ne Yaşar?
 
@@ -33,7 +33,7 @@ Altyapıyı anlamak için: [TURN & WebRTC](../../../docs/guides/turn-webrtc.md) 
 2. Temsilci aradığında çağrı ekranı gelir; kabul edince görüntülü görüşme başlar.
 3. Görüşme sırasında temsilci SMS kodu isteyebilir, fotoğraf alabilir, uyarı/kimlik çemberi
    açabilir, hatta uzaktan NFC okuma başlatabilir.
-4. Görüşme biter; sonuç (onaylandı/reddedildi/beklemede) ThankYou'da gösterilir.
+4. Görüşme biter; sonuç (tamamlandı/tamamlanamadı) ThankYou'da gösterilir.
 
 ---
 
@@ -51,7 +51,7 @@ sıkı bağlıdır — yeniden yazmaya değmez. Marka uyumu için önce [Tema](.
 
 > **Çalışan tam örnek:** [CallScreenCustomView.swift](CallScreenCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.callScreen) { CallScreenCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 Tasarım değiştirilecekse iki kesin kural vardır:
@@ -72,7 +72,7 @@ struct MyCallView: View {
 
             VStack {
                 Text("Sıra: \(vm.queuePosition)")
-                if vm.callState == .waiting {
+                if vm.callState == .ringing {
                     Button("Kabul Et") { vm.acceptCall() }                 // ✅ soket + WebRTC
                 }
                 TextField("SMS", text: $vm.smsCode)
@@ -82,10 +82,32 @@ struct MyCallView: View {
                     .disabled(!vm.endCallEnabled)
             }
         }
-        .onAppear { vm.checkSignLangIfNeeded() }
+        .onAppear {
+            IdentifyManager.shared.socketMessageListener = vm      // ✅ soket aksiyonları bu VM'e
+            IdentifyManager.shared.replayPendingQueueStats()        // ekrandan önce gelen sıra bilgisi
+            vm.checkSignLangIfNeeded()     // showSignLangGate'i açar; kapıyı siz gösterirsiniz
+        }
+        .onDisappear {
+            coordinator.restoreSocketListener()                     // ✅ dinleyiciyi geri ver
+            vm.cleanup()
+        }
+        .onChange(of: vm.socketThankYouStatus) { status in         // endCall, ret
+            guard status != nil else { return }
+            coordinator.advanceToNextModule()
+        }
+        .onChange(of: vm.directThankYouStatus) { status in         // panel kararı, kopma sınırı
+            guard let status else { return }
+            vm.finishSDKForDirectThankYou()                         // SDK'yı kapatır (4103)
+            coordinator.pushThankYouDirectly(status: status)
+        }
     }
 }
 ```
+
+`coordinator.pendingThankYouStatus`'ın setter'ı host'a açık değildir. Kendi ekranınızdan
+çağrılan `advanceToNextModule()` ThankYou rotasını statüsüz (`.thankYou(nil)`) açar; SDK'nın
+ThankYou ekranı bunu `.completed` olarak çizer. Statüyü kendi ThankYou ekranınıza siz taşıyın
+(örnek uygulama `CustomScreens.pendingThankYouStatus` kullanır).
 
 Video katmanları için bilmeniz gerekenler:
 
@@ -121,8 +143,8 @@ struct MyVideoHost: UIViewRepresentable {
 
 ### Tipler
 ```swift
-public enum SDKCallState { case waiting, /* ... */ connected, ended }
-public enum SDKCallNetworkQuality { case none, /* ... */ good, poor }
+public enum SDKCallState { case waiting, ringing, connected, smsVerification, nfcReading, ended }
+public enum SDKCallNetworkQuality { case none, bad, medium, good }
 ```
 
 ### Çağrı durumu (`@Published`, salt-okunur)
@@ -135,6 +157,7 @@ public enum SDKCallNetworkQuality { case none, /* ... */ good, poor }
 | `endCallEnabled` | `Bool` | "Görüşmeyi bitir" aktif mi (agent kilitleyebilir) |
 | `callCompleted` | `Bool` | Görüşme tamamlandı mı |
 | `socketThankYouStatus` | `ThankYouStatus?` | Soketten gelen sonuç statüsü |
+| `directThankYouStatus` | `ThankYouStatus?` | Panel karar verdiyse ya da kopma sınırı dolduysa sonuç; ThankYou doğrudan açılır |
 | `photoTakenToast` | `String?` | "Fotoğraf alındı" bildirimi |
 | `lostConnectionCallCompleted` | `Bool` | Kopma sonrası görüşme tamamlandı mı |
 
@@ -178,21 +201,24 @@ Ayrıntı: [Arka Kamera Odağı](#arka-kamera-odağı-330).
 ### Metotlar
 | Metot | Etki |
 |---|---|
-| `checkSignLangIfNeeded()` | `connectToSignLang` ise işaret dili kapısını açar |
+| `checkSignLangIfNeeded()` | Kapı bekliyorsa (`signLangSupport: true`, `signLangPreference` `nil`) işaret dili kapısını açar |
 | `signLangCompleted()` | İşaret dili adımını tamamlar |
 | `acceptCall()` | Çağrıyı kabul eder (`manager.acceptCall`) — TURN kimliği + SDP offer. Çalan çağrı yoksa ya da bağlantı kapanıyorsa **başarısız döner** ve `errorMessage` dolar |
-| `terminateCall(coordinator:)` | Görüşmeyi bitirir + dinleyiciyi geri verir + ThankYou'ya geçer (`showThankYouPage: false` ise akış aşağı kayarak kapanır). Sonuç: `onFinished` → `notCompleted` / `userEndedCall`. Panelin kapatması (`terminateCall`) için: [Görüşmenin Kapanışı](../../../docs/guides/websocket.md#görüşmenin-kapanışı--terminatecall) |
+| `terminateCall(coordinator:)` | Görüşmeyi bitirir + ThankYou'yu `.notCompleted` ile açar (`showThankYouPage: false` ise akış aşağı kayarak kapanır). Dinleyiciyi geri vermez. Sonuç: `onFinished` → `notCompleted` / `userEndedCall`. Panelin kapatması (`terminateCall`) için: [Görüşmenin Kapanışı](../../../docs/guides/websocket.md#görüşmenin-kapanışı--terminatecall) |
 | `verifySMS()` | SMS kodunu doğrular (`manager.smsVerification`) |
 | `startRemoteNFC(birthDate:validDate:docNo:)` | Uzaktan NFC okumayı başlatır |
 | `saveAndRestartRemoteNFC(serial:birth:valid:)` | MRZ'yi düzeltip NFC'yi yeniden başlatır |
 | `handleReconnectCompleted()` / `handleReconnectCompletedWithStatus(...)` | Kopma sonrası kurtarma |
-| `cleanup()` | Kaynakları temizler (ekrandan ayrılırken) |
+| `finishSDKForDirectThankYou()` | `directThankYouStatus` gelince SDK'yı kapatır (`forceQuitSDK`, soket 4103). `pushThankYouDirectly`'den önce çağrılır |
+| `cleanup()` | Kaynakları temizler (ekrandan ayrılırken). Dinleyiciyi geri vermez |
 
 ### Soket dinleyici
 ```swift
 nonisolated public func listenSocketMessage(message: SDKCallActions)
 ```
 CallScreen aktifken soket mesajlarını **doğrudan bu VM** işler (coordinator yerine).
+Ekran açılınca `IdentifyManager.shared.socketMessageListener = vm` atanır, kapanınca
+`coordinator.restoreSocketListener()` çağrılır.
 Aksiyonların tam listesi: [WebSocket → Aksiyon Kataloğu](../../../docs/guides/websocket.md#aksiyon-kataloğu--sdkcallactions).
 
 ## Gelen Arama Zili ve Çalma Penceresi
@@ -213,10 +239,13 @@ m.ringingTimeout               = 300    // yanıtlanmazsa sonlandırma süresi (
 - **Sessiz mod:** Sistem sesi iOS kısıtı gereği çalmaz; titreşim CoreHaptics üzerinden
   verildiği için sessiz anahtarından etkilenmez. Dokunsallık donanımı olmayan cihazlarda
   (iPhone 7 ve öncesi) eski `AudioServicesPlaySystemSound` yoluna düşülür.
-- **`hideCallAnswerScreen` açıkken zil hiç çalmaz** — host çağrıyı çalma ekranı
-  göstermeden anında yanıtladığı için zil tek bir gereksiz darbe olurdu.
+- **`hideCallAnswerScreen` açıkken zil hiç çalmaz.** Bayrak sunucunun `hide_call_answer_screen`
+  ayarından gelir; `setupSDK` oda yanıtını alınca değeri yeniden yazar, önceden verdiğiniz değer
+  ezilir. Hazır görüşme ekranı bu durumda çağrıyı kendisi yanıtlar. Kendi görüşme ekranınızda
+  bayrak açıksa `acceptCall()`'u siz çağırın. Çağırmazsanız çağrı zilsiz çalar ve
+  `ringingTimeout` dolunca 4108 ile düşer.
 - **Çalma zaman aşımı (4108):** Temsilci tarafı çağrıyı iptal edemediğinden yanıtlanmayan
-  çağrının bir üst sınırı vardır. Süre duvar saatiyle `initCall` anından ölçülür; dolduğunda
+  çağrının bir üst sınırı vardır. Süre `initCall` anından ölçülür; dolduğunda
   `terminateCall("RINGING_TIMEOUT")` yayınlanır.
 - **Yinelenen `initCall`** yok sayılır: görüşme sürerken ikinci bir çalma ekranı açılmaz.
 
@@ -246,7 +275,8 @@ tek kayıttan teşhis etmek içindir.
 ## Sinyal Zinciri — Perde Arkası
 
 ```
-(görünür) → checkSignLangIfNeeded() → connectToSignLang ? showSignLangGate
+(görünür) → socketMessageListener = vm
+          → checkSignLangIfNeeded() → signLangGatePending ? showSignLangGate
 acceptCall()         → manager.acceptCall [SOKET] + WebRTC peer connection kurulur
                        remoteVideoView / localVideoView (WebRTC track'leri)
 verifySMS()          → manager.smsVerification [SOKET]
@@ -254,9 +284,15 @@ startRemoteNFC(...)  → manager.startRemoteNFC (CoreNFC) → nfcMsgHandler
 listenSocketMessage  → çağrı aksiyonları (sonuç statüsü, foto alındı, kopma...)
 terminateCall(coordinator:)
    → manager.terminateCallByUser [SOKET]
-   → coordinator.restoreSocketListener()
-   → coordinator.pendingThankYouStatus = socketThankYouStatus
+   → callState = .ended
+   → coordinator.pushThankYouDirectly(status: .notCompleted)
+socketThankYouStatus (endCall, ret)
+   → coordinator.pendingThankYouStatus = status
    → coordinator.advanceToNextModule()  →  .thankYou(status)
+directThankYouStatus (panel kararı, kopma sınırı)
+   → finishSDKForDirectThankYou()       (soket 4103)
+   → coordinator.pushThankYouDirectly(status:)
+(kaybolur) → coordinator.restoreSocketListener() → cleanup()
 ```
 
 ## Host VM ile Gözlem (Composition) — Güvenli
@@ -343,9 +379,12 @@ Görüşme sırasında kamera durursa görüntü kendiliğinden yeniden açılı
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
-- **`terminateCall(coordinator:)`'ı asla atlamayın** — hem soketi bilgilendirir hem
-  dinleyiciyi coordinator'a geri verir; atlarsanız sonraki ekranlar soket mesajı almaz.
-- **İşaret dili:** `signLangSupport: true` ise `checkSignLangIfNeeded()` kapıyı açar —
+- **`terminateCall(coordinator:)`'ı asla atlamayın.** Panele `terminateCallOnMobile`
+  gönderir (bağlantı yoksa görüşmeyi yalnız cihazda kapatır) ve sonucu bildirir. Dinleyiciyi
+  ekranın `onDisappear`'ındaki `coordinator.restoreSocketListener()` geri verir; bu çağrı
+  eksik kalırsa sonraki ekranlar soket mesajı almaz.
+- **İşaret dili:** `signLangSupport: true` ise `checkSignLangIfNeeded()` kapıyı açar;
+  `signLangPreference` verildiyse açmaz. Ayrıntı:
   [SignLang rehberi](../SignLang/SignLang.md).
 - **Bağlantı koparsa:** `showLostConnection` overlay'i devreye girer —
   [LostConnection rehberi](../LostConnection/LostConnection.md).

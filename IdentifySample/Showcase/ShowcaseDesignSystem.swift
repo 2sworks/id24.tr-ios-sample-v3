@@ -760,7 +760,7 @@ struct ThemeJSONShowcaseView: View {
             VStack(alignment: .leading, spacing: IDSpacing.lg) {
 
                 Text("Aşağıdaki sözlük SDK'ya olduğu gibi verilir. React Native tarafında "
-                     + "IdentifySdk.setTheme(...), Flutter'da IdentifySdk.instance.setTheme(...) "
+                     + "IdentifySdk.setTheme(...), Flutter'da IdentifySdk().setTheme(...) "
                      + "aynı şemayı kullanır — renk denemesi için native derleme gerekmez.")
                     .font(IDFont.caption(.regular))
                     .foregroundColor(IDColor.adaptiveSubtitle(for: colorScheme))

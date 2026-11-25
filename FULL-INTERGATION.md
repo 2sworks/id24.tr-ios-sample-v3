@@ -52,7 +52,7 @@ IdentifyManager.shared.setSDKLang(lang: .tr)
 
 // 2. Tema (renk / font / ikon / metrik)
 let theme = SDKTheme.shared
-theme.colors.primary = Color(hex: "#E4002B")
+theme.colors.primary = Color(red: 228/255, green: 0, blue: 43/255)   // #E4002B
 theme.fonts.familyName = "Sofia Pro"
 theme.setIcon(.logo, Image("my_logo"))
 
@@ -74,7 +74,9 @@ IdentifyManager.shared.eventDelegate = myAnalytics
 // 7. SDK kurulumu
 coordinator.prepareForSetup()                    // setupSDK'dan ÖNCE — zorunlu
 IdentifyManager.shared.setupSDK(...) { socket, room, error in
-    if error == nil { coordinator.start() }     // ilk modüle geçer
+    // Başarıda da `error` dolu gelir, mesajı boştur.
+    if let message = error?.errorMessages, !message.isEmpty { return }
+    if socket?.isConnected == true, room.result == true { coordinator.start() }   // ilk modüle geçer
 }
 ```
 
@@ -108,6 +110,10 @@ SDKPermissionConfig.shared.provider = HostPermissions()
 Varsayılan `SDKSystemPermissionProvider.shared`'dır. `SDKPermission` ileride yeni durum alabilir;
 `switch` yazarken `@unknown default` ekleyin.
 
+Kimlik ve adres ekranlarındaki belge tarayıcısı kamera iznini sistemden kendisi ister. İzin daha
+önce sorulmadıysa sistem penceresi tarayıcı açılırken çıkar. Kimlik ekranı tarayıcıyı açmadan önce
+sağlayıcınızdan yalnız iznin reddedilip reddedilmediğine bakar.
+
 ---
 
 ## 2) Tema — `SDKTheme.shared`
@@ -124,19 +130,26 @@ public final class SDKTheme {
     public var metrics = SDKMetrics()     // boşluk + köşe yarıçapı
     public var navBar  = SDKNavBarAppearance()  // preset, marka başlığı, yükseklik
     public var buttons = SDKButtons()           // tüm butonlar + stil başına override
-    public var selection, alerts, banners, fields, sheets   // bileşen görünümleri
+    public var selection, alerts, banners, fields, sheets,
+               capture, controls, call, motion              // bileşen görünümleri
 
     public func setIcon(_ key: SDKIconKey, _ image: Image)   // tek ikon override
     public func setIcons(_ map: [SDKIconKey: Image])          // toplu override
     public func resetIcon(_ key: SDKIconKey)                  // varsayılana dön
+    public func setFocusIndicator(_ builder: (CGFloat) -> some View)  // odak göstergesi
+    public func resetFocusIndicator()
+    public func setButtonCorner(_ corner: SDKButtonCorner, for style: SDKButtonStyle? = nil)
+    public func setButtonAppearance(_ appearance: SDKButtonAppearance, for style: SDKButtonStyle? = nil)
     public func registerFont(at url: URL) -> Bool             // font dosyası kaydet
     public func registerFont(data: Data) -> Bool              // bellekteki font verisi
     public func applyTheme(named: String, in: Bundle) -> [String]  // JSON tema; bilinmeyen anahtarları döner
     public func apply(_ dict: [String: Any]) -> [String]
     public func apply(json: Data) -> [String]
-    public func resetAppearance()                              // tüm görünümü SDK varsayılanına al
+    public func resetAppearance()   // renk, yazı, ölçü ve bileşen görünümlerini sıfırlar; ikon ve dil override'larına dokunmaz
 }
 ```
+
+Bileşen görünümlerinin alanları: [Tema rehberi](docs/guides/theming.md#bileşen-görünümleri).
 
 ### Renkler — `SDKColors`
 
@@ -148,7 +161,7 @@ Tam liste ve fabrika varsayılanları:
 | `primaryDark` | `#2C5BF6` | Koyu temada primary karşılığı |
 | `primaryLight` | `#F0F5FF` | Açık primary zemin (chip/rozet arka planı) |
 | `success` | `#41D97F` | Başarı durumları |
-| `successAlt` | `#56DD8C` | Alternatif başarı tonu (gradyan vb.) |
+| `successAlt` | `#56DD8C` | Alternatif başarı tonu; hiçbir SDK ekranı okumuyor |
 | `successBright` | `#30D158` | Parlak başarı (success buton zemini) |
 | `error` | `#FF453A` | Hata durumları, cancel buton zemini |
 | `inkDarkest` | `#111827` | En koyu metin (başlıklar) |
@@ -163,14 +176,23 @@ Tam liste ve fabrika varsayılanları:
 | `darkBgSecondary` | `#1F2533` | Koyu tema yüzey zemini |
 | `darkMuted` | `#57637F` | Koyu tema ikincil metin |
 | `divider` | `#D1D5DB` | Ayırıcı çizgiler |
-| `accentPurple` | `#8C33CC` | Alternatif vurgu (tema örnekleri için) |
-| `accentTeal` | `#1A8C73` | Alternatif vurgu (tema örnekleri için) |
+| `accentPurple` | `#8C33CC` | Alternatif vurgu (tema örnekleri için); hiçbir SDK ekranı okumuyor |
+| `accentTeal` | `#1A8C73` | Alternatif vurgu (tema örnekleri için); hiçbir SDK ekranı okumuyor |
+| `accentWarning` | `#FCA64F` | Uyarı vurgusu |
+
+Bu tablonun yanında 18 rol rengi daha var: `pageBackground`, `moduleBackground`, `surface`,
+`title`, `subtitle`, `border`, `headerBackground`, `headerTitle`, `headerSubtitle`, `headerIcon`,
+`headerIconBackground`, `headerIconBorder`, `progressActive`, `progressInactive`,
+`selectedItemBackground`, `selectedItemText`, `unselectedItemBackground`, `unselectedItemText`.
+Tipleri `SDKAdaptiveColor?`, açık ve koyu tema için ayrı değer alırlar. Ayrıntı:
+[Rol Renkleri](docs/guides/theming.md#rol-renkleri).
 
 ```swift
-SDKTheme.shared.colors.primary = Color(hex: "#E4002B")   // hex init SDK'da hazır
+SDKTheme.shared.colors.primary = Color(red: 228/255, green: 0, blue: 43/255)   // #E4002B
 ```
 
-> `Color(hex:)` 6 haneli (`#RRGGBB`) ve 8 haneli (`#RRGGBBAA`) formatları destekler.
+> JSON temada renkler `#RRGGBB` ya da `#RRGGBBAA` olarak yazılır. Kodda SDK'nın hex
+> yardımcısı yok; `Color(red:green:blue:)` ya da kendi yardımcınızı kullanın.
 
 ### Fontlar — `SDKFonts`
 
@@ -204,7 +226,8 @@ SDK ekranlarındaki **her görsel öğe** bir anahtarla değiştirilebilir. `SDK
 |---|---|---|
 | `.logo` | `ic_identify_logo_text` (bundle) | Login nav bar, overlay bar ortası |
 | `.hamburger` | `hamburger` (bundle) | Login nav bar sol menü |
-| `.langButton` | `ic_lang_button_dark` (bundle) | Modül bar'ındaki yuvarlak logo |
+| `.headerLogo` | `ic_lang_button_dark` (bundle) | Modül bar'ındaki yuvarlak marka işareti |
+| `.langButton` | `ic_lang_button_dark` (bundle) | Eski ad. `.headerLogo` verilmediyse işaret bu override'dan gelir |
 | `.back` | SF `chevron.left` | Tüm geri butonları |
 | `.help` | SF `questionmark` | Overlay bar yardım butonu |
 | `.close` | SF `xmark` | Kapat butonları |
@@ -219,7 +242,7 @@ SDK ekranlarındaki **her görsel öğe** bir anahtarla değiştirilebilir. `SDK
 | `.trash` | SF `trash` |
 | `.video` | SF `video.fill` |
 | `.chat` | SF `message.fill` |
-| `.calendar` | SF `calendar` |
+| `.calendar` | SF `calendar` (hiçbir SDK ekranı okumuyor) |
 | `.sparkles` | SF `sparkles` |
 | `.chevronRight` | SF `chevron.right` |
 | `.signLang` | SF `person.wave.2.fill` |
@@ -248,15 +271,15 @@ SDK ekranlarındaki **her görsel öğe** bir anahtarla değiştirilebilir. `SDK
 | `.thankYouFail` | `ty_xmark` | ThankYou başarısız hero'su |
 | `.uploadFile` | `upload_file` | Adres belgesi yükleme |
 | `.lostConnection` | `lost_connection` | Bağlantı koptu ekranı |
-| `.idCardFront` | `frontID` | Kimlik ön yüz illüstrasyonu |
-| `.idCardBack` | `backID` | Kimlik arka yüz illüstrasyonu |
+| `.idCardFront` | `frontID` | Kimlik ön yüz illüstrasyonu; hiçbir SDK ekranı okumuyor, kimlik ekranı `frontID` görselini doğrudan yükler |
+| `.idCardBack` | `backID` | Kimlik arka yüz illüstrasyonu; hiçbir SDK ekranı okumuyor, kimlik ekranı `backID` görselini doğrudan yükler |
 
 **Durum / kontrol glifleri**
 
 | Anahtar | Varsayılan |
 |---|---|
 | `.successCircle` | SF `checkmark.circle.fill` |
-| `.failCircle` | SF `xmark.circle.fill` |
+| `.failCircle` | SF `xmark.circle.fill` (hiçbir SDK ekranı okumuyor; hata uyarısı bu sembolü doğrudan çizer) |
 | `.play` | SF `play.fill` |
 | `.pause` | SF `pause.fill` |
 | `.mic` | SF `mic.fill` |
@@ -265,6 +288,7 @@ SDK ekranlarındaki **her görsel öğe** bir anahtarla değiştirilebilir. `SDK
 | `.torchOff` | SF `bolt.slash.fill` |
 | `.wifiGood` | SF `wifi` |
 | `.wifiBad` | SF `wifi.exclamationmark` |
+| `.livenessStepDone` | SF `checkmark.circle.fill` (canlılıkta tamamlanan adım) |
 
 **Belge türü seçim satırı (IdCard ekranı)**
 
@@ -306,8 +330,8 @@ Image.sdk(.camera)                             // host override varsa onu dönd�
 | `radiusLG` | 16 | Büyük köşe |
 | `radiusXL` | 24 | Ekstra büyük köşe |
 | `radiusCard` | 36 | Kart köşesi |
-| `radiusPill` | 40 | Hap (pill) şekli |
-| `radiusCircle` | 9999 | Tam yuvarlak |
+| `radiusPill` | 40 | Hap (pill) şekli; hiçbir SDK ekranı okumuyor |
+| `radiusCircle` | 9999 | Tam yuvarlak; hiçbir SDK ekranı okumuyor |
 
 ```swift
 SDKTheme.shared.metrics.radiusCard = 12    // daha keskin köşeli kartlar
@@ -361,7 +385,7 @@ Ayrıntı: [Başlık Çubuğu Düğmeleri](IdentifySample/Modules/Modules.md#ba�
 |---|---|
 | `height` | Çubuk yüksekliği; `nil` → preset değeri |
 | `showsLogo`, `logoSize` | Marka işareti (`SDKIconKey.headerLogo`) |
-| `circleButtonSize`, `iconSize` | Geri / yardım / menü düğmesi ve içindeki ikon (`.back`, `.help`, `.hamburger`, `.close`) |
+| `circleButtonSize`, `iconSize` | Geri ve yardım düğmesi ile içindeki ikon (`.back`, `.help`). Menü düğmesi 48 pt sabittir |
 | `titleFont`, `subtitleFont` | Başlık ve alt başlık fontu |
 | `progressHeight`, `progressSpacing`, `progressCorner` | İlerleme çubuğu |
 | `overlayGradientOpacity` | Kamera üstü çubuğun gradyan koyuluğu |
@@ -400,11 +424,12 @@ Aksiyon kapsülleri (kamera ekranlarındaki yuvarlak düğmeler) aynı `corner` 
 ### JSON ile tema
 
 Kod yerine tek dosya: [`docs/integration/theme.example.json`](docs/integration/theme.example.json).
-Bilinmeyen anahtarlar dönüş değerinde listelenir — geliştirmede loglayın.
+Bilinmeyen anahtarlar dönüş değerinde listelenir — geliştirmede loglayın. Değer hatalarının çoğu
+listede görünmez; geçersiz değer sessizce varsayılana ya da eski değere döner.
 
 ```swift
 let unknown = SDKTheme.shared.applyTheme(named: "IdentifyTheme")   // setupSDK'dan önce
-SDKTheme.shared.resetAppearance()                                   // tümünü sıfırla
+SDKTheme.shared.resetAppearance()   // görünümü sıfırla (ikonlar için resetIcon(_:), odak göstergesi için resetFocusIndicator())
 ```
 
 Yukarıdaki her alanın JSON karşılığı ve anahtar adları: [Tema Rehberi → JSON](docs/guides/theming.md).
@@ -442,7 +467,7 @@ Hepsi aktif `familyName`'den üretilir; ağırlık parametresi opsiyoneldir:
 
 | Fonksiyon | Boyut | Varsayılan ağırlık |
 |---|---|---|
-| `IDFont.displayLarge()` | 28 | bold |
+| `IDFont.displayLarge()` | 28 | bold (hiçbir SDK ekranı kullanmıyor) |
 | `IDFont.displayMedium()` | 24 | bold |
 | `IDFont.displaySmall()` | 20 | bold |
 | `IDFont.bodyLarge()` | 18 | semibold |
@@ -518,7 +543,7 @@ Text(SDKLocalization.shared.string(forKey: "MyIntro"))   // aktif dile göre ç�
 
 ### Key envanteri — `SDKKeyword` grupları
 
-400'e yakın key vardır; tam liste `SDKLocalization.swift`'teki `SDKKeyword` enum'undadır.
+440'a yakın key vardır; tam liste `SDKLocalization.swift`'teki `SDKKeyword` enum'undadır.
 Ana gruplar:
 
 | Grup | Örnek key'ler |
@@ -533,7 +558,7 @@ Ana gruplar:
 | Video kayıt + sesli doğrulama | `recordVideo`, `readingTestTitle/Desc`, `sentenceToReadLabel`, `voiceVerifying`, `youSaidLabel`, `speechNoMatchTitle`, `similarityLabel` |
 | Konuşma tanıma (KYC modülü) | `speechInfoTitle/Text`, `spokenWordLabel`, `soundRecogOk/Fail`, `speechNotRecognized` |
 | İmza | `signatureTitle`, `signatureInfo(Title/Desc)`, `coreDelSig`, `signatureUploadFailed` |
-| Adres | `addressVerifyTitle/Desc`, `choosePhoto`, `chooseFile`, `uploadFile`, `pdfMaxSizeFmt`, `docAddressDesc` |
+| Adres | `addressVerifyTitle/Desc`, `choosePhoto`, `chooseFile`, `uploadFile`, `pdfMaxSizeFmt`, `docAddressDesc`, `addressFileFormats` (biçim satırı; PDF sınırını yazar: en fazla 5 MB) |
 | Görüşme (Call) | `callTitle/Description`, `callConnectingInfo`, `callEndCall`, `callQueuePositionFmt`, `callEstimatedWaitFmt`, `missedCallTitle` |
 | ThankYou | `thankU`, `thankYouMissedTitle`, `thankYouFailedTitle`, `thankYouCompletedDesc`, `resultWillBeNotified` |
 | Bağlantı | `coreNoInternet(Desc)`, `coreReConnect`, `coreReconnecting`, `connectionLostTitle/Desc`, `checkMyConn`, `connectionGood` |
@@ -585,13 +610,14 @@ SDKSpeechConfig.shared.setMode(.off, for: .livenessDetection)
 
 **`InterruptPolicy` seçenekleri:**
 
-Sesli okuma ekranı **kilitlemez**; kullanıcı okuma sürerken ilerleyebilir. Geçişte okuma
-kesilir, sonraki modül `onAppear`'da kendi okumasını baştan başlatır.
+Sesli okuma ekranı **kilitlemez**; kullanıcı okuma sürerken ilerleyebilir. Geçişte okuma her
+politikada kesilir, sonraki modül `onAppear`'da kendi okumasını baştan başlatır. Politika yalnız
+aynı ekranda yeni bir okuma başladığında ne olacağını belirler.
 
 | Politika | Davranış |
 |---|---|
-| `.interruptOnNext` (varsayılan) | Modül geçişinde okuma anında kesilir; sonraki modül baştan okur |
-| `.finishThenNext` | Okumalar sıraya alınır; sonraki, önceki bitince başlar |
+| `.interruptOnNext` (varsayılan) | Yeni okuma süren okumayı keser |
+| `.finishThenNext` | Native okumalar sıraya alınır; yenisi, süren okuma bitince başlar. `.customAudio`'da okuma yine kesilir |
 | `.blockUntilDone` | Kullanımdan kaldırıldı; `.interruptOnNext` gibi davranır |
 
 ### Custom ses dosyası adlandırma
@@ -618,7 +644,7 @@ bulunamazsa `fallbackToNativeIfAudioMissing` açıksa native okunur; akış asla
 | `.selfie` | `SelfieTts` | Kamera hazır olana kadar ertelenir |
 | `.selfieWithLiveness` | `SelfieWithLivenessTts` | Kamera beklenir |
 | `.idCard` | `IdCardTypeSelectTts` | Ayrıca: `IdCardFrontTts`, `IdCardBackTts`, `PassportTts` view içinden |
-| `.idCardOVD` | `IdCardOVDTts` | Kamera beklenir |
+| `.idCardOVD` | — | Ekran kendisi okur: seçimde `IdCardOVDTts`, çekimde `OvdScanFrontSide` |
 | `.nfc` | — | Otomatik okuma yok; view belge tipine göre `NfcTts` / `NfcPassportTts` okur |
 | `.liveness` | `LivenessTts` | Kamera beklenir; ardından her adımın komutu okunur |
 | `.speech` | `SpeechTts` | |
@@ -640,7 +666,7 @@ Açılış yönergesinin ötesinde NFC, Selfie ve Canlılık modülleri kullanı
 
 Bunun için üç giriş noktası vardır: `speak` (böler, mutlaka okunur), `speakAfterCurrent`
 (sıraya girer), `announce` (tekrar eden durum; kendini kısıtlar, kare başına çağrılabilir).
-Ayrıntı: `SampleApp/IdentifySample/Modules/ReadAloud.md` §7c.
+Ayrıntı: [ReadAloud §7c](IdentifySample/Modules/ReadAloud.md#7c-aksiyona-bağlı-seslendirme-itr-1903).
 
 ### Programatik okuma — kendi ekranlarınızda
 
@@ -718,6 +744,10 @@ zorunda; `.respect` orada uygulanamaz, okuma sessizde de duyulur.
 | `moduleRestartToken: Int` | Artınca aktif modül view+VM'i yeniden yaratılır |
 | `pendingThankYouStatus` | Görüşme sonucu için geçici statü |
 | `isDismissingFlow: Bool` | `showThankYouPage: false` iken akış aşağı kayarak kapanıyor (3.1.0) |
+| `isWaitingForRoom: Bool` | Sunucunun oda kaydını onaylaması bekleniyor; akış bu sırada ilerlemez |
+| `roomWaitStatus: String?` | Bekleme örtüsündeki durum satırı; `nil` iken yalnız "bağlanılıyor" yazar |
+| `roomOccupiedMessage: String?` | Oda kaydı olmadıysa gösterilecek uyarı metni |
+| `roomBlockKind` | Uyarının sebebi: `.occupied` (sunucu reddetti, 4120) ya da `.waitTimeout` (onay gelmeden süre doldu) |
 
 **Metotlar:**
 
@@ -737,6 +767,9 @@ zorunda; `.respect` orada uygulanamaz, okuma sessizde de duyulur.
 | `restartCurrentModule()` | Reconnect sonrası aktif modülü baştan başlat |
 | `dismissLostConnection()` | Bağlantı-koptu ekranını restart etmeden kapat |
 | `restoreSocketListener()` | CallScreen'den dönüşte soket dinleyicisini geri al |
+| `finishFlowAsFailed()` | Hak bitti, atlama kapalı: sonucu `notCompleted / moduleFailed` olarak bildirir, oturumu kapatır, "Doğrulama başarısız" ekranını açar |
+| `retryAfterRoomWaitTimeout()` | Oda beklemesi zaman aşımında kullanıcı yeniden bağlanmayı seçti: bağlantı ekranı açılır, oturum kapanmaz |
+| `exitAfterRoomOccupied()` | Oda uyarısı onaylandı: oturumu kapatır, köke döner. Sonuç `.occupied`'da `error / roomOccupied`, `.waitTimeout`'ta `cancelled / userExited` |
 
 ### `SDKFlowHostView` — kök view
 
@@ -812,7 +845,7 @@ vardır — SDK ekranının yalnızca public API ile yazılmış, çalışan bir
 tabloda "Tam özel örnek" sütunu). Projeye kopyalanır, `registry.override(...)` ile takılır,
 üzerinde değişiklik yapılır. Kamera kullananlar `Modules/CustomKit/` içindeki
 `CustomCameraPreview.swift` + `CustomComponents.swift` dosyalarını da ister. Örnek uygulamada
-hamburger menü → **Tam Özel Ekranlar** anahtarı tümünü akışta SDK ekranlarının yerine koyar.
+hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** anahtarı tümünü akışta SDK ekranlarının yerine koyar.
 Ayrıntı: [Özelleştirme Rehberi](docs/guides/customization.md#sıfırdan-yazmak-yerine-xxxcustomviewswift).
 
 ### B) Akışa custom ekran ekleme
@@ -933,15 +966,15 @@ SDKNavigationBar(style: .progress(steps: coordinator.progressTotal, current: coo
 | Stil | Görünüm |
 |---|---|
 | `.login` | Hamburger + logo + trailing slot |
-| `.module` | Geri + langButton logosu + başlık/alt başlık + trailing |
+| `.module` | Geri + marka işareti (`.headerLogo`) + başlık/alt başlık + trailing |
 | `.progress(steps:current:)` | Modül barı + adım şeridi (beyaz — renkli zemin üstü) |
 | `.progressClear(steps:current:)` | Aynısı, tema renkleriyle (açık zemin üstü) |
 | `.overlay` | Kamera üstü: yarı saydam geri/yardım + gradyan |
 
 Slotlar: `onBack`, `onMenu`, `onHelp` closure'ları, `trailing: AnyView?`.
-İkonları `.back` / `.hamburger` / `.logo` / `.langButton` / `.help` anahtarlarından alır.
+İkonları `.back` / `.hamburger` / `.logo` / `.headerLogo` / `.help` anahtarlarından alır.
 
-### `IDAlertView` — SDK stili alert
+### `idAlert` ile SDK stili alert
 
 ```swift
 // Model ile:
@@ -961,7 +994,7 @@ Aksiyon stilleri: `.primary` · `.cancel` · `.destructive`.
 | API | Erişim | İşlev |
 |---|---|---|
 | `Image.sdk(.camera)` | public | Aktif temadaki ikonu çizer (host override'ı otomatik uygular) |
-| `SDKPreviewGallery` | public | Tüm SDK ekranlarının Xcode Preview kataloğu (geliştirme yardımı) |
+| `SDKPreviewGallery` | public | Tüm SDK ekranlarının Xcode Preview kataloğu (geliştirme yardımı). Önizleme kipi kimlik ve adres ekranlarındaki tarayıcıyı kapsamaz; galeride bu iki ekranda tarayıcı açılınca gerçek kamera başlar ve izin istenir |
 | `.successBanner(_:isVisible:)` | internal | Üstten kayan başarı bandı — SDK ekranları içinde kullanılır, host çağıramaz |
 | `.dismissKeyboardOnTap()` | internal | SDK akışında global klavye kapatma — `SDKFlowHostView` otomatik uygular; kendi login/sheet'lerinizde kendi jestinizi kurun |
 
@@ -976,9 +1009,10 @@ IdentifyManager.shared.setupSDK(
     identId: String,                        // zorunlu — doğrulama oturumu ID'si
     baseApiUrl: String,                     // zorunlu — backend URL
     networkOptions: SDKNetworkOptions,      // zorunlu — timeout + SSL pinning
-    kpsData: SDKKpsData?,                   // opsiyonel — NFC/MRZ ön-doldurma (birthDate, validDate, serialNo)
+    kpsData: SDKKpsData?,                   // NFC/MRZ ön-doldurma (birthDate, validDate, serialNo); üçünü de dolu verin. Varsayılanı yok, kullanmıyorsanız nil verin
     identCardType: [CardType]?,             // varsayılan [.idCard, .passport, .oldSchool]
     signLangSupport: Bool,                  // işaret dili tercümanı desteği
+    signLangPreference: Bool? = nil,        // işaret dili tercihi host'ta alındıysa verin; SDK'nın tercih ekranı atlanır
     nfcMaxErrorCount: Int,                  // NFC deneme hakkı
     logLevel: SDKLogLevel?,                 // varsayılan .all — bkz. Loglama
     logOnlineSecretKey: String?,            // online log şifreleme anahtarı
@@ -990,13 +1024,13 @@ IdentifyManager.shared.setupSDK(
     turnKey: String,                        // zorunlu — TURN kimlik üretim anahtarı
     wsSecretKey: String?,                   // WebSocket token anahtarı
     showThankYouPage: Bool?,                // akış sonunda ThankYou göster (vars. true) — false: ThankYou'suz kapanış, bkz. Akış Sonucu
-    showNFCNotFoundPage: Bool?,             // NFC yoksa bilgi sayfası (vars. false)
+    showNFCNotFoundPage: Bool?,             // true: NFC'siz cihazda da NFC ekranı açılır (vars. false)
     supportU18: Bool?,                      // 18 yaş altı desteği (vars. false)
-    AESKey: String?,                        // AES şifreleme anahtarı
+    AESKey: String?,                        // sunucunun MRZ alanlarını çözer, NFC anahtar düzeltmesini şifreler; NFC adımı varsa kpsData verseniz de verin
     enableAutoRotateOCR: Bool?,             // OCR otomatik oryantasyon düzeltme (vars. false)
     ttsEnabled: Bool?,                      // sesli okumayı native modda aç (vars. false)
-    onFinished: ((SDKFlowOutcome) -> Void)?, // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
-    callback: (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()
+    onFinished: (@MainActor @Sendable (SDKFlowOutcome) -> Void)? = nil,  // oturum nasıl biterse bitsin tam bir kez — bkz. Akış Sonucu
+    callback: @escaping @MainActor @Sendable (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()  // ana thread'de; başarıda error boş mesajlı gelir
 )
 ```
 
@@ -1029,6 +1063,8 @@ IdentifyManager.shared.setSDKLang(lang: .tr)    // .tr / .en / .de / .az / .ru
 
 `.idCard` (çipli kimlik) · `.passport` (pasaport) · `.oldSchool` (eski tip/diğer belgeler).
 `identCardType`'a verdiğiniz liste, kimlik ekranındaki tür seçim satırlarını belirler.
+OVD (`idcard_w_ovd`) bu listeyi okumaz; listede pasaport olmasa da çipli kimlik ve pasaport
+sunulur. OVD satırlarını yalnız `SDKDocumentSelectionConfig.shared.ovd.options` daraltır.
 
 ### NFC imza doğrulaması: `passportCorrectlySigned` (3.2.1)
 
@@ -1052,7 +1088,8 @@ IdentifyManager.shared.setupSDK(
 
 - **Dosya biçimi:** Arka arkaya dizilmiş `-----BEGIN CERTIFICATE-----` blokları. `#` ile başlayan
   açıklama satırları olabilir. Örnek uygulamadaki `SupportingFiles/csca-masterlist.pem` BSI CSCA
-  Master List'ten üretildi (387 kök), bağlantı (link) sertifikaları içinde yok.
+  Master List'ten üretildi (387 kök). Sonuna 3 T.C. seyahat belgesi kökü eklendi (kimlik kartı
+  Sürüm 1 ve 2, Mavi Kart), toplam 390. Bağlantı (link) sertifikaları içinde yok.
 - **Kendi listeniz:** Örnek uygulamadaki dosyayı kullanabilir ya da kendi PEM dosyanızı verebilirsiniz.
   SDK listeyi indirmez. Listeyi uygulama sürümü çıkarmadan güncellemek isterseniz uygulamanız dosyayı
   indirsin ve yerel dosya yolunu `nfcMasterList`'e versin.
@@ -1075,10 +1112,10 @@ IdentifyManager.shared.setupSDK(
 ```swift
 final class MyAnalytics: SDKEventListener {
     func onSDKEvent(_ event: SDKEvent) {
-        // event.name       — "module.presented", "app.background", "call.ended"...
-        // event.category   — .navigation / .network / .media / .verification / .call / .lifecycle...
-        // event.status     — .info / .success / .failure / .warning
-        // event.module     — "selfie", "nfc"...
+        // event.name       — "module.Selfie.presented", "session.started", "call.ended"...
+        // event.category   — .session / .module / .call / .network / .error / .navigation
+        // event.status     — .info / .presented / .completed / .failed / .skipped / .success / .abandoned / .notFound
+        // event.module     — "Selfie", "Mrz & Nfc Screen"... (SdkModules.rawValue); error.shown'da kısa ad: "nfc"
         // event.sessionId, event.timestampMs, event.message, event.metadata [String:String]
         // event.toDictionary() / event.toJSONString() — RN/Flutter köprüsü için hazır
     }
@@ -1147,11 +1184,19 @@ Hepsi main thread'de ve oturum başına **bir kez** çağrılır. Son sonuç
 | `result` | `SDKFlowResult` — ilerleme kararını buna göre verin |
 | `reason` | `SDKFlowEndReason` — ayrıntılı sebep |
 | `lastModule`, `modules`, `stepIndex`, `totalSteps` | Oturumun bittiği yer ve akış sırası |
-| `skippedModules` | Doğrulanmadan geçilen modüller (atlandı, cihazda/belgede bulunamadı, NFC hata sınırı) — `approved` ile birlikte gelebilir |
+| `skippedModules` | Doğrulanmadan geçilen modüller: atlananlar, NFC donanımı ya da yüz takibi olmadığı için cihazda çalışamayanlar, anahtar düzeltme hakkı (`nfcKeyEntry`) biten NFC. `approved` ile birlikte gelebilir |
+| `verifiedModules` | `modules` içinden atlananlar çıkınca kalanlar. Yalnız `approved` oturumda anlamlı |
 | `terminateReason`, `statusSummary` | Panel kapattıysa birebir (`statusSummary.type`: `positive` / `negative` / `neutral`) |
 | `closeCode`, `errorMessage` | Son socket kapanış kodu / `setupSDK` hatası |
-| `isSuccess` | Yalnızca `.approved` için `true` |
+| `nfcVerification` | Çip okunduysa kontrollerin sonucu (zincir, imza, veri, CA, AA) |
+| `sessionId`, `timestampMs` | Oturum kimliği ve kapanış anı (Unix, milisaniye) |
+| `isSuccess` | `.approved` için `true`. `skipsCountAsFailure` açıksa `isFullyVerified` ile aynı değeri alır |
+| `isFullyVerified` | Oturum onaylandı, atlanan modül yok ve hiçbir çip kontrolü başarısız olmadı |
+| `verificationWarnings` | Yapılmayan ama oturumu bozmayan kontroller. Çip okunup CSCA listesi verilmediyse `nfcCertificateChainNotChecked` |
 | `toDictionary()` | RN/Flutter köprüsüne hazır sözlük |
+
+`approved` tek başına tam doğrulama demek değildir; `isFullyVerified` ve `verificationWarnings`'e de
+bakın. Ayrıntı: [Oturum Çıkışları](docs/guides/session-exit.md#3-sdkflowoutcome--kapanış-verileri).
 
 Karar kuralı `SDKTerminateClassifier` içindedir; varsayılan görüşme ekranı da aynı kuralı
 kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
@@ -1198,11 +1243,11 @@ sonra SwiftUI / UIKit / RN-Flutter'da yönlendirmenin nereye yazılacağı:
 SDKLog.debug("...", .network)
 SDKLog.info("...", .lifecycle)
 SDKLog.warning("...", .socket)
-SDKLog.error("...", .media)
+SDKLog.error("...", .webrtc)
 ```
 
 Severity sıralı ve karşılaştırılabilir; kategoriler (`SDKLogCategory`) socket/network/
-media/lifecycle vb. akışları ayrıştırır. Base64 gibi hassas içerikler otomatik redakte
+webrtc/lifecycle vb. akışları ayrıştırır. Base64 gibi hassas içerikler otomatik redakte
 edilir. Ayrıntı: [Loglama Rehberi](docs/guides/logging.md).
 
 ### Modül tanı raporu (3.3.0)
@@ -1274,31 +1319,35 @@ Görüşme sırasında kopmada:
 - ICE `.disconnected`: 5 sn (sabit) toparlanma beklenir, gelmezse görüşme 4140 ile biter.
 - ICE `.failed`: görüşme hemen 4141 ile biter.
 - WebSocket kopması, medya hattı ayaktaysa görüşmeyi hemen bitirmez. Görüşme
-  `m.signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer, soket bu sürede geri
-  gelmezse biter.
+  `m.signallessCallGracePeriod` (varsayılan 10 sn) boyunca sinyalsiz sürer. SDK bu sürede soketi
+  kendisi yeniden kurmaz; süre dolunca görüşme biter ve "Bağlantı Koptu" ekranı açılır. Sunucu
+  soketi normal kapatırsa (4110-4112) bu süre işlemez, görüşme medya hattı kapanınca biter.
 
 Görüşme bitince tüm bağlantılar kapatılır ve kullanıcıya "Bağlantı Koptu" ekranı gösterilir.
-Görüşme dışındaki kopmada ekran hemen açılır; kurallarını `SDKConnectionPolicy` belirler. Yeniden bağlanma
-kullanıcı tetiklidir ve tam prosedürle çalışır (imOnline + getIdentStatus + subscribe +
-stepChanged); panel bir karar vermemişse müşteri bekleme odasına döner, vermişse ThankYou
-ekranı açılır. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).
+Görüşme dışındaki kopmada ekran hemen açılır; kurallarını `SDKConnectionPolicy` belirler. Sunucunun
+normal kapanışı (4110-4112) görüşme dışında yalnızca loglanır. Yeniden
+bağlanmayı kullanıcı başlatır; `autoReconnectAttempts` 0'dan büyükse SDK da belirtilen aralıkla
+kendisi dener. Her deneme tam prosedürle çalışır: `getIdentStatus` ve `subscribe` gider; akışta
+bekleme odası varsa WebRTC yeniden kurulur ve adım bildirilir (`stepChanged`). `imOnline`'ı SDK
+yalnız sunucu `newSub` ile isterse gönderir. Panel statüsü `positive` ise (id `-3`, `-4`, `-5` hariç) ThankYou ekranı açılır.
+Başka her statüde müşteri bekleme odasına döner; olumsuz kararı panel `terminateCall` ile gönderir. Ayrıntı: [TURN & WebRTC → Kopma Durumunda WebRTC](docs/guides/turn-webrtc.md).
 
 Bağlantının neden koptuğunu okumak için `m.lastSocketCloseCode`, görüşmenin sağlık
 özeti için `m.lastCallHealthReport` — ayrıntı:
 [WebSocket → Birleşik Kapanma Kodları](docs/guides/websocket.md) ve
 [CallScreen → Görüşme Sağlık Raporu](IdentifySample/Modules/CallScreen/CallScreen.md).
 
-> ⚠️ **Sunucu koordinasyonu:** Bu sürümde `4106` artık `callCompleted`; heartbeat zaman
-> aşımı **4109**'a taşındı. Sunucu tarafındaki kod eşlemesini güncelleyin.
+> ⚠️ **Sunucu koordinasyonu:** 3.0.0'dan beri `4106` `callCompleted` (yalnız host
+> `disconnectSocket(reason: .callCompleted)` çağırırsa gider), heartbeat zaman aşımı **4109**. 2.x'ten geçiyorsanız sunucudaki kod eşlemesini güncelleyin.
 
 ---
 
 ## 14) "Bypass Yok" Kuralı
 
 Custom ekran yazarken her iş eylemini — **tara, yükle, ilerle** — SDK VM metoduna
-indirin. Her VM metodu işin yanında backend'e ilerleme sinyali (`sendStep`,
-`modulePresented`) gönderir; kendi HTTP/navigasyonunuzu kurarsanız görüntü aynı olur ama
-sunucu akışı ilerlemez — agent panelinde müşteri "takılı" görünür.
+indirin. SDK işin yanında sunucuya durum bildirir: modül `advanceToNextModule()` ile açılınca
+`stepChanged`, yükleme bitince sonucu (ör. `uploadIdFront`, `uploadSelfie`). Kendi
+HTTP/navigasyonunuzu kurarsanız görüntü aynı olur ama sunucu akışı ilerlemez, agent panelinde müşteri "takılı" görünür.
 
 | ✅ Doğru | ❌ Bypass |
 |---|---|
@@ -1337,7 +1386,7 @@ Kısa cevap: **İkisi de değil. SDK navigasyonunuzu DEVRALMAZ; kabı siz seçer
 | `UIWindow` oluşturma / `makeKeyAndVisible` | ❌ **Asla** | SDK kaynak kodunda tek bir `UIWindow`/`makeKeyAndVisible` çağrısı yoktur. Key window'unuza, scene'inize dokunmaz. |
 | `UINavigationController.push` | ❌ | Host'un navigation stack'ine hiçbir şey push etmez. |
 | Kendi `NavigationStack` / `NavigationView`'ı | ❌ | `SDKFlowHostView` gerçek bir navigation stack kurmaz (iOS 15 uyumu). |
-| Host'a `sheet` / `fullScreenCover` açma | ❌ | Sizin hiyerarşinize modal sunum yapmaz. |
+| Host'a `sheet` / `fullScreenCover` açma | ❌ (iki istisna) | Akış ekranları sizin hiyerarşinize modal sunum yapmaz. İstisnalar aşağıda. |
 
 ### Peki ekran geçişleri nasıl oluyor?
 
@@ -1360,6 +1409,14 @@ hiyerarşisinin içindedir ve sizin navigasyonunuza taşmaz:
 - bazı modüllerin kendi sheet'leri (ör. sesli doğrulama retry sheet'i),
 - IdentityScanner'ın `documentScanner` modifier'ı (bölüm 16 — bunu siz kendi
   view'ınıza takarsınız; `fullScreenCover` olarak açılır).
+
+Hiyerarşinin dışına çıkan iki sunum var:
+
+- `DocumentScanner.scan(profile:)` tarayıcıyı en üstteki view controller'ın üzerinde tam ekran
+  açar. Bunu siz çağırırsınız.
+- Soket mesajı kodlanamazsa SDK sade bir `UIAlertController` ("Socket ERROR") gösterir. Uyarı,
+  app delegate'in `window`'undaki kök view controller'dan açılır; o pencere yoksa hiçbir şey
+  gösterilmez.
 
 ### Kabı siz seçersiniz — üç geçerli yerleşim
 
@@ -1394,8 +1451,9 @@ let host = UIHostingController(
 )
 host.modalPresentationStyle = .fullScreen
 present(host, animated: true)                    // modal öneririz
-// navigationController?.pushViewController(host, animated: true) da çalışır;
-// SDK sistem nav bar'ını kendisi gizlediği için push'ta bar çakışması olmaz.
+// navigationController?.pushViewController(host, animated: true) da çalışır.
+// SDK sistem bar'ını yalnız birkaç ekranda gizler; push ediyorsanız bar'ı kendiniz gizleyin:
+// navigationController?.setNavigationBarHidden(true, animated: false)
 // Ayrı bir UIWindow açmanıza (makeKeyAndVisible) GEREK YOKTUR; isterseniz
 // kendi kararınızla açabilirsiniz — SDK için fark etmez.
 ```
@@ -1437,9 +1495,10 @@ coordinator.insert(["nfcIntro1", "nfcIntro2"], before: .nfc)
 // Kimlik bitince: idCardOzet → nfcIntro1 → nfcIntro2 → NFC
 ```
 
-> Dikkat: `insert` kayıtları rota bazlıdır ve **birikir**. Coordinator'ı her akış
-> girişinde sıfırdan kurduğunuz sürece (bölüm 17.5) sorun olmaz; aynı coordinator'ı
-> ikinci kez `start()` ederseniz ekranlar çiftlenir.
+> Dikkat: `insert` kayıtları rota bazlıdır ve **birikir**: aynı rotaya ikinci `insert`
+> öncekinin sonuna ekler. `start()` ve `resetFlow()` kayıtları silmez. `insert`'i her
+> coordinator için bir kez çağırın. Coordinator'ı her akış girişinde sıfırdan kuruyorsanız
+> (bölüm 17.5) sorun olmaz; aynı coordinator'da her girişte `insert` çağırırsanız ekranlar çiftlenir.
 
 Özet: **custom ekranınız da sheet ile değil, akışın içinde "push benzeri" geçişle
 gösterilir.** Kendi sheet'inizi custom ekranınızın İÇİNDEN açmakta özgürsünüz
@@ -1455,7 +1514,7 @@ durumda `terminateCall` gelir). `terminateCall` gelmeden kapanan görüşmeyi ku
 |---|---|---|---|
 | Panel karar verir | `.terminateCall(reason, "positive")` | `.completed` | `approved` / `agentDecision` |
 | | `.terminateCall(reason, "negative" \| "neutral")` | `.notCompleted` | `rejected` \| `neutral` / `agentDecision` |
-| Panel karar vermeden kapatır (statü yok, id -3, bağlantı sorunu) | `.terminateCall(…)` | — (yeniden bağlanma) | sonuç yok, oturum sürer |
+| Panel karar vermeden kapatır (statü yok, id -3/-4/-5, bağlantı sorunu) | `.terminateCall(…)` | — (yeniden bağlanma) | sonuç yok, oturum sürer |
 | Kullanıcı "Görüşmeyi bitir"e basar | `vm.terminateCall(coordinator:)` → `terminateCallByUser` | `.notCompleted` | `notCompleted` / `userEndedCall` |
 | Görüşme `terminateCall` olmadan biter | `.endCall` | `.notCompleted` | `notCompleted` / `userEndedCall` |
 
@@ -1474,7 +1533,7 @@ Kendi başarı/başarısız ekranlarınızı kullanmanın **iki yolu** var:
 ```swift
 IdentifyManager.shared.setupSDK(
     ...,
-    showThankYouPage: false,           // ThankYou hiçbir yolda açılmaz
+    showThankYouPage: false,           // ThankYou açılmaz; yalnız quitSDK onu yine döndürür, göstermeyin
     onFinished: { outcome in
         switch outcome.result {
         case .approved: router.show(.kycSuccess)
@@ -1520,8 +1579,8 @@ Ayrıntılı sebebe (ör. panelin `terminateReason`'ı) bu ekranda da ihtiyacın
 `IdentifyManager.shared.lastFlowOutcome`'ı okuyun — ThankYou açıldığında sonuç bildirilmiştir.
 
 > "Bypass yok" hatırlatması: görüşmeyi kendiniz bitirmek istiyorsanız bunun tek doğru
-> yolu `SDKCallScreenViewModel.terminateCall(coordinator:)`'dır — sunucuya
-> `terminateCallByUser` sinyalini o gönderir. Kabı görüşme SÜRERKEN sessizce kapatmak,
+> yolu `SDKCallScreenViewModel.terminateCall(coordinator:)`'dır. Bu metot
+> `IdentifyManager.terminateCallByUser` üzerinden sunucuya `terminateCallOnMobile` sinyalini gönderir. Kabı görüşme SÜRERKEN sessizce kapatmak,
 > temsilci tarafında müşteriyi "takılı" bırakır.
 
 ---
@@ -1584,6 +1643,15 @@ struct MyKycStep: View {
 - `Info.plist` → `NSCameraUsageDescription` zorunlu.
 - Kamera izni reddedilmişse sonuç `.failure(ScanningError.cameraPermissionDenied)` döner —
   ayarlara yönlendirme sizin sorumluluğunuz.
+- Uygulama açılışında bir kez `IdentityScanner.setup()` çağırın. Hazır profilleri id ile ve
+  TCKN/MRZ doğrulayıcılarını o kaydeder; SDK bunu kendisi çağırmaz. Çağrılmazsa
+  `DocumentScanner.scan(profileID:)` `.profileNotFound` döner, `validationResults` boş kalır ve
+  `isValid` hiçbir denetim yapılmadan `true` olur. Kayıt arka planda bir `Task` içinde yapılır,
+  `setup()` bitmesini beklemez. Bu yüzden onu ilk taramadan epey önce çağırın; hemen ardından
+  başlayan bir tarama `.profileNotFound` alabilir.
+- `setup()` `.turkishIDFront` ve `.turkishIDBack` profillerini kaydetmez. Bu ikisini
+  `scan(profileID:)` ile id üzerinden taramadan önce kendiniz kaydedin:
+  `await DocumentProfileRegistry.shared.register(.turkishIDFront)`.
 
 ### 16.3 Hazır profiller — `DocumentProfile`
 
@@ -1594,26 +1662,28 @@ Profil = "hangi belgeyi, hangi stratejiyle, hangi alanları okuyarak tarıyorum"
 | `.generic` | `generic` | `imageOnly` | Yok — sadece düzeltilmiş görüntü |
 | `.turkishIDFront` | `tr.id.front` | `visionText` | `tckn`, `surname`, `givenNames`, `birthDate`, `documentNumber`, `expirationDate` |
 | `.turkishIDBack` | `tr.id.back` | `mrzTurkishID` | anne/baba adı, veren makam (etiketine göre) + MRZ (`.td1`, zorunlu, `.presence`) |
-| `.turkishID` | — | `visionText` | Ön/arka ayrımı olmayan genel TC kimlik |
-| `.passport` | — | `visionText` | Pasaport veri sayfası (TD3 MRZ) + yana-çevir yönlendirmesi |
-| `.turkishDrivingLicense` | — | `visionText` | Ehliyet alanları |
-| `.bankCard` | — | — | Banka kartı |
-| `.a4Document` | — | `imageOnly` | A4 belge (fatura/adres belgesi) |
+| `.turkishID` | `tr.id` | `mrzTurkishID` | `tckn`, `surname`, `givenNames` (ön/arka ayrımı olmayan genel TC kimlik) |
+| `.passport` | `passport` | `mrzPassport` | `surname`, `givenNames`, `documentNumber`, `tckn`, `birthDate`, `expirationDate`, `photo` (TD3 MRZ; iki yönde de tutulabilir, yön uyarısı çıkmaz) |
+| `.turkishDrivingLicense` | `tr.driving` | `visionText` | `licenseNumber` |
+| `.bankCard` | `bank.card` | `visionText` | `pan` |
+| `.a4Document` | `a4` | `visionText` | Yok; bütün metni okur, alan çıkarmaz |
 
-Her `visionText` profili bir `DocumentKeywordSet` ile **keyword gating** yapar: kadraja
-yanlış belge girerse (ör. ehliyet yerine kimlik) kilitlenmez.
+Kimlik (ön, arka, genel), pasaport ve ehliyet profilleri `DocumentKeywordSet` ile **keyword
+gating** yapar: kadraja yanlış belge girerse (ör. ehliyet yerine kimlik) kilitlenmez.
+`.bankCard` ve `.a4Document`'ta anahtar kelime kümesi yok.
 
 ### 16.4 Konfigürasyon — `ScannerConfiguration`
 
-İki parça: `texts` (HUD metinleri) + `timing` (yakalama davranışı). Üç hazır preset:
-`.default` (kimlik), `.passport`, `.document` (A4/fatura — daha muhafazakâr zamanlama).
+İki parça: `texts` (HUD metinleri) + `timing` (yakalama davranışı). Dört hazır preset:
+`.default` (kimlik ön yüz), `.idBack` (kimlik arka yüz), `.passport`, `.document` (A4/fatura,
+daha muhafazakâr zamanlama).
 
 **Tek taramalık özelleştirme:**
 
 ```swift
 var config = ScannerConfiguration.document
 config.texts.idle = "Faturanızı çerçeveye yerleştirin"
-config.timing.lockThreshold = 12          // daha temkinli kilitlenme
+config.timing.stabilityConfirmFrames = 5   // daha temkinli kilitlenme
 .documentScanner(isPresented: $s, profile: .a4Document, configuration: config) { ... }
 ```
 
@@ -1622,6 +1692,7 @@ config.timing.lockThreshold = 12          // daha temkinli kilitlenme
 ```swift
 // Metinler zaten SDKLocalization'dan gelir (aktif dile uyar). Komple değiştirmek için:
 ScannerGuidanceTexts.overrideDefault  = ScannerGuidanceTexts(idle: "...", focusing: "...", ...)
+// cancel: ve manualCaptureTitle: init'te zorunlu, ama hiçbir ekran bu ikisini göstermez; boş verilebilir
 ScannerGuidanceTexts.overridePassport = ...   // pasaport HUD seti
 ScannerGuidanceTexts.overrideDocument = ...   // belge HUD seti
 // Veya tüm konfigürasyonu:
@@ -1643,8 +1714,8 @@ SDKOcrConfig.shared.readsParentNames = false
 
 | Alan | Varsayılan (id / belge) | Ne işe yarar |
 |---|---|---|
-| `lockThreshold` | 5 / 9 | Otomatik yakalama için üst üste stabil OCR karesi sayısı (~0.5 s/kare) |
-| `stabilityConfirmFrames` | 4 / 3 | Hızlı yol: keskin + geometrik stabil ardışık kare sayısı |
+| `lockThreshold` | 5 / 9 | Kullanılmıyor, kaynak uyumluluğu için duruyor. Otomatik çekimi `stabilityConfirmFrames` belirler |
+| `stabilityConfirmFrames` | 4 / 3 | Otomatik çekim için üst üste net ve sabit kare sayısı; kare çok net ve sabitse yarısı yeter |
 | `minimumSharpnessScore` | 120 / 110 | Canlı kare keskinlik eşiği (Laplacian; 0 = kapalı) |
 | `captureSharpnessFloor` | 95 / 85 | Çekilen NİHAİ fotoğrafın keskinlik tabanı — altındaysa çekim atılır |
 | `focusSettleDelay` | 0.3 / 0.8 | Odak sonrası bekleme (bulanık çekim şikayetinde artırın) |
@@ -1703,7 +1774,7 @@ let style = QuadrilateralStyle(
 
 ```swift
 case .success(let doc):
-    doc.croppedImage                        // perspektif-düzeltilmiş belge fotoğrafı
+    doc.croppedImage                        // belge fotoğrafı; köşeler bulunduysa perspektifi düzeltilmiş
     doc.rawText                             // OCR ham metni
     doc.profileID                           // hangi profille tarandı
     doc.isValid                             // tüm doğrulamalar geçti mi
@@ -1718,19 +1789,24 @@ case .success(let doc):
     let docNo = doc.fields["documentNumber"]?.value // "A12B34567"
 ```
 
-TCKN checksum ve MRZ check-digit doğrulamaları (`MRZValidator`) otomatik koşar;
-`doc.isValid == false` ise hangi kuralın kırıldığı `validationResults`'tadır.
+`IdentityScanner.setup()` çağrıldıysa TCKN checksum ve MRZ check-digit doğrulamaları
+(`MRZValidator`) her sonuçta koşar (16.2);
+`doc.isValid == false` ise hangi kuralın kırıldığı `validationResults`'tadır. `MRZValidator`
+profile bakmaz: ad, soyad, belge numarası, doğum ve son geçerlilik tarihi alanı olmayan belgeyi
+(ör. `.generic`, `.bankCard`, `.a4Document`) geçersiz sayar.
 
 ### 16.7 Hatalar — `ScanningError`
 
 | Case | Ne zaman |
 |---|---|
-| `.cancelled` | Kullanıcı "İptal"e bastı |
 | `.cameraPermissionDenied` | Kamera izni reddedilmiş |
 | `.cameraUnavailable` | Cihazda kamera yok (simülatör) |
-| `.recognitionFailed(String)` | OCR/tespit hatası |
-| `.profileNotFound(String)` | Registry'de olmayan profil id'si |
-| `.timeout` | Süre aşımı |
+| `.profileNotFound(String)` | `DocumentScanner.scan(profileID:)`'ye kayıtlı olmayan bir id verildi |
+| `.cancelled`, `.recognitionFailed(String)`, `.timeout` | Tanımlı, ama 3.3.0'da tarayıcı bunları üretmez |
+
+`.failure` kamera kurulumundaki sistem hatasını da (`AVCaptureDeviceInput`) olduğu gibi
+taşıyabilir; `ScanningError` dışındaki hatalar için de bir dal bırakın. Tarayıcıda iptal düğmesi
+yok. Sunumu siz kapatırsanız (`isPresented = false`) `onResult` çağrılmaz.
 
 ### 16.8 Kendi belge profilinizi tanımlama
 
@@ -1769,10 +1845,13 @@ await DocumentProfileRegistry.shared.register(sigorta)
   (yanlış alan yakalamayı ciddi azaltır). Bölge yoksa tüm metinde aranır.
 - `isRequired: true` alanların TAMAMI çıkarılamadan otomatik yakalama tetiklenmez.
 - MRZ de aynı mantıkla profilden yönetilir: `mrz: MRZRequirement(format: .td1, isRequired: true,
-  level: .presence)` — `nil` aranmaz, `isRequired: false` okunur ama beklemez, `.parsed`
+  level: .presence)`. `mrz` verilmezse `.mrzTurkishID` profili eski kuralı alır (`.td1`, zorunlu,
+  `.parsed`), diğer stratejilerde MRZ aranmaz. `isRequired: false` okunur ama beklemez, `.parsed`
   belge no + tarihler ayrışmadan çekmez. Hazır profili değiştirmek için kopya yardımcıları:
   `DocumentProfile.turkishIDBack.settingRequired(false, for: "fatherName").settingMRZRequired(false)`
   (`settingMRZ`, `settingField`, `removingFields`, `settingKeywordSet` de var).
+  `settingMRZRequired` `issuingState`'i `"TUR"`'a döndürür. Türkiye dışındaki kartta
+  `settingMRZ(MRZRequirement(format:isRequired:level:issuingState:))` kullanın.
 - `keywordSet`: belge üzerinde bulunması beklenen kelimeler; `minimumScore` altında
   kalan kareler "yanlış belge" sayılır ve kilitlenmez.
 
@@ -1792,7 +1871,10 @@ await DocumentValidatorRegistry.shared.register(PolicyNoValidator())
 ```
 
 Kayıtlı tüm doğrulayıcılar her başarılı taramada koşar ve sonuçları
-`doc.validationResults`'a eklenir (`doc.isValid` bunlara göre hesaplanır).
+`doc.validationResults`'a eklenir (`doc.isValid` bunlara göre hesaplanır). Koşma sırası ve
+sonuçların sırası belirsizdir, sonuçları `field` adıyla okuyun. Her doğrulayıcının `key`'i farklı
+olmalı: aynı `key` ile yapılan kayıt öncekinin yerine geçer. Hazır doğrulayıcılar `"tckn"` ve
+`"mrz"` adını kullanır.
 
 ### 16.10 KYC akışıyla ilişkisi
 
@@ -1855,11 +1937,13 @@ final class KycContext {
 ### 17.2 Senaryo → modül seti
 
 **Birinci tercih: sunucu belirlesin.** Her senaryo için backend'de ayrı işlem türü
-tanımlayın; `identId` zaten o işleme aitse `RoomResponse.modules` doğru seti döner ve
+tanımlayın; `identId` zaten o işleme aitse `RoomResponse.data?.modules` doğru seti döner ve
 istemcide hiçbir dallanma gerekmez. Bu, "bypass yok" felsefesinin akış planına
 uzantısıdır: modül sırasının sahibi sunucudur.
 
-İstemci tarafı sabitleme gerekiyorsa `setupSDK(selectedModules:)` senaryodan türetilir:
+İstemci tarafı sabitleme gerekiyorsa `setupSDK(selectedModules:)` senaryodan türetilir. Liste
+`getIdentDetails` isteğiyle sunucuya gider, sunucu onu kendi listesiyle kesiştirir ve akış dönen
+`data.modules` sırasıyla kurulur. Sunucunun döndürmediği bir modülü istemci ekleyemez.
 
 ```swift
 extension KycScenario {
@@ -1904,6 +1988,10 @@ Davranış notları:
 - `progressTotal` (ilerleme şeridi) otomatik güncellenir; `moduleStepOrder` bozulmaz.
 - `.nfc`, cihazda NFC yoksa SDK tarafından sessizce atlanabilir; `.login` / `.thankU`
   eklenemez (yok sayılır).
+- OVD (`.idcard_w_ovd`) iki `appendModules` yoluyla da akışa eklenmez.
+  `appendModules([.idcard_w_ovd])` ve `appendModules(moduleList: ["idCardOVD"])` "Akışa modül
+  eklendi" logunu yine yazar. `appendModules(moduleList: ["idcard_w_ovd"])` log yazılmadan yok
+  sayılır. OVD akışa yalnız sunucunun modül listesinden girer.
 - Akış ThankYou'ya ulaştıysa çağrı yok sayılır (log düşer) — bitmiş akış uzatılamaz;
   yeni akış = `resetFlow()` + `prepareForSetup()` + `setupSDK`.
 - Doğrudan `manager.addModules(...)` çağırmayın: dizi büyür ama `progressTotal`
@@ -1942,17 +2030,15 @@ func makeRegistry(for scenario: KycScenario) -> SDKViewRegistry {
         break
     }
 
-    // 2) Senaryoya özel SONUÇ ekranları (bölüm 15'teki 4-varyant kuralı):
+    // 2) Senaryoya özel SONUÇ ekranları (bölüm 15'teki üç varyant kuralı):
     switch scenario {
     case .onboarding:
         registry.override(.thankYou(.completed))    { OnboardingSuccessView() }  // "Hesabın hazır!"
         registry.override(.thankYou(.notCompleted)) { OnboardingFailedView() }
-        registry.override(.thankYou(.missedCall))   { OnboardingMissedView() }
         registry.override(.thankYou(nil))           { OnboardingSuccessView() }
     case .limitIncrease:
         registry.override(.thankYou(.completed))    { LimitResultView(approved: true) }
         registry.override(.thankYou(.notCompleted)) { LimitResultView(approved: false) }
-        registry.override(.thankYou(.missedCall))   { LimitResultView(approved: false) }
         registry.override(.thankYou(nil))           { LimitResultView(approved: true) }
     default:
         break                                        // diğerleri SDK ThankYou'sunu kullanır
@@ -2092,35 +2178,38 @@ IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çık
 
 | Değer | Davranış |
 |---|---|
-| `.selfie` | **Varsayılan.** Normal selfie modülü ile doğrulanır (çekilen kare kimlik fotoğrafıyla karşılaştırılır). Akışta selfie zaten varsa yeni adım eklenmez, desteklenmeyen modül yalnızca çıkarılır — aynı doğrulama iki kez yapılmasın |
+| `.selfie` | **Varsayılan.** Normal selfie modülü ile doğrulanır (çekilen kare kimlik fotoğrafıyla karşılaştırılır). Sunucu listesinde selfie bu modülden önce geliyorsa yeni adım eklenmez, desteklenmeyen modül yalnızca çıkarılır. Selfie sonra geliyorsa yedek selfie de eklenir ve akışta iki selfie olur |
 | `.skip` | Yerine bir şey konmaz, modül akıştan çıkarılır. Yüz doğrulaması akışın başka bir adımıyla veya operatör görüşmesiyle yapılıyorsa uygundur |
-| `.livenessDetection` | **Kabul edilir ama uygulanamaz; `.selfie` gibi davranır.** Canlılık ekranı da ARKit yüz takibine dayanır (göz kırpma/gülümseme blend shape'lerden, baş açısı yüz dönüşümünden okunur), yani TrueDepth yokken o da çalışamaz. `sdk_logs`'a açıklama satırı yazılır |
+| `.livenessDetection` | **Kabul edilir ama uygulanamaz; `.selfie` gibi davranır.** Canlılık ekranı da ARKit yüz takibine dayanır (göz kırpma/gülümseme blend shape'lerden, baş açısı yüz dönüşümünden okunur), yani ARKit yüz takibi yokken o da çalışamaz. `sdk_logs`'a açıklama satırı yazılır |
 
-> "TrueDepth yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü de
+> "Yüz takibi yoksa canlılığa düş" fiziksel olarak mümkün değildir: her iki canlılık modülü de
 > aynı donanımı ister. Gerçek seçim **selfie ile doğrula** ya da **adımı çıkar** arasındadır.
 
 Her iki durumda da ilgili olay yayınlanır — `livelinessModuleSkipped` /
 `selfieWithLivenessModuleSkipped` — ve hangi modülün neyle değiştirildiği `sdk_logs`'a yazılır.
-Panele ayrıca NFC'siz cihazlarda `NFCStatus = notAvailable` bildirilir.
+Panele ayrıca NFC'siz cihazlarda `NFCStatus = notAvailable` bildirilir. Bu cihazlarda NFC adımı
+`status == .notFound` olayıyla gelir ve `outcome.skippedModules` içinde `.nfc` olarak görünür.
 
 ```swift
-func onEvent(_ event: SDKEvent) {
-    guard event.status == .skipped else { return }      // hangi adım atlandı
+func onSDKEvent(_ event: SDKEvent) {                    // SDKEventListener
+    guard event.status == .skipped || event.status == .notFound else { return }  // atlanan ya da cihazda olmayan adım
     analytics.log("kyc_module_skipped", ["module": event.module ?? "-"])
 }
 ```
 
 ### 18.3 Titreşim — `SDKHapticConfig`
 
-SDK iki yerde titreşim kullanır; ikisi de kapatılabilir.
+SDK dört yerde titreşim kullanır; hepsi kapatılabilir. İlk ikisi `SDKHapticConfig`'e bağlıdır.
 
 | Nerede | Ne yapar |
 |---|---|
 | Otomatik çekim yapan modüller | Çekim anı yaklaştıkça hızlanan darbeler (ramp) |
-| Canlılık adımları | Adım onaylandığında **tek ve çok kısa** darbe — kullanıcı ekrana bakmadan geçtiğini anlar |
+| Canlılık adımları, kimlik ve adres tarayıcısı | Canlılık adımı onaylandığında ya da tarayıcıda hızlı çekim kabul edildiğinde **tek ve çok kısa** darbe; kullanıcı ekrana bakmadan geçtiğini anlar |
+| Butonlar | Dokununca tek darbe. Kapatmak için `SDKTheme.shared.buttons.base.hapticsEnabled = false` |
+| Gelen arama | Arama çalarken titreşim. Kapatmak için `IdentifyManager.shared.incomingCallVibrationEnabled = false` |
 
 ```swift
-SDKHapticConfig.shared.stepFeedbackEnabled = false                // yalnız adım darbesi
+SDKHapticConfig.shared.stepFeedbackEnabled = false                // yalnız adım darbesi (tarayıcı kilidi dahil)
 SDKHapticConfig.shared.stepFeedbackIntensity = 0.4                // 0…1, vars. 0.6
 SDKHapticConfig.shared.isEnabled = false                          // tüm titreşimler
 SDKHapticConfig.shared.setEnabled(false, for: .livenessDetection)  // tek modül (ramp + adım)
@@ -2131,9 +2220,11 @@ Ayrıntı: [Tema Rehberi — Titreşim](docs/guides/theming.md#titreşim-haptik)
 
 ### 18.4 iPad
 
-SDK iPad'de çalışır (`TARGETED_DEVICE_FAMILY = "1,2"`), yönelim tablette de portrait'e
-kilitlidir. Metin sütunları `.sdkReadableWidth()` ile, kılavuz çerçeveleri
-`SDKLayout.maxGuideWidth` / `maxFaceGuideWidth` ile sınırlanır; ölçüler ekran değil
+SDK iPad'de çalışır (`TARGETED_DEVICE_FAMILY = "1,2"`). Ekranlar dikey konuma göre tasarlandı,
+yönü SDK kendisi kilitlemez. Tablette de dikey kalması için host uygulamanın Info.plist'inde
+`UISupportedInterfaceOrientations~ipad` yalnız `UIInterfaceOrientationPortrait` içermeli.
+Metin sütunları `.sdkReadableWidth()` ile, yüz ovali `SDKLayout.maxFaceGuideWidth` ile, kimlik
+çerçevesi `ScannerFixedFrame.maxWidth` ile sınırlanır; ölçüler ekran değil
 **pencere** tabanlıdır (`SDKLayout.bounds`) — Split View / Stage Manager altında doğru olsun
 diye. Tam ayrıntı ve test matrisi: [iPad Desteği](docs/guides/ipad-support.md).
 

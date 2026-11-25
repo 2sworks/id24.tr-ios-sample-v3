@@ -34,7 +34,7 @@ Daha geniş bağlam için: [Mimari](../../docs/guides/architecture.md) ·
 | 🤟 İşaret Dili | Görüşme öncesi tercih kapısı (CallScreen alt-ekranı) | — | — | [SignLang.md](SignLang/SignLang.md) |
 | 📵 Bağlantı Koptu | Kopma overlay'i + toparlanma (modül değil, katman) | — | — | [LostConnection.md](LostConnection/LostConnection.md) |
 
-Modül sırasına backend karar verir (`RoomResponse.modules`) — uygulamanız hangi modüller
+Modül sırasına backend karar verir (`RoomResponse.data?.modules`); uygulamanız hangi modüller
 gelirse gelsin çalışacak şekilde kurulur.
 
 ---
@@ -57,13 +57,15 @@ struct RootView: View {
 }
 
 // 2) Bağlanma — prepareForSetup HER ZAMAN setupSDK'dan önce
-func connect(coordinator: SDKFlowCoordinator) {
+@MainActor func connect(coordinator: SDKFlowCoordinator) {
     coordinator.prepareForSetup()                        // ⚠️ önce bu
 
     IdentifyManager.shared.setupSDK(
         identId: "...",
         baseApiUrl: "https://v2api.identify.com.tr/",
-        networkOptions: SDKNetworkOptions(useSslPinning: false),
+        networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: nil,
+                                          timeoutIntervalForResource: nil,
+                                          useSslPinning: false),
         kpsData: nil,
         signLangSupport: false,
         nfcMaxErrorCount: 3,
@@ -72,10 +74,10 @@ func connect(coordinator: SDKFlowCoordinator) {
         wsSecretKey: "...",
         showThankYouPage: true
     ) { socket, roomResponse, error in
-        Task { @MainActor in
-            if error == nil, socket?.isConnected == true, roomResponse.result == true {
-                coordinator.start()                      // ilk modüle geç
-            }
+        // Callback ana thread'de gelir. Başarıda da `error` dolu gelir, mesajı boştur.
+        if let message = error?.errorMessages, !message.isEmpty { return }
+        if socket?.isConnected == true, roomResponse.result == true {
+            coordinator.start()                          // ilk modüle geç
         }
     }
 }
@@ -97,8 +99,8 @@ Tüm `setupSDK` parametreleri için: [Sunucu & API rehberi](../../docs/guides/se
 | `XxxCustomView.swift` | Sample App (örnek) | SDK ekranının public API ile yazılmış **birebir, çalışan** kopyası — override'a takılıp değiştirilmek için |
 | `XxxHostViewModel.swift` | Sample App (örnek) | SDK VM'ini saran host VM — gözlem/analitik deseni |
 
-Her VM'de hazır olanlar: `isLoading`, `errorMessage` (`@Published`) ve `manager`
-(`IdentifyManager.shared`) erişimi.
+Her VM'de hazır olanlar: `isLoading` ve `errorMessage` (`@Published`). Yöneticiye
+`IdentifyManager.shared` ile erişilir.
 
 ---
 
@@ -109,7 +111,8 @@ Her VM'de hazır olanlar: `isLoading`, `errorMessage` (`@Published`) ve `manager
 > dahil). Dosyayı projenize kopyalayıp `registry.override` ile takın — SDK'daki ekranın aynısını
 > görürsünüz; özelleştirme bu dosya üzerinde yapılır. Tüm modüllerin kaydı:
 > [CustomKit/CustomScreens.swift](CustomKit/CustomScreens.swift). Örnek uygulamada hamburger
-> menü → **Özel Ekranlar** anahtarı hepsini birden açar.
+> menü → **Modül Özelleştirme → Tam Özel Ekranlar** ekranındaki "Akışta özel ekranları kullan"
+> anahtarı hepsini birden açar.
 >
 > `XxxExample.swift` dosyaları üç biçimi yan yana gösterir: (1) hazır SDK ekranı, (2) tema
 > override, (3) `XxxCustomView` önizlemesi. Kök kurulum ve entegrasyon adımları için
@@ -138,8 +141,9 @@ Derinlemesine anlatım + kontrol listesi: [Özelleştirme rehberi](../../docs/gu
 ## ⚠️ Altın Kural: Bypass Yok
 
 Custom ekranınız her iş eylemini — **tara / yükle / ilerle** — SDK VM metoduna indirmelidir.
-VM metotları işin yanında backend'e ilerleme sinyali gönderir (`sendStep`, `modulePresented`);
-kendi HTTP isteğinizi atar veya kendi navigasyonunuzu kurarsanız **sunucu akışı ilerlemez.**
+SDK işin yanında sunucuya durum bildirir: modül `advanceToNextModule()` ile açılınca
+`stepChanged`, yükleme bitince sonucu (ör. `uploadIdFront`, `uploadSelfie`). Kendi HTTP
+isteğinizi atar veya kendi navigasyonunuzu kurarsanız **sunucu akışı ilerlemez.**
 
 | ✅ Doğru | ❌ Bypass |
 |---|---|
@@ -208,10 +212,14 @@ uygulanır. Flutter ve React Native köprülerindeki JSON tema yalnızca görün
 
 | Bağımlılık | Modüller |
 |---|---|
-| Yalnızca cihaz üzerinde (soket yok) | IdCard (OCR), IdCardOVD, Selfie, Liveness (kare analizi), Prepare (izinler) |
+| Cihaz üzerinde işlenir | IdCard (OCR), IdCardOVD, Selfie, Liveness (kare analizi) |
 | HTTP upload | IdCard, IdCardOVD, NFC, Selfie, Liveness, Signature, VideoRecorder, AddressConfirm |
 | Soket sinyali | Prepare (`sendPreparetatus`), SignLang (`sendStep`), Speech (`sendSpeechStatus`), CallScreen |
 | WebRTC | CallScreen |
+
+ThankYou dışındaki her modül açılınca soketten adım bildirir (`stepChanged`; kimlik ve OVD'de
+belge tipi seçilince). Yükleme sonuçları ve NFC durumu da soketten gider. Soket kapalıyken
+`advanceToNextModule()` ilerlemez, bağlantı ekranı açılır.
 
 Pasif ekranlar (ThankYou + sizin eklediğiniz ekranlar) hiçbir sinyal göndermez; araya
 eklenmeleri her zaman güvenlidir.
@@ -220,12 +228,12 @@ eklenmeleri her zaman güvenlidir.
 
 ## Donanım Gereksinimleri ve Yedek Modüller
 
-Sunucu akışı cihazdan bağımsız kurar; iki modül donanım ister ve cihaz desteklemiyorsa
+Sunucu akışı cihazdan bağımsız kurar; üç modül donanım ister ve cihaz desteklemiyorsa
 akışa **hiç alınmaz** — kullanıcı geçemeyeceği bir ekranda kalmaz.
 
 | Modül | Gereken donanım | Desteklemeyen cihazda |
 |---|---|---|
-| `nfc` | NFC okuyucu (iPad'de yok) | Modül çıkarılır; panele `NFCStatus = notAvailable` bildirilir. `showNFCNotFoundPage: true` ile bilgi sayfası gösterilebilir |
+| `nfc` | NFC okuyucu (iPad'de yok) | Modül çıkarılır; panele `NFCStatus = notAvailable` bildirilir. `showNFCNotFoundPage: true` verilirse modül akışta kalır ve NFC ekranı açılır; ayrı bilgi sayfası yoktur, okuma hata verir |
 | `livenessDetection` | ARKit yüz takibi (TrueDepth kamera ya da A12+ çip) | `faceTrackingFallback` uygulanır |
 | `selfieWithLiveness` | Moda bağlı: `selfieWithLivenessTrueDepth` (`.automatic` ARKit · `.required` TrueDepth · `.disabled` donanım istemez) | `faceTrackingFallback` uygulanır — [TrueDepth modu](SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) |
 

@@ -13,7 +13,7 @@ loglardan nasıl ayıklandığını anlatır.
 Bir log satırı iki yere gidebilir:
 
 - Konsol: Xcode çıktısı. Geliştirirken buradan okursunuz.
-- Online kuyruk: loglar biriktirilip `RoomResponse.sdk_log_api_url` adresine gönderilir. Sahada
+- Online kuyruk: loglar biriktirilip `RoomResponse.data?.sdk_log_api_url` adresine gönderilir. Sahada
   yaşanan bir sorunu kullanıcının cihazına erişmeden incelemek için bunu kullanırsınız.
 
 Hangi kanalın açık olacağını `setupSDK(logLevel:)` belirler:
@@ -35,6 +35,13 @@ IdentifyManager.shared.setupSDK(
     ...
 )
 ```
+
+### `logHandler`
+
+`IdentifyManager.shared.logHandler` her log satırını uygulamanıza da verir, ör. logları kendi
+ekranınızda göstermek için. Seviyeden bağımsız çalışır (`.noLog` dahil) ve satırı
+`IdentifyLogEntry` olarak (`date`, `message`, `severity`, `category`, `isSilent`) logu üreten
+thread'de verir. Arayüzü güncelleyecekseniz ana thread'e geçin.
 
 ---
 
@@ -64,8 +71,10 @@ yaparsınız:
 
 `general` · `socket` · `nfc` · `ocr` · `webrtc` · `network` · `liveness` · `offer` · `lifecycle`
 
-`lifecycle` uygulamanın ön plana ve arka plana geçişlerini kaydeder. "Kullanıcı NFC okurken
-uygulamayı arka plana aldı" gibi durumları bu kategoriden görürsünüz.
+`lifecycle` hazır akışta uygulamanın hangi modülde arka plana alındığını, uygulamanın kapatılmasını,
+oturumun kapanışını ve akış sonucunu kaydeder. "Kullanıcı NFC okurken uygulamayı arka plana aldı"
+gibi durumları bu kategoriden görürsünüz. Ön plana dönüş ve arka planda geçen süre `general`
+kategorisindedir.
 
 ---
 
@@ -92,14 +101,25 @@ Seviye `.online` olsa bile şu durumlarda satır kuyruğa girmez:
 |---|---|
 | `logOnlineSecretKey` boş | Konsola "Online log devre dışı: secKey boş" uyarısı basılır |
 | Oturum kapandı (`closeSDK` sonrasında gelen loglar) | Konsola basılır. Kuyruk kapalı olduğu için gönderilmez |
-| `SDKLog.console(...)` ile yazılan satırlar | Gönderim katmanına hiç girmez, aşağıya bakın |
+| Log gönderiminin kendi hata satırları | Gönderim katmanına hiç girmez, aşağıya bakın |
 
-### `SDKLog.console` — yalnızca konsol
+`.onlineSilent`'te de `logOnlineSecretKey` boşsa satır kuyruğa girmez, ama konsola uyarı da
+basılmaz: loglar sessizce düşer. Eksik anahtar `lastKeyReport`'ta görünür: durum `.missing`
+(SAĞLANMADI), `hasProblem` `true`. `verifyKeysOnServer()` bu durumda sunucuya sormaz, aynı raporu
+döndürür.
+
+Kuyruğa giren satır hemen gitmez. Gönderim her yeni satırdan sonra 0,25 sn bekler,
+`flushLogsNow()` da aynı beklemeyle çalışır. `closeSDK` kuyruğu bu süre dolmadan kapattığı için
+kapanıştan hemen önce yazılan satırlar ("Oturum sonlandı", akış sonunda ve `quitSDK`'de
+"Akış sonucu") o oturum sürerken gitmeyebilir. Gitmeyen satırlar cihazda saklanır ve aynı cihazda
+sonraki oturum açılınca gönderilir. Her satır kendi oturum kimliğini taşıdığı için kendi oturumunun
+kaydına düşer. 30 dakikadan eski satırlar gönderilmeden silinir.
+
+### Log gönderiminin kendi hataları
 
 Log gönderimi hata verdiğinde bu hatanın satırı da online kuyruğa girerse yeni bir gönderim
-denemesi başlar, o da hata verirse döngü hiç bitmez. Bu yüzden gönderimin kendi hataları
-`SDKLog.console(severity, category, mesaj)` ile yazılır. Biçimi ve maskeleme kuralları diğer
-loglarla aynıdır; farkı kuyruğa hiç uğramamasıdır.
+denemesi başlar, o da hata verirse döngü hiç bitmez. Bu yüzden gönderimin kendi hataları yalnız
+konsola yazılır, kuyruğa girmez. Satırın biçimi diğer loglarla aynıdır.
 
 ```
 [identify] ⚠️ WARN  · NETWORK  · 2026-08-11 02:49:41 › Log gönderimi tamamlanamadı. Sunucuya ulaşılamadı. Neden: …
@@ -113,13 +133,23 @@ Mesajın içinde uzun bir Base64 bloğu (görsel ya da video verisi) varsa log a
 otomatik kısaltır. Böylece kimlik fotoğrafı ya da selfie online loglara taşınmaz; logda yalnızca
 verinin gönderildiği ve boyutu kalır.
 
+Kişisel veriler de maskelenir: TCKN `‹tckn›`, MRZ satırı `‹mrz›`, tarih `‹tarih›`, 6 haneli sayı
+`‹6 hane›`, belge numarası `‹belge no›`, `token=` değeri `‹gizli›` olarak yazılır. Konsol, online
+kuyruk ve `logHandler` aynı maskeli metni alır. `getSocketLogs()` dökümünde bu maskeleme yoktur,
+yalnız uzun Base64 blokları kısaltılır.
+
 ---
 
 ## Soket Trafiği Logları
 
-Gelen ve giden her soket mesajı `socket` kategorisiyle, yönü (`incoming` / `outgoing`)
-işaretlenerek loglanır. Bir akış sorununu incelerken çoğunlukla en çok işe yarayan kayıtlar
-bunlardır: agent'ın ne gönderdiğini ve SDK'nın ne cevap verdiğini sırasıyla görürsünüz.
+Giden soket mesajları `socket`, gelenler `general` kategorisiyle yazılır. Satırda yön ➡️ (giden) ve
+⬅️ (gelen) ile görünür. Yönü `incoming`/`outgoing` olarak tutan kayıt
+`IdentifyManager.shared.getSocketLogs()`'tadır. Bu dökümde SDP ve ICE aday mesajları IP
+adresleriyle tam metin durur. Döküm uygulama süreci boyunca birikir, oturum kapanınca temizlenmez.
+Sessiz gönderilen mesajlar yalnız konsola basılır; online kuyruğa, `logHandler`'a ve
+`getSocketLogs()`'a girmez. Bir akış sorununu incelerken
+çoğunlukla en çok işe yarayan kayıtlar bunlardır: agent'ın ne gönderdiğini ve SDK'nın ne cevap
+verdiğini sırasıyla görürsünüz.
 
 ---
 
@@ -174,9 +204,9 @@ eklenir. Ayrıca bir şey açmanız gerekmez.
    - işaret dili: talep edildi
 ```
 
-Görüşmedeki ağ kalitesi panelin gönderdiği değerdir, SDK kendisi ölçmez. NFC denemeleri oturum
-başında sıfırlanır; aynı oturumda NFC ekranına ikinci kez gelinirse önceki denemeler de rapora
-girer.
+Görüşmedeki ağ kalitesini SDK uzak görüntünün genişliğinden çıkarır (320 px ve altı `bad`,
+360-479 px `medium`, 480 px ve üstü `good`) ve panele bildirir. NFC denemeleri oturum başında
+sıfırlanır; aynı oturumda NFC ekranına ikinci kez gelinirse önceki denemeler de rapora girer.
 
 ---
 

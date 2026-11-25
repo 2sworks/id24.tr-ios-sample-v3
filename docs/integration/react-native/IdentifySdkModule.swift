@@ -105,8 +105,8 @@ class IdentifySdkModule: RCTEventEmitter, SDKEventListener {
                     reject("E_SETUP", "Socket bağlantısı kurulamadı", nil)
                     return
                 }
-                // Akışı sunmak için: kendi UIViewController host'unuzu present edin,
-                // veya SDKFlowHostView (SwiftUI) ile coordinator'ı start() edin.
+                // Köprü akışı sunmaz. SDKFlowHostView kullanacaksanız coordinator.prepareForSetup()'ı
+                // setupSDK'dan önce, start()'ı bu noktada çağırın (bkz. LoginViewModel.swift).
                 //
                 // KAPANIŞ ANİMASYONU: SDK akışı kendini sunmaz ve kapatmaz — sunum da
                 // kapanış da host'a aittir. Akış bittiğinde ekranı animasyonlu kaldırın:

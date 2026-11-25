@@ -4,7 +4,7 @@
 //
 //  Özel ekranların paylaştığı kamera önizlemesi (AVCaptureVideoPreviewLayer).
 //
-//  SDK'nın kendi önizlemesiyle aynı davranır: ekran portrait'e kilitli olduğu için önizleme
+//  SDK'nın kendi önizlemesiyle aynı davranır: örnek uygulama yalnız dikey çalıştığı için önizleme
 //  cihaz eğimiyle dönmez; açı iOS 17+ `RotationCoordinator`'dan okunur (iPhone 17 ailesinde
 //  ön sensör portrait monte edildiği için sabit 90° yazmak görüntüyü yan çevirir).
 //

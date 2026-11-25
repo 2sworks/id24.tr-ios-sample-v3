@@ -46,8 +46,8 @@ Ayarı `coordinator.start()` çağrısından önce verin. En kolay yer `setupSDK
 IdentifyManager.shared.useConnectionSpeedTest = true
 
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
-    coordinator.start()
+    if let message = error?.errorMessages, !message.isEmpty { return }   // kurulum hatası
+    if socket?.isConnected == true, room.result == true { coordinator.start() }
 }
 ```
 
@@ -100,7 +100,7 @@ Hazırlık ekranının iki test için davranışı:
 
 | Durum | Eski test | Yeni test |
 |---|---|---|
-| Ölçüm bitti, engel yok | Düğme "Devam Et" olur; bağlantı iyiyse başarı bandı çıkar | Aynı; `outcome == .failed` ise bant çıkmaz ama kullanıcı ilerler |
+| Ölçüm bitti, engel yok | Düğme "Devam Et" olur; bağlantı iyiyse başarı bandı çıkar | Aynı. Sunucu `qualityBand` döndürdüyse bant sonuçtan bağımsız çıkar ve metni bu değere (`good` / `fair` / `poor`) göre değişir. `qualityBand` yoksa `outcome == .failed` iken ya da sunucuya ulaşılamadığında bant çıkmaz. Kullanıcı her durumda ilerler |
 | Engel var | Yok (eski test engellemez) | Hata uyarısı: "Tekrar Dene" testi yeniden çalıştırır, düğme "Ölç ve Devam Et" olarak kalır |
 
 ---
@@ -211,7 +211,8 @@ coordinator.insert(["speedCheck"], before: .callScreen)
 
 // 2) Oturum açılırken:
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
+    if let message = error?.errorMessages, !message.isEmpty { return }
+    guard socket?.isConnected == true, room.result == true else { return }
     // İsteğe bağlı: hazırlık ekranı ikinci kez ölçmesin (bkz. aşağıdaki not).
     IdentifyManager.shared.needSpeedTest = false
     coordinator.start()
@@ -275,7 +276,7 @@ ekran ait olduğu modülün önünde kalır.
 - WebRTC ölçümü kamera ve mikrofon izni ister, ölçüm ekranı izin istemez. Ekranı hazırlıktan
   önce, akışın ilk modülünün önüne koyarsanız izinler henüz verilmemiş olabilir; ping, indirme ve
   yükleme yine ölçülür, `rtcOutcome` `no_media_permission` gelir.
-- Ölçüm ekranı `prepareCompleted()` göndermez; bu sinyal hazırlık ekranına aittir.
+- Ölçüm ekranı hazırlık adımını tamamlamaz; bu iş hazırlık ekranına aittir.
 - Kullanıcıya akıştan çıkış sunmak isterseniz engel durumuna kendi düğmenizi ekleyin; SDK bu
   ekranda bir kapatma düğmesi çizmez.
 
@@ -298,8 +299,8 @@ Uygulamada tek satır yeterli:
 IdentifyManager.shared.useConnectionSpeedTest = true
 
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
-    coordinator.start()
+    if let message = error?.errorMessages, !message.isEmpty { return }   // kurulum hatası
+    if socket?.isConnected == true, room.result == true { coordinator.start() }
 }
 ```
 
@@ -376,7 +377,8 @@ dönüşünde çağırın. Bu yol `useConnectionSpeedTest` ayarına bakmaz.
 
 ```swift
 IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) { socket, room, error in
-    guard error == nil else { return }
+    if let message = error?.errorMessages, !message.isEmpty { return }
+    guard socket?.isConnected == true, room.result == true else { return }
 
     showLoading(true)
     IdentifyManager.shared.startConnectionSpeedTest { result in   // ana thread'de bir kez döner
@@ -400,8 +402,9 @@ IdentifyManager.shared.setupSDK(identId: identId, baseApiUrl: baseApiUrl, ...) {
 IdentifyManager.shared.cancelConnectionSpeedTest()
 ```
 
-- Yeni test `prepareCompleted()` çağırmaz. Hazırlık ekranı bunu kendisi yapar; kendi ekranınızda
-  çalıştırırsanız sunucuya hazırlık sinyali göndermek sizin akışınıza kalır.
+- Yeni test hazırlık adımını tamamlanmış saymaz; bunu hazırlık ekranı yapar. Hazırlığı SDK'nın
+  ekranı yerine kendi ekranınızda yapıyorsanız ekranınız bitince sunucuya
+  `IdentifyManager.shared.sendPreparetatus(isCompleted: true)` ile bildirin.
 
 Eski test de yerinde duruyor ve aynı şekilde çağrılabilir:
 
@@ -415,8 +418,8 @@ IdentifyManager.shared.startSpeedTest { status, kbPerSec in
 
 ## 8) Örnek uygulamada denemek
 
-Giriş ekranında sağ üstteki menü → **Hız testi → Yeni hız testi**. Açıkken hazırlık ekranı yeni
-testi, kapalıyken eski testi çalıştırır. Ayar cihazda saklanır.
+Giriş ekranında sol üstteki menü → **Hızlı Ayarlar → Debug Değerleri → Hız testi → Yeni hız testi**.
+Açıkken hazırlık ekranı yeni testi, kapalıyken eski testi çalıştırır. Ayar cihazda saklanır.
 
 Kodda karşılığı:
 

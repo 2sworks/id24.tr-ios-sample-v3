@@ -810,7 +810,7 @@ enum ShowcaseScenarios {
 
                 // Adım seti (göz kırpma, gülümseme, baş çevirme…) modülün kendi
                 // ViewModel'indeki `allow*` alanlarından gelir ve sunucunun gönderdiği
-                // `RoomResponse.liveness` dizisiyle kurulur; showcase o örneğe erişemez.
+                // `RoomResponse.data?.liveness` dizisiyle kurulur; showcase o örneğe erişemez.
             ]
 
         // MARK: Canlılıkla selfie

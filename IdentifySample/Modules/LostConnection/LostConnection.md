@@ -2,7 +2,7 @@
 
 İnternet ya da soket bağlantısı koptuğunda kullanıcıyı karşılayan kurtarma ekranı. Bağımsız
 bir akış modülü değildir — kullanıcı **hangi modülde olursa olsun** devreye girebilen bir
-overlay'dir. Amaç basit: paniği önle, yeniden bağlan, kullanıcıyı **kaldığı yerden** devam ettir.
+overlay'dir. Amaç basit: paniği önle, yeniden bağlan, kullanıcıyı **kaldığı modülden** devam ettir.
 
 Kopmanın nasıl tespit edildiği ve reconnect'in perde arkası için:
 [WebSocket → Bağlantı Kopması](../../../docs/guides/websocket.md#bağlantı-kopması-ve-toparlanma)
@@ -24,9 +24,11 @@ Kopmanın nasıl tespit edildiği ve reconnect'in perde arkası için:
 ## Kullanıcı Ne Yaşar?
 
 1. Bağlantı gider; ekranda "Bağlantı koptu" overlay'i belirir.
-2. Cihaz ağa dönene kadar "Yeniden bağlan" pasiftir (`isNetworkAvailable` izlenir).
-3. Butona basınca reconnect denenir; başarıda overlay kapanır, akış kaldığı modülden sürer.
-4. Kopma görüşme sırasındaysa ve temsilci bu arada sonucu girdiyse, kullanıcı doğrudan
+2. Ağ yoksa düğmede "İnternet Yok" yazar (`isNetworkAvailable` izlenir). Düğme ağa göre
+   kilitlenmez; yalnız bir deneme sürerken pasiftir.
+3. Butona basınca reconnect denenir; başarıda overlay kapanır. Görüşme dışındaki modül
+   baştan başlar, görüşme ekranındaki kullanıcı bekleme odasına döner.
+4. Kopma görüşme sırasındaysa ve temsilci bu arada olumlu karar girdiyse, kullanıcı doğrudan
    sonuç ekranına taşınır.
 
 ---
@@ -47,7 +49,7 @@ yayını overlay'i otomatik tetikler.
 
 > **Çalışan tam örnek:** [LostConnectionCustomView.swift](LostConnectionCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Bu ekran bir rota değildir; özel görüşme ekranı ([CallScreenCustomView.swift](../CallScreen/CallScreenCustomView.swift)) içinden açılır.
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 ```swift
@@ -63,8 +65,12 @@ struct MyLostConnectionView: View {
         }
         .onAppear {
             vm.onReconnectCompleted = { /* overlay'i kapat */ }
-            vm.onReconnectCompletedWithStatus = { ok, status in /* sonuç geldiyse işle */ }
+            vm.onReconnectCompletedWithStatus = { isWaitingRoom, statusType in
+                /* isWaitingRoom false ise panel olumlu karar vermiştir: sonuç ekranına geç */
+            }
+            vm.startAutoRetry()     // SDKAttemptLimits.shared.connection izin veriyorsa kendisi dener
         }
+        .onDisappear { vm.stopAutoRetry() }
     }
 }
 ```
@@ -82,18 +88,20 @@ struct MyLostConnectionView: View {
 ### Hesaplanan
 | Üye | Anlam |
 |---|---|
-| `canReconnect: Bool` | Denenebilir mi (ağ var **ve** deneme sürmüyor) |
+| `canReconnect: Bool` | Denenebilir mi (deneme sürmüyorsa `true`; ağ durumuna bakmaz) |
 
 ### Metotlar
 | Metot | Etki |
 |---|---|
 | `reconnect()` | Soketi yeniden bağlar (`manager.reconnectToSocket`) |
+| `startAutoRetry()` | Kullanıcı dokunmadan, `SDKAttemptLimits.shared.connection` ayarındaki sayı ve aralıkla dener (`autoReconnectAttempts` varsayılanı 0: kapalı) |
+| `stopAutoRetry()` | Otomatik denemeyi durdurur (ekran kapanırken) |
 
 ### Closure'lar
 | Üye | Ne zaman |
 |---|---|
-| `onReconnectCompleted: (() -> Void)?` | Yeniden bağlanma başarılı (statüsüz) |
-| `onReconnectCompletedWithStatus: ((Bool, String?) -> Void)?` | Sonuç + opsiyonel görüşme statüsüyle |
+| `onReconnectCompleted: (() -> Void)?` | Soket yeniden bağlandı (önce bu gelir) |
+| `onReconnectCompletedWithStatus: ((Bool, String?) -> Void)?` | Panelin statü yanıtı geldi: `(isWaitingRoom, statusType)`. `isWaitingRoom` `false` ise panel olumlu karar vermiştir, oturum biter |
 
 ## Sinyal Zinciri — Perde Arkası
 
@@ -101,9 +109,10 @@ struct MyLostConnectionView: View {
 (internet gitti / soket koptu) → .connectionErr (tek sefer) → overlay görünür
 reconnect()  → manager.reconnectToSocket [SOKET]
    ├─ socket_auth aktifse yeni token üretilir
-   ├─ başarılı (statüsüz)       → onReconnectCompleted?()
-   └─ başarılı (sonuç statülü)  → onReconnectCompletedWithStatus?(success, status)
-host/CallScreen: overlay kapanır, akış kaldığı modülden devam eder
+   ├─ bağlandı                  → onReconnectCompleted?()
+   └─ panel statüsü geldi       → onReconnectCompletedWithStatus?(isWaitingRoom, statusType)
+coordinator: overlay kapanır, aktif modül baştan başlar (restartCurrentModule)
+CallScreen:  bekleme odasına döner; isWaitingRoom == false ise ThankYou açılır
 ```
 
 CallScreen tarafında bu closure'lar `handleReconnectCompleted()` /
@@ -125,11 +134,17 @@ Genel bilgi: [ReadAloud](../ReadAloud.md)
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
-- **"Yeniden bağlan" hep pasif:** Cihazın ağı yok (`isNetworkAvailable == false`) —
-  kullanıcıyı Wi-Fi/hücresel ayarlarına yönlendirin; ağ dönünce buton açılır.
-- **Reconnect ile ne geri gelir?** Soket bağlantısı ve oturum kaydı; kullanıcı görüşme
-  ekranındaysa WebRTC oturumu da CallScreen tarafından yeniden kurulur.
-- **Sürekli başarısızsa:** Akış `disconnect()` yoluna gidebilir ve oturum sonlanır;
-  kullanıcı yeni bir `identId` süreciyle geri döner.
+- **"Yeniden bağlan" hep pasif:** Düğme yalnız deneme sürerken (`isReconnecting`) pasiftir,
+  ağ durumuna bakmaz. Ağ yoksa (`isNetworkAvailable == false`) kullanıcıyı Wi-Fi/hücresel
+  ayarlarına yönlendirin.
+- **Reconnect ile ne geri gelir?** Soket bağlantısı ve oda aboneliği. Akışta bekleme odası
+  modülü varsa ve işaret dili sorusu beklenmiyorsa SDK WebRTC'yi yeniden hazırlar ve adım
+  bilgisini (`stepChanged`) yeniden gönderir. Kopmadan önceki görüşme bitmiştir; yeni görüşme
+  yeni bir çağrıyla başlar.
+- **Sürekli başarısızsa:** SDK kendiliğinden vazgeçmez; ekran açık kalır, kullanıcı yeniden
+  dener. Başarısız denemeler sayılmaz. Oturumdaki kopma sayısına sınır
+  `SDKAttemptLimits.shared.connection` (`SDKConnectionPolicy`) ile konur: `maxDrops` dolunca
+  `onExceeded: .exit` akışı bitirir. Yeni oturum için `setupSDK` yeniden çağrılır.
 - **Overlay her modülde çıkar mı?** Evet — kopma tespiti globaldir (reachability + soket);
-  KYC tamamlandıktan sonra tetiklenmez.
+  KYC tamamlandıktan sonra tetiklenmez. Görüşme medyası ayaktayken yalnız sinyal koparsa
+  ekran hemen açılmaz; sinyal `signallessCallGracePeriod` (varsayılan 10 sn) içinde dönmezse açılır.

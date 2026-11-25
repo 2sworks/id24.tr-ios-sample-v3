@@ -87,6 +87,14 @@ nfcVM.startNFC()
 
 - Handler'ı `SDKNfcViewModel()` oluşturulduktan sonra atayın. View model oluşurken kendi
   handler'ını kurar ve önceden atanmış handler'ın yerine geçer.
+- SDK'nın hazır NFC ekranı (`SDKNfcView()`) açılırken kendi view model'ini kurar; o view
+  model'in handler'ı sizinkinin yerine geçer. Hazır ekranı kendi handler'ınızla kullanmak için
+  view model'i siz kurun, handler'ı atayın ve ekranı `registry.override(.nfc)` içinde
+  `SDKNfcView(viewModel:)` ile verin.
+- View model seri no ve tarihleri yalnız kurulurken okur. Bu bilgiler henüz yokken kurulursa
+  alanlar boş kalır; `startNFC()` okumayı başlatmaz, bilgi düzeltme ekranını (`showEditScreen`)
+  açar. View model'i NFC adımına gelince kurun.
+- Handler çip okuyucunun kuyruğunda çalışır. İçinde arayüz güncelliyorsanız ana thread'e geçin.
 - Örnek önce SDK'nın handler'ını çağırır. Okuma sırasındaki sesli yönlendirme ve "Okuma
   tamamlandı" durumu bu sayede çalışır. SDK handler'ı çağrılmazsa ikisi de devre dışı kalır.
 - Görüntülü görüşme sırasındaki NFC okumasında handler'ı SDK yönetir. Bu yöntem o akışı
@@ -100,8 +108,8 @@ nfcVM.startNFC()
 | `.nfcScanTitle` | "NFC Tarama" |
 | `.nfcChipInstruction` | "Kimliğinizi telefonunuzun arkasına yaklaştırarak çipi okutun." |
 | `.nfcChipInstructionPassport` | "Pasaportunuzu telefonunuzun arkasına yaklaştırarak çipi okutun." |
-| `.nfcHoldInstruction` | "NFC okutma işlemi için lütfen kimlik kartınızı telefonunuzun önüne tutunuz." |
-| `.nfcHoldInstructionPassport` | "NFC okutma işlemi için lütfen pasaportunuzu telefonunuzun önüne tutunuz." |
+| `.nfcHoldInstruction` | "NFC okutma işlemi için lütfen kimlik kartınızı telefonunuzun arkasına tutunuz." |
+| `.nfcHoldInstructionPassport` | "NFC okutma işlemi için lütfen pasaportunuzu telefonunuzun arkasına tutunuz." |
 | `.nfcStart` | "Taramayı başlat" |
 | `.nfcStarting` | "NFC başlatılıyor..." |
 | `.readingCompleted` | "Okuma tamamlandı" |
@@ -125,14 +133,15 @@ SDKLocalization.shared.setOverride(key: .nfcVerifyTitle, language: .tr, value: "
 
 | Anahtar | Varsayılan metin (TR) |
 |---|---|
-| `.nfcTts` | "Kimliğinizi telefonunuzun ön yüzüne yerleştirin ve sabit tutun." |
-| `.nfcPassportTts` | "Pasaportunuzu telefonunuzun ön yüzüne yerleştirin ve sabit tutun." |
+| `.nfcTts` | "Kimliğinizi telefonunuzun arka yüzüne yerleştirin ve sabit tutun." |
+| `.nfcPassportTts` | "Pasaportunuzu telefonunuzun arka yüzüne yerleştirin ve sabit tutun." |
 | `.nfcReadingTts` | "Okuma devam ediyor, lütfen belgenizi hareket ettirmeyin." |
 | `.nfcSuccessTts` | "Çip okuma tamamlandı." |
-| `.nfcErrorTts` | "Okuma tamamlanamadı. Lütfen belgenizi telefonun ön yüzüne yeniden yerleştirin." |
+| `.nfcErrorTts` | "Okuma tamamlanamadı. Lütfen belgenizi telefonun arka yüzüne yeniden yerleştirin." |
 
-Varsayılan sesli metinler "ön yüz" der. Ekrandaki metinde "arka kamera" kullanıyorsanız
-`.nfcTts`, `.nfcPassportTts` ve `.nfcErrorTts` anahtarlarını da aynı ifadeye çekin.
+Varsayılan sesli metinler 3.3.0'dan itibaren telefonun arka yüzünü söyler; önceki sürümlerde
+"ön yüz" der. Ekrandaki metni değiştirdiyseniz `.nfcTts`, `.nfcPassportTts` ve `.nfcErrorTts`
+anahtarlarını da aynı ifadeye çekin.
 
 ## 4. Birden fazla metni tek seferde değiştirme
 

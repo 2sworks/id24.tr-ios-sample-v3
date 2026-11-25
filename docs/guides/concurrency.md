@@ -43,28 +43,23 @@ Bu closure'ların tipi `@MainActor`. SDK onları ana thread'de çağırır.
 | `SDKErrorConfig.onError` | DefaultUI bir hata gösterdiğinde |
 | `SDKViewRegistry` kurucuları, imza ve işaret dili closure'ları | Ekran kurulurken |
 
-### Fonksiyon callback'leri: thread garantisi yok
+### Fonksiyon callback'leri: çoğu ana thread'de
 
-Aşağıdaki fonksiyonların `callBack` / `completion` closure'ı düz tiptedir. Ana thread garantisi
-yoktur. Callback çağrıyı yaptığınız thread'de, ağ kuyruğunda ya da görüntü işleme kuyruğunda
-gelebilir. Ekrana dokunmadan önce ana thread'e geçin, ya da aynı fonksiyonun async karşılığını
-kullanın. async karşılıkların hepsi ana thread'de döner.
+SDK 3.3.0'dan beri fonksiyon callback'lerinin çoğu `@MainActor` tiplidir: ana thread'de gelir,
+ekranı doğrudan güncelleyebilirsiniz. async karşılıkların hepsi de ana thread'de döner.
 
 | Fonksiyon | Callback'in geldiği yer |
 |---|---|
-| `startNFC`, `updateReadNFCKeys`, `notifyLivenessCompleted` | Ana thread (SDK içeride taşıyor) |
-| `probeMRZPresence` | Arka plan kuyruğu (`userInitiated`) |
-| `startFrontIdOcr`, `startBackIdOcr`, `startPassportMrzKey`, `detectHumanFace`, `twoFacesCompare` | Görüntü işleme kuyruğu ya da çağıran thread |
-| `uploadIdPhoto`, `upload5SecVideo`, `uploadLivenessVideo`, `uploadAddressInfo`, `uploadAddressInfoWithPdf`, `transcribeSpeech`, `smsVerification` | Ağ kuyruğu ya da ana thread, yola göre değişir |
-| `startSpeedTest`, `startConnectionSpeedTest` | Ağ kuyruğu |
-| `acceptCall`, `killSDKByUser`, `terminateCallByUser`, `getNextLivenessTest` | Çağıran thread ya da soket kuyruğu |
+| `startNFC`, `updateReadNFCKeys`, `notifyLivenessCompleted`, `probeMRZPresence`, `startFrontIdOcr`, `startBackIdOcr`, `startPassportMrzKey`, `uploadIdPhoto`, `upload5SecVideo`, `uploadLivenessVideo`, `uploadAddressInfo`, `uploadAddressInfoWithPdf`, `transcribeSpeech`, `smsVerification`, `startConnectionSpeedTest`, `acceptCall` | Ana thread. Callback tipi `@MainActor` |
+| `startSpeedTest` | Ana thread, her ölçümde bir kez. Callback tipi düz, sonucu SDK ana thread'e taşır |
+| `detectHumanFace`, `twoFacesCompare`, `getNextLivenessTest`, `killSDKByUser`, `terminateCallByUser` | Çağrıyı yaptığınız thread, fonksiyon dönmeden. Callback tipi düz |
 
 Örnek:
 
 ```swift
-// Closure: ana thread'e kendiniz geçersiniz.
+// Callback `@MainActor`: ekranı doğrudan güncelleyin.
 IdentifyManager.shared.uploadIdPhoto(idPhoto: image) { response in
-    DispatchQueue.main.async { self.showResult(response) }
+    self.showResult(response)
 }
 
 // async: sonuç ana thread'de döner.
@@ -81,6 +76,9 @@ showResult(response)
 - Swift 5 projeler değişiklik yapmadan derlenmeye devam eder.
 - Swift 6 projeler (`SWIFT_VERSION = 6`, `SWIFT_STRICT_CONCURRENCY = complete`) SDK'yı
   hatasız derler. `@preconcurrency import IdentifySDK` gerekmez.
+- SDK'nın kendisi de 3.3.0'dan beri Swift 6 dil moduyla (`SWIFT_VERSION = 6`) derlenir. Bu
+  modda strict concurrency denetimi tam açıktır: SDK kodundaki bir eşzamanlılık hatası
+  derlemeyi durdurur.
 - Public modeller (`RoomResponse`, `FrontIdInfo`, `NewBoolResponse`, `SDKEvent`,
   `SDKFlowOutcome` ve diğerleri) `Sendable`. Task'lar ve actor'ler arasında taşınabilir.
 - `IdentifyManager.shared` her thread'den çağrılabilir. Sınıfın tamamı `@MainActor` değildir,
@@ -98,19 +96,11 @@ derlenmesini şart koşar.
    Protokol metotları zaten `@MainActor` olduğu için Swift bunu ister.
 2. Delegate metotlarındaki `DispatchQueue.main.async { }` ve `Task { @MainActor in }` sarmalarını
    silin. Bildirim zaten ana thread'de gelir.
-3. Thread garantisi olmayan fonksiyon callback'lerini async karşılıklarıyla değiştirin. Swift 6
-   derleyicisi bu closure'larda ekrana dokunmanıza izin vermez, async biçimde bu sorun yoktur.
+3. `@MainActor` tipli fonksiyon callback'lerindeki `DispatchQueue.main.async { }` sarmalarını
+   silin. Callback zaten ana thread'de gelir.
 4. `onFlowFinished` gibi `@MainActor` closure'larda ekranı doğrudan güncelleyebilirsiniz.
 
 ### Sırada ne var
-
-İki adım daha var. İkisi de 3.x içinde, public imzaları bozmadan yapılır. Sizin tarafınızda
-bir değişiklik gerektirmez.
-
-| Adım | İçerik |
-|---|---|
-| İç temizlik | SDK'nın iç kodu strict concurrency denetiminde uyarısız hale gelir |
-| SDK Swift 6 modu | SDK'nın kendisi `SWIFT_VERSION = 6` ile derlenir. Yeni uyarıyı yakalayan derleme kapısı eklenir |
 
 Swift 5 desteği, müşterilerin hepsi Swift 6'ya geçtikten sonra kaldırılacak. Öncesinde ayrıca
 duyurulur.
