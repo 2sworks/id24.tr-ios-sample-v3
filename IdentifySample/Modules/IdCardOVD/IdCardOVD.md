@@ -18,12 +18,14 @@ fotokopi ya da ekran görüntüsüyle yapılan sahtecilik denemeleri bu adımda 
 | Drop-in view | `SDKIdCardOVDView` |
 | ViewModel | `SDKIdCardOVDViewModel` |
 | Dış dünya | Cihazda skor analizi + **HTTP** (`uploadIdPhoto`) |
-| Ses anahtarı | `IdCardOVDTts` |
+| Ses anahtarı | `IdCardOVDTts` (seçim ekranı), `OvdScanFrontSide` (çekim başı) |
 
 ## Kullanıcı Ne Yaşar?
 
 0. **Belge tipi seçim ekranı** açılır (IdCardView deseni): **Çipli Kimlik** ya da **Pasaport**.
    Seçime göre çekim akışı belirlenir. (Host `SDKIdCardOVDView(documentType:)` ile bu ekranı atlayabilir.)
+   OVD `setupSDK(identCardType:)` listesini okumaz; o listede pasaport olmasa da iki tip de
+   sunulur. Satırları yalnız `SDKDocumentSelectionConfig.shared.ovd.options` daraltır.
 1. Belgeyi çerçeveye hizalar; SDK kareleri canlı değerlendirir (dikdörtgen/coverage + netlik +
    görüntü ve cihaz sabitliği + parlama oranı). Uygun olunca **otomatik** yüksek-çözünürlüklü
    fotoğraf çekilir. Çekilen kare bulanıksa (still netlik tabanının altında) kullanıcıya
@@ -33,7 +35,8 @@ fotokopi ya da ekran görüntüsüyle yapılan sahtecilik denemeleri bu adımda 
    çekim **belge sakinleşince** alınır (en az 0.75 sn, en çok 2.5 sn); bu sırada çerçevede belge
    görünmüyorsa (kart çekildi, renkli başka bir yüzey girdi) adım sıfırlanır — ölçüm ilk yüzde
    onaylanan belgenin çerçevede kalmasını şart koşar.
-3. (Yalnız kimlik) arka yüz hizalanır — **MRZ okunana kadar** yakalama tetiklenmez.
+3. (Yalnız kimlik) arka yüz hizalanır. **MRZ okunana kadar** yakalama tetiklenmez. Kart çerçevede,
+   net ve sabit olarak 4 sn kalırsa MRZ okunmadan da çekilir; yanlış yüz OCR'da reddedilir.
 4. Adımlar (`OVDStep`) sırayla tamamlanır; her yakalama sunucuya yüklenir. Son adım bitince
    akış otomatik ilerler.
 
@@ -48,7 +51,8 @@ referans akışının davranışının aynısı. **TTS kapalıysa** yalnız ekra
 
 Pasaportun tek veri sayfası olduğu için **arka yüz adımı yoktur** — ama flaşlı (hologram) adımı
 kimliktekiyle **aynı şekilde çalışır**: `ön (veri sayfası) → flaşlı (hologram) → tamamlandı` (2 adım).
-Ön yüz upload'ı `type=passport` + `doc_type=passport`; flaşlı adım kimliktekiyle aynı (`.frontIdOvd`).
+Ön yüz upload'ı `type=passport` + `doc_type=passport`; flaşlı adım `type=passportOvd` ile yüklenir
+(sokette `uploadPassportOvd`).
 
 ```swift
 SDKIdCardOVDView(documentType: .passport)   // seçim ekranını atlar, doğrudan pasaport çekimi
@@ -59,8 +63,9 @@ let vm = SDKIdCardOVDViewModel(); vm.documentType = .passport
 Standart drop-in `SDKIdCardOVDView()` ise **önce belge tipi seçim ekranı** gösterir; kullanıcı
 Kimlik/Pasaport seçince ilgili akış başlar.
 
-`documentType` ayarlanınca `IdentifyManager.selectedCardType` otomatik güncellenir (WS location =
-"Passport"). Kimlik varsayılandır (`.idCard`).
+`documentType` ayarlanınca `IdentifyManager.selectedCardType` otomatik güncellenir. Çekim başlayınca
+`notifyCaptureStarted()` WS location'ı "Passport OVD" yapar (kimlikte "Id Card OVD"). Kimlik
+varsayılandır (`.idCard`).
 
 ---
 
@@ -85,7 +90,7 @@ SDKDocumentSelectionConfig.shared.ovd.autoSkipSingleOption = false  // tek seçe
 | Alan | Varsayılan | Anlam |
 |---|---|---|
 | `showsScreen` | `true` | `false` → ekran hiç açılmaz, doğrudan çekime girilir |
-| `options` | `[.idCard, .passport]` | Ekrandaki satırlar, yazdığınız sırayla. OVD yalnız bu iki tipi destekler; başka bir tip yok sayılır ve durum `sdk_logs`a yazılır |
+| `options` | `[.idCard, .passport]` | Ekrandaki satırlar, yazdığınız sırayla. OVD yalnız bu iki tipi destekler, `identCardType`'a bakmaz. Listedeki başka bir tip log yazılmadan düşer. Yazdığınız tiplerin hiçbiri desteklenmiyorsa iki tip de gösterilir ve durum `sdk_logs`a yazılır |
 | `defaultType` | `nil` | Ekranda ilk seçili gelen / ekran atlandığında kullanılan tip. `nil` → `options` içindeki ilk tip |
 | `speaksOnScreen` | `true` | `false` → yalnız bu ekran okunmaz, çekim adımları okunmaya devam eder |
 | `autoSkipSingleOption` | `true` | Geriye tek seçenek kaldığında ekran atlanır |
@@ -101,7 +106,7 @@ gönderir (önceden hiç göndermiyordu).
 
 > **Çalışan tam örnek:** [IdCardOVDCustomView.swift](IdCardOVDCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.idCardOVD) { IdCardOVDCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 OVD, kamerayı SDK'dan en çok isteyen modüldür: VM kararı verir, **kamerayı siz sürersiniz**.
@@ -207,8 +212,8 @@ public enum OVDStep: Int, CaseIterable {
 | `handleCaptured(_:roi:)` | `onRequestCapture` sonrası çekilen fotoğrafı işler ve yükler |
 | `startMotion()` / `stopMotion()` | IMU sabitlik ölçümünü başlatır / durdurur |
 | `motionFeed` | Kare-farkı hareket ölçeri besleyicisi: `(CVPixelBuffer) -> Void`, kamera kuyruğundan çağrılabilir |
-| `forceCapture(ciImage:roi:)` | Skorları beklemeden zorla yakalar |
-| `capture(image:)` | Yakalanan görseli işler (`makeUIImage` + `processCaptured`) |
+| `forceCapture(ciImage:roi:)` | Canlı kapıları beklemeden kareyi işler ve yükler. Hizalama adımlarında çekim anında telefon kımıldarsa çekimi iptal eder. Kare bulanıksa yeniden çekim ister, iki yeniden çekimden sonra kareyi yine yükler |
+| `capture(image:)` | Verilen `UIImage`'ı aktif adım için yükler (ön ve arka yüzde önce OCR); canlı analiz ve kırpma yapılmaz |
 | `advance()` | Sonraki adım; son adımda **`onCompleted?()`** |
 | `reset()` | Akışı başa alır |
 | `requestSkip()` | `onSkipRequested?()` tetikler |
@@ -223,7 +228,7 @@ public enum OVDStep: Int, CaseIterable {
 | `onRequestLensSwitch: (() -> Void)?` | Belge çok yakın — sonraki lense geç (isteğe bağlı) |
 | `onRequestFocusNudge: (() -> Void)?` | Netlik gelmiyor — tek atış odak turu başlat (isteğe bağlı) |
 | `focusProbe: (() -> (Bool, Float, Int?, Bool))?` | Odak durumu: ayarlıyor mu, `lensPosition`, asgari odak mm, yakın sınırda mı (isteğe bağlı) |
-| `onFlowFailed: (() -> Void)?` | Akış başarısız sonlandı |
+| `onFlowFailed: (() -> Void)?` | Karşılaştırma hakkı tükendi, atlama kapalı → `coordinator.finishFlowAsFailed()` |
 
 ## Sinyal Zinciri — Perde Arkası
 
@@ -259,7 +264,11 @@ final class IdCardOVDHostViewModel: HostModuleViewModel {
 
 ## Sesli Okuma (Read-Aloud)
 
-Ekran açıldığında yönerge otomatik seslendirilebilir (`SDKFlowHostView` yapar, kod gerekmez).
+Hazır ekran yönergeyi kendisi okur: seçim ekranında `IdCardOVDTts` (`speaksOnScreen` açıksa),
+çekim başında `OvdScanFrontSide`. `SDKFlowHostView` bu modülü otomatik okumaz. Kendi ekranınızda
+`SDKSpeechService.shared.speak(.idCardOVDTts, in: .idcard_w_ovd)` ve
+`speak(.ovdScanFrontSide, in: .idcard_w_ovd, whenCameraReady: true)` çağırın
+([IdCardOVDCustomView.swift](IdCardOVDCustomView.swift) bunu yapar).
 
 ```swift
 SDKSpeechConfig.shared.setMode(.native, for: .idcard_w_ovd)        // Siri/sistem sesi

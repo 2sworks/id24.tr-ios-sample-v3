@@ -1,8 +1,8 @@
 # Signature — Islak İmza
 
 Kullanıcı parmağıyla ekrana imzasını atar; imza görseli sunucuya yüklenir. Modüllerin en
-sadesi: soket yok, WebRTC yok — yalnızca bir tuval ve bir HTTP yüklemesi. Bu yüzden custom
-ekran yazmayı öğrenmek için de en iyi başlangıç noktasıdır.
+sadesi: WebRTC yok — yalnızca bir tuval ve bir HTTP yüklemesi; sonucu SDK sokete kendisi
+bildirir. Bu yüzden custom ekran yazmayı öğrenmek için de en iyi başlangıç noktasıdır.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -16,16 +16,16 @@ ekran yazmayı öğrenmek için de en iyi başlangıç noktasıdır.
 | Rota | `SDKModuleRoute.signature` |
 | Drop-in view | `SDKSignatureView` (+ `SDKSignatureCanvas`) |
 | ViewModel | `SDKSignatureViewModel` |
-| Dış dünya | **HTTP** (`uploadIdPhoto`) — soket/WebRTC yok |
+| Dış dünya | **HTTP** (`uploadIdPhoto`) + soket durum mesajı `uploadSignature`; WebRTC yok |
 | Ses anahtarı | `SignatureTts` |
 
-Hazır tuval, `SwiftSignatureView` (SPM) üzerine kuruludur.
+Hazır tuval PencilKit (`PKCanvasView`) üzerine kuruludur.
 
 ## Kullanıcı Ne Yaşar?
 
 1. Boş bir imza alanı görür; parmağıyla imzasını çizer.
-2. Beğenmezse "Temizle" ile baştan başlar.
-3. "Gönder"e basınca imza yüklenir ve akış ilerler.
+2. Beğenmezse çöp kutusu düğmesiyle alanı temizler.
+3. "Devam Et"e basınca imza yüklenir ve akış ilerler.
 
 ---
 
@@ -37,7 +37,7 @@ Hiçbir şey yazmayın; rota gelince `SDKSignatureView` çizilir.
 
 > **Çalışan tam örnek:** [SignatureCustomView.swift](SignatureCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.signature) { SignatureCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 Kendi tuvalinizi bile kullanabilirsiniz — tek şart, görselin SDK üzerinden yüklenmesi:
@@ -53,7 +53,7 @@ struct MySignatureView: View {
         VStack {
             MyCanvas(onDraw: { vm.signatureDidDraw() })       // çizim başladı işareti
             HStack {
-                Button("Temizle") { vm.clearSignature() }
+                Button("Temizle") { myCanvasClear(); vm.clearSignature() }  // tuvali siz temizlersiniz
                 Button("Gönder") {
                     let rendered = myCanvasRenderedImage()    // tuvali UIImage'a çevirin
                     vm.uploadSignature(image: rendered)       // ✅ uploadIdPhoto
@@ -84,7 +84,7 @@ struct MySignatureView: View {
 | Metot | Etki |
 |---|---|
 | `signatureDidDraw()` | Çizim başladığını işaretler (`signatureDrawn = true`) |
-| `clearSignature()` | Tuvali temizler (`signatureDrawn` tekrar `false`) |
+| `clearSignature()` | İmza durumunu sıfırlar: `signatureDrawn` ve `uploadCompleted` `false` olur, hata silinir. Tuvale dokunmaz; SDK tuvalini `SDKSignatureActions.clear()` temizler |
 | `uploadSignature(image: UIImage)` | İmza görselini yükler → `onCompleted` |
 
 ### Closure'lar

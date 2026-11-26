@@ -59,10 +59,13 @@ SDKLocalization.shared.setOverride(key: .connect, language: .tr, value: "Bağlan
 
 ```swift
 SDKLocalization.shared.registerOverrides([
-    .tr: ["connect": "Bağlan", "selfie_info": "Yüzünüzü çerçeveye alın"],
-    .en: ["connect": "Connect"]
+    .tr: ["Connect": "Bağlan", "SelfieFrameInstruction": "Yüzünüzü çerçeveye alın"],
+    .en: ["Connect": "Connect"]
 ])
 ```
+
+Sözlük anahtarı `SDKKeyword`'ün ham değeridir ve büyük/küçük harfe duyarlıdır (`.connect` için
+`"Connect"`).
 
 ### 3. Dosyadan yükleme
 
@@ -99,5 +102,6 @@ Ayrıntı: [ReadAloud rehberi](../../IdentifySample/Modules/ReadAloud.md).
 
 - Override, `SDKKeyword.rawValue` ile eşleşir. 400'den fazla anahtarın tam listesi SDK'daki
   `SDKKeyword` enum'ında. Bir metnin anahtarını ilgili modülün rehberinde de bulabilirsiniz.
-- SDK'nın başlık çubuğunda hazır bir dil düğmesi var (`langButton` ikonu). Dil seçimini kendi
-  arayüzünüzde yapıyorsanız `sdkLang`'i güncellemeniz yeterli.
+- SDK'nın kendi dil seçicisi yok. Dili kendi arayüzünüzde seçtirip
+  `IdentifyManager.shared.sdkLang`'i güncelleyin; örnek uygulamanın giriş ekranındaki bayrak düğmesi
+  böyle çalışır. Temadaki `.langButton` simgesi başlıktaki marka işaretinin eski adıdır.

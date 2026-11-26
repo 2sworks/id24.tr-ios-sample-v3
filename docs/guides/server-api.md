@@ -16,13 +16,13 @@ Oturum tek bir çağrıyla başlar:
 ```
 setupSDK(identId, baseApiUrl, ...) ──► POST connectToRoom(identId)
                                           │
-                            RoomResponse ◄┘
-                            ├─ modules[]        → hangi adımlar, hangi sırada
-                            ├─ ws_url           → WebSocket adresi
-                            ├─ socket_auth      → soket token zorunlu mu
-                            ├─ *_comparison_count → deneme hakları
-                            ├─ encrypted_turn_credential / short_term_usage → TURN modu
-                            └─ sdk_log_api_url  → online log hedefi
+                       RoomResponse.data ◄┘
+                       ├─ modules[]        → hangi adımlar, hangi sırada
+                       ├─ ws_url           → WebSocket adresi
+                       ├─ socket_auth      → soket token zorunlu mu
+                       ├─ *_comparison_count → deneme hakları
+                       ├─ encrypted_turn_credential / short_term_usage → TURN modu
+                       └─ sdk_log_api_url  → online log hedefi
 ```
 
 Modüllerin sırasını backend belirler; akış `modules` dizisinde ne gelirse odur. `selectedModules`
@@ -37,7 +37,9 @@ sıra kullanılır.
 IdentifyManager.shared.setupSDK(
     identId: "...",
     baseApiUrl: "https://v2api.identify.com.tr/",
-    networkOptions: SDKNetworkOptions(useSslPinning: false),
+    networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: nil,
+                                      timeoutIntervalForResource: nil,
+                                      useSslPinning: false),
     kpsData: nil,
     signLangSupport: false,
     nfcMaxErrorCount: 3,
@@ -53,12 +55,13 @@ IdentifyManager.shared.setupSDK(
 | `identId` | `String` | — | Müşteri işlem numarası; içindeki boşluklar silinir |
 | `baseApiUrl` | `String` | — | Backend kök adresi |
 | `networkOptions` | `SDKNetworkOptions` | — | Timeout ve SSL pinning (aşağıda) |
-| `kpsData` | `SDKKpsData?` | — | NFC/BAC için kimlik verisi. `nil` ise veri sunucudan şifreli gelir (aşağıda) |
+| `kpsData` | `SDKKpsData?` | — | NFC/BAC için kimlik verisi. `nil` ise veri sunucudan şifreli gelir (aşağıda). Üç alanı da dolu verin: `serialNo` boşsa `kpsData` yok sayılır; bir tarih boşsa SDK yine bu veriyi kullanır, OCR'a ve sunucunun MRZ'sine dönmez, okuma eksik anahtarla başlar |
 | `identCardType` | `[CardType]?` | `[.idCard, .passport, .oldSchool]` | Kabul edilen belge türleri |
 | `signLangSupport` | `Bool` | — | Görüşmeden önce işaret dili sorusu gösterilsin mi |
-| `nfcMaxErrorCount` | `Int` | — | NFC okuması kaç hatadan sonra bırakılır |
+| `signLangPreference` | `Bool?` | `nil` | İşaret dili tercihini baştan verir. Doluysa SDK soruyu göstermez, değer sunucuya gider |
+| `nfcMaxErrorCount` | `Int` | — | Anahtardan (MRZ) kaynaklanabilecek kaç okuma hatasından sonra anahtar düzeltme ekranı açılır. Düzeltilen anahtarla da `SDKAttemptLimits.shared.nfcKeyEntry` (varsayılan 3) kez hata olursa modül bırakılır |
 | `logLevel` | `SDKLogLevel?` | `.all` | Konsol ve online log ayarı → [Loglama](logging.md) |
-| `logOnlineSecretKey` | `String?` | `""` | Online log imza anahtarı |
+| `logOnlineSecretKey` | `String?` | `""` | Online log anahtarı (Base64). Loglar bu anahtarla şifrelenir ve imzalanır; Base64 değilse gönderim yapılmaz |
 | `bigCustomerCam` | `Bool?` | `true` | `true`: temsilci tam ekran, kullanıcının kamerası küçük pencerede. `false`: tersi |
 | `selectedModules` | `[SdkModules]` | `[]` | Boşsa backend'in sırası, doluysa yalnızca bu modüller |
 | `idCardLang` | `IDLang?` | `.TR` | OCR'a belgenin dilini söyler |
@@ -67,24 +70,27 @@ IdentifyManager.shared.setupSDK(
 | `turnKey` | `String` | — | TURN kimliklerinin anahtarı → [TURN & WebRTC](turn-webrtc.md) |
 | `wsSecretKey` | `String?` | `nil` | `socket_auth` açıksa soket token anahtarı → [WebSocket](websocket.md) |
 | `showThankYouPage` | `Bool?` | `true` | Akış sonunda SDK'nın sonuç ekranı gösterilsin mi. `false` verirseniz sonuç ekranı açılmaz, SDK aşağı kayarak kapanır ve sonuç `onFinished`'a gelir |
-| `onFinished` | `((SDKFlowOutcome) -> Void)?` | `nil` | Oturum nasıl biterse bitsin tam bir kez çağrılır (3.1.0) |
-| `showNFCNotFoundPage` | `Bool?` | `false` | Çipsiz belgede "NFC yok" ekranı gösterilsin mi |
+| `onFinished` | `(@MainActor (SDKFlowOutcome) -> Void)?` | `nil` | Oturum nasıl biterse bitsin tam bir kez çağrılır (3.1.0) |
+| `showNFCNotFoundPage` | `Bool?` | `false` | `true`: NFC donanımı olmayan cihazda da NFC modülü akışta kalır, NFC ekranı açılır (ayrı bilgi sayfası yok) |
 | `supportU18` | `Bool?` | `false` | 18 yaş altı desteği |
-| `AESKey` | `String?` | `""` | Sunucudan şifreli gelen MRZ alanlarını çözen anahtar |
+| `AESKey` | `String?` | `""` | Sunucudan şifreli gelen MRZ alanlarını çözen anahtar. NFC anahtar düzeltmesinde (`updateReadNFCKeys`) gönderilen alanları da bu anahtar şifreler. NFC adımı varsa `kpsData` verseniz de anahtarı verin; vermezseniz `lastKeyReport` anahtarı `.missing` (SAĞLANMADI) gösterir |
 | `enableAutoRotateOCR` | `Bool?` | `false` | Yamuk çekilmiş kimlik fotoğrafı düzeltilsin mi |
 | `ttsEnabled` | `Bool?` | `false` | Sesli okumayı açmanın kısa yolu (`defaultMode .off` ise `.native` yapar) |
-| `callback` | closure | — | `(SDKWebSocket?, RoomResponse, SDKWebError?)` |
+| `callback` | `@MainActor (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()` | — | Kurulumun sonucu (aşağıda) |
 
 ### Callback'te başarı kontrolü
 
+Callback ana aktörde (`@MainActor`) çağrılır. `error` başarıda da dolu gelir ama mesajı boştur;
+hata olup olmadığını mesajdan anlayın:
+
 ```swift
 { socket, roomResponse, error in
-    Task { @MainActor in
-        if error == nil, socket?.isConnected == true, roomResponse.result == true {
-            coordinator.start()
-        } else {
-            // error?.message kullanıcıya gösterilebilir metin içerir
-        }
+    if let message = error?.errorMessages, !message.isEmpty {
+        // message kullanıcıya gösterilebilir
+        return
+    }
+    if socket?.isConnected == true, roomResponse.result == true {
+        coordinator.start()
     }
 }
 ```
@@ -93,7 +99,8 @@ IdentifyManager.shared.setupSDK(
 
 ## RoomResponse — Akışı Şekillendiren Alanlar
 
-`connectToRoom` cevabındaki önemli alanlar ve ne işe yaradıkları:
+`connectToRoom` cevabında `RoomResponse.data` (`FirstRoom`) altındaki önemli alanlar ve ne işe
+yaradıkları:
 
 | Alan | Etki |
 |---|---|
@@ -107,7 +114,7 @@ IdentifyManager.shared.setupSDK(
 | `liveness`, `liveness_recording`, `liveness_report*` | Canlılık adımlarının sırası, kayıt ve rapor ayarları |
 | `video_record_speech*`, `speech_expected_sentence`, `video_record_duration` | Kısa videoda sesli okuma doğrulaması. `video_record_duration` milisaniye cinsinden (6000 = 6 sn). Doğrulama okunacak metne göre açılır: `video_record_read_text` (yoksa `speech_expected_sentence`) doluysa açık, boşsa kapalıdır. `video_record_speech` bayrağı bunu değiştirmez |
 | `agent_view_scale` | Görüşmede agent görüntüsünün oranı |
-| `hide_call_answer_screen` | Çağrı cevaplama ekranını gizler |
+| `hide_call_answer_screen` | Çağrı cevaplama ekranını gizler, zil çalmaz. `hideCallAnswerScreen` her oda yanıtında bu değerle yeniden yazılır. Hazır görüşme ekranı çağrıyı kendisi yanıtlar; kendi ekranınızda `acceptCall()`'u siz çağırın ([CallScreen](../../IdentifySample/Modules/CallScreen/CallScreen.md)) |
 | `request_max_body_size` | Yükleme boyutu sınırı (sunucu belirler) |
 | `sdk_log_api_url` | Online logların gönderildiği adres |
 
@@ -122,8 +129,8 @@ veriyi siz de verebilirsiniz, sunucu da.
 ## SDKNetworkOptions — Ağ Ayarları
 
 ```swift
-// Basit kullanım
-SDKNetworkOptions(useSslPinning: false)
+// Basit kullanım (nil verilen süreler 30 sn olur)
+SDKNetworkOptions(timeoutIntervalForRequest: nil, timeoutIntervalForResource: nil, useSslPinning: false)
 
 // Tam kontrol
 SDKNetworkOptions(
@@ -144,13 +151,16 @@ SDKNetworkOptions(
 
 Sertifikanızı bunlardan birine koymanız yeterli. Sample App'te örnek bir sertifika var.
 
+Pinning HTTP isteklerinde geçerlidir. WebSocket bağlantısı sistemin standart TLS doğrulamasını
+kullanır.
+
 ---
 
 ## Hata Modeli
 
-HTTP hataları `SDKWebError` olarak döner; `message` alanını kullanıcıya gösterebilirsiniz. Sunucu
-`result == false` döndürürse mesaj `RoomResponse.messages` listesinden alınır. Modül içindeki
-yüklemelerde VM'ler hatayı `errorMessage`'a yazar; kendi ekranınızda
+HTTP hataları `SDKWebError` olarak döner; `errorMessages` alanını kullanıcıya gösterebilirsiniz.
+Sunucu `result == false` döndürürse mesaj `RoomResponse.messages` listesinden alınır. Modül
+içindeki yüklemelerde VM'ler hatayı `errorMessage`'a yazar; kendi ekranınızda
 `@Published errorMessage`'ı dinlemeniz yeterli.
 
 ---

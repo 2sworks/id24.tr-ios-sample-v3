@@ -1,8 +1,10 @@
 # async/await API
 
-SDK 3.x, closure'lı API'nin yanında her bekleme için bir `async` karşılık da sunar. İkisi aynı iç
-akışı kullanır, aynı oturumu yönetir. Closure API'si değişmedi. Mevcut
-entegrasyonunuz olduğu gibi çalışır, async'e istediğiniz ekrandan başlayarak geçebilirsiniz.
+SDK 3.3.0'dan beri closure'lı API'nin yanında her bekleme için bir `async` karşılık da sunar.
+İkisi aynı iç akışı kullanır, aynı oturumu yönetir. Closure API'si yerinde durur. 3.3.0'da
+callback'lerin çoğu `@MainActor` tipli oldu, soketin tipi de `SDKWebSocket` oldu; `Starscream`
+import eden kodu güncelleyin ([Thread modeli ve Swift 6](concurrency.md)). async'e istediğiniz
+ekrandan başlayarak geçebilirsiniz.
 
 ← [README'ye dön](../../README.md) · İlgili: [Thread modeli ve Swift 6](concurrency.md) ·
 [Oturum Çıkışları](session-exit.md)
@@ -28,6 +30,7 @@ final class LoginViewModel: ObservableObject {
     private var setupTask: Task<Void, Never>?
 
     func connect(coordinator: SDKFlowCoordinator) {
+        coordinator.prepareForSetup()               // setupSDK'dan önce
         setupTask?.cancel()
         setupTask = Task {
             do {
@@ -55,6 +58,8 @@ final class LoginViewModel: ObservableObject {
 }
 ```
 
+- Sıra: `prepareForSetup()`, `setupSDK`, `start()`. `prepareForSetup()` atlanırsa modüller
+  hiç başlamaz.
 - `setupSDK` soket bağlandığında `RoomResponse` döner. Oda açılmazsa ya da soket bağlanmazsa
   `SDKSetupError` fırlatır. Kurulum hatasında oturum yine `.setupFailed` sebebiyle biter,
   `outcome()` bu sonucu da verir.
@@ -91,8 +96,8 @@ IdentifyManager.shared.exitSDK()
 - İptal edilen bekleme `CancellationError` fırlatır.
 - Task çağrıdan önce iptal edilmişse `setupSDK` oturumu hiç başlatmaz.
 - `outcome()` iptalle bitmez. Oturum bitene kadar bekler.
-- SwiftUI'da `.task { }` ekran kapanınca kendi iptal eder. `SpeedCheckBeforeView` bunu örnek
-  olarak gösterir: ekran kapanınca task iptal edilir ve sonuçla bir karar verilmez.
+- SwiftUI'da `.task { }` ekran kapanınca kendini iptal eder. `SpeedCheckBeforeView` ekran
+  kapanınca task'ı iptal eder ve ölçümü `cancelConnectionSpeedTest()` ile ayrıca durdurur.
 
 ---
 
@@ -126,13 +131,13 @@ Döngü, task iptal edilene kadar sürer. `.task` ile bağlandığında ekran ka
 
 | Hata | Ne zaman | İçinde ne var |
 |---|---|---|
-| `SDKSetupError` | `setupSDK` oda açamadı ya da soket bağlanmadı | `message` |
+| `SDKSetupError` | `setupSDK` oda açamadı, soket bağlanmadı ya da oturum kurulum bitmeden kapandı | `message` |
 | `SDKWebError` | Yükleme ve sunucu çağrıları | `errorMessages`, closure'ın verdiği nesnenin aynısı |
-| `SDKError` | `acceptCall`, `twoFacesCompare` | `errorMessages` |
+| `SDKError` | `acceptCall`, `twoFacesCompare`, `reconnectToSocket` | `errorMessages` |
 | `SDKPartialError<Value>` | Hata, okunmuş veriyle birlikte geldiğinde (OCR, NFC) | `message`, `partial`, `underlying` |
 | `CancellationError` | Bekleyen task iptal edildi | - |
 
-Hepsinde `localizedDescription` kullanıcıya gösterilecek mesajı verir.
+`CancellationError` dışındakilerde `localizedDescription` kullanıcıya gösterilecek mesajı verir.
 
 OCR'da hata, okunabilen alanlarla birlikte gelir:
 
@@ -158,9 +163,11 @@ NFC'de `partial` sunucu yanıtıdır (`NewBoolResponse`), `underlying` ise okuyu
 | `setupSDK(...)` | `RoomResponse` | `SDKSetupError` |
 | `outcome()` | `SDKFlowOutcome` | fırlatmaz |
 | `outcomes`, `events` | `AsyncStream` | - |
-| `quitSDK()` | kapanış ekranı (`UIViewController`) | fırlatmaz |
+| `quitSDK()` | ThankYou ekranı (`UIViewController`). `showThankYouPage: false` iken de döner, o zaman göstermeyin | fırlatmaz |
 | `killSDKByUser()`, `terminateCallByUser()` | `Bool` | `CancellationError` |
 | `nextModule()` | `UIViewController` | fırlatmaz |
+| `reconnectToSocket(statusCallback:)` | `Bool` (soket bağlandı mı) | `SDKError` (deneme zaten sürüyor ya da oturum kapalı), `CancellationError` |
+| `selectDocType(_:)` | yok | `SDKWebError` |
 | `acceptCall()` | `Bool` (SDP gönderildi mi) | `SDKError` |
 | `smsVerification(tan:)` | `Bool` | `CancellationError` |
 | `startNFC()` | `(card, status, response)` | `SDKPartialError<NewBoolResponse>` |
@@ -169,13 +176,14 @@ NFC'de `partial` sunucu yanıtıdır (`NewBoolResponse`), `underlying` ise okuyu
 | `startBackIdOcr(frontImg:)` | `BackIdInfo` | `SDKPartialError<BackIdInfo>` |
 | `twoFacesCompare()` | `(distance, samePerson, images)` | `SDKError` (belge fotoğrafı yok), `CancellationError` |
 | `detectHumanFace(comingPhoto:)`, `probeMRZPresence(in:roi:)` | `Bool` | fırlatmaz |
-| `uploadIdPhoto`, `upload5SecVideo`, `uploadLivenessVideo` | `NewBoolResponse` | `SDKWebError` |
+| `uploadIdPhoto` | `NewBoolResponse` | `CancellationError` |
+| `upload5SecVideo`, `uploadLivenessVideo` | `NewBoolResponse` | `SDKWebError` |
 | `uploadAddressInfo`, `uploadAddressInfoWithPdf` | yok | `SDKWebError` |
 | `transcribeSpeech(mediaData:expectedText:threshold:)` | `SpeechTranscribeResponse` | `SDKWebError` |
 | `notifyLivenessCompleted(timeout:)` | yok | fırlatmaz, kendi süre sınırı var |
 | `nextLivenessTest()` | `LivenessTestStep?` | eşzamanlı, bekleme yok. Bilinmeyen adım atlanır |
 | `startSpeedTest(repeatCount:)` | `AsyncStream<(status, kbPerSec)>` | Ölçümler sırayla yapılır. Akış `repeatCount` ölçümden sonra biter, en az bir ölçüm yapılır |
-| `startConnectionSpeedTest(identId:baseApiUrl:)` | `SDKSpeedTestResult` | `CancellationError` |
+| `startConnectionSpeedTest(identId:baseApiUrl:)` | `SDKSpeedTestResult` | `CancellationError`. İptal ölçümü durdurmaz, `cancelConnectionSpeedTest()` durdurur |
 | `verifyKeysOnServer()` | `SDKKeyReport` | `CancellationError` |
 
 Yüklemelerde `NewBoolResponse.result` `false` gelebilir. Sunucunun reddi hata sayılmaz, sonucu
@@ -185,8 +193,9 @@ siz okursunuz.
 
 `exitSDK()` ya da `quitSDK()` oturumu kapatınca uçuştaki istekler iptal edilir. Kapanıştan
 sonra gelen yanıtlar callback'e iletilmez, iptal hatası da gelmez. O sırada bekleyen yükleme ve
-sunucu çağrıları (`uploadIdPhoto`, `smsVerification`, `setupSDK` ve diğerleri) hiç dönmez. Bu
-çağrıları ekranın ömrüne bağlı bir task içinde yapın, oturumu kapatmadan önce task'ı iptal edin.
+sunucu çağrıları (`uploadIdPhoto`, `smsVerification` ve diğerleri) hiç dönmez. Bu çağrıları
+ekranın ömrüne bağlı bir task içinde yapın, oturumu kapatmadan önce task'ı iptal edin. Bekleyen
+`setupSDK` ise döner ve "Kurulum tamamlanmadan oturum kapatıldı" mesajlı `SDKSetupError` fırlatır.
 
 `killSDKByUser()` soket kopukken de döner: panele haber verilemez, oturum cihazda kapanır ve
 sonuç `true` olur.
@@ -202,7 +211,7 @@ sonuç `true` olur.
 | `eventDelegate = self` | `for await e in events` |
 | `quitSDK { vc in }` | `let vc = await quitSDK()` |
 | `getNextModule { vc in }` | `let vc = await nextModule()` |
-| `getNextLivenessTest { step in }` | `let step = nextLivenessTest()` |
+| `getNextLivenessTest { step, _ in }` | `let step = nextLivenessTest()` |
 | `startSpeedTest { status, kb in }` | `for await (status, kb) in startSpeedTest()` |
 | `startConnectionSpeedTest { result in }` | `try await startConnectionSpeedTest()` |
 

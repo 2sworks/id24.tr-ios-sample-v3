@@ -68,7 +68,7 @@ uygulamanızdaki başka bir paket WebRTC'nin farklı bir sürümünü istiyorsa 
 | Mikrofon | `NSMicrophoneUsageDescription` | Hazırlık, Görüşme, Video kayıt, Konuşma |
 | Konuşma tanıma | `NSSpeechRecognitionUsageDescription` | Hazırlık, Konuşma (Speech). Hazırlık ekranı akışta konuşma modülü olmasa da bu izni ister |
 | NFC | `NFCReaderUsageDescription` + `com.apple.developer.nfc.readersession.formats` → `TAG` (entitlement) + Info.plist'e `com.apple.developer.nfc.readersession.iso7816.select-identifiers` → `A0000002471001` | NFC çip okuma |
-| iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK portrait kilitlidir; bu anahtar olmadan App Store yüklemesi iPad çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
+| iPad hedefi | `UIRequiresFullScreen` → `YES` | SDK ekranları dikey tasarlandı, yönü SDK kilitlemez. iPad'de dikey kalması için `UISupportedInterfaceOrientations~ipad` yalnız dikey olmalı; yalnız dikey bir iPad paketi bu anahtar olmadan App Store yüklemesinde çoklu görev şartıyla reddedilir ([iPad Desteği](docs/guides/ipad-support.md)) |
 
 Modül başına tam liste ve gereken cihaz yetenekleri (NFC, TrueDepth): [Modül Gereksinimleri](docs/guides/module-requirements.md).
 
@@ -93,13 +93,15 @@ struct RootView: View {
     }
 }
 
-func connect(coordinator: SDKFlowCoordinator) {
+@MainActor func connect(coordinator: SDKFlowCoordinator) {
     coordinator.prepareForSetup()            // 1) setupSDK'dan ÖNCE
 
     IdentifyManager.shared.setupSDK(
         identId: "MÜŞTERİ-İŞLEM-NO",
         baseApiUrl: "https://v2api.identify.com.tr/",
-        networkOptions: SDKNetworkOptions(useSslPinning: false),
+        networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: nil,
+                                          timeoutIntervalForResource: nil,
+                                          useSslPinning: false),
         kpsData: nil,
         signLangSupport: false,
         nfcMaxErrorCount: 3,
@@ -108,10 +110,10 @@ func connect(coordinator: SDKFlowCoordinator) {
         wsSecretKey: "WS-ANAHTARINIZ",
         showThankYouPage: true
     ) { socket, roomResponse, error in
-        Task { @MainActor in
-            if error == nil, socket?.isConnected == true, roomResponse.result == true {
-                coordinator.start()          // 2) ilk modüle geç
-            }
+        // Callback ana thread'de gelir. Başarıda da `error` dolu gelir, mesajı boştur.
+        if let message = error?.errorMessages, !message.isEmpty { return }
+        if socket?.isConnected == true, roomResponse.result == true {
+            coordinator.start()              // 2) ilk modüle geç
         }
     }
 }
@@ -141,8 +143,8 @@ Kaynak dosya kopyalamanız gerekmez — tek isteğe bağlı dosya, projenize ekl
 | Başlık çubuğu düğmeleri | kaldır: `SDKTheme.shared.navBar.buttons.showsBack = false` (`showsMenu`) · yardımı aç (varsayılan kapalı): `buttons.showsHelp = true` + `buttons.onHelp = { route in … }` · ek düğme: `buttons.trailing = [SDKNavBarButton(…)]` · tek ekran: `navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: true)` |
 | Logo / geri / yardım / menü ikonu | `SDKTheme.shared.setIcon(.headerLogo, Image("my_mark"))` — anahtarlar `SDKIconKey`; geri al: `resetIcon(_:)` |
 | Titreşim | `SDKHapticConfig.shared.stepFeedbackEnabled = false` · per-modül `setEnabled(false, for: .selfie)` · hepsi `setEnabledForAll(false)` |
-| Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın |
-| Varsayılanlara dön | `SDKTheme.shared.resetAppearance()` |
+| Her şeyi tek JSON'la | `SDKTheme.shared.applyTheme(named: "IdentifyTheme")` / `apply(dict)` / `apply(json:)` → **tanınmayan anahtarları döner**, geliştirmede loglayın. Değer hatalarının çoğu listede görünmez |
+| Varsayılanlara dön | `SDKTheme.shared.resetAppearance()`. İkonlara dokunmaz, onları `resetIcon(_:)` geri alır |
 | Dil | `IdentifyManager.shared.setSDKLang(lang: .tr)` (`.tr .en .de .az .ru`) |
 | Tek metni değiştir | `SDKLocalization.shared.setOverride(key: .idVerifyTitle, language: .tr, value: "Kimlik Kontrolü")` |
 | Toplu metin | `SDKLocalization.shared.registerOverrides([.tr: ["IdVerifyTitle": "…"]])` · dosyadan: `loadOverrides(from:language:)` |
@@ -182,7 +184,7 @@ Kopyaladığınız her `.swift` dosyasını Xcode'da **uygulama target'ına** ek
 Host App                         IdentifySDK                        Identify Backend
 ────────                         ───────────                        ────────────────
 setupSDK(identId, ...)  ───────► connectToRoom ────────────────────► oda + modül listesi
-                                 RoomResponse.modules ◄─────────────  (RoomResponse)
+                                 data?.modules ◄────────────────────  (RoomResponse)
 coordinator.start()     ───────► SDKFlowCoordinator
                                    │  path'e rota push eder
                                    ▼
@@ -219,7 +221,7 @@ kullanma, **kendi tasarımınla değiştirme** ve ViewModel referansı — hepsi
 | Hazırlık          | İzinleri ve bağlantı hızını kontrol eder, kullanıcıyı akışa hazırlar | [Prepare](IdentifySample/Modules/Prepare/Prepare.md)                                  |
 | Kimlik (OCR)      | Kimlik kartının ön/arka yüzünü çeker, cihaz üzerinde okur            | [IdCard](IdentifySample/Modules/IdCard/IdCard.md)                                     |
 | Kimlik (OVD)      | Hologram/optik doğrulama ile sahte kimlik tespiti                    | [IdCardOVD](IdentifySample/Modules/IdCardOVD/IdCardOVD.md)                            |
-| NFC               | Kimlik/pasaport çipini okur (ICAO: BAC/PACE/CA)                      | [NFC](IdentifySample/Modules/NFC/NFC.md)                                              |
+| NFC               | Kimlik/pasaport çipini okur (ICAO: BAC/CA)                           | [NFC](IdentifySample/Modules/NFC/NFC.md)                                              |
 | Selfie            | Selfie çeker, cihaz üzerinde yüz tespiti yapar                       | [Selfie](IdentifySample/Modules/Selfie/Selfie.md)                                     |
 | Selfie + Canlılık | Selfie ile canlılık testini birleştirir                              | [SelfieWithLiveness](IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md) |
 | Canlılık          | Sola dön / göz kırp / gülümse adımlarıyla canlılık testi             | [Liveness](IdentifySample/Modules/Liveness/Liveness.md)                               |
@@ -301,7 +303,7 @@ bunun dışındadır: modül değildirler ve `coordinator.advanceExternal()` ile
 
 **B için başlangıç noktası hazır:** her modül klasöründe `XxxCustomView.swift` vardır —
 SDK ekranının yalnızca public API ile yazılmış, çalışan birebir kopyası (15 ekran). Projeye kopyalanır, `registry.override(...)` ile takılır,
-üzerinde değişiklik yapılır. Örnek uygulamada hamburger menü → **Tam Özel Ekranlar**
+üzerinde değişiklik yapılır. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar**
 anahtarı bu ekranların tamamını akışta SDK ekranlarının yerine koyar; kapalıyken SDK
 ekranları çalışır. Aynı ekrandan her modülün özel sürümü tek tek de önizlenir.
 Ayrıntı: [Özelleştirme Rehberi](docs/guides/customization.md) ·

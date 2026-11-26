@@ -1,5 +1,4 @@
 {
-  "_comment": "IdentifySDK tema örneği — SDKTheme.shared.applyTheme(named:) / setTheme() ile uygulanır.",
   "colors": {
     "primary": "#0F172A",
     "success": "#22C55E",

@@ -19,12 +19,12 @@ rehberdeki *Tek Sözlükle Tema (JSON)* bölümüne bakın.
 | Yapılandırma | yalnızca Swift API | + sözlük/JSON (`apply`) → RN ve Flutter'da `setTheme`, native derleme gerekmez |
 | Header marka işareti | `.langButton` (yanlış ad) | `.headerLogo` (eski ad çalışmaya devam ediyor) |
 | İngilizce dil kodu | `.eng` | `.en` |
-| Cihaz ailesi | yalnızca iPhone | iPhone + iPad (tablette de dikey konuma kilitli) |
+| Cihaz ailesi | yalnızca iPhone | iPhone + iPad (yönü host'un Info.plist'i belirler) |
 | Donanımı eksik cihaz | canlılık modülü akıştan düşerdi | `faceTrackingFallback`: yerine ne geleceğini entegrasyon seçer |
 | Selfie + canlılık derinliği | ARKit varsa ARKit (A12+ cihazda derinliksiz de) | `selfieWithLivenessTrueDepth`: `.automatic` · `.required` · `.disabled` (Vision) |
 | Canlılık adımı geçişi | sessiz | çok kısa bir onay titreşimi (`stepFeedbackEnabled`) |
 | Oturum sonucu | dağınık (`terminateCall` delegate, `session.*` olayları) | `setupSDK(onFinished:)` / `onFlowFinished` / `flowResultDelegate`: tek bir `SDKFlowOutcome`, oturum başına bir kez |
-| `showThankYouPage: false` | yalnızca görüşmesiz akışın sonunda geçerliydi, kullanıcı son ekranda kalıyordu | her yolda geçerli: sonuç ekranı açılmaz, SDK aşağı kayarak kapanır |
+| `showThankYouPage: false` | yalnızca görüşmesiz akışın sonunda geçerliydi, kullanıcı son ekranda kalıyordu | `quitSDK` dışında her yolda geçerli: sonuç ekranı açılmaz, SDK aşağı kayarak kapanır. `quitSDK` ThankYou'yu yine döndürür |
 
 ---
 
@@ -88,7 +88,8 @@ da yalnızca başlık çubuğunun rengini değiştirebilirsiniz.
 
 ```swift
 SDKTheme.shared.colors.pageBackground =
-    SDKAdaptiveColor(light: Color(hex: "#F8FAFC"), dark: Color(hex: "#0B1120"))
+    SDKAdaptiveColor(light: Color(red: 248/255, green: 250/255, blue: 252/255),
+                     dark: Color(red: 11/255, green: 17/255, blue: 32/255))
 SDKTheme.shared.colors.selectedItemBackground = SDKAdaptiveColor(Color.black)
 ```
 
@@ -123,7 +124,9 @@ SDKTheme.shared.applyTheme(named: "theme")      // Bundle'daki theme.json
 SDKTheme.shared.resetAppearance()
 ```
 
-`apply(...)` tanımadığı anahtarların listesini döndürür, böylece yazım hataları gözden kaçmaz.
+`apply(...)` tanımadığı anahtarların listesini döndürür; anahtar adındaki yazım hataları burada
+görünür. Değer hatalarının çoğu listeye girmez, geçersiz değer sessizce varsayılana ya da eski
+değere döner ([Tema rehberi](theming.md)).
 
 React Native ve Flutter köprüleri aynı şemayı kullanır. Renk ya da logo denerken native derleme
 gerekmez; JS ya da Dart reload yeterli:
@@ -143,7 +146,8 @@ kullanın; yoksa `fonts.familyName` verdiğinizde o metin sistem fontunda kalır
 
 ### 7. iPad desteği ve yetenek tabanlı modül ikamesi
 
-SDK artık iPad'de de çalışıyor; ekran tablette de dikey konuma kilitli. Donanım isteyen modüller
+SDK artık iPad'de de çalışıyor. Ekranlar dikey tasarlandı, yönü SDK kilitlemez; tablette de
+dikey kalması için Info.plist'te yalnız dikey konumu seçin. Donanım isteyen modüller
 için karar akış kurulurken verilir ve yerine ne geleceğini siz belirlersiniz:
 
 ```swift
@@ -164,8 +168,8 @@ ARKit olmadan her cihazda çalıştırmak isteyenler `.disabled` seçer. Tek bir
 [Ayrıntı](../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu)
 
 Yerleşimde ölçüler artık ekrana değil pencereye göre hesaplanıyor (`SDKLayout.bounds`). Metin
-sütunlarını `.sdkReadableWidth()`, kılavuz çerçevelerini `SDKLayout.maxGuideWidth` /
-`maxFaceGuideWidth` sınırlar. Ayrıntı: [iPad Desteği](ipad-support.md).
+sütunlarını `.sdkReadableWidth()`, yüz ovalini `SDKLayout.maxFaceGuideWidth`, kimlik
+çerçevesini `ScannerFixedFrame.maxWidth` sınırlar. Ayrıntı: [iPad Desteği](ipad-support.md).
 
 ### 8. Canlılık adımlarında onay titreşimi
 
@@ -204,8 +208,9 @@ IdentifyManager.shared.setupSDK(
 IdentifyManager.shared.flowResultDelegate = resultHandler   // IdentifyFlowResultListener, weak
 ```
 
-Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç üretmez;
-kullanıcı yeniden bağlanır. Doğrulanmadan geçilen modüller (atlandı, NFC yok…)
+Karar içermeyen statüler (statü yok, "Durum Seçilmedi") ve geçici kopmalar sonuç üretmez,
+kullanıcı yeniden bağlanır. Bağlantı geri gelmeden oturum kapanırsa sonuç `.connectionLost`
+sebebiyle gelir. Doğrulanmadan geçilen modüller (atlandı, NFC yok…)
 `outcome.skippedModules`'ta listelenir. Bütün çıkış yolları ve yönlendirme:
 [Oturum Çıkışları](session-exit.md). Alanlar ve sebep tablosu:
 [FULL-INTERGATION → Akış Sonucu](../../FULL-INTERGATION.md#akış-sonucu--onfinished-310).
@@ -264,7 +269,8 @@ Ayrıntı: [IdentityScanner rehberi](identity-scanner.md#neyin-çekimi-bekletti�
 
 - `showThankYouPage` varsayılanı `true`. 3.0.0'da varsayılan `false` görünüyordu, ama görüşme
   sonunda bu bayrağa bakılmadığı için sonuç ekranı yine açılıyordu. Yani görünen davranış
-  değişmiyor. `false` artık her yolda geçerli (bkz. *Akış sonucu*).
+  değişmiyor. `false` artık `quitSDK` dışında her yolda geçerli (bkz. *Akış sonucu*). `quitSDK`
+  ThankYou ekranını yine döndürür, `false` verdiyseniz göstermeyin.
 
 - `session.completed` ve `session.failed` olayları yalnızca gerçek bir bitişte gönderiliyor.
   3.0.0'da her `terminateCall`'da gönderiliyordu ve panelin `positive` statüsü başarı sayılmıyordu.

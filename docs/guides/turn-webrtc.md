@@ -29,7 +29,7 @@ yaradığını da burada bulursunuz.
 ## TURN Kimlikleri — Üç Mod
 
 STUN/TURN adresleri ve kimlikleri, soket kurulmadan hemen önce `getWSCredential` servisinden
-alınır (servisin anahtarı `RoomResponse.ws_secret_key`). Kimliklerin nasıl kullanılacağını
+alınır (servisin anahtarı `RoomResponse.data?.ws_secret_key`). Kimliklerin nasıl kullanılacağını
 backend'den gelen iki bayrak belirler.
 
 ### 1. Düz kimlik (varsayılan)
@@ -39,7 +39,7 @@ kullanılır. Bu modda `turnKey` kullanılmaz.
 ### 2. Şifreli kimlik — `encrypted_turn_credential == "1"`
 Servis kimlikleri AES-256-CBC ile şifreli gönderir, SDK da bunları sizin `turnKey`'inizle çözer.
 
-> ⚠️ Bu modda `turnKey` boşsa görüşme kurulmaz ve konsolda `⚠️ turn key gerekli` yazar.
+> ⚠️ Bu modda `turnKey` boşsa görüşme kurulmaz ve konsolda `⚠️turn key gerekli` yazar.
 
 ### 3. Kısa ömürlü kimlik — `short_term_usage == "1"`
 SDK, çağrı cevaplanırken (`acceptCall`) kimliği cihazda üretir:
@@ -83,8 +83,8 @@ Agent'ın görüşme sırasında gönderebileceği komutların listesi:
 |---|---|---|
 | `bigCustomerCam` | `setupSDK` parametresi | `true` (verilmezse de böyle): temsilci tam ekran, kullanıcının kamerası küçük pencerede. `false`: tersi |
 | `agent_view_scale` | `RoomResponse` | Agent görüntüsünün ölçeği (dikey gösterim dahil) |
-| `hide_call_answer_screen` | `RoomResponse` | Çağrı cevaplama ekranı atlanır |
-| `signLangSupport` | `setupSDK` parametresi | Görüşmeden önce işaret dili tercihi sorulur ([SignLang](../../IdentifySample/Modules/SignLang/SignLang.md)) |
+| `hide_call_answer_screen` | `RoomResponse` | Çağrı cevaplama ekranı atlanır, zil çalmaz. Hazır görüşme ekranı çağrıyı kendisi yanıtlar; kendi ekranınızda `acceptCall()`'u siz çağırın, yoksa çağrı `ringingTimeout` dolunca 4108 ile düşer |
+| `signLangSupport` | `setupSDK` parametresi | Görüşmeden önce işaret dili tercihi sorulur. `signLangPreference` verildiyse sorulmaz ([SignLang](../../IdentifySample/Modules/SignLang/SignLang.md)) |
 | `backCameraFocusEnabled` | `IdentifyManager` (3.3.0) | `true` (varsayılan): arka kamera yakına sürekli odaklanır. `false`: kameranın kendi odağı |
 | `tapToFocusEnabled` | `IdentifyManager` (3.3.0) | `true` (varsayılan): önizlemeye dokununca o noktaya odaklanır. `false`: dokunmayı host yakalar |
 | `swapsLayoutOnBackCamera` | `IdentifyManager` (3.3.0) | `true` (varsayılan): arka kamerada kullanıcının görüntüsü büyük ekrana geçer. Ayrıntı: [Arka Kamera Odağı](../../IdentifySample/Modules/CallScreen/CallScreen.md#arka-kamera-odağı-330) |
@@ -109,13 +109,17 @@ Kodlar: [WebSocket → Birleşik Kapanma Kodları](websocket.md#birleşik-kapanm
 Medya hattı ayaktaysa soket kopması görüşmeyi hemen bitirmez. Görüşme
 `IdentifyManager.shared.signallessCallGracePeriod` boyunca (varsayılan 10 sn) sinyalsiz sürer:
 
-- Bu sürede soket yeniden bağlanırsa görüşme kesilmez.
-- Bağlanmazsa görüşme cihazda biter ve "Bağlantı Koptu" ekranı açılır. Sinyal yokken panelin
+- SDK bu sürede soketi kendiliğinden bağlamaz; bu arada istenen bir yeniden bağlanma da görüşmeyi
+  bitirir.
+- Süre dolunca görüşme cihazda biter ve "Bağlantı Koptu" ekranı açılır. Sinyal yokken panelin
   `endCall` / `terminateCall` komutları cihaza ulaşmaz, görüşme bu yüzden süresiz bırakılmaz.
 - Bu sürede ICE de koparsa görüşme yukarıdaki tabloya göre biter.
+- Sunucu soketi normal kodla kapatırsa (4110, 4111, 4112) bu süre başlamaz. Görüşme medya hattı
+  kapanana kadar sinyalsiz sürer, sonra yukarıdaki tabloya göre biter.
 
 Görüşme dışındaki kopmada (ya da medya hattı zaten düşmüşse) medya oturumu tamamen kapanır, soket
-kapatılır ve "Bağlantı Koptu" ekranı açılır. Kopma sayısı sınırı ve otomatik yeniden bağlanma
+kapatılır ve "Bağlantı Koptu" ekranı açılır. Sunucunun normal kapanışı (4110, 4111, 4112) görüşme
+dışında yalnızca loglanır. Kopma sayısı sınırı ve otomatik yeniden bağlanma
 `SDKAttemptLimits.shared.connection` (`SDKConnectionPolicy`) ile ayarlanır.
 
 ### Neden sessiz yeniden abonelik yok?
@@ -128,16 +132,18 @@ abone oluyordu. Sunucu ve panel bunu desteklemediği için bu yapı kaldırıld�
 - Panel çağrı oturumunu kapatmıyor, süre saymaya devam ediyordu.
 - Cihaz testinde ident statüsü bu yüzden `Reddedildi` oldu.
 
-Yukarıdaki iki bekleme süresi odaya abone olmaz, yalnızca bağlantının geri gelmesini bekler.
+Yukarıdaki iki bekleme süresinde SDK odaya yeniden abone olmaz.
 Görüşme bittiğinde kullanıcı "Bağlantı Koptu" ekranından yeniden bağlanır ve prosedür baştan
-işler. Yeniden bağlanırken `imOnline`,
-`getIdentStatus`, `subscribe` ve `stepChanged` gönderilir. Panel henüz karar vermediyse (statü id
-`< 0`) müşteri bekleme odasına döner ve temsilci onu yeniden arayabilir. Karar verildiyse başarılı
-ya da başarısız ThankYou ekranı açılır.
+işler. Yeniden bağlanırken sırasıyla `getIdentStatus`, `subscribe` ve `stepChanged` gönderilir.
+`imOnline` sunucu `newSub` ile isteyince gider. Kayıtlı statü `positive` ise (id -3, -4 ve -5
+hariç) oturum biter ve başarılı ThankYou ekranı açılır. Diğer durumların hepsinde müşteri bekleme
+odasına döner, temsilci onu yeniden arayabilir. Olumsuz karar için panel `terminateCall`
+göndermelidir.
 
-Kullanıcı yeniden bağlandığında (`reconnectToSocket`) WebRTC oturumu yalnızca kullanıcı görüşme
-ekranındaysa yeniden kurulur (video, ses ve data channel) ve `sendStep()` ile hangi adımda olduğu
-bildirilir. Kopma başka bir modüldeyken olduysa WebRTC'ye dokunulmaz.
+Kullanıcı yeniden bağlandığında (`reconnectToSocket`) akışta görüntülü görüşme (bekleme odası)
+modülü varsa WebRTC oturumu yeniden kurulur (video, ses ve data channel) ve `sendStep()` ile hangi
+adımda olduğu bildirilir. Kopmanın hangi modülde olduğu fark etmez. İşaret dili sorusu cevap
+beklerken ikisi de yapılmaz.
 Ayrıntı: [WebSocket → Bağlantı Kopması](websocket.md#bağlantı-kopması-ve-toparlanma).
 
 ---
