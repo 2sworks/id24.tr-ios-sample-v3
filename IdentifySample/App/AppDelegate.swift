@@ -77,7 +77,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Tüm akış SDK'dan gelir: SDKFlowHostView(coordinator:registry:) { LoginView() }
         window.rootViewController = UIHostingController(rootView: RootView())
         self.window = window
-        // SDK 3.2.0 ve öncesi uyarı penceresini uygulama delegesinden okuyor.
+        // SDK 3.3.0 ve öncesi uyarı penceresini uygulama delegesinden okuyor.
         (UIApplication.shared.delegate as? AppDelegate)?.window = window
         window.makeKeyAndVisible()
     }
