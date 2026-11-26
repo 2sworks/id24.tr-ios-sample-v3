@@ -785,6 +785,7 @@ private struct HamburgerMenuSheet: View {
     @ObservedObject private var nfxState = NFXDebugState.shared
     @AppStorage("sdkReadAloudEnabled") private var readAloudEnabled = false
     @AppStorage("idScanAlertEnabled") private var idScanAlertEnabled = false
+    @AppStorage("sdkScreenCaptureProtection") private var screenCaptureProtection = false
     @State private var livenessStepWait = SDKLivenessRules.default.nextStepWait
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
@@ -859,6 +860,19 @@ private struct HamburgerMenuSheet: View {
                             set: { newValue in
                                 idScanAlertEnabled = newValue
                                 IdScanAlert.apply()
+                            }
+                        )
+                    )
+                    // SDK ekranları ekran görüntüsünde ve ekran kaydında boş görünür. Akış
+                    // başlamadan verilir; açılışta RootView kayıtlı değeri uygular.
+                    MenuOptionRow(
+                        icon: Image(systemName: "eye.slash.fill"),
+                        title: "Ekran Koruması",
+                        isOn: Binding(
+                            get: { screenCaptureProtection },
+                            set: { newValue in
+                                screenCaptureProtection = newValue
+                                IdentifyManager.shared.screenCaptureProtectionEnabled = newValue
                             }
                         )
                     )

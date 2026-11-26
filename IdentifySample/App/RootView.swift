@@ -111,6 +111,11 @@ struct RootView: View {
         guard !didConfigure else { return }
         didConfigure = true
 
+        // Ekran koruması (menü → Hızlı Ayarlar → Ekran Koruması). Varsayılan kapalı; akış
+        // başlamadan verilir, akış sürerken değiştirilmez.
+        IdentifyManager.shared.screenCaptureProtectionEnabled =
+            UserDefaults.standard.bool(forKey: "sdkScreenCaptureProtection")
+
         // D) Tam ekran değiştirme — tüm modüller (anahtar kapalıyken SDK ekranına düşer).
         CustomScreens.register(in: registry)
 

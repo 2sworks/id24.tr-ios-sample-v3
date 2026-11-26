@@ -51,11 +51,17 @@ struct NfcCustomView: View {
             }
         }
         .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
+        // Ekran koruması açıksa sayfanın içeriği ayrıca sarılır. `presentationDetents` gibi
+        // sunum ayarları korumadan SONRA yazılır: içerik ayrı bir hiyerarşide çizildiği için
+        // korumanın içindeki sunum ayarı sayfaya ulaşmaz.
         .sheet(isPresented: $viewModel.showEditScreen) {
             if #available(iOS 16.0, *) {
-                NfcEditSheet(viewModel: viewModel).presentationDetents([.height(550)])
+                NfcEditSheet(viewModel: viewModel)
+                    .sdkScreenCaptureProtected()
+                    .presentationDetents([.height(550)])
             } else {
                 NfcEditSheet(viewModel: viewModel)
+                    .sdkScreenCaptureProtected()
             }
         }
         .onAppear {

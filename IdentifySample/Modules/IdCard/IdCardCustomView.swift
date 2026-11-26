@@ -85,6 +85,7 @@ struct IdCardCustomView: View {
         }
         // Otomatik çekimin hatası da popup açar: sessiz kalınca fotoğraf uyarısız siliniyordu.
         .idErrorAlert($viewModel.errorMessage, onDismiss: { viewModel.consumePendingAlertAction() })
+        // Kamera ayrı bir sayfada açılır; ekran koruması açıksa ayrıca sarılır.
         .fullScreenCover(item: $scannerSide) { side in
             IdCardScannerCover(side: side) { document in
                 scannerSide = nil
@@ -92,6 +93,7 @@ struct IdCardCustomView: View {
                 if side == .back { viewModel.scanBack(document: document) }
                 else { viewModel.scanFront(document: document) }
             }
+            .sdkScreenCaptureProtected()
         }
         .onAppear {
             viewModel.onSkipRequested = { coordinator.skipCurrentModule() }

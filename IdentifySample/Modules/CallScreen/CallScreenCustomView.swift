@@ -25,6 +25,8 @@
 //    endCallEnabled + terminateCall(coordinator:)   görüşmeyi bitir
 //    showNFCEdit + saveAndRestartRemoteNFC(...)     panelin istediği MRZ düzeltmesi
 //    showSignLangGate + signLangCompleted()         işaret dili tercihi
+//    showNoSignLanguageAgent + confirmNoSignLanguageAgent(coordinator:)   işaret dili bilen temsilci yok
+//                                                   (yalnız kuyrukta; okunmazsa müşteri kuyrukta bekler)
 //    showLostConnection + handleReconnectCompleted / handleReconnectCompletedWithStatus
 //    socketThankYouStatus  → coordinator.advanceToNextModule()
 //    directThankYouStatus  → viewModel.finishSDKForDirectThankYou(); coordinator.pushThankYouDirectly(status:)
@@ -104,11 +106,30 @@ struct CallScreenCustomView: View {
                 }
             ]
         ))
+        // İşaret dili bilen temsilci yok: tek düğmeli bildirim, yalnız kuyrukta beklerken.
+        // Dışarı dokunmak kapatmaz; "Tamam" oturumu bitirir (sonuç .cancelled / .noSignLanguageAgent).
+        .idAlert(isPresented: Binding(
+            get: { viewModel.showNoSignLanguageAgent && viewModel.callState == .waiting },
+            set: { _ in }
+        ), alert: IDAlertModel(
+            type: .info,
+            title: String(.callNoSignLanguageAgentTitle),
+            message: String(.callNoSignLanguageAgentDesc),
+            actions: [
+                IDAlertAction(title: String(.coreOk), style: .primary) {
+                    viewModel.confirmNoSignLanguageAgent(coordinator: coordinator)
+                }
+            ]
+        ))
+        // Her sayfa ayrı bir görünüm hiyerarşisidir: ekran koruması açıksa
+        // (`IdentifyManager.shared.screenCaptureProtectionEnabled`) içerikleri ayrıca sarılır.
         .sheet(isPresented: $viewModel.showNFCEdit) {
             CallNFCEditCustomSheet(viewModel: viewModel)
+                .sdkScreenCaptureProtected()
         }
         .fullScreenCover(isPresented: $viewModel.showSignLangGate) {
             SignLangCustomView { viewModel.signLangCompleted() }
+                .sdkScreenCaptureProtected()
         }
         .fullScreenCover(isPresented: $viewModel.showLostConnection) {
             LostConnectionCustomView(
@@ -118,6 +139,7 @@ struct CallScreenCustomView: View {
                         isWaitingRoom: isWaitingRoom, statusType: statusType, coordinator: coordinator)
                 }
             )
+            .sdkScreenCaptureProtected()
         }
     }
 
