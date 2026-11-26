@@ -1,7 +1,7 @@
 # ThankYou — Sonuç Ekranı
 
-Akışın son durağı. Kullanıcıya KYC sürecinin sonucunu gösterir: başarıyla tamamlandı,
-reddedildi ya da cevapsız çağrı. **Tamamen pasiftir** — hiçbir soket/HTTP çağrısı yapmaz;
+Akışın son durağı. Kullanıcıya KYC sürecinin sonucunu gösterir: tamamlandı ya da
+tamamlanamadı. **Tamamen pasiftir** — hiçbir soket/HTTP çağrısı yapmaz;
 bu yüzden özelleştirme riski en düşük ekrandır.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
@@ -21,16 +21,21 @@ bu yüzden özelleştirme riski en düşük ekrandır.
 
 ## İki Biçimde Gelir
 
-- **Statüsüz** — `SDKThankYouView()`: `manager.kycIsCompleted`'a göre genel başarı/başarısızlık.
-- **Statülü** — `SDKThankYouView(status:)`: görüşme sonucu (pozitif/negatif/cevapsız).
-  CallScreen, sonucu `coordinator.pendingThankYouStatus`'a yazar; statü rotaya gömülür.
+- **Statüsüz** — `SDKThankYouView()`: `.completed` ekranını çizer (`init(status:)` varsayılanı).
+- **Statülü** — `SDKThankYouView(status:)`: görüşme sonucu (`.completed` / `.notCompleted`).
+  Panel karar verince ya da kullanıcı görüşmeyi bitirince CallScreen ekranı
+  `coordinator.pushThankYouDirectly(status:)` ile açar.
+  Görüşme soketten bitince sonucu `coordinator.pendingThankYouStatus`'a yazar; statü rotaya gömülür.
 
 ```swift
-public enum ThankYouStatus: Hashable {
-    case completed        // genel başarı
-    // ... görüşme sonuç varyantları (pozitif / negatif / missed) ...
+public enum ThankYouStatus: Hashable, Sendable {
+    case completed      // Başarılı tamamlama
+    case missedCall     // Çağrı cevapsız (3.3.0'da SDK bu statüyü üretmez)
+    case notCompleted   // Tamamlanamadı
 }
 ```
+
+Cevapsız çağrıda SDK kullanıcıyı bekleme odasına döndürür; `.thankYou(.missedCall)` rotası açılmaz.
 
 ---
 
@@ -59,7 +64,7 @@ case .thankYou(let status):
 
 > **Çalışan tam örnek:** [ThankYouCustomView.swift](ThankYouCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için dört rota değerinin hepsini kaydedin (`.thankYou(nil)`, `.completed`, `.missedCall`, `.notCompleted`); örnek: [CustomScreens.swift](../CustomKit/CustomScreens.swift)
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 ```swift
@@ -88,10 +93,10 @@ public init(status: ThankYouStatus = .completed)
 |---|---|---|
 | `status` | `ThankYouStatus` | Gösterilen sonuç |
 | `isSelfieIdentification` | `Bool` | Selfie-only kimlik akışı mıydı |
-| `kycCompleted` | `Bool` | KYC tamamlandı mı |
+| `kycCompleted` | `Bool` | Ekran açılmadan önce KYC tamamlanmış mıydı (`manager.kycIsCompleted`; VM açılışta bunu `true` yapar) |
 
 Bu VM'in **girdi metodu veya çıktı closure'u yoktur** — terminal ekrandır. Modül sırası
-tükendiğinde SDK bağlantıyı kendisi kapatır (`disconnect()`); ekrandan sonra
+tükendiğinde SDK bağlantıyı kendisi kapatır (kod 4100, `flowCompleted`); ekrandan sonra
 `advanceToNextModule` yoktur.
 
 ---
@@ -115,11 +120,12 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .thankYouTts, language: .t
 - **Bu ekran gösterilmesin istiyorum:** `setupSDK(showThankYouPage: false)` — hiçbir çıkış
   yolunda (akış sonu, panel kararı, modül hatası, kullanıcının görüşmeyi bitirmesi) açılmaz;
   SDK bulunduğu ekrandan aşağı kayarak kapanır ve sonuç `onFinished`'a gelir. Parametre
-  verilmezse varsayılan `true`'dur. Yönlendirme kalıpları:
+  verilmezse varsayılan `true`'dur. İstisna `quitSDK`: bu ayara bakmadan ThankYou ekranını
+  döndürür; `false` verdiyseniz dönen ekranı göstermeyin. Yönlendirme kalıpları:
   [Oturum Çıkışları](../../../docs/guides/session-exit.md#9-kapanıştan-sonra-yönlendirme--kodu-nereye-yazacağım).
 - **Ekrandayken sonucu okumak:** `IdentifyManager.shared.lastFlowOutcome` — ThankYou açıldığında
   sonuç bildirilmiştir (`result`, `reason`, panelin `terminateReason` / `statusSummary`'si).
 - **Özelleştirmesi risksiz mi?** Evet — pasif olduğundan yerine/arasına ne koyarsanız koyun
   akış bozulmaz.
-- **Kapanış kim yapar?** KYC sonrası `disconnect`/`closeSDK` SDK tarafında, ekrandan
-  bağımsız yönetilir.
+- **Kapanış kim yapar?** SDK yapar; ekran bunu tetiklemez. Akış sonunda bağlantı 4100
+  (`flowCompleted`) koduyla kapanır.

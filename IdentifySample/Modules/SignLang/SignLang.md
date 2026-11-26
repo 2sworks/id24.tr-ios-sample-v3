@@ -19,7 +19,8 @@ bir adım.
 | ViewModel    | `SDKSignLangViewModel`                                                |
 | Dış dünya    | **Soket** (`sendStep`)                                                |
 
-Kapının görünmesi için `setupSDK(signLangSupport: true)` verilmelidir.
+Kapının görünmesi için `setupSDK(signLangSupport: true)` verilmeli ve `signLangPreference`
+boş (`nil`) bırakılmalıdır.
 
 ---
 
@@ -29,7 +30,10 @@ Kapının görünmesi için `setupSDK(signLangSupport: true)` verilmelidir.
 IdentifyManager.shared.setupSDK(
     identId: identId,
     baseApiUrl: baseApiUrl,
-    networkOptions: SDKNetworkOptions(),
+    networkOptions: SDKNetworkOptions(timeoutIntervalForRequest: nil,
+                                      timeoutIntervalForResource: nil,
+                                      useSslPinning: false),
+    kpsData: nil,
     signLangSupport: true,          // görüşme ekranı açılınca kapı gösterilir
     ...
 )
@@ -43,6 +47,9 @@ IdentifyManager.shared.setupSDK(
 - Toggle varsayılan olarak **kapalı** gelir (`isSignLangEnabled = false`). `setupSDK`'da bunu
   önceden açan bir parametre yoktur; açık gelmesini istiyorsanız kendi ekranınızda
   `vm.isSignLangEnabled = true` atayın.
+- Tercihi kendi ekranınızda topladıysanız `setupSDK(signLangPreference:)` verin (ya da
+  `setupSDK`'dan sonra, görüşmeden önce `IdentifyManager.shared.signLangPreference` atayın).
+  Kapı açılmaz, değer `sign_language` olarak gider. `setupSDK` bu değeri her oturumda sıfırlar.
 
 ## Sunucuya Giden Veri
 
@@ -63,7 +70,7 @@ Tercih, `stepChanged` aksiyonunun `steps` nesnesinde `sign_language` alanıyla g
 
 | Alan | Tip | Değer |
 |---|---|---|
-| `steps.sign_language` | `Bool` | Kullanıcı toggle'ı açıp **Devam**'a bastıysa `true`, aksi hâlde `false` |
+| `steps.sign_language` | `Bool` | `signLangPreference` verildiyse o değer; verilmediyse kullanıcı toggle'ı açıp **Devam**'a bastıysa `true`, aksi hâlde `false` |
 
 Temsilci havuzu seçimi bu alana göre sunucu tarafında yapılır.
 
@@ -91,13 +98,15 @@ Simge: `SDKTheme` ikonu `.signLang` (`person.wave.2.fill`).
 VM o kadar küçük ki tamamını gösterebiliriz:
 
 ```swift
+@MainActor
 public final class SDKSignLangViewModel: SDKBaseModuleViewModel {
     @Published public var isSignLangEnabled: Bool = false
 
-    public func continueAction(onFinish: @escaping () -> Void) {
+    public func continueAction(onFinish: @escaping @MainActor () -> Void) {
         manager.connectToSignLang = isSignLangEnabled
+        manager.signLangPreference = isSignLangEnabled   // kapı geçildi
         manager.sendStep()        // [SOKET] tercihi backend'e bildir
-        onFinish()
+        onFinish()                // (log ve rapor satırları gösterilmedi)
     }
 }
 ```
@@ -116,6 +125,7 @@ public final class SDKSignLangViewModel: SDKBaseModuleViewModel {
 isSignLangEnabled = true/false           (kullanıcı tercihi)
 continueAction(onFinish:)
    → manager.connectToSignLang = isSignLangEnabled
+   → manager.signLangPreference = isSignLangEnabled
    → manager.sendStep()                  [SOKET]
    → onFinish()                          → CallScreen.signLangCompleted() / kapıyı kapat
 ```
@@ -126,7 +136,7 @@ continueAction(onFinish:)
 
 > **Çalışan tam örnek:** [SignLangCustomView.swift](SignLangCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Bu ekran bir rota değildir; özel görüşme ekranı ([CallScreenCustomView.swift](../CallScreen/CallScreenCustomView.swift)) içinden açılır.
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 Toggle'ınız nasıl görünürse görünsün, tercih **mutlaka** `continueAction`'dan geçmeli:
@@ -186,7 +196,7 @@ Genel bilgi: [ReadAloud](../ReadAloud.md)
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
-- **Kapı hiç görünmüyor:** `signLangSupport: true` verilmiş mi? Kapıyı CallScreen açar
-  (`checkSignLangIfNeeded()`); tek başına bir rota yoktur.
+- **Kapı hiç görünmüyor:** `signLangSupport: true` verilmiş mi? `signLangPreference` verildiyse
+  kapı açılmaz. Kapıyı CallScreen açar (`checkSignLangIfNeeded()`); tek başına bir rota yoktur.
 - **Kuyruk etkisi:** İşaret dili seçen kullanıcı normal görüşme kuyruğuna düşmez —
   doğru temsilci havuzuna yönlendirilir.

@@ -25,10 +25,15 @@ Bu modül aynı zamanda Default UI geçişinin pilotuydu; **composition desenini
 
 ## Kullanıcı Ne Yaşar?
 
-1. Ön kamera açılır; kullanıcı yüzünü çerçeveye alır ve fotoğrafı çeker.
-2. SDK cihazda yüz arar — yüz yoksa (ya da birden fazla yüz varsa) uyarı çıkar, yeniden çekilir.
-3. Yüz doğrulanınca görsel yüklenir; "Devam" aktifleşir.
-4. Sunucudaki karşılaştırma hakkı tükenir ve atlamaya izin varsa adım atlanabilir.
+1. Ön kamera açılır; kullanıcı yüzünü ovale oturtup kısa süre sabit tutar, fotoğraf
+   kendiliğinden çekilir.
+2. Fotoğraf önizlemede gösterilir; kullanıcı onaylar ya da yeniden çeker.
+3. Onaydan sonra SDK cihazda yüz arar. Yüz yoksa ya da birden fazla yüz varsa uyarı çıkar,
+   yeniden çekilir.
+4. Yüz bulununca görsel yüklenir ve sunucuda kimlik fotoğrafıyla karşılaştırılır. Eşleşirse akış
+   kendiliğinden ilerler; eşleşmezse mesaj çıkar ve çekim baştan başlar.
+5. Karşılaştırma hakkı tükenirse mesaj kapanınca adım atlanır (atlamaya izin varsa) ya da akış
+   başarısız biter.
 
 ---
 
@@ -40,7 +45,7 @@ Hiçbir şey yazmayın; rota gelince `SDKSelfieView` çizilir.
 
 > **Çalışan tam örnek:** [SelfieCustomView.swift](SelfieCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.selfie) { SelfieCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 Kamera ve UI sizin. Kameranızın karelerini VM'e verirseniz **canlı yönlendirme ve otomatik
@@ -77,7 +82,10 @@ struct MySelfieView: View {
         }
         .onChange(of: vm.shouldAutoCapture) { if $0 { camera.takePhoto { vm.presentCaptured(image: $0) } } }
         .onChange(of: vm.canContinue) { if $0 { coordinator.advanceToNextModule() } }   // ✅
-        .onAppear { vm.onSkipRequested = { coordinator.skipCurrentModule() } }
+        .onAppear {
+            vm.onSkipRequested = { coordinator.skipCurrentModule() }
+            vm.onFlowFailed = { coordinator.finishFlowAsFailed() }
+        }
     }
 }
 ```
@@ -119,7 +127,8 @@ struct MySelfieView: View {
 ### Closure'lar
 | Üye | Ne zaman |
 |---|---|
-| `onSkipRequested: (() -> Void)?` | Karşılaştırma hakkı tükenip atlamaya izin varsa |
+| `onSkipRequested: (() -> Void)?` | Karşılaştırma hakkı ya da çoklu yüz hakkı (`SDKFaceConfig` `.fail` modunda) tükenip atlamaya izin varsa |
+| `onFlowFailed: (() -> Void)?` | Aynı haklardan biri tükendi ve atlama kapalı. Akışı `coordinator.finishFlowAsFailed()` ile bitirin |
 
 ## Sinyal Zinciri — Perde Arkası
 
@@ -162,10 +171,13 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .selfieTts, language: .tr,
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
-- **Bu modül aynı zamanda yedektir:** cihazda TrueDepth kamera yoksa `livenessDetection` ve
+- **Bu modül aynı zamanda yedektir:** cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth kamera
+  yok, çip A11 ya da öncesi) `livenessDetection`, seçilen
+  [TrueDepth modunda](../SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) çalışamıyorsa
   `selfieWithLiveness` yerine bu modül konur (varsayılan `faceTrackingFallback = .selfie`) —
   doğrulama yine yüz üzerinden yapılır, çekilen kare kimlik fotoğrafıyla karşılaştırılır.
-  Akışta selfie zaten varsa ikinci bir adım eklenmez.
+  Sunucu listesinde selfie, yerine geçtiği modülden önce geliyorsa ikinci bir adım eklenmez.
+  Selfie sonra geliyorsa akışta iki selfie adımı olur.
   Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
 - **Tablet yerleşimi:** yüz ovali pencere genişliğiyle birlikte büyümez;
   `SDKLayout.maxFaceGuideWidth` (vars. 560) ile sınırlanır. Kılavuz ile analiz aynı
@@ -175,7 +187,8 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .selfieTts, language: .tr,
   `reset()` ile yeniden çekime yönlendirin (ışık ve tek-yüz koşulunu hatırlatın).
 - **Birden fazla yüz:** SDK yalnızca **tek yüz** algılandığında ilerletir (2.3.15+).
 - **Deneme hakkı:** `selfie_comparison_count` sunucudan gelir; custom ekranınızda
-  `onSkipRequested`'ı bağlamayı unutmayın — yoksa hak tükenince kullanıcı sıkışır.
+  `onSkipRequested`'ı ve `onFlowFailed`'ı bağlamayı unutmayın. Bağlamazsanız hak tükenince
+  kullanıcı ekranda kalır.
 - **Yardım (?) düğmesi:** 3.3.0'dan beri varsayılan kapalı. Yalnız bu ekranda açmak için
   `SDKTheme.shared.navBar.routeButtons[.selfie] = SDKNavBarButtons(showsHelp: true)`. SDK düğmeye işlev
   bağlamaz, `onHelp` vermezseniz basılınca bir şey olmaz;

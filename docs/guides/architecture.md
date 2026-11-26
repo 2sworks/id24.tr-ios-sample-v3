@@ -48,10 +48,15 @@ Bir KYC oturumu şu adımlardan geçer:
 4. SDK, `modules` listesinden `modulesControllersArray` ve `identifyModules` dizilerini oluşturur
    (`addWebModules` → `addModules`).
 5. Soket bağlanır, gerekiyorsa token ile (`socket_auth`). Ayrıntı: [WebSocket](websocket.md).
-6. `coordinator.start()`: ilk modülün rotası `path`'e eklenir ve ekran açılır.
+6. `coordinator.start()`: oda kaydı onaylanınca ilk modülün rotası `path`'e eklenir ve ekran
+   açılır. Beklerken `isWaitingForRoom` true olur; onay süresinde gelmezse akış başlamaz ve
+   `roomBlockKind` `.waitTimeout` olur.
 7. Modüller sırayla ilerler. Bir modül bittiğinde `advanceToNextModule()` çağrılır, SDK backend'e
    adım sinyali gönderir ve sıradaki ekran açılır.
-8. Akış ThankYou ekranında biter ve sonucu (başarılı, reddedildi ya da beklemede) gösterir.
+8. Akış ThankYou ekranında biter. Ekran oturumun tamamlandığını ya da tamamlanamadığını gösterir.
+   Cevapsız çağrı akışı bitirmez, kullanıcı bekleme odasına döner. Onay ya da ret gibi ayrıntılı
+   sonuç host'a `onFlowFinished` ile `SDKFlowOutcome` olarak gelir
+   ([Oturum Çıkışları](session-exit.md)).
 
 ---
 
@@ -93,9 +98,10 @@ VM'ler yapar. Bu kuralın adı ["bypass yok" kuralı](customization.md#bypass-yo
 | Üye | Görev |
 |---|---|
 | `prepareForSetup()` | `setupSDK`'dan önce çağrılır; yer tutucu controller'ları kaydeder |
-| `start()` | İlk modülü açar |
+| `start()` | Oda kaydı onaylanınca ilk modülü açar |
 | `advanceToNextModule()` | Sıradaki modüle geçer. Araya eklenmiş custom ekran varsa önce onu açar |
 | `skipCurrentModule()` | Modülü atlar (`manager.skipModule()` ve ardından ilerleme) |
+| `finishFlowAsFailed()` | Oturumu başarısız kapatır (sonuç `.notCompleted`, neden `.moduleFailed`) ve bitiş ekranını açar. Kendi ekranınızda modülün `onFlowFailed` kapanışına bağlayın |
 | `insert(_:before:)` / `insert(_:after:)` | Bir rotanın önüne ya da arkasına custom ekran ekler. Eklenen ekran `advanceExternal()` ile ilerler |
 | `appendModules(_:)` / `appendModules(moduleList:)` | Akışın sonuna yeni SDK modülü ekler. Dallanan senaryolar için; `progressTotal` kendiliğinden güncellenir |
 | `showExternalScreen(_:)` / `advanceExternal()` | O an bir custom ekran gösterir / custom ekrandan akışa devam eder. Ayrıntı: [Özelleştirme, advanceExternal](customization.md#ara-ekrandan-ilerlemek-advanceexternal) |
@@ -264,14 +270,18 @@ Kullanıcı ara ekrana geri dönüp oradan yeniden ilerlerse aynı ekran bir kez
 
 ## Modüllerin Dış Dünya Bağımlılıkları
 
-Modüllerin hepsi aynı altyapıyı kullanmıyor; bazıları tamamen cihazda çalışıyor:
+Modüllerin hepsi aynı altyapıyı kullanmıyor; bazıları işin büyük kısmını cihazda yapıyor:
 
 | Bağımlılık | Modüller |
 |---|---|
-| Yalnızca cihaz üzerinde (soket yok) | IdCard (OCR), IdCardOVD, Selfie, Liveness (kare analizi), Prepare (izinler) |
+| Cihaz üzerinde işlenir | IdCard (OCR), IdCardOVD, Selfie, Liveness (kare analizi) |
 | HTTP upload (sonuç sunucuya gider) | IdCard, IdCardOVD, NFC, Selfie, Liveness, Signature, VideoRecorder, AddressConfirm |
 | Soket sinyali (adım/durum bildirimi) | Prepare, SignLang, Speech, CallScreen |
 | WebRTC (canlı görüntü + data channel) | CallScreen |
+
+ThankYou dışında her modül açılınca soketten adım bildirir (`stepChanged`; kimlik ve OVD'de belge
+tipi seçilince). Yükleme sonuçları ve NFC durumu da soketten gider. Soket kapalıyken
+`advanceToNextModule()` sonraki modüle geçmez, yeniden bağlanma ekranı açılır.
 
 ThankYou ve sizin tanıtım ya da başarı ekranlarınız gibi pasif ekranlar hiçbir sinyal göndermez.
 Bunları akışın herhangi bir yerine güvenle ekleyebilirsiniz.

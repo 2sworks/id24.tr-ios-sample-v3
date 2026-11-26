@@ -14,9 +14,9 @@ Köprünün iskelet dosyaları bu klasörde.
 ### iOS native bağımlılığı
 `ios/Runner.xcworkspace` → **File → Add Packages** →
 `https://github.com/2sworks/id24.tr-ios-sdk-spm`
-(XCFramework + OpenSSL/WebRTC/SwiftSignatureView/PermissionsKit).
+(XCFramework + OpenSSL ve WebRTC). Uygulama target'ının iOS Deployment Target'ı en az 15.0 olmalı.
 
-Dependency Rule'u `Exact Version` yapın (ör. `3.0.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
+Dependency Rule'u `Exact Version` yapın (ör. `3.3.0`). 2.x ve 3.x aynı depodan dağıtılıyor;
 Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı için yanlış sürümü
 çekebilir. Ayrıntı: [ana README §1](../../../README.md#1-paketi-ekleyin-swift-package-manager).
 
@@ -25,8 +25,12 @@ Xcode'un varsayılan *Up to Next Major* kuralı en son etiketten başladığı i
 ```xml
 <key>NSCameraUsageDescription</key><string>Kimlik doğrulama için kamera</string>
 <key>NSMicrophoneUsageDescription</key><string>Görüntülü görüşme için mikrofon</string>
+<key>NSSpeechRecognitionUsageDescription</key><string>Sesli doğrulama için konuşma tanıma</string>
 <key>NFCReaderUsageDescription</key><string>Kimlik/pasaport çipi okuma</string>
+<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+<array><string>A0000002471001</string></array>
 ```
+NFC için `*.entitlements` dosyasına ayrıca `com.apple.developer.nfc.readersession.formats` → `TAG` ekleyin.
 
 ### Köprü dosyaları
 | Dosya | Konum | Görev |
@@ -42,11 +46,11 @@ Plugin'in Dart'a açtığı metotlar:
 
 | Dart | Native karşılığı | Ne zaman |
 |---|---|---|
-| `IdentifySdk.setTheme(map)` → `unknownKeys` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan önce. Hot reload yeterli, derleme gerekmez |
-| `IdentifySdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | SDK varsayılanlarına dönmek için |
-| `IdentifySdk.setupSDK(...)` | `IdentifyManager.shared.setupSDK(...)` + akışı sunar | Akışı başlatır |
-| `IdentifySdk.events` (`Stream<SDKEvent>`) | `SDKEventListener` → `EventChannel` | Önce `listen`, sonra `setupSDK` |
-| `IdentifySdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | Kullanıcı akışı Dart tarafında terk ettiğinde |
+| `sdk.setTheme(map)` → `unknownKeys` | `SDKTheme.shared.apply(dict)` | `setupSDK`'dan önce. Hot reload yeterli, derleme gerekmez |
+| `sdk.resetTheme()` | `SDKTheme.shared.resetAppearance()` | Renk, yazı tipi, ölçü ve bileşen ayarlarını varsayılana döndürür. `icons` ile verilen görseller kalır |
+| `sdk.setupSDK(...)` | `IdentifyManager.shared.setupSDK(...)`. Akışı sunmaz, sunumu native tarafta yaparsınız | Oturumu açar |
+| `sdk.events` (`Stream<SDKEvent>`) | `SDKEventListener` → `EventChannel` | Önce `listen`, sonra `setupSDK` |
+| `sdk.reportAbandoned(reason)` | `IdentifyManager.shared.reportSessionAbandoned(reason:)` | Kullanıcı akışı Dart tarafında terk ettiğinde. Yalnız olay yayar, oturumu kapatmaz |
 
 ### Örnek uygulamadan kopyalanacaklar (iOS tarafı)
 
@@ -103,7 +107,7 @@ final result = await sdk.setupSDK(SetupOptions(
   signLangSupport: false,
   nfcMaxErrorCount: 3,
   selectedModules: const [],     // boş = backend sırası
-  showThankYouPage: true,        // false: sonuç ekranı yok, SDK kapanır — sonucu 'session.finished' ile alın
+  showThankYouPage: true,        // verilmezse köprü false gönderir. false: sonuç ekranı yok, SDK kapanır — sonucu 'session.finished' ile alın
 ));
 
 // 3) Temizlik
@@ -131,7 +135,7 @@ SDK'nın hazır ekranlarının görünümünü Dart'tan ayarlarsınız. Renk, lo
 yeniden derlemeniz gerekmez; hot reload yeterli.
 
 ```dart
-final unknownKeys = await IdentifySdk.instance.setTheme({
+final unknownKeys = await sdk.setTheme({
   'colors': {
     'primary': '#0F172A',
     'pageBackground': {'light': '#F8FAFC', 'dark': '#0B1120'},
@@ -146,11 +150,14 @@ final unknownKeys = await IdentifySdk.instance.setTheme({
 });
 
 if (unknownKeys.isNotEmpty) debugPrint('Tema: tanınmayan anahtar $unknownKeys');
+// Değer hatalarının çoğu bu listede görünmez; geçersiz değer varsayılana ya da eski değere döner.
 
-await IdentifySdk.instance.resetTheme();   // SDK varsayılanlarına dön
+await sdk.resetTheme();   // renk, yazı tipi, ölçü ve bileşen ayarları varsayılana döner; icons kalır
 ```
 
-Renkler `'#RRGGBB'` ya da `{'light': ..., 'dark': ...}` olarak, köşeler `'capsule'` ya da sayı
+Renkler `'#RRGGBB'` olarak verilir. `{'light': ..., 'dark': ...}` yalnız rol renklerinde
+(`pageBackground`, `headerBackground` vb.) ve `fields`, `sheets` renklerinde geçerlidir; marka
+paletinde (`primary`, `success`, `error` …) `dark` yok sayılır. Köşeler `'capsule'` ya da sayı
 olarak verilir. Bölümler: `colors`, `fonts`, `metrics`, `buttons`, `navBar`, `selection`, `alerts`,
 `banners`, `fields`, `sheets`, `capture`, `controls`, `call`, `motion`, `icons`.
 Bütün anahtarlar: [Tema Rehberi](../../guides/theming.md) ·
@@ -183,13 +190,14 @@ SDKHapticConfig.shared.stepFeedbackIntensity = 0.6      // 0…1
 |---|---|
 | `faceTrackingFallback` | Cihaz ARKit yüz takibini desteklemiyorsa (TrueDepth kamerası olmayan A11 ve öncesi). `livenessDetection` / `selfieWithLiveness` yerine ne konacağını belirler: `.selfie` (varsayılan) ya da `.skip` |
 | `selfieWithLivenessTrueDepth` | Selfie + canlılık ekranının derinlik kamerasını nasıl kullanacağı: `.automatic` (varsayılan), `.required` (yalnızca TrueDepth kamerası olan cihazlarda), `.disabled` (ARKit kullanılmaz, Vision ile her cihazda çalışır ama derinlik kontrolü olmaz). [Ayrıntı](../../../IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md#truedepth-modu) |
-| NFC | iPad'de ve NFC'siz iPhone'larda modül kendiliğinden çıkarılır ve panele `NFCStatus = notAvailable` gider. Kullanıcıya bilgi sayfası göstermek için `setupSDK(..., showNFCNotFoundPage: true)` |
+| NFC | iPad'de ve NFC'siz iPhone'larda modül kendiliğinden çıkarılır ve panele `NFCStatus = notAvailable` gider. `setupSDK(..., showNFCNotFoundPage: true)` verilirse modül akışta kalır ve NFC ekranı açılır (ayrı bilgi sayfası yok) |
 | `SDKHapticConfig` | Çekim sırasındaki artan titreşim ve canlılık adımlarındaki titreşim; ikisi de kapatılabilir |
 
-Dart tarafında bu durumları olaylardan takip edersiniz: atlanan adım `module.<Modül>.skipped`
-olarak gelir.
+Dart tarafında bu durumları olaylardan takip edersiniz: yüz takibi yoksa atlanan adım
+`module.<Modül>.skipped`, NFC yoksa `module.Mrz & Nfc Screen.notFound` olarak gelir.
 
-SDK iPhone ve iPad'de çalışır; ekran ikisinde de dikey konuma kilitlidir.
+SDK iPhone ve iPad'de çalışır. Ekranlar dikey konuma göre tasarlandı, yönü SDK kilitlemez;
+dikey kalması için Info.plist'te yalnız dikey konumu seçin.
 Ayrıntı: [iPad Desteği](../../guides/ipad-support.md).
 
 ---
@@ -204,7 +212,7 @@ class SDKEvent {
   final String name;             // "session.started", "module.Selfie.completed" ...
   final SDKEventCategory category;
   final SDKEventStatus status;
-  final String? module;          // "Selfie", "Mrz & Nfc Screen" ...
+  final String? module;          // "Selfie", "Mrz & Nfc Screen" ...; error.shown'da kısa ad ("nfc")
   final String? screen;          // kullanıcının o anki/son ekranı
   final String sessionId;
   final int timestampMs;
@@ -222,12 +230,15 @@ class SDKEvent {
 | `module.<Modül>.completed` | module | Modül bittiğinde | Adım başarıyla tamamlandı |
 | `module.<Modül>.failed` | module | Modül hata verdiğinde | Adım başarısız |
 | `module.<Modül>.skipped` | module | Modül atlandığında | Adım atlandı |
-| `call.connected` | call | Çağrı başladığında | Görüşme başladı |
-| `call.ended` | call | Çağrı bittiğinde | Görüşme bitti (metadata['statusSummary']) |
+| `module.<Modül>.notFound` | module | Cihazda NFC yoksa | Adım bu cihazda yapılamaz |
+| `call.connected` | call | Çağrı çalmaya başladığında | Temsilci arıyor; kullanıcı yanıtlamasa da gelir |
+| `call.ended` | call | Sunucudan `endCall` ya da `terminateCall` geldiğinde | Görüşme bitti. `metadata['reason']` ve `metadata['statusSummary']` yalnız `terminateCall`'da dolar |
 | `session.finished` | session | Oturum nasıl biterse bitsin, bir kez | Nihai sonuç: `metadata['result']`, `endReason`, `terminateReason`, `statusSummary`, `lastModule` (3.1.0) |
 | `session.completed` | session | `result == approved` | Oturum başarıyla kapandı (status `success`) |
 | `session.failed` | session | `rejected` · `neutral` · `notCompleted` · `error` | Oturum başarısız kapandı |
 | `session.abandoned` | session | `cancelled` | Kullanıcı ya da host çıktı (metadata['lastScreen'] kullanıcının kaldığı ekran) |
+
+Görüntülü görüşme adımının `module.Call Wait Screen.<durum>` olaylarının kategorisi `call`.
 
 Metadata anahtarlarının tamamı: [Event Sistemi → Oturum Sonucu Olayları](../../guides/events.md#oturum-sonucu-olayları-310) · bütün çıkış yolları ve kapanıştan sonra yönlendirme: [Oturum Çıkışları](../../guides/session-exit.md#95-react-native--flutter).
 

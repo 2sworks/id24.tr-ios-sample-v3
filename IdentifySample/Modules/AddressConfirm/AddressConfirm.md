@@ -1,8 +1,8 @@
 # AddressConfirm — Adres Onayı
 
-Kullanıcı ikamet adresini yazar ve kanıt olarak bir belge ekler — kamerayla çekilmiş bir
-**fotoğraf** ya da bir **PDF** (ör. e-Devlet ikametgâh belgesi). "Gönder" ile adres + belge
-tek istekte sunucuya yüklenir.
+Kullanıcı ikamet adresini yazar ve kanıt olarak bir belge ekler — kamerayla çekilmiş ya da
+galeriden seçilmiş bir **fotoğraf** veya bir **PDF** (ör. e-Devlet ikametgâh belgesi).
+"Devam Et" ile adres + belge tek istekte sunucuya yüklenir.
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -21,9 +21,9 @@ tek istekte sunucuya yüklenir.
 
 ## Kullanıcı Ne Yaşar?
 
-1. Adresini metin alanına yazar (en az 10 karakter).
-2. "Belge ekle" ile kaynağını seçer: kamerayla tara **veya** dosyalardan PDF seç.
-3. Adres geçerli + belge ekli olunca "Gönder" aktifleşir; yükleme biter, akış ilerler.
+1. Adresini metin alanına yazar (alan boş kalamaz).
+2. "Belge ekle" ile kaynağını seçer: kamerayla tara, galeriden fotoğraf seç **veya** dosyalardan PDF seç.
+3. Adres geçerli + belge ekli olunca "Devam Et" aktifleşir; yükleme biter, akış ilerler.
 
 ---
 
@@ -35,11 +35,11 @@ Hiçbir şey yazmayın; rota gelince `SDKAddressConfirmView` çizilir.
 
 > **Çalışan tam örnek:** [AddressConfirmCustomView.swift](AddressConfirmCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.addressConfirm) { AddressConfirmCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
-Sample App'te bu modülün canlı bir override örneği zaten vardır
-(`AddressConfirmExample`, kayıt yeri: `RootView.configureIfNeeded`):
+Örnek uygulamada bu rotanın kaydı `CustomScreens.register(in:)` içindedir
+(`RootView.configureIfNeeded` çağırır). Kendi ekranınız için en kısa kayıt:
 
 ```swift
 registry.override(.addressConfirm) { MyAddressView() }
@@ -92,7 +92,7 @@ aynı şekilde: seçilen görseli `photoSelected(_:)` ile verin. PDF sınırı: 
 ### Hesaplanan
 | Üye | Anlam |
 |---|---|
-| `isAddressValid: Bool` | Adres ≥ 10 karakter mi |
+| `isAddressValid: Bool` | Adres boş değil mi (`count >= 1`) |
 | `canSubmit: Bool` | Adres geçerli **ve** (foto veya PDF) var mı |
 | `maxPDFSizeMB: Int` | İzinli en büyük PDF (`manager.maxAddressPDFFileSize`) |
 
@@ -104,7 +104,7 @@ aynı şekilde: seçilen görseli `photoSelected(_:)` ile verin. PDF sınırı: 
 | `photoSelected(_ image: UIImage)` | Seçilen fotoğrafı set eder |
 | `pdfSelectedFromURL(_ url: URL)` | URL'den PDF yükler |
 | `pdfSelected(_ data: Data, preview: UIImage?)` | PDF verisini set eder |
-| `submit()` | Adres + belgeyi yükler → `onCompleted` |
+| `submit()` | Adres + belgeyi yükler → `onCompleted`. `canSubmit`'i kendisi denetlemez; kendi ekranınızda çağırmadan önce `canSubmit`'e bakın. Belge yokken çağrılırsa hiçbir şey gönderilmez ve `isLoading` `true` kalır |
 
 ### Closure'lar
 | Üye | Ne zaman |
@@ -133,7 +133,10 @@ final class AddressHostViewModel: HostModuleViewModel {
         sdk.onCompleted = { [weak self] in self?.log("address_done") }
     }
     var canSubmit: Bool { sdk.canSubmit }
-    func submit() { sdk.submit() }
+    func submit() {
+        guard sdk.canSubmit else { return }   // submit() canSubmit'e bakmaz
+        sdk.submit()
+    }
 }
 ```
 
@@ -166,8 +169,13 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .addressConfirmTts, langua
 ## Sık Sorulanlar & Dikkat Edilecekler
 
 - **Foto mu PDF mi?** Biri yeterli — ikisi aynı anda gerekmez.
-- **"Gönder" pasif:** Adres 10 karakterin altındaysa `isAddressValid` `false` kalır.
-- **PDF sınırı:** `maxPDFSizeMB` sunucudan gelir; seçimden önce kullanıcıya gösterin.
+- **"Devam Et" pasif:** Düğme `canSubmit` ile açılır. Adres alanı boşsa (`isAddressValid`
+  `false`) ya da belge eklenmediyse `canSubmit` `false` kalır.
+- **PDF sınırı:** `maxPDFSizeMB` SDK'da sabittir: 5 MB (`manager.maxAddressPDFFileSize`).
+  Daha büyük dosyayı `pdfSelected` almaz, `errorMessage`'ı doldurur. Fotoğrafın boyutuna
+  bakılmaz. Sınırı seçimden önce kullanıcıya gösterin. Hazır ekran bunu seçimden önce
+  `addressFileFormats` metniyle beş dilde gösterir (TR: "PDF (en fazla 5 MB), JPG, JPEG, PNG,
+  WEBP, TIFF").
 - **Fotoğraf kalitesi:** SDK, adres belgesini okunaklı kalacak sıkıştırma ayarlarıyla yükler
   (2.5.4'te iyileştirildi) — ekstra sıkıştırma yapmayın.
 - **Belge tarayıcısı:** `openScanner()` ile açılan kamera, SDK'nın gerçek zamanlı tarama

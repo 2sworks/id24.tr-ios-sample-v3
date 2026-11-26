@@ -52,15 +52,17 @@ loc.setOverride(key: .scannerFocusing,   language: .tr, value: "Telefonunu sabit
 | `.scannerReadingId` | Kimlik üzerindeki bilgiler okunuyor | "Kimlik okunuyor…" |
 | `.scannerLockedId` | Çekim yapıldı | "Kimlik tespit edildi" |
 | `.scannerGlare` | Kimlik üzerinde parlama var | "Parlama var — belgeyi ışığa göre hafifçe eğin" |
-| `.scannerManualCapture` | Manuel çekim düğmesi | "Manuel Çek" |
-| `.scannerManualFailTitle` | Otomatik çekim tekrar tekrar başarısız olduğunda | "Otomatik okuma başarısız oldu" |
-| `.scannerCancel` | İptal düğmesi | "İptal" |
+| `.scannerManualCapture` | Manuel çekim düğmesi. Otomatik çekim gecikince ya da üst üste başarısız olunca çıkar | "Manuel Çek" |
 
-## Metni ekranın üst kısmında gösterme (3.2.1+)
+## Metni ekranın üst kısmında gösterme
 
-SDK yönlendirme metnini tarama ekranının altında gösterir. Metni üstte ya da kalın vurgularla
-göstermek için SDK'nın metnini kapatıp kendi görünümünüzde çizin. 3.2.1 öncesinde metin alta
-sabittir, gizlenemez.
+SDK yönlendirme metnini varsayılan olarak tarama ekranının altında gösterir. 3.3.0'dan itibaren
+metni `guidancePosition` ile çerçevenin içine (`.insideFrame`) ya da hemen üstüne (`.aboveFrame`)
+alabilirsiniz ([IdentityScanner rehberi](../guides/identity-scanner.md#yönerge-satırının-yeri-330)).
+Bu yalnız sabit çerçevede çalışır; çerçevenin üstünde yer yoksa metin altta kalır.
+
+Kalın vurgu gibi farklı bir stil için SDK'nın metnini kapatıp kendi görünümünüzde çizin (3.2.1+).
+3.2.1 öncesinde metin alta sabittir, gizlenemez.
 
 **1. SDK'nın metnini kapatın.** Bütün taramalar için:
 
@@ -127,8 +129,9 @@ struct KimlikTaramaEkrani: View {
 
 - `.padding(.top, 120)` değerini fener ve kapatma düğmelerinin altına gelecek şekilde ayarlayın.
 - `.allowsHitTesting(false)` metnin dokunarak odaklamayı engellememesi için.
-- `state`, metinden geriye bulunur. İki durum aynı metni taşıyorsa ilki gelir (`focusing`,
-  `align`'dan önce). Bu yüzden örnek ikisini birlikte ele alır.
+- 3.3.0'dan itibaren `align` ve `focusing` ayrı gelir. 3.2.1'de `state` metinden geriye
+  bulunduğu ve iki durum aynı metni taşıdığı için `focusing` gelir; örnek bu yüzden ikisini
+  birlikte ele alır.
 - `onGuidance` tek fonksiyon tutar. Başka yerde de kullanıyorsanız ekran kapanınca eski değerine
   döndürün.
 - Sesli yönlendirme bu ayardan etkilenmez.
@@ -187,6 +190,10 @@ final class KimlikSuresi {
 Pencere açıkken tarayıcı çalışmayı sürdürür. Kullanıcı pencereyi kapatmadan kimlik okunursa
 `"locked"` gelir ve süre durur; pencereyi kapatmak sizin işiniz.
 
+Tarayıcı her belgede `module` olarak `.idCard` gönderir; adres onayındaki belge taraması da
+`"preparing"` ile başlar. Akışınızda adres onayı da varsa koşula `SDKFlowCoordinator`'ın aktif
+modülünü ekleyin: `coordinator.activeModule == .idCard`.
+
 **Kendi tarama ekranınızla.** Kimlik ekranını `SDKViewRegistry` ile değiştirdiyseniz süreyi ekranın
 kendisi tutar. `pausesDetection: true` kamerayı açık bırakır, taramayı bekletir; `false` olunca
 tarama baştan başlar.
@@ -202,7 +209,8 @@ struct KimlikEkrani: View {
     @State private var cekildi = false
 
     var body: some View {
-        IdentityScannerView(profile: .turkishIDFront, pausesDetection: duraklat) { sonuc in
+        IdentityScannerView(profile: .turkishIDFront, dismissesOnResult: false,
+                            pausesDetection: duraklat) { sonuc in
             if case .success(let belge) = sonuc {
                 cekildi = true
                 onDocument(belge)
@@ -237,7 +245,7 @@ ayarını kullanır; ikisinde de aynı süre isteniyorsa ikisini de ayarlayın.
 |---|---|---|
 | "Kimlik tespit edilemedi" yönergesi | 4 sn | `notDetectedDelay` |
 | "Manuel Çek" düğmesi | 8 sn | `manualCaptureHintDelay` |
-| Zorla elle çekime geçiş | 3 başarısız otomatik çekim | `maxAutoCaptureFails` |
+| "Manuel Çek" düğmesinin süre dolmadan çıkması (otomatik çekim sürer) | 3 başarısız otomatik çekim | `maxAutoCaptureFails` |
 | "Kimlik bilgileri okunamıyor" yönergesi | 2 sn | Sabit, değiştirilemez |
 
 ```swift

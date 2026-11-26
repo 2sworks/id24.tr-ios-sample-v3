@@ -1,7 +1,7 @@
 # Speech — Konuşma Doğrulama
 
 Kullanıcıya bir hedef kelime/metin gösterilir (ör. "Berlin"); kullanıcı bunu mikrofona
-söyler, Apple **Speech** framework'ü **cihaz üzerinde** tanır ve hedefle eşleştirir.
+söyler, Apple **Speech** framework'ü tanır, SDK sonucu cihazda hedefle eşleştirir.
 Amaç, mikrofonun çalıştığını ve karşıda konuşabilen gerçek bir kişinin olduğunu
 görüşme öncesinde kanıtlamaktır. Sonuç, sokete `sendSpeechStatus` ile bildirilir.
 
@@ -20,7 +20,7 @@ görüşme öncesinde kanıtlamaktır. Sonuç, sokete `sendSpeechStatus` ile bil
 | Rota | `SDKModuleRoute.speech` |
 | Drop-in view | `SDKSpeechRecView` |
 | ViewModel | `SDKSpeechRecViewModel` |
-| Dış dünya | Speech framework (cihazda) + **soket** (`sendSpeechStatus`) |
+| Dış dünya | Speech framework + **soket** (`sendSpeechStatus`) |
 | Ses anahtarı | `SpeechTts` |
 
 **İzinler:** `NSSpeechRecognitionUsageDescription` + `NSMicrophoneUsageDescription`.
@@ -28,8 +28,9 @@ görüşme öncesinde kanıtlamaktır. Sonuç, sokete `sendSpeechStatus` ile bil
 ## Kullanıcı Ne Yaşar?
 
 1. Ekranda söylemesi gereken kelimeyi görür.
-2. "Konuş"a basar, kelimeyi söyler; tanınan metin canlı akar.
-3. Eşleşme sağlanınca "Onayla" aktifleşir; onayla sonuç sokete gider ve akış ilerler.
+2. Mikrofon düğmesini basılı tutup kelimeyi söyler; tanınan metin canlı akar.
+3. Düğmeyi bırakınca metin hedefle karşılaştırılır. Eşleşirse "Devam Et" aktifleşir; basınca
+   sonuç sokete gider ve akış ilerler.
 
 ---
 
@@ -41,7 +42,7 @@ Hiçbir şey yazmayın; rota gelince `SDKSpeechRecView` çizilir.
 
 > **Çalışan tam örnek:** [SpeechCustomView.swift](SpeechCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.speech) { SpeechCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 ```swift
@@ -68,8 +69,9 @@ struct MySpeechView: View {
 
 - `targetWord` sunucudan (`speech_expected_sentence`) gelir; sunucu boş gönderirse varsayılan
   `"Berlin"` kalır.
-- **Karşılaştırma cihazda yapılır** (Apple konuşma tanıma + `SDKSpeechMatcher`); sunucuya
-  transkript değil yalnız "tamamlandı" bilgisi gider.
+- **Karşılaştırma cihazda yapılır** (`SDKSpeechMatcher`); sokete yalnız "tamamlandı" bilgisi
+  gider. Tanınan metin SDK loguna yazılır; `.online` ve `.onlineSilent` log seviyelerinde log
+  sunucusuna da gider.
 - `confirmSpeech()` yalnız `speechSuccess` true iken bildirim yapar; öncesinde çağrılırsa
   hiçbir şey göndermez ve ilerlemez. Onay düğmesini yine de `speechSuccess`'e bağlayın.
 
@@ -104,7 +106,7 @@ struct MySpeechView: View {
 ## Sinyal Zinciri — Perde Arkası
 
 ```
-startRecording()  → Speech tanıma (cihazda) → recognizedText / speechSuccess
+startRecording()  → Speech tanıma → recognizedText / speechSuccess
 stopRecording()   → değerlendirme
 confirmSpeech()   → manager.sendSpeechStatus [SOKET] → onCompleted?()
 host: → coordinator.advanceToNextModule() [modulePresented]
@@ -140,8 +142,9 @@ SDKSpeechConfig.shared.audioBundle = Bundle.main
 SDKSpeechConfig.shared.setMode(.customAudio, for: .speech)    // dosya yoksa native'e düşer
 ```
 
-> ⚠️ Bu modülde kullanıcı mikrofona konuşur; sesli okuma yönergeyle çakışabilir.
-> Gerekirse bu modül için `.off` seçin.
+> ⚠️ Hazır ekran yönerge okunurken mikrofonu kilitler. Kendi ekranınızda sesli okuma kayıtla
+> çakışabilir: `SDKSpeechService.shared.isSpeaking` iken kaydı başlatmayın ya da bu modül için
+> `.off` seçin.
 
 Metni ezmek: `SDKLocalization.shared.setOverride(key: .speechTts, language: .tr, value: "...")`
 · Tüm ayrıntı: [ReadAloud](../ReadAloud.md)
@@ -152,4 +155,6 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .speechTts, language: .tr,
   metinlere de hazırlayın.
 - **Tanıma dili:** `IdentifyManager.shared.sdkLang`'e göre seçilir
   ([Lokalizasyon](../../../docs/guides/localization.md)).
-- **Tanıma nerede çalışır?** Cihazda; sokete yalnızca **sonuç** (başarılı/başarısız) gider.
+- **Tanıma nerede çalışır?** Apple Speech framework'ünde. SDK `requiresOnDeviceRecognition`
+  açmaz, iOS sesi Apple sunucusunda da tanıyabilir. Eşleştirme cihazda yapılır; sokete yalnızca
+  başarı gider.

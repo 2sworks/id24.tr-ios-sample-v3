@@ -84,8 +84,11 @@ gerekmez.
 **Kamera durursa (3.3.0).** Selfie, canlılık, kimlik ve video kaydı ekranlarında kamera durursa
 uyarı çıkar, "Tamam"dan sonra kamera yeniden açılır. Video kaydında uyarı kameranın mı
 mikrofonun mu durduğunu söyler. iOS medya servisi sıfırlanınca kamera önce uyarısız yeniden
-açılmayı dener, açılmazsa uyarı çıkar. `.none` seçiliyse uyarı çıkmaz, kamera yine kendiliğinden
-açılır. `onError` verdiyseniz hata `cameraFailed` koduyla gelir. Görüntülü görüşmede kamera
+açılmayı dener, açılmazsa uyarı çıkar. Canlılıkta ve selfie+canlılığın ARKit yolunda bu deneme
+yok: ARKit durunca uyarı hemen çıkar. `.none` seçiliyse uyarı çıkmaz, kamera yine kendiliğinden
+açılır. `onError` verdiyseniz hata `cameraFailed` koduyla gelir. Kimlik taraması bunun dışında
+kalır: kamera hatası `onError`'a ve `error.shown` olayına gitmez. SDK uyarısı kapalıysa (`.none`
+ya da `onError` verilmiş `.custom`) kamera uyarısız hemen yeniden açılır. Görüntülü görüşmede kamera
 durursa uyarı hiç çıkmaz, görüntü kendiliğinden yeniden açılır.
 
 Kendi modül ekranınızı yazdıysanız `.idErrorAlert` bu ayara zaten uyar. Hatayı başka bir
@@ -105,7 +108,7 @@ Kendi kimlik ekranınızda hata popup'ını şöyle bağlayın:
 | Kod | Ne zaman |
 |---|---|
 | `.comparisonFailed` | Sunucunun karşılaştırması tutmadı, hak var |
-| `.attemptsExhausted` | Karşılaştırma hakkı bitti |
+| `.attemptsExhausted` | Karşılaştırma hakkı ya da canlılık adım veya kayıt hakkı bitti. Çoklu yüz hakkı bitince `.multipleFaces` gelir, `attemptsLeft` 0 olur |
 | `.requestRejected` | Sunucu isteği reddetti ve anlamlı bir metin gönderdi |
 | `.livenessStepTimeout` | Canlılık adımı süresinde yapılmadı |
 | `.livenessWrongAction` | Canlılıkta başka bir adımın hareketi yapıldı |
@@ -117,8 +120,9 @@ Kendi kimlik ekranınızda hata popup'ını şöyle bağlayın:
 Örnek: yüz bulunamadı hatasının kodu `SDKErrorCode(.faceNotFound)`, mikrofon izni
 hatasının kodu `SDKErrorCode(.micAccessError)`.
 
-Ağ hatası için ayrı kod yok. SDK'nın ağ katmanı bağlantı hatasında da yalnızca
-"istek başarısız" döndürüyor, ikisi ayırt edilemiyor.
+NFC doğrulamasında bağlantı hatası (zaman aşımı, bağlantı yok) `SDKErrorCode(.connectionErrorRetry)`
+koduyla gelir. Diğer modüllerde ağ hatası için ayrı kod yok: yanıt alınamayan istek çoğunlukla
+`.requestRejected` ile gelir, mesajı iOS'un hata metnidir ve sunucu reddinden ayırt edilemez.
 
 ### Olay akışı
 
@@ -195,7 +199,8 @@ SDKAttemptLimits.shared.set(SDKModuleLimits(comparison: .manual(2), onExhausted:
 - `comparison`: `.server` (varsayılan) ya da `.manual(n)`. Sunucunun kapalı tuttuğu bir
   karşılaştırmayı elle verilen sınır açmaz.
 - `onExhausted`: `.server` (`active_comparison_result_skip_module`), `.skip` (modül atlanır)
-  ya da `.fail` (akış başarısız biter).
+  ya da `.fail` (akış başarısız biter). NFC anahtar düzeltme hakkı (`nfcKeyEntry`) dolunca panel
+  ayarına bakılmaz, `.server` da `.skip` gibi davranır.
 
 SDK'nın kendi sınırları:
 
@@ -262,8 +267,8 @@ SDKTheme.shared.capture.showsLivenessStepDoneIcon = false   // onay işaretini g
   üretilmez, süre işlemeye devam eder.
 - Yanlış hareket: istenen adım sürerken başka bir adımın tetikleme koşulu 0,35 sn boyunca
   sağlanırsa adım başarısız sayılır. Yeni eşik yoktur, her adımın kendi koşulu kullanılır.
-  Birlikte oluşan hareketler sayılmaz: göz kırpma hiçbir zaman, kaş kaldırma ile yukarı
-  bakma birbirini, başı geriye eğerken yukarı bakma ve kaş kaldırma.
+  Yanlış hareket olarak yalnız gülümseme, sola ve sağa dönme aranır. Göz kırpma istemsiz
+  olduğu için sayılmaz.
 - Hata sonrası aynı adım yeniden istenir. Her başarısız deneme o adımın `livenessStepFailure`
   hakkından düşer; sonraki adım hakkı baştan alır.
 

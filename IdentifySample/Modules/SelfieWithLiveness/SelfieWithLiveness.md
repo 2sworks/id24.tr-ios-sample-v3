@@ -47,7 +47,7 @@ case .selfieWithLiveness: SDKSelfieWithLivenessView()
 
 > **Çalışan tam örnek:** [SelfieWithLivenessCustomView.swift](SelfieWithLivenessCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.selfieWithLiveness) { SelfieWithLivenessCustomView() }`
 >
-> Vision yolu için kamera denetleyicisi [SelfieCustomView.swift](../Selfie/SelfieCustomView.swift) içindeki `SelfieCameraController`, önizleme [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Tam Özel Ekranlar** ile açılıp kapatılır.
+> Vision yolu için kamera denetleyicisi [SelfieCustomView.swift](../Selfie/SelfieCustomView.swift) içindeki `SelfieCameraController`, önizleme [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 Kamera/ARKit ve çizim sizin; ölçüm, durum makinesi, çekim zamanı, yükleme ve karar ViewModel'in.
 
@@ -68,7 +68,7 @@ Kamera/ARKit ve çizim sizin; ölçüm, durum makinesi, çekim zamanı, yükleme
 
 - Yükleme atlanamaz, kendi `POST`'unuz yazılamaz; karşılaştırma kararı ve deneme hakkı sunucudan gelir.
 - `phase`, `holdProgress`, `shouldCapture`, `canContinue` dışarıdan yazılamaz (`private(set)`); yalnız girdiyle ilerler.
-- Vision yolunda eşikler `SDKSelfieGuidanceConfig`'in Selfie modülüyle ortak saha değerleridir, ekran bazında değiştirilemez.
+- Vision yolunda eşikler `SDKSelfieGuidanceConfig`'in Selfie modülüyle ortak saha değerleridir (bu ekranda karanlık denetimi kapalıdır), ekran bazında değiştirilemez.
 - Çekim anı flaşı, projeksiyon (3B yüz → ekran noktası) ve anlık görüntü ekranındır; ViewModel görüntüyü üretmez, yalnız alır.
 
 ```swift
@@ -208,7 +208,8 @@ IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çık
 // setupSDK'dan ÖNCE
 ```
 
-Akışta zaten selfie varsa `.selfie` yeni adım eklemez, bu modülü yalnızca çıkarır. Olay:
+Sunucu listesinde selfie bu modülden önce geliyorsa `.selfie` yeni adım eklemez, bu modülü
+yalnızca çıkarır. Selfie sonra geliyorsa akışta iki selfie adımı olur. Olay:
 `status == .skipped`, modül `Selfie With Liveness`. `.livenessDetection` değeri kabul edilir
 ama canlılık modülü de ARKit istediğinden `.selfie` gibi davranır.
 Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).

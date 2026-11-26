@@ -26,9 +26,9 @@ ekranların hepsi markanızın görünümüne geçer; hiçbir ekranı yeniden ya
 let theme = SDKTheme.shared
 
 // Renkler
-theme.colors.primary      = Color(hex: "#E4002B")     // marka ana rengi
-theme.colors.primaryDark  = Color(hex: "#B80023")
-theme.colors.success      = Color(hex: "#0BA34E")
+theme.colors.primary      = Color(red: 228/255, green: 0, blue: 43/255)       // #E4002B, marka ana rengi
+theme.colors.primaryDark  = Color(red: 184/255, green: 0, blue: 35/255)       // #B80023
+theme.colors.success      = Color(red: 11/255, green: 163/255, blue: 78/255)  // #0BA34E
 
 // Font ailesi (uygulamada kayıtlı bir custom font)
 theme.fonts.familyName = "Sofia Pro"
@@ -41,6 +41,9 @@ theme.setIcons([
 ])
 ```
 
+SDK public bir `Color(hex:)` sunmaz. Kodda rengi `Color(red:green:blue:)` ya da asset rengiyle verin;
+hex kodla çalışmak için [JSON tema](#tek-sözlükle-tema-json) `"#RRGGBB"` ve `"#RRGGBBAA"` kabul eder.
+
 ---
 
 ## Token Sistemi
@@ -51,7 +54,7 @@ Token'lar da `SDKTheme.shared`'a bakar. Temayı değiştirdiğinizde bütün ekr
 | Token ailesi | Örnek | Kaynağı |
 |---|---|---|
 | `IDColor` | `IDColor.primary`, `IDColor.error` | `theme.colors` (`SDKColors`) |
-| `IDFont` | `IDFont.font(size:weight:)` | `theme.fonts` (`SDKFonts`) |
+| `IDFont` | `IDFont.bodyMedium(.semibold)`, `IDFont.custom(16, .semibold)` | `theme.fonts` (`SDKFonts`) |
 | `IDSpacing` | `IDSpacing.md` (12pt) | `theme.metrics` (`SDKMetrics`) |
 | `IDRadius` | `IDRadius.card` (36pt) | `theme.metrics` |
 | `SDKButtonShape` | `SDKButtonShape.themed()` | `theme.buttons` (`SDKButtons`) |
@@ -64,11 +67,11 @@ SDK'nın geri kalanıyla uyumlu kalır.
 | Grup | Üyeler |
 |---|---|
 | Marka | `primary` · `primaryDark` · `primaryLight` |
-| Başarı | `success` · `successAlt` · `successBright` |
+| Başarı | `success` · `successAlt` · `successBright` (`successAlt`'ı hiçbir SDK ekranı okumuyor) |
 | Hata | `error` |
 | Metin/yüzey (ink) | `inkDarkest` · `inkDark` · `inkMid` · `inkLight` · `inkBorder` · `inkBackground` · `inkSurface` · `inkSubtitle` |
 | Koyu yüzeyler | `darkBg` · `darkBgSecondary` · `darkMuted` |
-| Diğer | `divider` · `accentPurple` · `accentTeal` |
+| Diğer | `divider` · `accentPurple` · `accentTeal` · `accentWarning` (`accentPurple` ile `accentTeal`'ı hiçbir SDK ekranı okumuyor) |
 
 ### Fontlar — `SDKFonts`
 
@@ -84,7 +87,8 @@ SDKTheme.shared.fonts.familyName = "Sofia Pro"
 ### Metrikler — `SDKMetrics`
 
 Boşluklar `spacingXS` (4) ile `spacingXXL` (32) arasında, köşe yarıçapları `radiusSM` (8) ile
-`radiusCard` (36) arasında tanımlı. Daha keskin köşeler için örneğin:
+`radiusCard` (36) arasında tanımlı. Hap ve daire için `radiusPill` (40) ve `radiusCircle` (9999)
+var; bu ikisini hiçbir SDK ekranı okumuyor. Daha keskin köşeler için örneğin:
 
 ```swift
 SDKTheme.shared.metrics.radiusCard = 12
@@ -154,10 +158,10 @@ Her görsel öğeyi bir anahtarla değiştirebilirsiniz. Anahtarların tam liste
 | Grup | Anahtarlar |
 |---|---|
 | Nav / chrome | `logo` · **`headerLogo`** · `hamburger` · `back` · `help` · `close` · `langButton` (eski ad) |
-| Aksiyonlar | `retry` · `checkmark` · `camera` · `trash` · `video` · `chat` · `calendar` · `chevronRight` · `signLang` ... |
+| Aksiyonlar | `retry` · `checkmark` · `camera` · `trash` · `video` · `chat` · `calendar` · `chevronRight` · `signLang` ... (`calendar`'ı hiçbir SDK ekranı okumuyor) |
 | İzin satırları (Prepare) | `permCamera` · `permMic` · `permSpeech` · `permIdCard` · `permAlone` · `permConditions` |
-| İllüstrasyonlar | `incomingCall` · `nfcFront` · `nfcBack` · `thankYouSuccess` · `thankYouFail` · `uploadFile` · `lostConnection` · `idCardFront` · `idCardBack` |
-| Durum/kontrol | `successCircle` · `failCircle` · `play` · `pause` · `mic` · `stopRecord` · `torchOn` · `torchOff` · `wifiGood` · `wifiBad` |
+| İllüstrasyonlar | `incomingCall` · `nfcFront` · `nfcBack` · `thankYouSuccess` · `thankYouFail` · `uploadFile` · `lostConnection` · `idCardFront` · `idCardBack` (son ikisini hiçbir SDK ekranı okumuyor; kimlik ekranı `frontID` ve `backID` görsellerini SDK paketinden doğrudan yükler) |
+| Durum/kontrol | `successCircle` · `failCircle` · `play` · `pause` · `mic` · `stopRecord` · `torchOn` · `torchOff` · `wifiGood` · `wifiBad` (`failCircle`'ı hiçbir SDK ekranı okumuyor; hata uyarısı `xmark.circle.fill` sembolünü doğrudan çizer) |
 | Belge türü seçimi | `idTypeChip` · `idTypePassport` · `idTypeOther` |
 
 ```swift
@@ -188,8 +192,9 @@ dokunmadan seçili satırın rengini ayarlayabilirsiniz.
 // Tek renk (iki temada da aynı):
 SDKTheme.shared.colors.selectedItemBackground = SDKAdaptiveColor(Color.black)
 // Açık/koyu ayrı:
-SDKTheme.shared.colors.pageBackground = SDKAdaptiveColor(light: Color(hex: "#F8FAFC"),
-                                                         dark:  Color(hex: "#0B1120"))
+SDKTheme.shared.colors.pageBackground = SDKAdaptiveColor(
+    light: Color(red: 248/255, green: 250/255, blue: 252/255),   // #F8FAFC
+    dark:  Color(red: 11/255, green: 17/255, blue: 32/255))      // #0B1120
 ```
 
 | Rol | Nerede | Varsayılan |
@@ -242,7 +247,7 @@ SDKTheme.shared.navBar.titleMode  = .brandWithModule   // varsayılan: marka ver
 |---|---|---|
 | `.module` | adım adı | ekranın alt başlığı (SDK varsayılanı) |
 | `.brandWithModule` | `brandTitle` | adım adı |
-| `.brand` | `brandTitle` | `brandSubtitle` (verilmişse) |
+| `.brand` | `brandTitle` | `brandSubtitle`, yoksa ekranın alt başlığı |
 
 `brandTitle` verip `titleMode`'u `.module` bırakırsanız `.brandWithModule` uygulanır. Kamera üstü
 ekranlarda (selfie, NFC, hologram) marka adı logonun yanına yazılır. Marka adıyla adım adını
@@ -292,8 +297,9 @@ JSON temada yalnızca görünürlük ayarlanır: `"navBar": { "buttons": { "show
 
 ## Bileşen Görünümleri
 
-Butonlardaki (`buttons`) kalıp burada da geçerli: her alan isteğe bağlıdır, `nil` SDK
-varsayılanı demektir.
+Butonlardaki (`buttons`) kalıp burada da geçerli: `motion` dışında her alan isteğe bağlıdır, `nil`
+SDK varsayılanı demektir. `motion` alanlarının sabit varsayılanı var: `transitionDuration` 0.25 sn,
+`overlayDuration` 0.2 sn, `disabled` false.
 
 | Kap | Alanlar |
 |---|---|
@@ -302,10 +308,25 @@ varsayılanı demektir.
 | `SDKTheme.shared.banners` | `cornerRadius` · `shadowRadius` · `shadowOffsetY` · `iconCircleSize` · `iconCircleOpacity` |
 | `SDKTheme.shared.fields` | `cornerRadius` · `background` · `borderColor` · `borderWidth` · `placeholderColor` · `minHeight` |
 | `SDKTheme.shared.sheets` | `cornerRadius` · `handleWidth` · `handleHeight` · `handleColor` · `background` |
-| `SDKTheme.shared.capture` | `maskOpacity` · `guideStrokeColor` · `guideLockedColor` · `guideLineWidth` · `faceAlignedColor` · `faceIdleColor` · `overlayButtonFill` · `overlayButtonBorder` |
+| `SDKTheme.shared.capture` | `maskOpacity` · `guideStrokeColor` · `guideLockedColor` · `guideLineWidth` · `faceAlignedColor` · `faceIdleColor` · `overlayButtonFill` · `overlayButtonBorder` · `maskColor` · `scanLineColor` · `focusIndicatorColor` · `showsFocusIndicator` · `showsLivenessStepDoneIcon` · `livenessStepDoneColor` |
 | `SDKTheme.shared.controls` | `shutterSize` · `shutterRingWidth` · `shutterFill` · `shutterRingColor` · `recordingColor` · `progressRingWidth` |
 | `SDKTheme.shared.call` | `panelCornerRadius` · `panelBackground` · `handleColor` · `controlSize` · `remoteVideoBackground` · `localPreviewCornerRadius` |
 | `SDKTheme.shared.motion` | `transitionDuration` · `overlayDuration` · `disabled` |
+
+Şu alanları hiçbir ekran okumuyor; değer vermek görünümü değiştirmez: `fields.placeholderColor`,
+`fields.minHeight`, `sheets.cornerRadius`, `sheets.background`, `controls.shutterRingWidth`,
+`controls.shutterRingColor`, `controls.progressRingWidth` ve `call` kabında `handleColor` dışındaki
+bütün alanlar.
+
+Şu adları da hiçbir SDK ekranı kullanmıyor: renklerde `successAlt`, `accentPurple`, `accentTeal`;
+köşelerde `radiusPill`, `radiusCircle`; fontlarda `IDFont.displayLarge`; ikonlarda `calendar`,
+`idCardFront`, `idCardBack`, `failCircle`. Bunları değiştirmek SDK ekranlarını etkilemez. Yalnız
+kendi ekranlarınızda `IDColor`, `IDRadius`, `IDFont` ya da `Image.sdk(_:)` ile kullanırsanız
+işe yarar.
+
+`capture` içindeki `showsLivenessStepDoneIcon` ve `livenessStepDoneColor` yalnız koddan ayarlanır,
+JSON'da tanınmayan anahtar olarak döner. Odak karesinin görünümü
+`SDKTheme.shared.setFocusIndicator { size in … }` ile değişir.
 
 ```swift
 SDKTheme.shared.resetAppearance()   // renk/font/metrik/bileşen override'larının tümünü sil
@@ -315,15 +336,18 @@ SDKTheme.shared.resetAppearance()   // renk/font/metrik/bileşen override'ların
 
 ## Titreşim (Haptik)
 
-SDK iki yerde titreşim kullanır ve ikisini de host kapatabilir:
+SDK şu yerlerde titreşim kullanır ve hepsini host kapatabilir:
 
 | Nerede | Ne yapar |
 |---|---|
 | Otomatik çekim yapan modüller | Çekim yaklaştıkça hızlanan darbeler (ramp); kullanıcı çekimin geldiğini hisseder |
 | Canlılık adımları | Adım (göz kırpma, gülümseme, başı çevirme…) onaylanınca çok kısa tek bir darbe; kullanıcı ekrana bakmadan adımı geçtiğini anlar |
+| Kimlik ve adres tarayıcısı | Hızlı çekim kabul edilince tek kısa darbe |
+| Butonlar | Dokununca tek darbe. Kapatmak için `SDKTheme.shared.buttons.base.hapticsEnabled = false` |
+| Gelen arama | Arama çalarken titreşim. Kapatmak için `IdentifyManager.shared.incomingCallVibrationEnabled = false` |
 
 ```swift
-// Adım onay darbesi — canlılık testindeki "geçtim" hissi:
+// Adım onay darbesi (canlılık adımı, tarayıcıda hızlı çekim):
 SDKHapticConfig.shared.stepFeedbackEnabled = false     // yalnız bu darbeyi kapat
 SDKHapticConfig.shared.stepFeedbackIntensity = 0.4     // daha hafif (0…1, varsayılan 0.6)
 
@@ -334,14 +358,16 @@ SDKHapticConfig.shared.setEnabled(false, for: [.selfie, .idCard])
 ```
 
 Modül anahtarı (`setEnabled(_:for:)`) hem rampayı hem adım darbesini kapatır.
-`stepFeedbackEnabled` yalnızca adım darbesini etkiler. İkisi de varsayılan olarak açık.
+`stepFeedbackEnabled` yalnızca adım darbesini etkiler. İkisi de varsayılan olarak açık. Buton ve
+gelen arama titreşimi `SDKHapticConfig`'e bağlı değildir, tablodaki ayarlarla kapanır.
 
 Dokunsallık donanımı olmayan cihazlarda darbe `UIImpactFeedbackGenerator` ile çalınır; bu da
 desteklenmiyorsa sessizce atlanır. iPad'lerde Taptic Engine olmadığından titreşim hissedilmez,
 ama akış bundan etkilenmez.
 
-Adım darbesi yalnızca `livenessDetection` modülünde çalar. Birleşik `selfieWithLiveness`
-ekranında adım kavramı farklı olduğu için çalmaz; orada çekim rampası vardır.
+Adım darbesi iki yerde çalar: `livenessDetection` modülünde adım onaylanınca, kimlik ve adres
+tarayıcısında hızlı çekim kabul edilince. Birleşik `selfieWithLiveness` ekranında adım kavramı
+farklı olduğu için çalmaz; orada çekim rampası vardır.
 
 ---
 
@@ -371,13 +397,26 @@ Değer biçimleri:
 
 | Tip | Yazım |
 |---|---|
-| Renk | `"#RRGGBB"` ya da `{"light": "#…", "dark": "#…"}` |
+| Renk | `"#RRGGBB"`, `"#RRGGBBAA"` ya da `{"light": "#…", "dark": "#…"}` |
 | Köşe | `"capsule"` ya da sayı (`0` = tamamen köşeli) |
 | Font | `{"size": 16, "weight": "semibold"}` |
 | İkon | host uygulamasının asset adı |
 
-`apply(...)` tanımadığı anahtarların listesini döner. Entegrasyonda bu listeyi loglayın; böylece
-bir yazım hatası gözden kaçmaz:
+Açık/koyu çifti `colors` içindeki rol renklerinde ([Rol Renkleri](#rol-renkleri), `pageBackground` ile
+`unselectedItemText` arası), `fields` ve `sheets` renklerinde geçerlidir. `primary`, `success`, `error`,
+`accentWarning` gibi palet renklerinde ve öbür kaplarda yalnız `light` okunur. 6 ya da 8 haneden farklı
+bir değer (ör. `#FFF`) siyah olur.
+
+`apply(...)` tanımadığı anahtarların listesini döner. Listede birkaç tip hatası da görünür, ör.
+sözlük olmayan bölüm, sayı olmayan `metrics` değeri, `icons` içinde metin olmayan değer ya da
+`SDKIconKey`'de olmayan anahtar, `navBar.preset` ve `navBar.titleMode`'da bilinmeyen değer.
+`apply(json:)` çözülemeyen veride `"<invalid json>"`, `applyTheme(named:)` dosyayı bulamazsa
+`"<file not found>"` döner.
+
+Öbür geçersiz değerler listeye girmez. Palet renkleri (`primary`, `success`, `error` vb.) eski
+değerinde kalır; rol renkleri ve öbür alanların çoğu SDK varsayılanına döner. İkonların asset
+adına da bakılmaz, bulunamayan ad boş görsel çizer; bu adları ayrıca denetleyin. Listeyi
+entegrasyonda loglayın; anahtar adındaki yazım hataları orada görünür:
 
 ```swift
 let unknown = SDKTheme.shared.apply(config)
@@ -392,7 +431,8 @@ IdentifySdk.resetTheme();
 ```
 
 ```dart
-await IdentifySdk.instance.setTheme({'colors': {'primary': '#0F172A'}});
+final sdk = IdentifySdk();
+await sdk.setTheme({'colors': {'primary': '#0F172A'}});
 ```
 
 ---

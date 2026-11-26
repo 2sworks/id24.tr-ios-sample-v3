@@ -43,7 +43,7 @@ değiştirmek için tema anahtarları: `nfcFront`, `nfcBack` ([Tema](../../../do
 
 > **Çalışan tam örnek:** [NfcCustomView.swift](NfcCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.nfc) { NfcCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 ```swift
@@ -58,7 +58,7 @@ struct MyNfcView: View {
             Text(vm.nfcStatus)                                      // canlı durum
             Button("Çipi Oku") { vm.startNFC() }                    // ✅ manager.startNFC
         }
-        .sheet(isPresented: $vm.showEditScreen) {                   // OCR bilgisi eksikse açılır
+        .sheet(isPresented: $vm.showEditScreen) {                   // OCR bilgisi eksikse ya da okuma hata sınırında açılır
             MyMrzForm(serial: $vm.serialNo, birth: $vm.birthDate, valid: $vm.validDate,
                       onSave: vm.saveManualDates)
         }
@@ -97,25 +97,32 @@ struct MyNfcView: View {
 | Metot | Etki |
 |---|---|
 | `startNFC()` | MRZ anahtarıyla çip okumayı başlatır (`manager.startNFC`) |
-| `saveManualDates()` | Manuel girilen MRZ alanlarını kaydeder |
+| `saveManualDates()` | Manuel girilen MRZ alanlarını `manager.sdkBackInfo`'ya yazar, `updateReadNFCKeys` ile sunucuya gönderir ve başarıda okumayı yeniden başlatır |
 
 ### Closure'lar
 | Üye | Ne zaman |
 |---|---|
-| `onCompleted: (() -> Void)?` | Okuma başarılı — ayrıca okuma hata sınırında (`MAX_ERR_COUNT`) ve manuel MRZ düzeltmesi tükendiğinde doğrulanmadan geçilirken |
-| `onSkipRequested: (() -> Void)?` | Deneme hakkı tükenip atlamaya izin varsa |
-| `onFlowFailed: (() -> Void)?` | Karşılaştırma hakkı tükendi, atlama kapalı → `coordinator.finishFlowAsFailed()` |
+| `onCompleted: (() -> Void)?` | Okuma başarılı. Okuma hata sınırı dolunca önce anahtar düzeltme ekranı açılır. Elle düzeltilen anahtarla okuma hakkı (`SDKAttemptLimits.shared.nfcKeyEntry`, varsayılan 3) da bitince yine çağrılır ve modül doğrulanmadan geçer |
+| `onSkipRequested: (() -> Void)?` | Karşılaştırma hakkı tükendi ve atlamaya izin var. Anahtar düzeltme hakkı bitince çağrılmaz |
+| `onFlowFailed: (() -> Void)?` | Karşılaştırma hakkı tükendi, atlama kapalı → `coordinator.finishFlowAsFailed()`. NFC için `SDKAttemptLimits.shared.set(SDKModuleLimits(onExhausted: .fail), for: .nfc)` verildiyse anahtar düzeltme hakkı bitince de çağrılır |
 | `onRetryFromPreviousStep: (() -> Void)?` | Çip ile belge verisi uyuşmadı, hak var → önceki adıma dön (NFC ilk ekransa ekranda kalınır) |
 
-MRZ alanları VM açılışında otomatik dolar: `manager.mrzDocNo`, `manager.mrzBirthDay`,
-`manager.mrzValidDate` (önceki OCR adımından). `manager.useKpsData` aktifse KPS verisi
-kullanılır — sunucudan şifreli MRZ da gelebilir
+MRZ alanları VM açılışında otomatik dolar. Kaynak önceki OCR adımıdır: önce arka yüzün MRZ'si,
+o yoksa ön yüzün OCR'ı. `manager.useKpsData` aktifse KPS verisi kullanılır (`manager.mrzDocNo`,
+`manager.mrzBirthDay`, `manager.mrzValidDate`); sunucudan şifreli MRZ da gelebilir
 ([Sunucu & API → şifreli MRZ](../../../docs/guides/server-api.md#şifreli-mrz-verisi-kpsdata-yerine)).
+
+VM kullanmadan kendi ekranınızı yazıyorsanız: KPS verisi ve sunucudan çözülen MRZ yoksa
+`manager.startNFC` anahtarı her çağrıda yeniden `manager.sdkBackInfo`'dan (o yoksa ön yüz
+OCR'ından) okur. `updateReadNFCKeys` ile düzelttiğiniz değerler bu okumada ezilir ve okuma eski
+anahtarla tekrarlanır. Düzeltilen değerleri `sdkBackInfo.idDocumentNumberMRZ`, `idBirthDateMRZ` ve
+`idValidDateMRZ` alanlarına da yazın (tarihler MRZ biçiminde, `yyMMdd`). Hazır VM bunu
+`saveManualDates()`'te kendisi yapar.
 
 ## Sinyal Zinciri — Perde Arkası
 
 ```
-(VM init) ← manager.mrzDocNo / mrzBirthDay / mrzValidDate (önceki OCR'dan)
+(VM init) ← KPS: manager.mrzDocNo / mrzBirthDay / mrzValidDate; yoksa arka yüz MRZ'si, o da yoksa ön yüz OCR'ı
 startNFC()  → manager.startNFC (CoreNFC çip okuma) → nfcMsgHandler (durum) → onCompleted?()
             → (nfcComparisonCount tükendi & skip izinli) → onSkipRequested?()
 host: → coordinator.advanceToNextModule() [modulePresented]
@@ -141,7 +148,10 @@ final class NfcHostViewModel: HostModuleViewModel {
 
 ## Sesli Okuma (Read-Aloud)
 
-Ekran açıldığında yönerge otomatik seslendirilebilir (`SDKFlowHostView` yapar, kod gerekmez).
+Hazır ekran açılınca yönergeyi kendisi okur: kimlikte `NfcTts`, pasaportta `NfcPassportTts`.
+`SDKFlowHostView` bu modülü otomatik okumaz. Kendi ekranınızda
+`SDKSpeechService.shared.speak(vm.introTtsKey, in: .nfc)` çağırın
+([NfcCustomView.swift](NfcCustomView.swift) bunu yapar).
 
 ```swift
 SDKSpeechConfig.shared.setMode(.native, for: .nfc)          // Siri/sistem sesi
@@ -163,20 +173,20 @@ sonuç `setupSDK(onFinished:)`'a gelir:
 | Çip okundu ve doğrulandı | `approved` / `allModulesCompleted` | `[]` |
 | Hak bitti, atlama izinli | `approved` / `allModulesCompleted` | `[nfc]` |
 | Hak bitti, atlama kapalı | `notCompleted` / `moduleFailed` | `[]` |
-| Okuma hata sınırı (`nfcMaxErrorCount`) / manuel düzeltme tükendi | `approved` / `allModulesCompleted` | `[nfc]` |
+| Okuma hata sınırından (`nfcMaxErrorCount`) sonra anahtar düzeltme hakkı da bitti (`nfcKeyEntry`; `onExhausted` `.fail` değilse) | `approved` / `allModulesCompleted` | `[nfc]` |
 | Cihazda NFC yok (modül akışa alınmadı) | `approved` / `allModulesCompleted` | `[nfc]` |
 | İlk ekranda geri | `cancelled` / `userExited` | `[]` |
 
-Çipin gerçekten doğrulandığını anlamak için `result == .approved` **ve**
-`!skippedModules.contains(.nfc)` kontrol edin. Tüm ayrıntı, loglar ve yönlendirme kalıpları:
+Çipin gerçekten doğrulandığını anlamak için `result == .approved`, `!skippedModules.contains(.nfc)`
+**ve** `nfcVerification?.hasFailedCheck != true` kontrol edin. Tüm ayrıntı, loglar ve yönlendirme kalıpları:
 [Oturum Çıkışları → Senaryo: panelde tek modül açık](../../../docs/guides/session-exit.md#5-senaryo-1--tek-modüllü-akış-müşteri-adımı-tamamladı-sdk-işini-bitirdi).
 
 ## Sık Sorulanlar & Dikkat Edilecekler
 
 - **Cihazda NFC yoksa?** (Tüm iPad'ler ve eski iPhone'lar.) Kontrol akış kurulurken yapılır
   (`NFCNDEFReaderSession.readingAvailable`); modül akışa alınmaz, panele bir kez
-  `NFCStatus = notAvailable` bildirilir ve `sdk_logs`'a yazılır. Kullanıcıya bilgi sayfası
-  göstermek isterseniz `setupSDK(..., showNFCNotFoundPage: true, ...)`.
+  `NFCStatus = notAvailable` bildirilir ve `sdk_logs`'a yazılır. `setupSDK(..., showNFCNotFoundPage: true, ...)` verilirse modül akışta kalır
+  ve NFC ekranı açılır. Ayrı bir bilgi sayfası yoktur, okuma denemesi hata verir.
   Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
 
 - **Simülatörde çalışmaz** — CoreNFC gerçek cihaz ister; NFC'yi test etmeden yayına çıkmayın.
@@ -191,8 +201,9 @@ sonuç `setupSDK(onFinished:)`'a gelir:
   anahtar hakkına sayılmaz.
 - **MRZ yanlış okunmuşsa:** `showEditScreen = true` + `saveManualDates()` ile kullanıcı
   düzeltebilir; agent uzaktan da NFC düzeltme başlatabilir (`editNfcProcess` soket aksiyonu).
-- **Çipsiz belge:** `setupSDK(showNFCNotFoundPage: true)` ile "NFC bulunamadı" ekranı
-  gösterilebilir; event akışında `notFound` durumu görülür ([Event Sistemi](../../../docs/guides/events.md)).
+- **Çipsiz belge:** SDK'da çipsiz belgeye özel bir ekran ya da event durumu yok.
+  `showNFCNotFoundPage` ve event akışındaki `notFound` durumu yalnız NFC donanımı olmayan
+  cihazda devreye girer ([Event Sistemi](../../../docs/guides/events.md)).
 - **Sertifika doğrulama:** SDK CSCA listesi taşımaz. Listeyi `setupSDK(nfcMasterList:)` ile
   PEM dosyası olarak verin; çip sertifika zinciri bu listeye karşı doğrulanır. Liste yoksa
   zincir kontrolü yapılmaz. Zincir tutmazsa okuma yine geçer, sonuç

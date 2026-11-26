@@ -17,13 +17,13 @@ farklı olabilir), böylece önceden kaydedilmiş videoyla aldatma zorlaşır.
 | Rota | `SDKModuleRoute.liveness` |
 | Drop-in view | `SDKLivenessView` |
 | ViewModel | `SDKLivenessViewModel` |
-| Dış dünya | Adım API'si (`getNextLivenessTest`) + **HTTP** (kare + isteğe bağlı video) |
+| Dış dünya | **HTTP** (kare + isteğe bağlı video) + soket durum mesajları; adım sırası `RoomResponse` ile gelir |
 | Ses anahtarı | `LivenessTts` |
-| Donanım | **TrueDepth kamera (ARKit yüz takibi) zorunlu** — yoksa modül akışa hiç girmez |
+| Donanım | **ARKit yüz takibi (TrueDepth kamera ya da A12+ çip) zorunlu** — yoksa modül akışa hiç girmez |
 
 ## Kullanıcı Ne Yaşar?
 
-1. Ön kamera açılır; ekranda ilk talimat belirir (ör. "Gözlerinizi kırpın").
+1. Ön kamera açılır; ekranda ilk talimat belirir (ör. "Lütfen gözlerinizi kırpın").
 2. Hareketi yapar; doğrulama karesi arka planda yüklenir, sıradaki talimat gelir.
 3. Tüm adımlar bitince — sunucu ekran kaydı istiyorsa — oturum videosu da yüklenir.
 4. Akış otomatik ilerler.
@@ -38,7 +38,7 @@ Hiçbir şey yazmayın; rota gelince `SDKLivenessView` çizilir.
 
 > **Çalışan tam örnek:** [LivenessCustomView.swift](LivenessCustomView.swift) — SDK ekranının yalnızca public API ile yazılmış birebir karşılığı. Değişiklik yapmadan takıldığında SDK ekranıyla aynı sonucu verir; özelleştirme bu dosya üzerinde yapılır. Takmak için: `registry.override(.liveness) { LivenessCustomView() }`
 >
-> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Özel Ekranlar** ile açılıp kapatılır.
+> Paylaşılan parçalar (kamera önizlemesi, video görünümü, banner) [CustomKit](../CustomKit/) klasöründedir. Örnek uygulamada hamburger menü → **Modül Özelleştirme → Tam Özel Ekranlar** ile açılıp kapatılır.
 
 
 > **Önce okuyun:** İfade algılama (göz kırpma, gülümseme, baş/göz yönü) **VM'de değil,
@@ -112,7 +112,7 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 | Üye | Tip | Anlam |
 |---|---|---|
 | `currentStep` | `LivenessTestStep?` | Mevcut adım (`turnLeft/turnRight/blinkEyes/smile/completed`) |
-| `stepInstruction` | `String` | Adım talimatı (ör. "Göz kırpın") |
+| `stepInstruction` | `String` | Adım talimatı (ör. "Lütfen gözlerinizi kırpın") |
 | `allStepsCompleted` | `Bool` | Tüm adımlar bitti mi |
 | `isWaitingForNextStep` | `Bool` | Kare çekildi, sıradaki komut bekleniyor (`SDKLivenessRules.default.nextStepDelay`). Bu sırada hareket aramayın; `uploadFrame` yok sayılır, `stepInstruction` "Lütfen bekleyin" olur |
 
@@ -135,7 +135,7 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 | `faceVisibilityChanged(_:)` | Yüz kadraja girdi ya da çıktı; `isFaceVisible` güncellenir |
 | `multipleFacesChanged(_:)` | Birden fazla yüz izleniyor (`SDKFaceConfig`); `hasMultipleFaces` güncellenir, `.fail` modunda hata gösterilir |
 | `reportWrongAction(_:)` | İstenen yerine başka bir hareket yapıldı (`SDKLivenessRules.default.wrongActionCheck`); hata gösterilir, haktan düşer |
-| `fetchNextStep()` | Sıradaki adımı sunucudan alır; `init` ve `uploadFrame` zaten çağırır |
+| `fetchNextStep()` | Sıradaki adımı `RoomResponse`'tan gelen listenin başından cihazda alır (`manager.getNextLivenessTest`); `init` ve `uploadFrame` zaten çağırır |
 | `finishRecordingAndUpload()` / `uploadVideo(videoData:)` | İç akış; son adımda VM kendisi çağırır |
 | `resetTest()` | Testi başa alır |
 
@@ -144,8 +144,8 @@ SDK'nın kullandığı algılama kuralları (başlangıç için referans; eşikl
 |---|---|
 | `onCompleted: (() -> Void)?` | Tüm akış (adımlar + varsa video) tamamlandı |
 | `onRecordingReady: (() -> Void)?` | Ekran kaydı başladı — kamerayı şimdi açın |
-| `onSkipRequested: (() -> Void)?` | Atlama istendi |
-| `onFlowFailed: (() -> Void)?` | Akış başarısız sonlandı |
+| `onSkipRequested: (() -> Void)?` | Bir deneme hakkı (yüz karşılaştırma, adım, kayıt ya da çoklu yüz) tükendi ve atlamaya izin var. Cihaz yüz takibini desteklemiyorsa da çağrılır |
+| `onFlowFailed: (() -> Void)?` | Aynı haklardan biri tükendi ve atlama kapalı; akış başarısız biter. Cihaz yüz takibini desteklemiyorsa ve `onSkipRequested` bağlanmamışsa da çağrılır |
 
 ## Sinyal Zinciri — Perde Arkası
 
@@ -196,10 +196,10 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
   `false` ise `uploadVideo` boş `Data` ile çağrılabilir; VM yine `onCompleted`'a düşer.
 - **Adım seti:** `allowBlink/allowSmile/allowLeft/allowRight` ile hangi hareketlerin
   isteneceğini host daraltabilir.
-- **Adım sırası neden rastgele?** `RoomResponse.liveness` dizisi sırayı belirler —
+- **Adım sırası neden rastgele?** `RoomResponse.data?.liveness` dizisi sırayı belirler —
   replay saldırılarını zorlaştırmak için oturum başına değişebilir.
-- **Cihaz desteklemiyorsa ne olur?** Göz kırpma/gülümseme ARKit blend shape'lerinden, baş
-  açısı yüz dönüşümünden okunur; bu yüzden modül **ARKit yüz takibi ister** (TrueDepth kamera
+- **Cihaz desteklemiyorsa ne olur?** Göz kırpma/gülümseme ve baş çevirme ARKit
+  blend shape'lerinden okunur; bu yüzden modül **ARKit yüz takibi ister** (TrueDepth kamera
   ya da A12+ çip). TrueDepth'siz A11 ve öncesi cihazlarda (iPhone 8, iPad 7…) çalışamaz; model
   listesi: [Cihaz modelleri](../SelfieWithLiveness/SelfieWithLiveness.md#cihaz-modelleri). Kontrol akış kurulurken yapılır
   (`ARFaceTrackingConfiguration.isSupported`) ve modül akışa alınmaz — kullanıcı
@@ -210,7 +210,8 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .livenessTts, language: .t
   IdentifyManager.shared.faceTrackingFallback = .skip     // adımı tamamen çıkar
   ```
 
-  Akışta zaten selfie varsa `.selfie` yeni adım eklemez, canlılık adımını yalnızca çıkarır.
+  Sunucu listesinde selfie canlılıktan önce geliyorsa `.selfie` yeni adım eklemez, canlılık
+  adımını yalnızca çıkarır. Selfie sonra geliyorsa akışta iki selfie adımı olur.
   Olay: `status == .skipped`, modül `Liveness Detection`.
   Ayrıntı: [iPad Desteği](../../../docs/guides/ipad-support.md).
 - **Adım geçince titreşim:** her onaylanan adımda tek ve çok kısa bir darbe çalınır.
