@@ -20,10 +20,13 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 **Değişti**
 - NFC: kart PACE'i destekliyorsa çip önce PACE ile açılıyor; kartta PACE bilgisi yoksa ya da PACE kurulamazsa BAC kullanılıyor (Android'deki sıra). BAC düşünce PACE'e dönen yedek adım kaldırıldı.
 - Örnek uygulamanın özel görüşme ekranı (`CallScreenCustomView`) işaret dili bilen temsilci yok bildirimini SDK ekranıyla aynı gösteriyor.
+- Örnek uygulamanın özel hazırlık ekranı (`PrepareCustomView`) üst barda "Test etmek istediğiniz ortamı seçin" alt başlığını göstermiyor, SDK ekranıyla aynı.
 - Örnek uygulamada hamburger menü → Hızlı Ayarlar → Ekran Koruması anahtarı eklendi (varsayılan kapalı, açılışta uygulanır). Özel ekranların kendi açtığı sayfalar da korunuyor: görüşme ekranında MRZ düzeltme, işaret dili ve bağlantı koptu sayfaları; NFC'de MRZ formu; kimlikte kamera sayfası.
 - Örnek uygulamada kimlik taraması belirlenen süreyi aşınca uygulamanın kendi uyarı penceresini açma örneği eklendi: hamburger menü → Hızlı Ayarlar → Kimlik Taramasında Uyarı ([Süre dolunca uyarı penceresi](docs/examples/scanner-guidance.md#süre-dolunca-uyarı-penceresi-321)). Menü "Modül Özelleştirme" ve "Hızlı Ayarlar" altında toplandı.
 
 **Düzeltildi**
+- Hazırlık ekranının üst barında örnek uygulamadan kalma "Test etmek istediğiniz ortamı seçin" alt başlığı artık görünmüyor. Anahtarı kendi metniyle değiştiren host'ta da SDK'nın hazırlık ekranında alt satır çıkmaz. `.prepareEnvSubtitle` anahtarı 3.x boyunca duruyor, 4.0'da kaldırılacak.
+- Selfie + canlılık adımı sunucuya "Selfie With Liveness" adıyla gidiyordu. Sunucu bu adımı "Selfie with Liveness" olarak tanıdığı için panelde adım satırı "başladı" olmuyor, mobil listede müşteri önceki modülde görünüyor, alt statü bu modüle çekilmiyordu. `stepChanged` ve `subscribe` artık sunucunun adını gönderiyor. Host'a açık ad değişmedi: `SdkModules.selfieWithLiveness.rawValue`, olay adları ve `onFinished` değerleri aynı.
 - Görüşme: işaret dili ekranı açıkken müşteri kuyruğa alınmıyor; temsilciye "Devam Et"ten sonra bağlanıyor (Android'deki gibi). Önceden aynı ident hemen yeniden açılınca ya da bu ekrandayken bağlantı kopup gelince seçim yapılmadan temsilciye çağrı düşebiliyordu.
 
 ### 3.3.0
