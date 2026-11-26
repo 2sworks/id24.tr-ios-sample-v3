@@ -166,6 +166,8 @@ struct MyIdCardScanView: View {
 - Pasaport: `profile: .passport` + `configuration: .passport`.
 - `IdentityScannerView`'ı modifier olmadan kullanacaksanız mutlaka `fullScreenCover` içinde
   sunun: sonuç gelince kendini `dismiss()` eder, bir ekranın gövdesine gömülürse o ekranı kapatır.
+  Ekran koruması kullanıyorsanız (3.3.1) kapağın içeriğine `.sdkScreenCaptureProtected()`
+  ekleyin. `.documentScanner(isPresented:…)` modifier'ı bunu kendisi yapar.
 
 ### B) Kendi kameranızla
 

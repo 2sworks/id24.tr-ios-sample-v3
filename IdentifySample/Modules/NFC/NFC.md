@@ -1,9 +1,10 @@
 # NFC — Kimlik/Pasaport Çip Okuma
 
 Kimlik doğrulamanın en güçlü kanıtı: belgedeki **çipin** okunması. SDK, tam bir ICAO
-yığını taşır (BAC/PACE ile anahtar anlaşması → Secure Messaging → veri grupları) ve çipteki
+yığını taşır (PACE ya da BAC ile anahtar anlaşması → Secure Messaging → veri grupları) ve çipteki
 fotoğraf/kimlik verisini güvenle çıkarır. Çipe erişimin anahtarı, bir önceki OCR adımında
-okunan üç MRZ alanıdır: **seri no + doğum tarihi + son geçerlilik tarihi**.
+okunan üç MRZ alanıdır: **seri no + doğum tarihi + son geçerlilik tarihi**. Çip destekliyorsa
+önce PACE denenir; kartta PACE bilgisi yoksa ya da PACE kurulamazsa BAC kullanılır (3.3.1).
 
 ← [Modül İndeksi](../Modules.md) · [README](../../../README.md)
 
@@ -61,6 +62,7 @@ struct MyNfcView: View {
         .sheet(isPresented: $vm.showEditScreen) {                   // OCR bilgisi eksikse ya da okuma hata sınırında açılır
             MyMrzForm(serial: $vm.serialNo, birth: $vm.birthDate, valid: $vm.validDate,
                       onSave: vm.saveManualDates)
+                .sdkScreenCaptureProtected()                        // ekran koruması (3.3.1); presentationDetents bundan sonra
         }
         .onAppear {
             vm.onCompleted     = { coordinator.advanceToNextModule() }

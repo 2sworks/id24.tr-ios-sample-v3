@@ -221,7 +221,7 @@ kullanma, **kendi tasarımınla değiştirme** ve ViewModel referansı — hepsi
 | Hazırlık          | İzinleri ve bağlantı hızını kontrol eder, kullanıcıyı akışa hazırlar | [Prepare](IdentifySample/Modules/Prepare/Prepare.md)                                  |
 | Kimlik (OCR)      | Kimlik kartının ön/arka yüzünü çeker, cihaz üzerinde okur            | [IdCard](IdentifySample/Modules/IdCard/IdCard.md)                                     |
 | Kimlik (OVD)      | Hologram/optik doğrulama ile sahte kimlik tespiti                    | [IdCardOVD](IdentifySample/Modules/IdCardOVD/IdCardOVD.md)                            |
-| NFC               | Kimlik/pasaport çipini okur (ICAO: BAC/CA)                           | [NFC](IdentifySample/Modules/NFC/NFC.md)                                              |
+| NFC               | Kimlik/pasaport çipini okur (ICAO: PACE/BAC/CA)                      | [NFC](IdentifySample/Modules/NFC/NFC.md)                                              |
 | Selfie            | Selfie çeker, cihaz üzerinde yüz tespiti yapar                       | [Selfie](IdentifySample/Modules/Selfie/Selfie.md)                                     |
 | Selfie + Canlılık | Selfie ile canlılık testini birleştirir                              | [SelfieWithLiveness](IdentifySample/Modules/SelfieWithLiveness/SelfieWithLiveness.md) |
 | Canlılık          | Sola dön / göz kırp / gülümse adımlarıyla canlılık testi             | [Liveness](IdentifySample/Modules/Liveness/Liveness.md)                               |
@@ -325,6 +325,11 @@ Modüllerden bağımsız, akışın tamamına dokunan yetenekler:
 - **Log & İzleme** — konsol + online log, kategori bazlı; `TrackingEventType` ile her modülün
   gösterildi/tamamlandı/atlandı olaylarını dinlersiniz.
   → [Loglama](docs/guides/logging.md) · [Event Sistemi](docs/guides/events.md)
+- **Ekran koruması (3.3.1)** — `IdentifyManager.shared.screenCaptureProtectionEnabled = true` iken
+  SDK ekranları ekran görüntüsünde ve ekran kaydında boş görünür, ekranda normal çalışır
+  (varsayılan kapalı; akış başlamadan verilir). Akış içinde kendi açtığınız sayfalara
+  `.sdkScreenCaptureProtected()` eklenir.
+  → [Full Integration → Ekran koruması](FULL-INTERGATION.md#ekran-görüntüsü-ve-ekran-kaydı-koruması-331)
 
 ---
 

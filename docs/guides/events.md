@@ -112,12 +112,12 @@ bütün çıkış yolları ve yönlendirme için [Oturum Çıkışları](session
 | `session.finished` | sonuca göre | Her bitişte |
 | `session.completed` | `success` | `result == approved` |
 | `session.failed` | `failed` | `rejected` · `neutral` · `notCompleted` · `error` |
-| `session.abandoned` | `abandoned` | `cancelled` (kullanıcı ya da host çıktı, uygulama kapatıldı) |
+| `session.abandoned` | `abandoned` | `cancelled` (kullanıcı ya da host çıktı, uygulama kapatıldı, işaret dili bilen temsilci yok) |
 
 | Metadata | Anlamı |
 |---|---|
 | `result` | `approved` · `rejected` · `neutral` · `notCompleted` · `cancelled` · `error` |
-| `endReason` | `agentDecision` · `allModulesCompleted` · `userEndedCall` · `moduleFailed` · `userExited` · `hostQuit` · `hostExit` · `hostForceQuit` · `appTerminated` · `roomOccupied` · `connectionLost` · `setupFailed` |
+| `endReason` | `agentDecision` · `allModulesCompleted` · `userEndedCall` · `moduleFailed` · `userExited` · `noSignLanguageAgent` · `hostQuit` · `hostExit` · `hostForceQuit` · `appTerminated` · `roomOccupied` · `connectionLost` · `setupFailed` |
 | `reason` | Panelin gönderdiği `terminateReason`; yoksa `endReason` (3.0.0 uyumu için) |
 | `terminateReason`, `statusSummary`, `statusId` | Oturumu panel kapattıysa panelin gönderdiği değerler |
 | `lastScreen`, `lastModule`, `stepIndex`, `totalSteps` | Oturumun bittiği yer |
@@ -127,6 +127,13 @@ bütün çıkış yolları ve yönlendirme için [Oturum Çıkışları](session
 | `nfcCertificateChain`, `nfcDocumentSignature`, `nfcDataIntegrity`, `nfcChipAuthentication`, `nfcActiveAuthentication` | Son NFC okumasının çip kontrolleri: `passed` · `failed` · `notPerformed` (çip okunmadıysa anahtar gelmez). NFC modülünün `nfcModuleCompleted` ve `nfcModuleFailed` olaylarında da gelir |
 | `nfcFailureReasons` | Kontrollerin kalma nedenleri, virgülle ayrılmış (neden yoksa anahtar gelmez). Bkz. [Çip doğrulama ayrıntısı](session-exit.md#çip-doğrulama-ayrıntısı) |
 | `verificationWarnings` | Yapılmayan ama oturumu bozmayan kontroller, virgülle ayrılmış (yoksa anahtar gelmez). Şu an tek değer `nfcCertificateChainNotChecked`: çip okundu, sertifika zinciri kontrol edilmedi (`nfcCertificateChain` `notPerformed`) |
+
+İşaret dili isteyen müşteri, projede işaret dili bilen temsilci olmadığı için bekleme ekranındaki
+bildirimde "Tamam"a basarsa (3.3.1) olaylar şu sırayla gelir: `module.Call Wait Screen.skipped`
+(`call` kategorisi, `metadata.reason` = `no_sign_language_agent`; `trackingDelegate`'e
+`videoCallModuleSkipped`), `session.finished` ve `session.abandoned` (`endReason` =
+`noSignLanguageAgent`, `skippedModules` `Call Wait Screen`'i içerir). Ayrıntı:
+[Oturum Çıkışları → Bilinçli çıkış](session-exit.md#43-bilinçli-çıkış).
 
 > 3.0.0'da `session.completed` ve `session.failed` her `terminateCall`'da gönderiliyordu. Başarı
 > da statünün içinde `success` ya da `approve` aranarak belirleniyordu. Panel `positive`

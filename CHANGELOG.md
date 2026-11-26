@@ -7,6 +7,25 @@ Güncel kurulum ve dökümantasyon için [README](README.md)'ye dönebilirsiniz.
 
 ## IdentifySDK
 
+### 3.3.1
+
+**Kırıcı değişiklik**
+- `SDKFlowEndReason` ve `SDKSocketCloseCode`'a `noSignLanguageAgent` eklendi. Bu enum'lar üzerinde `default` olmadan `switch` yazan uygulama derlenmez; `@unknown default` önerilir.
+
+**Yeni**
+- Ekran görüntüsü ve ekran kaydı koruması: `IdentifyManager.shared.screenCaptureProtectionEnabled = true` iken SDK ekranları ekran görüntüsünde ve ekran kaydında boş görünür, ekranda normal çalışır (varsayılan kapalı). Ayar akış başlamadan verilir. Uygulamanın akış içinde kendi açtığı sayfalar kendiliğinden korunmaz; içeriklerine `.sdkScreenCaptureProtected()` eklenir. Sunucuda canlılık videosu kaydı açıksa (`liveness_recording`) canlılık modülünün ekranı korunmaz; selfie + canlılık ekranı korunur ([Ekran koruması](FULL-INTERGATION.md#ekran-görüntüsü-ve-ekran-kaydı-koruması-331)).
+- "Selfie + canlılık" ekranında yön tanılama paneli: cihaz ve ekran yönü, eğim, çekim açısı, çekilen fotoğrafın boyutu ve yönü. `SDKDebugSettings.shared.swlDiagnostics = true` ile açılıyor, varsayılan kapalı. Örnek uygulamada: hamburger menü → Hızlı Ayarlar → Debug Değerleri → Selfie + Canlılık → Yön paneli (HUD).
+- Görüşme: işaret dili isteyen müşteri kuyrukta beklerken projede işaret dili bilen temsilci yoksa bekleme ekranında tek düğmeli bir bildirim çıkıyor; düğme oturumu sonuç ekranı olmadan kapatıyor (sonuç `.cancelled` / `.noSignLanguageAgent`, görüşme `skippedModules`'ta, soket 4121). Özel görüşme ekranı `showNoSignLanguageAgent`'ı okuyup `confirmNoSignLanguageAgent(coordinator:)` çağırır; bildirimi okumayan özel ekranda davranış değişmez, müşteri kuyrukta bekler. Kendi soket dinleyicisini yazan özel ekran bildirimi `SDKSignLanguageListener`'ı benimseyerek alır, oturumu `IdentifyManager.shared.exitForNoSignLanguageAgent()` ile kapatır ([Bekleme Odasında Temsilci Yok Bildirimi](IdentifySample/Modules/CallScreen/CallScreen.md#bekleme-odasında-temsilci-yok-bildirimi-331)).
+
+**Değişti**
+- NFC: kart PACE'i destekliyorsa çip önce PACE ile açılıyor; kartta PACE bilgisi yoksa ya da PACE kurulamazsa BAC kullanılıyor (Android'deki sıra). BAC düşünce PACE'e dönen yedek adım kaldırıldı.
+- Örnek uygulamanın özel görüşme ekranı (`CallScreenCustomView`) işaret dili bilen temsilci yok bildirimini SDK ekranıyla aynı gösteriyor.
+- Örnek uygulamada hamburger menü → Hızlı Ayarlar → Ekran Koruması anahtarı eklendi (varsayılan kapalı, açılışta uygulanır). Özel ekranların kendi açtığı sayfalar da korunuyor: görüşme ekranında MRZ düzeltme, işaret dili ve bağlantı koptu sayfaları; NFC'de MRZ formu; kimlikte kamera sayfası.
+- Örnek uygulamada kimlik taraması belirlenen süreyi aşınca uygulamanın kendi uyarı penceresini açma örneği eklendi: hamburger menü → Hızlı Ayarlar → Kimlik Taramasında Uyarı ([Süre dolunca uyarı penceresi](docs/examples/scanner-guidance.md#süre-dolunca-uyarı-penceresi-321)). Menü "Modül Özelleştirme" ve "Hızlı Ayarlar" altında toplandı.
+
+**Düzeltildi**
+- Görüşme: işaret dili ekranı açıkken müşteri kuyruğa alınmıyor; temsilciye "Devam Et"ten sonra bağlanıyor (Android'deki gibi). Önceden aynı ident hemen yeniden açılınca ya da bu ekrandayken bağlantı kopup gelince seçim yapılmadan temsilciye çağrı düşebiliyordu.
+
 ### 3.3.0
 
 **Kırıcı değişiklik**

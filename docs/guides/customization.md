@@ -378,4 +378,5 @@ B yöntemindeki pasif ekranlar bu kuralın dışında kalır, çünkü hiçbir V
 - [ ] `vm.errorMessage` ve `vm.isLoading` kullanıcıya gösteriliyor; hata kapanınca `vm.consumePendingAlertAction()` çağrılıyor (`.idErrorAlert`'in `onDismiss`'i ya da 3.2.0+ `vm.dismissError()`)
 - [ ] Modülün closure'ları bağlandı (`onSkipRequested`, `onFlowFailed` vb., modül rehberine bakın)
 - [ ] Deneme hakkının bittiği durum test edildi (comparison count'lar sunucudan gelir)
+- [ ] Ekran koruması kullanılıyorsa (3.3.1) ekranın kendi açtığı `sheet` / `fullScreenCover` içeriklerine `.sdkScreenCaptureProtected()` eklendi. Ekranın kendisi akış rotası olduğu için zaten korunur; sunucuda canlılık videosu kaydı (`liveness_recording`) açıksa canlılık modülünün ekranı korunmaz ([Ekran koruması](../../FULL-INTERGATION.md#ekran-görüntüsü-ve-ekran-kaydı-koruması-331))
 - [ ] Akış gerçek cihazda baştan sona denendi (NFC ve görüşme simülatörde çalışmaz)

@@ -86,6 +86,44 @@ extension MyController: SDKSocketListener {
 > DefaultUI'da bu dinleyiciyi `SDKFlowCoordinator` yönetir. CallScreen gibi dinleyiciyi bir süre
 > kendine alan ekranlar kapanırken `coordinator.restoreSocketListener()` çağırır.
 
+İşaret dili bilen temsilci yok bildirimi (`signLanguageUnavailable`, 3.3.1) `SDKCallActions`'a
+çevrilmez. Sunucu bunu, işaret dili isteyen müşteri kuyrukta beklerken projede işaret dili bilen
+temsilci yoksa kuyruktaki ziyaret başına bir kez gönderir; arada böyle bir temsilci gelip giderse
+yeniden gönderebilir. Abonelik reddi (`subRejected`) değildir; bağlantı sürer, müşteri kuyrukta
+kalır. SDK bildirimi yalnız o anki `socketMessageListener`'a, o da `SDKSignLanguageListener`'ı
+benimsiyorsa iletir. DefaultUI'da `SDKCallScreenViewModel` benimser. Kendi dinleyicinizi
+yazdıysanız:
+
+```swift
+extension MyCallViewController: SDKSignLanguageListener {
+    // Ana thread'de gelir. Metot @MainActor değil; @MainActor sınıfta nonisolated yazılır.
+    nonisolated func signLanguageUnavailable() {
+        MainActor.assumeIsolated {
+            guard isWaitingInQueue else { return }   // yalnız müşteri kuyruktayken
+            showNoSignLanguageNotice {               // tek düğmeli bildiriminiz
+                guard self.isWaitingInQueue else { return }   // temsilci aradıysa oturumu kapatma
+                IdentifyManager.shared.exitForNoSignLanguageAgent()   // soket 4121
+                self.closeKycScreens()               // sonuç ekranı yok, ekranları siz kapatın
+            }
+        }
+    }
+}
+```
+
+Bildirimi kapatmak da sizdedir. SDK'nın ekranı bildirimi `incomingCall`, `updateQueue` (yalnız
+sıra `"0"` olunca; sıra ya da süre değişikliği kapatmaz), `missedCall`, `endCall`, karar içeren
+`terminateCall`, `subrejectedDismiss` ve `connectionErr` gelince, yeniden bağlanma ekranı açılınca
+(karar içermeyen `terminateCall`) ve yeniden bağlanınca kapatır. `exitForNoSignLanguageAgent()`
+çağrının çalıp çalmadığına bakmaz: temsilci ararken basılan "Tamam" oturumu
+`cancelled / noSignLanguageAgent` ile kapatır. Dinleyiciniz mesajları `SDKCallScreenViewModel`'e
+aktarıyorsa bu bildirimi de aktarın (`vm.signLanguageUnavailable()`). O zaman bildirimi
+`showNoSignLanguageAgent` ile gösterir, "Tamam"da `confirmNoSignLanguageAgent(coordinator:)`
+çağırırsınız; kapatma koşullarını VM izler.
+
+Protokolü benimsemeyen dinleyicide bir şey değişmez, müşteri kuyrukta bekler. Hazır ve özel
+görüşme ekranındaki bildirim:
+[CallScreen → Bekleme Odasında Temsilci Yok Bildirimi](../../IdentifySample/Modules/CallScreen/CallScreen.md#bekleme-odasında-temsilci-yok-bildirimi-331).
+
 ---
 
 ## Modül → Sunucu Sinyalleri
@@ -346,12 +384,13 @@ Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 > kopmada `.connectionErr` gönderiliyor ve arkada açık kalan WebSocket/WebRTC bağlantıları elle
 > kapatılıyor.
 
-### 4120 · Oda reddi
-Bu kapanışı SDK kendisi yapar ve kod close frame ile sunucuya da gider.
+### 4120–4121 · Oda reddi, işaret dili bilen temsilci yok
+Bu kapanışları SDK kendisi yapar ve kod close frame ile sunucuya da gider.
 
 | Kod | Case | Ne zaman |
 |---|---|---|
 | 4120 | `roomOccupied` | Sunucu odaya kaydı yeniden denemelerden sonra da reddetti (`subRejected`, ör. odada başka bir oturum açık). Oturum biter, `onFinished` `result = .error`, `reason = .roomOccupied` ile gelir |
+| 4121 | `noSignLanguageAgent` | İşaret dili isteyen müşteri kuyrukta beklerken projede işaret dili bilen temsilci yoktu (`signLanguageUnavailable`), müşteri bildirimi onayladı (`confirmNoSignLanguageAgent(coordinator:)` ya da `exitForNoSignLanguageAgent()`, 3.3.1). Oturum biter, `onFinished` `result = .cancelled`, `reason = .noSignLanguageAgent` ile gelir. Sonuç soket kapanmadan üretildiği için `outcome.closeCode` 4121 olmaz |
 
 ### 4130–4133 · Ağ kaynaklı — hepsi LostConnection overlay'ini tetikler
 
