@@ -173,9 +173,14 @@ Metni ezmek: `SDKLocalization.shared.setOverride(key: .addressConfirmTts, langua
   `false`) ya da belge eklenmediyse `canSubmit` `false` kalır.
 - **PDF sınırı:** `maxPDFSizeMB` SDK'da sabittir: 5 MB (`manager.maxAddressPDFFileSize`).
   Daha büyük dosyayı `pdfSelected` almaz, `errorMessage`'ı doldurur. Fotoğrafın boyutuna
-  bakılmaz. Sınırı seçimden önce kullanıcıya gösterin. Hazır ekran bunu seçimden önce
-  `addressFileFormats` metniyle beş dilde gösterir (TR: "PDF (en fazla 5 MB), JPG, JPEG, PNG,
-  WEBP, TIFF").
+  bakılmaz. Sınırı seçimden önce kullanıcıya gösterin. Hazır ekranın seçimden önce gösterdiği
+  `addressFileFormats` metni beş dilde de 15 MB yazar (TR: "PDF, JPG, JPEG, PNG, WEBP, TIFF
+  15MB'den az"). Metni her dil için ayrı düzeltin:
+
+  ```swift
+  SDKLocalization.shared.setOverride(key: .addressFileFormats, language: .tr,
+                                     value: "PDF (en fazla 5 MB), JPG, JPEG, PNG, WEBP, TIFF")
+  ```
 - **Fotoğraf kalitesi:** SDK, adres belgesini okunaklı kalacak sıkıştırma ayarlarıyla yükler
   (2.5.4'te iyileştirildi) — ekstra sıkıştırma yapmayın.
 - **Belge tarayıcısı:** `openScanner()` ile açılan kamera, SDK'nın gerçek zamanlı tarama
