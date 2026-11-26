@@ -73,7 +73,7 @@ IdentifyManager.shared.setupSDK(
 | `onFinished` | `(@MainActor (SDKFlowOutcome) -> Void)?` | `nil` | Oturum nasıl biterse bitsin tam bir kez çağrılır (3.1.0) |
 | `showNFCNotFoundPage` | `Bool?` | `false` | `true`: NFC donanımı olmayan cihazda da NFC modülü akışta kalır, NFC ekranı açılır (ayrı bilgi sayfası yok) |
 | `supportU18` | `Bool?` | `false` | 18 yaş altı desteği |
-| `AESKey` | `String?` | `""` | Sunucudan şifreli gelen MRZ alanlarını çözen anahtar. NFC anahtar düzeltmesinde (`updateReadNFCKeys`) gönderilen alanları da bu anahtar şifreler. NFC adımı varsa `kpsData` verseniz de anahtarı verin; vermezseniz `lastKeyReport` anahtarı `.missing` (SAĞLANMADI) gösterir |
+| `AESKey` | `String?` | `""` | Sunucudan şifreli gelen MRZ alanlarını çözen anahtar. NFC anahtar düzeltmesinde (`updateReadNFCKeys`) gönderilen alanları da bu anahtar şifreler. NFC adımı varsa `kpsData` verseniz de anahtarı verin; `lastKeyReport` bu durumda anahtarı `.notRequired` (GEREKMİYOR) gösterir |
 | `enableAutoRotateOCR` | `Bool?` | `false` | Yamuk çekilmiş kimlik fotoğrafı düzeltilsin mi |
 | `ttsEnabled` | `Bool?` | `false` | Sesli okumayı açmanın kısa yolu (`defaultMode .off` ise `.native` yapar) |
 | `callback` | `@MainActor (SDKWebSocket?, RoomResponse, SDKWebError?) -> ()` | — | Kurulumun sonucu (aşağıda) |
