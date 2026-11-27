@@ -178,7 +178,6 @@ public enum SDKCallNetworkQuality { case none, bad, medium, good }
 | Üye | Tip | Anlam |
 |---|---|---|
 | `showSignLangGate` | `Bool` (r/w) | İşaret dili kapısını göster |
-| `showNoSignLanguageAgent` | `Bool` (salt-okunur) | İşaret dili bilen temsilci yok bildirimini göster (3.3.1). Yalnız işaret dili isteyen müşteri kuyrukta beklerken `true` olur; temsilci arayınca, sıra 0'a gelince, çağrı cevapsız kalınca ya da bitince, bağlantı kopunca kendiliğinden `false` olur. Ayrıntı: [Bekleme Odasında Temsilci Yok Bildirimi](#bekleme-odasında-temsilci-yok-bildirimi-331) |
 | `showLostConnection` | `Bool` (r/w) | Bağlantı-koptu overlay'i |
 
 ### Video (WebRTC)
@@ -204,7 +203,6 @@ Ayrıntı: [Arka Kamera Odağı](#arka-kamera-odağı-330).
 |---|---|
 | `checkSignLangIfNeeded()` | Kapı bekliyorsa (`signLangSupport: true`, `signLangPreference` `nil`) işaret dili kapısını açar |
 | `signLangCompleted()` | İşaret dili adımını tamamlar |
-| `confirmNoSignLanguageAgent(coordinator:)` | İşaret dili bilen temsilci yok bildiriminin düğmesi (3.3.1). Oturumu sonuç ekranı olmadan kapatır, müşteri kuyruğa dönmez. Sonuç: `onFinished` → `cancelled` / `noSignLanguageAgent`, görüşme `skippedModules`'ta, soket 4121. Bildirim artık gösterilmiyorsa (ör. bu arada temsilci aradı) bir şey yapmaz |
 | `acceptCall()` | Çağrıyı kabul eder (`manager.acceptCall`) — TURN kimliği + SDP offer. Çalan çağrı yoksa ya da bağlantı kapanıyorsa **başarısız döner** ve `errorMessage` dolar |
 | `terminateCall(coordinator:)` | Görüşmeyi bitirir + ThankYou'yu `.notCompleted` ile açar (`showThankYouPage: false` ise akış aşağı kayarak kapanır). Dinleyiciyi geri vermez. Sonuç: `onFinished` → `notCompleted` / `userEndedCall`. Panelin kapatması (`terminateCall`) için: [Görüşmenin Kapanışı](../../../docs/guides/websocket.md#görüşmenin-kapanışı--terminatecall) |
 | `verifySMS()` | SMS kodunu doğrular (`manager.smsVerification`) |
@@ -377,50 +375,6 @@ SDKTheme.shared.capture.showsFocusIndicator = false   // kare çizilmez, odak yi
 Görüşme sırasında kamera durursa görüntü kendiliğinden yeniden açılır. Kullanıcıya uyarı
 çıkmaz.
 
-## Bekleme Odasında Temsilci Yok Bildirimi (3.3.1)
-
-Müşteri işaret dili bilen temsilci istediyse ve kuyrukta beklerken projede böyle bir temsilci
-yoksa sunucu `signLanguageUnavailable` gönderir. Müşteri kuyrukta kalır, SDK'nın bekleme
-ekranında tek düğmeli bir bildirim çıkar: "Şu an işaret dili bilen temsilcimiz
-bulunmamaktadır. Lütfen daha sonra tekrar deneyiniz." Dışarı dokunmak bildirimi kapatmaz.
-"Tamam" oturumu kapatır, sonuç ekranı açılmaz:
-
-| | |
-|---|---|
-| `onFinished` | `cancelled / noSignLanguageAgent`, `skippedModules` `.waitScreen`'i içerir (oturumda daha önce atlanan modüller de listede kalır) |
-| Olaylar | `module.Call Wait Screen.skipped` (`metadata.reason` = `no_sign_language_agent`), ardından `session.finished` ve `session.abandoned` |
-| Soket | 4121 (`noSignLanguageAgent`) ile kapanır. Sonuç soket kapanmadan üretildiği için `outcome.closeCode` 4121 değildir |
-
-Kendi görüşme ekranınızda bildirimi siz gösterirsiniz. `showNoSignLanguageAgent`'ı okumayan
-ekranda davranış değişmez, müşteri kuyrukta bekler:
-
-```swift
-.idAlert(isPresented: Binding(
-    get: { vm.showNoSignLanguageAgent && vm.callState == .waiting },
-    set: { _ in }                                   // dışarı dokunmak kapatmaz
-), alert: IDAlertModel(
-    type: .info,
-    title: String(.callNoSignLanguageAgentTitle),
-    message: String(.callNoSignLanguageAgentDesc),
-    actions: [
-        IDAlertAction(title: String(.coreOk), style: .primary) {
-            vm.confirmNoSignLanguageAgent(coordinator: coordinator)   // ✅ oturumu kapatır
-        }
-    ]
-))
-```
-
-[CallScreenCustomView.swift](CallScreenCustomView.swift) bildirimi bu şekilde gösterir.
-
-Soket dinleyicisini VM'e değil kendi nesnenize verdiyseniz bildirim VM'e gelmez. Nesneniz
-mesajları VM'e aktarıyorsa bu bildirimi de aktarsın: `SDKSignLanguageListener`'ı benimseyip
-`vm.signLanguageUnavailable()` çağırır, yukarıdaki kod değişmeden çalışır. VM kullanmıyorsanız
-nesneniz bildirimi kendisi gösterir; `incomingCall`, `updateQueue` (sıra `"0"`), `missedCall`,
-`endCall`, `terminateCall`, `subrejectedDismiss` ve `connectionErr` gelince ve yeniden
-bağlanınca kapatır. Onayda `IdentifyManager.shared.exitForNoSignLanguageAgent()` çağırır; bu
-fonksiyon çağrının çalıp çalmadığına bakmaz. Ekranları kapatmak bu durumda sizdedir. Ayrıntı:
-[WebSocket → Dinleme](../../../docs/guides/websocket.md#dinleme).
-
 ---
 
 ## Sık Sorulanlar & Dikkat Edilecekler
@@ -431,8 +385,7 @@ fonksiyon çağrının çalıp çalmadığına bakmaz. Ekranları kapatmak bu du
   eksik kalırsa sonraki ekranlar soket mesajı almaz.
 - **İşaret dili:** `signLangSupport: true` ise `checkSignLangIfNeeded()` kapıyı açar;
   `signLangPreference` verildiyse açmaz. Ayrıntı:
-  [SignLang rehberi](../SignLang/SignLang.md). Projede işaret dili bilen temsilci yoksa:
-  [Bekleme Odasında Temsilci Yok Bildirimi](#bekleme-odasında-temsilci-yok-bildirimi-331).
+  [SignLang rehberi](../SignLang/SignLang.md).
 - **Bağlantı koparsa:** `showLostConnection` overlay'i devreye girer —
   [LostConnection rehberi](../LostConnection/LostConnection.md).
 - **Görüşme kurulamıyor / tek yönlü medya:** Neredeyse her zaman TURN kimlik sorunudur —

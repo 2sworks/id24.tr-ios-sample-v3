@@ -595,7 +595,7 @@ Ana gruplar:
 | Konuşma tanıma (KYC modülü) | `speechInfoTitle/Text`, `spokenWordLabel`, `soundRecogOk/Fail`, `speechNotRecognized` |
 | İmza | `signatureTitle`, `signatureInfo(Title/Desc)`, `coreDelSig`, `signatureUploadFailed` |
 | Adres | `addressVerifyTitle/Desc`, `choosePhoto`, `chooseFile`, `uploadFile`, `pdfMaxSizeFmt`, `docAddressDesc`, `addressFileFormats` (biçim satırı; metin 15 MB yazar, gerçek sınır yalnız PDF için ve 5 MB) |
-| Görüşme (Call) | `callTitle/Description`, `callConnectingInfo`, `callEndCall`, `callQueuePositionFmt`, `callEstimatedWaitFmt`, `missedCallTitle`, `callNoSignLanguageAgentTitle/Desc` (işaret dili bilen temsilci yok bildirimi) |
+| Görüşme (Call) | `callTitle/Description`, `callConnectingInfo`, `callEndCall`, `callQueuePositionFmt`, `callEstimatedWaitFmt`, `missedCallTitle` |
 | ThankYou | `thankU`, `thankYouMissedTitle`, `thankYouFailedTitle`, `thankYouCompletedDesc`, `resultWillBeNotified` |
 | Bağlantı | `coreNoInternet(Desc)`, `coreReConnect`, `coreReconnecting`, `connectionLostTitle/Desc`, `checkMyConn`, `connectionGood` |
 | Cihaz/izin hataları | `cameraPermissionDenied`, `micPermissionDenied`, `speechPermissionDenied`, `micAccessError`, `cameraAccessError`, `mediaAccessError` |
@@ -968,14 +968,6 @@ gösterir. Ayarlar (`backCameraFocusEnabled`, `tapToFocusEnabled`, `swapsLayoutO
 host'tan odak isteme ve odak karesinin görünümü:
 [CallScreen → Arka Kamera Odağı](IdentifySample/Modules/CallScreen/CallScreen.md#arka-kamera-odağı-330).
 
-### Görüşmede işaret dili bilen temsilci yok bildirimi (3.3.1)
-
-İşaret dili isteyen müşteri kuyrukta beklerken projede işaret dili bilen temsilci yoksa bekleme
-ekranında tek düğmeli bir bildirim çıkar, "Tamam" oturumu sonuç ekranı olmadan kapatır
-(`cancelled / noSignLanguageAgent`). Kendi görüşme ekranınızda `showNoSignLanguageAgent`'ı okuyup
-`confirmNoSignLanguageAgent(coordinator:)` çağırın:
-[CallScreen → Bekleme Odasında Temsilci Yok Bildirimi](IdentifySample/Modules/CallScreen/CallScreen.md#bekleme-odasında-temsilci-yok-bildirimi-331).
-
 ---
 
 ## 9) Ortak UI Bileşenleri
@@ -1228,7 +1220,7 @@ Hepsi main thread'de ve oturum başına **bir kez** çağrılır. Son sonuç
 | `result` | `SDKFlowResult` — ilerleme kararını buna göre verin |
 | `reason` | `SDKFlowEndReason` — ayrıntılı sebep |
 | `lastModule`, `modules`, `stepIndex`, `totalSteps` | Oturumun bittiği yer ve akış sırası |
-| `skippedModules` | Doğrulanmadan geçilen modüller: atlananlar, NFC donanımı ya da yüz takibi olmadığı için cihazda çalışamayanlar, anahtar düzeltme hakkı (`nfcKeyEntry`) biten NFC, işaret dili bilen temsilci olmadığı için kapanan görüşme (`noSignLanguageAgent`). `approved` ile birlikte gelebilir |
+| `skippedModules` | Doğrulanmadan geçilen modüller: atlananlar, NFC donanımı ya da yüz takibi olmadığı için cihazda çalışamayanlar, anahtar düzeltme hakkı (`nfcKeyEntry`) biten NFC. `approved` ile birlikte gelebilir |
 | `verifiedModules` | `modules` içinden atlananlar çıkınca kalanlar. Yalnız `approved` oturumda anlamlı |
 | `terminateReason`, `statusSummary` | Panel kapattıysa birebir (`statusSummary.type`: `positive` / `negative` / `neutral`) |
 | `closeCode`, `errorMessage` | Sonuç üretildiği anda kayıtlı son socket kapanış kodu (karar anında bildirilen yollarda genellikle boş; kesin kod `IdentifyManager.shared.lastSocketCloseCode`'da) / `setupSDK` hatası |
@@ -1252,7 +1244,6 @@ kullanır, dolayısıyla ekranda görünenle bildirilen sonuç ayrışmaz.
 | `userEndedCall` | notCompleted | Kullanıcı görüşmeyi kapattı (`terminateCall` gelmedi) |
 | `moduleFailed` | notCompleted | Deneme hakkı bitti, atlama kapalı |
 | `userExited` / `hostQuit` / `hostExit` / `hostForceQuit` / `appTerminated` | cancelled | Bilinçli çıkış |
-| `noSignLanguageAgent` | cancelled | İşaret dili isteyen müşteri kuyruktayken projede işaret dili bilen temsilci yoktu, müşteri bildirimi onayladı (3.3.1). Görüşme `skippedModules`'ta, soket 4121 ile kapanır (`closeCode` 4121 olmaz) |
 | `roomOccupied` / `connectionLost` / `setupFailed` | error | Oturum kurulamadı ya da sürdürülemedi |
 
 Karar içermeyen sonlandırmalar (statü yok, "Durum Seçilmedi", bağlantı sorunları) sonuç

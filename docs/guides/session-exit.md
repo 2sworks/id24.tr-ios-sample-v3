@@ -92,7 +92,7 @@ arkasına `uyarı: CSCA listesi verilmedi, sertifika zinciri kontrol edilmedi` e
 | `reason` | `SDKFlowEndReason` | Hangi yoldan çıkıldığı (bkz. [Tüm çıkış yolları](#4-tüm-çıkış-yolları)) |
 | `lastModule` | `SdkModules?` | Oturumun bittiği modül (henüz modül açılmadıysa `nil`) |
 | `modules` | `[SdkModules]` | Bu oturumda akışa alınan modüller (cihazda çalışamayanlar hariç) |
-| `skippedModules` | `[SdkModules]` | Doğrulanmadan geçilen modüller: atlananlar, cihazda çalışamayanlar (NFC donanımı ya da yüz takibi yok), anahtar düzeltme hakkı (`nfcKeyEntry`) biten NFC, işaret dili bilen temsilci olmadığı için kapanan görüşme (`waitScreen`, `noSignLanguageAgent`) |
+| `skippedModules` | `[SdkModules]` | Doğrulanmadan geçilen modüller: atlananlar, cihazda çalışamayanlar (NFC donanımı ya da yüz takibi yok), anahtar düzeltme hakkı (`nfcKeyEntry`) biten NFC |
 | `stepIndex` / `totalSteps` | `Int` | Adım sayacı |
 | `terminateReason` | `String?` | Panel kapattıysa sebep, olduğu gibi |
 | `statusSummary` | `StatusSummary?` | Panel kararı: `id`, `type`, `name_tr` / `name_en` / `name_de` |
@@ -183,14 +183,6 @@ gelen `terminateCall` karar sayılmaz ve sonuç üretmez, bkz. [4.5](#45-sonuç-
 | `hostExit` | `cancelled` | Host `exitSDK()` çağırdı | — | 4102 |
 | `hostForceQuit` | `cancelled` | Host `forceQuitSDK()` çağırdı | — | 4103 |
 | `appTerminated` | `cancelled` | Oturum açıkken uygulama kapatıldı (sistem izin verdiği ölçüde; log bir sonraki oturumda gönderilir) | — | — |
-| `noSignLanguageAgent` | `cancelled` | İşaret dili isteyen müşteri kuyrukta beklerken projede işaret dili bilen temsilci yok (`signLanguageUnavailable`, 3.3.1); müşteri bekleme ekranındaki bildirimde "Tamam"a bastı (`confirmNoSignLanguageAgent(coordinator:)` ya da `exitForNoSignLanguageAgent()`) | ThankYou açılmaz (`showThankYouPage`'e bakılmaz); ekran aşağı kayarak kalkar, host'un kök ekranı görünür | 4121 |
-
-`noSignLanguageAgent`'ta `skippedModules` `.waitScreen`'i içerir; oturumda daha önce atlanan
-modüller de listede kalır. Sonuç soket kapanmadan üretildiği için `closeCode` 4121 olmaz; 4121 `lastSocketCloseCode`'da ve `sdk_logs`'ta görünür.
-`exitForNoSignLanguageAgent()`'ı kendi soket dinleyicinizden çağırdıysanız ekranları siz
-kapatırsınız. Bildirimi göstermeyen özel görüşme ekranında sonuç üretilmez, müşteri kuyrukta
-bekler. Ayrıntı:
-[CallScreen → Bekleme Odasında Temsilci Yok Bildirimi](../../IdentifySample/Modules/CallScreen/CallScreen.md#bekleme-odasında-temsilci-yok-bildirimi-331).
 
 ### 4.4 Oturum kurulamadı / sürdürülemedi
 
@@ -634,7 +626,6 @@ Sonlandırma sonucu: panel karar gönderdi (positive), oturum bitiriliyor
 | Temsilci nötr statüyle kapattı (`neutral`) | `neutral / agentDecision` | dolu | 4103 | ThankYou, tamamlanamadı |
 | Temsilci şüpheli bir durum için tanımlı olumsuz statüyü seçti | `rejected / agentDecision` | dolu; `statusSummary.id` ile ayırın | 4103 | ThankYou, tamamlanamadı (sebep gösterilmez) |
 | Müşteri "Görüşmeyi bitir"e bastı | `notCompleted / userEndedCall` | `nil` | 4101 | ThankYou, tamamlanamadı |
-| İşaret dili isteyen müşteri kuyruktayken projede işaret dili bilen temsilci yok, müşteri bildirimde "Tamam"a bastı (3.3.1) | `cancelled / noSignLanguageAgent`, `skippedModules` `.waitScreen`'i içerir | `nil` | 4121 | Açılmaz, host'un kök ekranı |
 | Temsilci statü seçmeden kapattı / bağlantı sorunu | **sonuç yok**. Bağlantı Koptu, ardından bekleme odası | | | |
 | Çağrı cevaplanmadı / cevapsız çağrı | **sonuç yok**. Müşteri bekleme odasında kalır | | | |
 | Görüşme sırasında bağlantı koptu, yeniden bağlanıldı, panelde kayıtlı statü `positive` | `approved / agentDecision` | `statusSummary` dolu, `terminateReason` `nil` | 4103 | ThankYou, başarılı |
@@ -885,7 +876,6 @@ ve [WebSocket → Görüşmenin Kapanışı](websocket.md#görüşmenin-kapanı�
 |---|---|---|
 | Temsilci onayladı / reddetti / nötr kapattı | `approved` · `rejected` · `neutral` / `agentDecision` + `terminateReason`, `statusSummary` | 4103 |
 | Müşteri "Görüşmeyi bitir"e bastı | `notCompleted / userEndedCall` | 4101 |
-| İşaret dili bilen temsilci yok bildiriminde "Tamam" (3.3.1) | `cancelled / noSignLanguageAgent`, `skippedModules` `.waitScreen`'i içerir | 4121 |
 | Görüşme `terminateCall` gelmeden kapandı, akış bitti | `notCompleted / userEndedCall` | 4100 |
 | Temsilci statü seçmeden ya da bağlantı sorunuyla kapattı | Çağrılmaz. Bağlantı Koptu, ardından bekleme odası | |
 | Çağrı cevaplanmadı / cevapsız çağrı | Çağrılmaz. Müşteri bekleme odasında kalır | |
@@ -1077,7 +1067,6 @@ loglayın:
 | Akışı sonuna kadar tamamla | `approved / allModulesCompleted`, `skippedModules` boş |
 | Görüşmede temsilci onaylasın / reddetsin | `approved` / `rejected` + `terminateReason`, `statusSummary` |
 | Kullanıcı görüşmeyi bitirsin | `notCompleted / userEndedCall` |
-| (İşaret dili kullanıyorsanız) İşaret dili isteyip kuyruğa gir, projede işaret dili bilen temsilci olmasın, bildirimde "Tamam"a bas | `cancelled / noSignLanguageAgent`, `skippedModules` `.waitScreen`'i içerir |
 | Bir modülde hakları bitir (atlama kapalı) | `notCompleted / moduleFailed`, `lastModule` doğru |
 | Bir modülde hakları bitir (atlama açık) | `approved`, `skippedModules` o modülü içerir |
 | İlk ekranda geri çık | `cancelled / userExited` |

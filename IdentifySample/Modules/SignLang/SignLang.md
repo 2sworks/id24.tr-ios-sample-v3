@@ -200,10 +200,3 @@ Genel bilgi: [ReadAloud](../ReadAloud.md)
   kapı açılmaz. Kapıyı CallScreen açar (`checkSignLangIfNeeded()`); tek başına bir rota yoktur.
 - **Kuyruk etkisi:** İşaret dili seçen kullanıcı normal görüşme kuyruğuna düşmez —
   doğru temsilci havuzuna yönlendirilir.
-- **Kapı açıkken kuyruk yok (3.3.1):** Kapı ekranı açıkken müşteri kuyruğa alınmaz, temsilciye
-  "Devam Et"ten sonra bağlanır. Önceden aynı ident hemen yeniden açılınca ya da bu ekrandayken
-  bağlantı kopup gelince seçim yapılmadan temsilciye çağrı düşebiliyordu.
-- **Projede işaret dili bilen temsilci yoksa (3.3.1):** Müşteri kuyrukta beklerken bekleme
-  ekranında tek düğmeli bir bildirim çıkar, "Tamam" oturumu kapatır
-  (`cancelled / noSignLanguageAgent`). Ayrıntı:
-  [CallScreen → Bekleme Odasında Temsilci Yok Bildirimi](../CallScreen/CallScreen.md#bekleme-odasında-temsilci-yok-bildirimi-331).

@@ -13,14 +13,13 @@ geçerken SDK tarafında yapmanız gereken bir şey yok.
 
 ### Delegate'ler: hepsi ana thread'de
 
-Delegate protokollerinin metotları `@MainActor` işaretlidir (tek istisna `SDKSignLanguageListener`,
-tablonun altında). SDK bunları içerideki hangi kuyrukta oluşursa oluşsun ana thread'e taşıyarak
-çağırır. Ekranı doğrudan güncelleyebilirsiniz, `DispatchQueue.main.async` gerekmez.
+Delegate protokollerinin bütün metotları `@MainActor` işaretlidir. SDK bunları içerideki hangi
+kuyrukta oluşursa oluşsun ana thread'e taşıyarak çağırır. Ekranı doğrudan güncelleyebilirsiniz,
+`DispatchQueue.main.async` gerekmez.
 
 | Protokol | Atandığı yer | Ne zaman, kaç kez |
 |---|---|---|
 | `SDKSocketListener` | `IdentifyManager.shared.socketMessageListener` | Her soket aksiyonunda bir kez. Bağlantı koptuğunda yerel `connectionErr` |
-| `SDKSignLanguageListener` (3.3.1) | `socketMessageListener` olan nesne ayrıca benimser | `signLanguageUnavailable`: işaret dili bilen temsilci yok. Kuyruktaki ziyaret başına bir kez; arada işaret dili bilen temsilci gelip giderse aynı ziyarette yeniden ([WebSocket → Dinleme](websocket.md#dinleme)) |
 | `IdentifyListenerDelegate` | `IdentifyManager.shared.delegate` | Eski arayüz. `SDKSocketListener` ile aynı aksiyonlar. `incomingCall`, `openNFC`, `skipNFC`, `approvedSms`, `updateQueue`, `missedCall` artık çağrılmaz |
 | `IdentifyManagerListener` | `IdentifyManager.shared.appListenerDelegate` | `sdkResponse` çağrılmaz |
 | `SDKEventListener` | `IdentifyManager.shared.eventDelegate` | Her olayda bir kez |
@@ -28,10 +27,6 @@ tablonun altında). SDK bunları içerideki hangi kuyrukta oluşursa oluşsun an
 | `IdentifyFlowResultListener` | `IdentifyManager.shared.flowResultDelegate` | `identifyFlowDidFinish` oturum başına tam bir kez |
 | `SDKCallLivenessListener` | `SDKCallLiveness.listener` | `onLivenessVerified` bir kez, `onContinuousTrackingProgress` saniyede bir |
 | `PopUpProtocol`, `LoadingViewDelegate` | DefaultUI ekranları | Ekran olayıyla |
-
-> `SDKSignLanguageListener.signLanguageUnavailable()` de ana thread'de gelir ama `@MainActor`
-> işaretli değildir. `@MainActor` bir sınıfta metodu `nonisolated` yazın, ekran işini
-> `MainActor.assumeIsolated { }` içinde yapın.
 
 ### Closure özellikleri: ana thread'de
 
@@ -98,11 +93,7 @@ derlenmesini şart koşar.
 ### Swift 6'ya geçerken sizin tarafınızda
 
 1. Delegate'lerinizi uygulayan sınıfı `@MainActor` yapın ya da metotları `@MainActor` işaretleyin.
-   Protokol metotları zaten `@MainActor` olduğu için Swift bunu ister. Tek istisna
-   `SDKSignLanguageListener` (3.3.1): `signLanguageUnavailable()` `@MainActor` değildir.
-   `@MainActor` sınıfta metodu `nonisolated` yazın, ekran işini `MainActor.assumeIsolated { }`
-   içinde yapın. Metodu ya da sınıfı yalnız `@MainActor` işaretlemek Swift 6'da derleme hatası
-   verir (`InferIsolatedConformances` açıksa `@MainActor` sınıfta vermez).
+   Protokol metotları zaten `@MainActor` olduğu için Swift bunu ister.
 2. Delegate metotlarındaki `DispatchQueue.main.async { }` ve `Task { @MainActor in }` sarmalarını
    silin. Bildirim zaten ana thread'de gelir.
 3. `@MainActor` tipli fonksiyon callback'lerindeki `DispatchQueue.main.async { }` sarmalarını

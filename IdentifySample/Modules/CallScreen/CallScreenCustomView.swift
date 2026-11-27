@@ -25,8 +25,6 @@
 //    endCallEnabled + terminateCall(coordinator:)   görüşmeyi bitir
 //    showNFCEdit + saveAndRestartRemoteNFC(...)     panelin istediği MRZ düzeltmesi
 //    showSignLangGate + signLangCompleted()         işaret dili tercihi
-//    showNoSignLanguageAgent + confirmNoSignLanguageAgent(coordinator:)   işaret dili bilen temsilci yok
-//                                                   (yalnız kuyrukta; okunmazsa müşteri kuyrukta bekler)
 //    showLostConnection + handleReconnectCompleted / handleReconnectCompletedWithStatus
 //    socketThankYouStatus  → coordinator.advanceToNextModule()
 //    directThankYouStatus  → viewModel.finishSDKForDirectThankYou(); coordinator.pushThankYouDirectly(status:)
@@ -103,21 +101,6 @@ struct CallScreenCustomView: View {
                 IDAlertAction(title: String(.coreGiveUp), style: .cancel),
                 IDAlertAction(title: String(.finish), style: .destructive) {
                     viewModel.terminateCall(coordinator: coordinator)
-                }
-            ]
-        ))
-        // İşaret dili bilen temsilci yok: tek düğmeli bildirim, yalnız kuyrukta beklerken.
-        // Dışarı dokunmak kapatmaz; "Tamam" oturumu bitirir (sonuç .cancelled / .noSignLanguageAgent).
-        .idAlert(isPresented: Binding(
-            get: { viewModel.showNoSignLanguageAgent && viewModel.callState == .waiting },
-            set: { _ in }
-        ), alert: IDAlertModel(
-            type: .info,
-            title: String(.callNoSignLanguageAgentTitle),
-            message: String(.callNoSignLanguageAgentDesc),
-            actions: [
-                IDAlertAction(title: String(.coreOk), style: .primary) {
-                    viewModel.confirmNoSignLanguageAgent(coordinator: coordinator)
                 }
             ]
         ))
